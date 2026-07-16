@@ -1,9 +1,9 @@
-platform,local_path,current_version,status,primary_database,main_run_command,last_successful_run,known_issue,github_repository,notes
-Crypto,C:\Users\DevonLockard\Crypto,3.3.4,Partially Operational,,,7/15/2026,Module 14 cannot find core asset rows,,Modules 1 6 10 and 13 have completed successfully
-Metals,C:\Users\DevonLockard\metals,8.1,Operational,,,,,,Dashboard and analytics currently satisfactory
-MTG,,2.10.4,Operational,,,,,,Adaptive Drift Intelligence Engine built
-Housing,C:\Users\DevonLockard\HousingPredictorv6,10,Operational,,,,,,Includes Monte Carlo and best-window analysis
-Macro,,Current Model,Operational,,,,,,CRSI and recession intelligence model
-Personal Finance,,Initial,Planning,,,,,,Income and net worth tracker exists
-Stocks and ETFs,,Not Started,Not Started,,,,,,Needed for VOO SCHD QQQM and future equities
-Universal Platform,C:\Users\DevonLockard\InvestmentPlatform,0.0.1,Foundation,,,,,,Master integration platform
+platform,repository_name,local_path,current_version,status,primary_database,main_run_command,exchange_folder,github_repository,last_verified,known_issue,notes
+Universal Platform,investment-intelligence-platform,C:\Users\DevonLockard\InvestmentPlatform,0.0.1,Foundation,,,exchange\,Not Connected,7/16/2026,,Master integration and portfolio intelligence repository
+Crypto,crypto-intelligence,C:\Users\DevonLockard\Crypto,3.3.4,Partially Operational,,,exchange\crypto,Not Connected,7/16/2026,Module 14 cannot find core asset rows,Modules 1 6 10 and 13 completed successfully
+Metals,metals-intelligence,C:\Users\DevonLockard\metals,8.1,Operational,,,exchange\metals,Not Connected,7/16/2026,,Dashboard and analytics currently satisfactory
+MTG,mtg-intelligence,TO_BE_CONFIRMED,2.10.4,Operational,,,exchange\mtg,Not Connected,7/16/2026,,Currently located on secondary laptop
+Housing,housing-intelligence,C:\Users\DevonLockard\HousingPredictorv6,10,Operational,,,exchange\housing,Not Connected,7/16/2026,,Includes Monte Carlo and purchase-window analysis
+Macro,macro-intelligence,TO_BE_CONFIRMED,Current Model,Operational,,,exchange\macro,Not Connected,7/16/2026,,CRSI and recession intelligence model
+Stocks and ETFs,stock-intelligence,TO_BE_CREATED,Not Started,Not Started,,,exchange\stocks,Not Connected,7/16/2026,,Planned support for VOO SCHD QQQM and future equities
+Personal Finance,personal-finance-intelligence,TO_BE_CONFIRMED,Initial,Planning,,,exchange\personal_finance,Not Connected,7/16/2026,,Income and net worth tracker exists
