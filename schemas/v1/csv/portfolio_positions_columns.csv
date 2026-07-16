@@ -1,0 +1,17 @@
+column_name,data_type,required,description,example
+contract_version,string,yes,Universal contract version,1.0.0
+portfolio_id,string,yes,Portfolio identifier,primary-investment-portfolio
+universal_asset_id,string,yes,Universal asset identifier,crypto:bitcoin
+as_of_date,date,yes,Position date,7/16/2026
+quantity,decimal,no,Units held,0.125
+unit_value,decimal,no,Current value per unit,118500
+position_value,decimal,yes,Total market value,14812.5
+cost_basis,decimal,no,Total cost basis,12000
+unrealized_gain_loss,decimal,no,Unrealized gain or loss,2812.5
+current_weight,decimal,yes,Current portfolio weight,0.18
+target_weight,decimal,no,Target portfolio weight,0.2
+minimum_weight,decimal,no,Minimum permitted weight,0.1
+maximum_weight,decimal,no,Maximum permitted weight,0.3
+monthly_allocation_amount,decimal,no,Planned monthly contribution,990
+source_platform,string,no,Position source system,personal_finance
+last_updated_at_utc,timestamp,yes,Latest update timestamp,2026-07-16T18:06:30Z

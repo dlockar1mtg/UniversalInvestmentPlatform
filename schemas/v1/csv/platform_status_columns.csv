@@ -1,0 +1,15 @@
+column_name,data_type,required,description,example
+contract_version,string,yes,Universal contract version,1.0.0
+platform_id,string,yes,Stable platform identifier,crypto
+platform_name,string,yes,Human-readable platform name,Crypto Intelligence Platform
+platform_version,string,yes,Platform software version,3.3.4
+run_id,string,yes,Unique platform run identifier,53807130-a90a-4570-ba75-18b17e88ee5d
+run_started_at_utc,timestamp,yes,Run start timestamp in UTC,2026-07-16T18:00:00Z
+run_completed_at_utc,timestamp,no,Run completion timestamp in UTC,2026-07-16T18:06:30Z
+run_status,string,yes,success partial failed or running,success
+data_as_of_date,date,yes,Latest date represented by the platform data,7/15/2026
+records_published,integer,yes,Number of primary records published,6
+warning_count,integer,yes,Number of nonfatal warnings,0
+error_count,integer,yes,Number of errors,0
+source_machine,string,no,Logical machine identifier,primary-workstation
+message,string,no,Summary message,Run completed successfully

@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uiip.local/schemas/v1/portfolio_positions.schema.json",
+  "title": "UIIP Portfolio Positions v1",
+  "description": "One portfolio_positions record conforming to Universal Data Contracts 1.0.0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "portfolio_id",
+    "universal_asset_id",
+    "as_of_date",
+    "position_value",
+    "current_weight",
+    "last_updated_at_utc"
+  ],
+  "properties": {
+    "contract_version": {
+      "type": "string",
+      "description": "Universal contract version",
+      "examples": [
+        "1.0.0"
+      ],
+      "const": "1.0.0"
+    },
+    "portfolio_id": {
+      "type": "string",
+      "description": "Portfolio identifier",
+      "examples": [
+        "primary-investment-portfolio"
+      ]
+    },
+    "universal_asset_id": {
+      "type": "string",
+      "description": "Universal asset identifier",
+      "examples": [
+        "crypto:bitcoin"
+      ],
+      "pattern": "^[a-z0-9]+(?:[:][a-z0-9-]+)+$"
+    },
+    "as_of_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Position date",
+      "examples": [
+        "7/16/2026"
+      ]
+    },
+    "quantity": {
+      "type": "number",
+      "description": "Units held",
+      "examples": [
+        "0.125"
+      ]
+    },
+    "unit_value": {
+      "type": "number",
+      "description": "Current value per unit",
+      "examples": [
+        "118500"
+      ]
+    },
+    "position_value": {
+      "type": "number",
+      "description": "Total market value",
+      "examples": [
+        "14812.5"
+      ]
+    },
+    "cost_basis": {
+      "type": "number",
+      "description": "Total cost basis",
+      "examples": [
+        "12000"
+      ]
+    },
+    "unrealized_gain_loss": {
+      "type": "number",
+      "description": "Unrealized gain or loss",
+      "examples": [
+        "2812.5"
+      ]
+    },
+    "current_weight": {
+      "type": "number",
+      "description": "Current portfolio weight",
+      "examples": [
+        "0.18"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "target_weight": {
+      "type": "number",
+      "description": "Target portfolio weight",
+      "examples": [
+        "0.2"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "minimum_weight": {
+      "type": "number",
+      "description": "Minimum permitted weight",
+      "examples": [
+        "0.1"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "maximum_weight": {
+      "type": "number",
+      "description": "Maximum permitted weight",
+      "examples": [
+        "0.3"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "monthly_allocation_amount": {
+      "type": "number",
+      "description": "Planned monthly contribution",
+      "examples": [
+        "990"
+      ]
+    },
+    "source_platform": {
+      "type": "string",
+      "description": "Position source system",
+      "examples": [
+        "personal_finance"
+      ]
+    },
+    "last_updated_at_utc": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Latest update timestamp",
+      "examples": [
+        "2026-07-16T18:06:30Z"
+      ]
+    }
+  }
+}

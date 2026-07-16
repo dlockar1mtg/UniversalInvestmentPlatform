@@ -1,0 +1,16 @@
+column_name,data_type,required,description,example
+contract_version,string,yes,Universal contract version,1.0.0
+platform_id,string,yes,Source platform identifier,macro
+run_id,string,yes,Originating run identifier,macro-20260716-001
+signal_id,string,yes,Stable signal identifier,macro:recession_stress
+signal_name,string,yes,Human-readable signal name,Composite Recession Stress Index
+as_of_date,date,yes,Signal effective date,7/16/2026
+signal_value,decimal,yes,Numeric signal value,64.2
+normalized_score,decimal,no,Normalized score from 0 to 100,64.2
+signal_direction,string,no,rising falling stable or mixed,rising
+signal_state,string,no,Human-readable state,elevated
+confidence_score,decimal,no,Confidence from 0 to 100,81
+applicable_asset_classes,string,no,Pipe-delimited applicable asset classes,equity|crypto|metal
+recommended_action,string,no,Recommended portfolio action,reduce_risk
+description,string,no,Signal explanation,Recession stress has increased
+generated_at_utc,timestamp,yes,Generation timestamp,2026-07-16T18:06:30Z

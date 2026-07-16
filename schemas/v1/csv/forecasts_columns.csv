@@ -1,0 +1,20 @@
+column_name,data_type,required,description,example
+contract_version,string,yes,Universal contract version,1.0.0
+platform_id,string,yes,Source platform identifier,crypto
+run_id,string,yes,Originating run identifier,53807130-a90a-4570-ba75-18b17e88ee5d
+universal_asset_id,string,yes,Universal asset identifier,crypto:bitcoin
+forecast_origin_date,date,yes,Date the forecast begins,7/16/2026
+forecast_horizon_months,integer,yes,Forecast horizon in months,36
+forecast_date,date,yes,Forecast endpoint date,7/16/2029
+current_value,decimal,no,Value at forecast origin,118500
+forecast_value_base,decimal,no,Base-case projected value,175000
+forecast_value_bear,decimal,no,Bear-case projected value,85000
+forecast_value_bull,decimal,no,Bull-case projected value,260000
+expected_total_return,decimal,no,Expected total return as decimal,0.4768
+expected_cagr,decimal,no,Expected annualized return as decimal,0.1383
+probability_positive_return,decimal,no,Probability from 0 to 1,0.74
+forecast_confidence,decimal,no,Confidence from 0 to 100,78
+forecast_method,string,yes,Forecast methodology,monte_carlo
+scenario_name,string,no,Named scenario,base
+model_version,string,no,Forecast model version,3.3.4
+generated_at_utc,timestamp,yes,Generation timestamp,2026-07-16T18:06:30Z

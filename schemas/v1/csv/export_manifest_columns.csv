@@ -1,0 +1,14 @@
+column_name,data_type,required,description,example
+contract_version,string,yes,Universal contract version,1.0.0
+platform_id,string,yes,Source platform identifier,crypto
+run_id,string,yes,Originating run identifier,53807130-a90a-4570-ba75-18b17e88ee5d
+export_name,string,yes,Logical export name,recommendations
+file_name,string,yes,Published filename,recommendations.csv
+file_format,string,yes,csv parquet or json,csv
+schema_name,string,yes,Schema contract name,recommendations
+schema_version,string,yes,Schema version,1.0.0
+record_count,integer,yes,Number of records,6
+file_size_bytes,integer,no,File size in bytes,18452
+sha256,string,no,File checksum,
+created_at_utc,timestamp,yes,Creation timestamp,2026-07-16T18:06:30Z
+validation_status,string,yes,not_validated valid warning or invalid,valid

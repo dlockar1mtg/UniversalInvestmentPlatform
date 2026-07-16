@@ -1,0 +1,124 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uiip.local/schemas/v1/export_manifest.schema.json",
+  "title": "UIIP Export Manifest v1",
+  "description": "One export_manifest record conforming to Universal Data Contracts 1.0.0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "platform_id",
+    "run_id",
+    "export_name",
+    "file_name",
+    "file_format",
+    "schema_name",
+    "schema_version",
+    "record_count",
+    "created_at_utc",
+    "validation_status"
+  ],
+  "properties": {
+    "contract_version": {
+      "type": "string",
+      "description": "Universal contract version",
+      "examples": [
+        "1.0.0"
+      ],
+      "const": "1.0.0"
+    },
+    "platform_id": {
+      "type": "string",
+      "description": "Source platform identifier",
+      "examples": [
+        "crypto"
+      ]
+    },
+    "run_id": {
+      "type": "string",
+      "description": "Originating run identifier",
+      "examples": [
+        "53807130-a90a-4570-ba75-18b17e88ee5d"
+      ]
+    },
+    "export_name": {
+      "type": "string",
+      "description": "Logical export name",
+      "examples": [
+        "recommendations"
+      ]
+    },
+    "file_name": {
+      "type": "string",
+      "description": "Published filename",
+      "examples": [
+        "recommendations.csv"
+      ]
+    },
+    "file_format": {
+      "type": "string",
+      "description": "csv parquet or json",
+      "examples": [
+        "csv"
+      ],
+      "enum": [
+        "csv",
+        "parquet",
+        "json"
+      ]
+    },
+    "schema_name": {
+      "type": "string",
+      "description": "Schema contract name",
+      "examples": [
+        "recommendations"
+      ]
+    },
+    "schema_version": {
+      "type": "string",
+      "description": "Schema version",
+      "examples": [
+        "1.0.0"
+      ]
+    },
+    "record_count": {
+      "type": "integer",
+      "description": "Number of records",
+      "examples": [
+        "6"
+      ]
+    },
+    "file_size_bytes": {
+      "type": "integer",
+      "description": "File size in bytes",
+      "examples": [
+        "18452"
+      ]
+    },
+    "sha256": {
+      "type": "string",
+      "description": "File checksum"
+    },
+    "created_at_utc": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Creation timestamp",
+      "examples": [
+        "2026-07-16T18:06:30Z"
+      ]
+    },
+    "validation_status": {
+      "type": "string",
+      "description": "not_validated valid warning or invalid",
+      "examples": [
+        "valid"
+      ],
+      "enum": [
+        "not_validated",
+        "valid",
+        "warning",
+        "invalid"
+      ]
+    }
+  }
+}

@@ -1,0 +1,166 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uiip.local/schemas/v1/risk_metrics.schema.json",
+  "title": "UIIP Risk Metrics v1",
+  "description": "One risk_metrics record conforming to Universal Data Contracts 1.0.0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "platform_id",
+    "run_id",
+    "universal_asset_id",
+    "as_of_date",
+    "risk_score",
+    "risk_level",
+    "generated_at_utc"
+  ],
+  "properties": {
+    "contract_version": {
+      "type": "string",
+      "description": "Universal contract version",
+      "examples": [
+        "1.0.0"
+      ],
+      "const": "1.0.0"
+    },
+    "platform_id": {
+      "type": "string",
+      "description": "Source platform identifier",
+      "examples": [
+        "crypto"
+      ]
+    },
+    "run_id": {
+      "type": "string",
+      "description": "Originating run identifier",
+      "examples": [
+        "53807130-a90a-4570-ba75-18b17e88ee5d"
+      ]
+    },
+    "universal_asset_id": {
+      "type": "string",
+      "description": "Universal asset identifier",
+      "examples": [
+        "crypto:bitcoin"
+      ],
+      "pattern": "^[a-z0-9]+(?:[:][a-z0-9-]+)+$"
+    },
+    "as_of_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Risk metric effective date",
+      "examples": [
+        "7/16/2026"
+      ]
+    },
+    "risk_score": {
+      "type": "number",
+      "description": "Normalized risk score from 0 to 100",
+      "examples": [
+        "72"
+      ],
+      "minimum": 0,
+      "maximum": 100
+    },
+    "risk_level": {
+      "type": "string",
+      "description": "low medium high or extreme",
+      "examples": [
+        "high"
+      ],
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "extreme"
+      ]
+    },
+    "annualized_volatility": {
+      "type": "number",
+      "description": "Annualized volatility as decimal",
+      "examples": [
+        "0.62"
+      ]
+    },
+    "maximum_drawdown": {
+      "type": "number",
+      "description": "Maximum historical drawdown as decimal",
+      "examples": [
+        "-0.77"
+      ]
+    },
+    "downside_deviation": {
+      "type": "number",
+      "description": "Annualized downside deviation",
+      "examples": [
+        "0.41"
+      ]
+    },
+    "value_at_risk_95": {
+      "type": "number",
+      "description": "95 percent value at risk",
+      "examples": [
+        "-0.085"
+      ]
+    },
+    "liquidity_risk_score": {
+      "type": "number",
+      "description": "Liquidity risk from 0 to 100",
+      "examples": [
+        "8"
+      ],
+      "minimum": 0,
+      "maximum": 100
+    },
+    "concentration_risk_score": {
+      "type": "number",
+      "description": "Concentration risk from 0 to 100",
+      "examples": [
+        "65"
+      ],
+      "minimum": 0,
+      "maximum": 100
+    },
+    "model_risk_score": {
+      "type": "number",
+      "description": "Model uncertainty risk from 0 to 100",
+      "examples": [
+        "35"
+      ],
+      "minimum": 0,
+      "maximum": 100
+    },
+    "data_quality_score": {
+      "type": "number",
+      "description": "Data quality from 0 to 100",
+      "examples": [
+        "96"
+      ],
+      "minimum": 0,
+      "maximum": 100
+    },
+    "risk_notes": {
+      "type": "string",
+      "description": "Short risk description",
+      "examples": [
+        "High volatility with strong liquidity"
+      ]
+    },
+    "lookback_days": {
+      "type": "integer",
+      "description": "Historical lookback used",
+      "examples": [
+        "365"
+      ]
+    },
+    "generated_at_utc": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Generation timestamp",
+      "examples": [
+        "2026-07-16T18:06:30Z"
+      ]
+    }
+  }
+}

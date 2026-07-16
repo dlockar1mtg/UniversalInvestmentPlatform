@@ -1,0 +1,173 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uiip.local/schemas/v1/recommendations.schema.json",
+  "title": "UIIP Recommendations v1",
+  "description": "One recommendations record conforming to Universal Data Contracts 1.0.0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "platform_id",
+    "run_id",
+    "universal_asset_id",
+    "as_of_date",
+    "recommendation",
+    "normalized_score",
+    "confidence_score",
+    "generated_at_utc"
+  ],
+  "properties": {
+    "contract_version": {
+      "type": "string",
+      "description": "Universal contract version",
+      "examples": [
+        "1.0.0"
+      ],
+      "const": "1.0.0"
+    },
+    "platform_id": {
+      "type": "string",
+      "description": "Source platform identifier",
+      "examples": [
+        "crypto"
+      ]
+    },
+    "run_id": {
+      "type": "string",
+      "description": "Originating run identifier",
+      "examples": [
+        "53807130-a90a-4570-ba75-18b17e88ee5d"
+      ]
+    },
+    "universal_asset_id": {
+      "type": "string",
+      "description": "Universal asset identifier",
+      "examples": [
+        "crypto:bitcoin"
+      ],
+      "pattern": "^[a-z0-9]+(?:[:][a-z0-9-]+)+$"
+    },
+    "as_of_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Recommendation effective date",
+      "examples": [
+        "7/16/2026"
+      ]
+    },
+    "recommendation": {
+      "type": "string",
+      "description": "Standard recommendation vocabulary",
+      "examples": [
+        "buy"
+      ],
+      "enum": [
+        "strong_buy",
+        "buy",
+        "accumulate",
+        "hold",
+        "reduce",
+        "sell",
+        "strong_sell",
+        "watch",
+        "not_ready",
+        "insufficient_data"
+      ]
+    },
+    "normalized_score": {
+      "type": "number",
+      "description": "Universal score from 0 to 100",
+      "examples": [
+        "82.5"
+      ],
+      "minimum": 0,
+      "maximum": 100
+    },
+    "confidence_score": {
+      "type": "number",
+      "description": "Confidence from 0 to 100",
+      "examples": [
+        "88"
+      ],
+      "minimum": 0,
+      "maximum": 100
+    },
+    "platform_native_score": {
+      "type": "number",
+      "description": "Original platform score",
+      "examples": [
+        "7.8"
+      ]
+    },
+    "platform_native_label": {
+      "type": "string",
+      "description": "Original recommendation label",
+      "examples": [
+        "ACCUMULATE"
+      ]
+    },
+    "time_horizon": {
+      "type": "string",
+      "description": "Recommendation horizon",
+      "examples": [
+        "3_year"
+      ]
+    },
+    "target_weight": {
+      "type": "number",
+      "description": "Suggested portfolio weight as a decimal",
+      "examples": [
+        "0.15"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "minimum_weight": {
+      "type": "number",
+      "description": "Minimum suggested weight",
+      "examples": [
+        "0.05"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "maximum_weight": {
+      "type": "number",
+      "description": "Maximum suggested weight",
+      "examples": [
+        "0.25"
+      ],
+      "minimum": 0,
+      "maximum": 1
+    },
+    "rationale_summary": {
+      "type": "string",
+      "description": "Short recommendation rationale",
+      "examples": [
+        "Strong trend and favorable valuation"
+      ]
+    },
+    "primary_risk": {
+      "type": "string",
+      "description": "Primary identified risk",
+      "examples": [
+        "high volatility"
+      ]
+    },
+    "model_version": {
+      "type": "string",
+      "description": "Model or scoring version",
+      "examples": [
+        "13"
+      ]
+    },
+    "generated_at_utc": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Generation timestamp",
+      "examples": [
+        "2026-07-16T18:06:30Z"
+      ]
+    }
+  }
+}

@@ -1,0 +1,18 @@
+column_name,data_type,required,description,example
+contract_version,string,yes,Universal contract version,1.0.0
+platform_id,string,yes,Source platform identifier,crypto
+run_id,string,yes,Originating run identifier,53807130-a90a-4570-ba75-18b17e88ee5d
+universal_asset_id,string,yes,Stable universal asset identifier,crypto:bitcoin
+platform_asset_id,string,yes,Platform-native asset identifier,bitcoin
+asset_name,string,yes,Human-readable asset name,Bitcoin
+asset_symbol,string,no,Ticker or short symbol,BTC
+asset_class,string,yes,Universal asset classification,crypto
+asset_subclass,string,no,More specific classification,large_cap_crypto
+currency,string,no,Primary valuation currency,USD
+market_or_region,string,no,Market geography or region,global
+is_active,boolean,yes,Whether the asset is active,TRUE
+investable,boolean,yes,Whether the asset may receive allocation,TRUE
+liquidity_tier,string,no,high medium low or illiquid,high
+data_source,string,no,Primary source name,CoinGecko
+first_available_date,date,no,Earliest supported history date,4/28/2013
+last_updated_at_utc,timestamp,yes,Latest record update timestamp,2026-07-16T18:06:30Z

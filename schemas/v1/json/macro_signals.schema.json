@@ -1,0 +1,138 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uiip.local/schemas/v1/macro_signals.schema.json",
+  "title": "UIIP Macro Signals v1",
+  "description": "One macro_signals record conforming to Universal Data Contracts 1.0.0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "platform_id",
+    "run_id",
+    "signal_id",
+    "signal_name",
+    "as_of_date",
+    "signal_value",
+    "generated_at_utc"
+  ],
+  "properties": {
+    "contract_version": {
+      "type": "string",
+      "description": "Universal contract version",
+      "examples": [
+        "1.0.0"
+      ],
+      "const": "1.0.0"
+    },
+    "platform_id": {
+      "type": "string",
+      "description": "Source platform identifier",
+      "examples": [
+        "macro"
+      ]
+    },
+    "run_id": {
+      "type": "string",
+      "description": "Originating run identifier",
+      "examples": [
+        "macro-20260716-001"
+      ]
+    },
+    "signal_id": {
+      "type": "string",
+      "description": "Stable signal identifier",
+      "examples": [
+        "macro:recession_stress"
+      ]
+    },
+    "signal_name": {
+      "type": "string",
+      "description": "Human-readable signal name",
+      "examples": [
+        "Composite Recession Stress Index"
+      ]
+    },
+    "as_of_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Signal effective date",
+      "examples": [
+        "7/16/2026"
+      ]
+    },
+    "signal_value": {
+      "type": "number",
+      "description": "Numeric signal value",
+      "examples": [
+        "64.2"
+      ]
+    },
+    "normalized_score": {
+      "type": "number",
+      "description": "Normalized score from 0 to 100",
+      "examples": [
+        "64.2"
+      ],
+      "minimum": 0,
+      "maximum": 100
+    },
+    "signal_direction": {
+      "type": "string",
+      "description": "rising falling stable or mixed",
+      "examples": [
+        "rising"
+      ],
+      "enum": [
+        "rising",
+        "falling",
+        "stable",
+        "mixed"
+      ]
+    },
+    "signal_state": {
+      "type": "string",
+      "description": "Human-readable state",
+      "examples": [
+        "elevated"
+      ]
+    },
+    "confidence_score": {
+      "type": "number",
+      "description": "Confidence from 0 to 100",
+      "examples": [
+        "81"
+      ],
+      "minimum": 0,
+      "maximum": 100
+    },
+    "applicable_asset_classes": {
+      "type": "string",
+      "description": "Pipe-delimited applicable asset classes",
+      "examples": [
+        "equity|crypto|metal"
+      ]
+    },
+    "recommended_action": {
+      "type": "string",
+      "description": "Recommended portfolio action",
+      "examples": [
+        "reduce_risk"
+      ]
+    },
+    "description": {
+      "type": "string",
+      "description": "Signal explanation",
+      "examples": [
+        "Recession stress has increased"
+      ]
+    },
+    "generated_at_utc": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Generation timestamp",
+      "examples": [
+        "2026-07-16T18:06:30Z"
+      ]
+    }
+  }
+}

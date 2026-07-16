@@ -1,0 +1,131 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uiip.local/schemas/v1/platform_status.schema.json",
+  "title": "UIIP Platform Status v1",
+  "description": "One platform_status record conforming to Universal Data Contracts 1.0.0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "platform_id",
+    "platform_name",
+    "platform_version",
+    "run_id",
+    "run_started_at_utc",
+    "run_status",
+    "data_as_of_date",
+    "records_published",
+    "warning_count",
+    "error_count"
+  ],
+  "properties": {
+    "contract_version": {
+      "type": "string",
+      "description": "Universal contract version",
+      "examples": [
+        "1.0.0"
+      ],
+      "const": "1.0.0"
+    },
+    "platform_id": {
+      "type": "string",
+      "description": "Stable platform identifier",
+      "examples": [
+        "crypto"
+      ]
+    },
+    "platform_name": {
+      "type": "string",
+      "description": "Human-readable platform name",
+      "examples": [
+        "Crypto Intelligence Platform"
+      ]
+    },
+    "platform_version": {
+      "type": "string",
+      "description": "Platform software version",
+      "examples": [
+        "3.3.4"
+      ]
+    },
+    "run_id": {
+      "type": "string",
+      "description": "Unique platform run identifier",
+      "examples": [
+        "53807130-a90a-4570-ba75-18b17e88ee5d"
+      ]
+    },
+    "run_started_at_utc": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Run start timestamp in UTC",
+      "examples": [
+        "2026-07-16T18:00:00Z"
+      ]
+    },
+    "run_completed_at_utc": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Run completion timestamp in UTC",
+      "examples": [
+        "2026-07-16T18:06:30Z"
+      ]
+    },
+    "run_status": {
+      "type": "string",
+      "description": "success partial failed or running",
+      "examples": [
+        "success"
+      ],
+      "enum": [
+        "success",
+        "partial",
+        "failed",
+        "running"
+      ]
+    },
+    "data_as_of_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Latest date represented by the platform data",
+      "examples": [
+        "7/15/2026"
+      ]
+    },
+    "records_published": {
+      "type": "integer",
+      "description": "Number of primary records published",
+      "examples": [
+        "6"
+      ]
+    },
+    "warning_count": {
+      "type": "integer",
+      "description": "Number of nonfatal warnings",
+      "examples": [
+        "0"
+      ]
+    },
+    "error_count": {
+      "type": "integer",
+      "description": "Number of errors",
+      "examples": [
+        "0"
+      ]
+    },
+    "source_machine": {
+      "type": "string",
+      "description": "Logical machine identifier",
+      "examples": [
+        "primary-workstation"
+      ]
+    },
+    "message": {
+      "type": "string",
+      "description": "Summary message",
+      "examples": [
+        "Run completed successfully"
+      ]
+    }
+  }
+}

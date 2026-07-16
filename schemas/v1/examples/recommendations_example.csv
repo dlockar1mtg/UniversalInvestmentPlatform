@@ -1,0 +1,4 @@
+contract_version,platform_id,run_id,universal_asset_id,as_of_date,recommendation,normalized_score,confidence_score,platform_native_score,platform_native_label,time_horizon,target_weight,minimum_weight,maximum_weight,rationale_summary,primary_risk,model_version,generated_at_utc
+1.0.0,crypto,example-run-001,crypto:bitcoin,2026-07-16,buy,82.5,88.0,7.8,ACCUMULATE,3_year,0.15,0.05,0.25,Strong trend and favorable long-term adoption,High volatility,13.0,2026-07-16T18:06:30Z
+1.0.0,metals,example-run-002,etf:gld,2026-07-16,hold,56.8,74.0,56.8,HOLD,3_year,0.03,0.00,0.08,Portfolio hedge with moderate expected return,Rate sensitivity,8.1,2026-07-16T18:06:30Z
+1.0.0,mtg,example-run-003,collectible:mtg:final-fantasy-collector-booster-display,2026-07-16,accumulate,78.0,72.0,78.0,BUY,3_year,0.04,0.00,0.08,Strong collector demand and limited sealed supply,Reprint and liquidity risk,2.10.4,2026-07-16T18:06:30Z

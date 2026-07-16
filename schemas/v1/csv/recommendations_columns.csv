@@ -1,0 +1,19 @@
+column_name,data_type,required,description,example
+contract_version,string,yes,Universal contract version,1.0.0
+platform_id,string,yes,Source platform identifier,crypto
+run_id,string,yes,Originating run identifier,53807130-a90a-4570-ba75-18b17e88ee5d
+universal_asset_id,string,yes,Universal asset identifier,crypto:bitcoin
+as_of_date,date,yes,Recommendation effective date,7/16/2026
+recommendation,string,yes,Standard recommendation vocabulary,buy
+normalized_score,decimal,yes,Universal score from 0 to 100,82.5
+confidence_score,decimal,yes,Confidence from 0 to 100,88
+platform_native_score,decimal,no,Original platform score,7.8
+platform_native_label,string,no,Original recommendation label,ACCUMULATE
+time_horizon,string,no,Recommendation horizon,3_year
+target_weight,decimal,no,Suggested portfolio weight as a decimal,0.15
+minimum_weight,decimal,no,Minimum suggested weight,0.05
+maximum_weight,decimal,no,Maximum suggested weight,0.25
+rationale_summary,string,no,Short recommendation rationale,Strong trend and favorable valuation
+primary_risk,string,no,Primary identified risk,high volatility
+model_version,string,no,Model or scoring version,13
+generated_at_utc,timestamp,yes,Generation timestamp,2026-07-16T18:06:30Z

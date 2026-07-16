@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uiip.local/schemas/v1/asset_master.schema.json",
+  "title": "UIIP Asset Master v1",
+  "description": "One asset_master record conforming to Universal Data Contracts 1.0.0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "platform_id",
+    "run_id",
+    "universal_asset_id",
+    "platform_asset_id",
+    "asset_name",
+    "asset_class",
+    "is_active",
+    "investable",
+    "last_updated_at_utc"
+  ],
+  "properties": {
+    "contract_version": {
+      "type": "string",
+      "description": "Universal contract version",
+      "examples": [
+        "1.0.0"
+      ],
+      "const": "1.0.0"
+    },
+    "platform_id": {
+      "type": "string",
+      "description": "Source platform identifier",
+      "examples": [
+        "crypto"
+      ]
+    },
+    "run_id": {
+      "type": "string",
+      "description": "Originating run identifier",
+      "examples": [
+        "53807130-a90a-4570-ba75-18b17e88ee5d"
+      ]
+    },
+    "universal_asset_id": {
+      "type": "string",
+      "description": "Stable universal asset identifier",
+      "examples": [
+        "crypto:bitcoin"
+      ],
+      "pattern": "^[a-z0-9]+(?:[:][a-z0-9-]+)+$"
+    },
+    "platform_asset_id": {
+      "type": "string",
+      "description": "Platform-native asset identifier",
+      "examples": [
+        "bitcoin"
+      ]
+    },
+    "asset_name": {
+      "type": "string",
+      "description": "Human-readable asset name",
+      "examples": [
+        "Bitcoin"
+      ]
+    },
+    "asset_symbol": {
+      "type": "string",
+      "description": "Ticker or short symbol",
+      "examples": [
+        "BTC"
+      ]
+    },
+    "asset_class": {
+      "type": "string",
+      "description": "Universal asset classification",
+      "examples": [
+        "crypto"
+      ],
+      "enum": [
+        "crypto",
+        "equity",
+        "etf",
+        "metal",
+        "commodity",
+        "collectible",
+        "real_estate",
+        "cash",
+        "bond",
+        "macro_signal",
+        "personal_finance"
+      ]
+    },
+    "asset_subclass": {
+      "type": "string",
+      "description": "More specific classification",
+      "examples": [
+        "large_cap_crypto"
+      ]
+    },
+    "currency": {
+      "type": "string",
+      "description": "Primary valuation currency",
+      "examples": [
+        "USD"
+      ]
+    },
+    "market_or_region": {
+      "type": "string",
+      "description": "Market geography or region",
+      "examples": [
+        "global"
+      ]
+    },
+    "is_active": {
+      "type": "boolean",
+      "description": "Whether the asset is active",
+      "examples": [
+        "TRUE"
+      ]
+    },
+    "investable": {
+      "type": "boolean",
+      "description": "Whether the asset may receive allocation",
+      "examples": [
+        "TRUE"
+      ]
+    },
+    "liquidity_tier": {
+      "type": "string",
+      "description": "high medium low or illiquid",
+      "examples": [
+        "high"
+      ],
+      "enum": [
+        "high",
+        "medium",
+        "low",
+        "illiquid"
+      ]
+    },
+    "data_source": {
+      "type": "string",
+      "description": "Primary source name",
+      "examples": [
+        "CoinGecko"
+      ]
+    },
+    "first_available_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Earliest supported history date",
+      "examples": [
+        "4/28/2013"
+      ]
+    },
+    "last_updated_at_utc": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Latest record update timestamp",
+      "examples": [
+        "2026-07-16T18:06:30Z"
+      ]
+    }
+  }
+}

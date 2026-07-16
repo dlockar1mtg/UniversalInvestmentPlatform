@@ -1,0 +1,4 @@
+contract_version,platform_id,run_id,universal_asset_id,platform_asset_id,asset_name,asset_symbol,asset_class,asset_subclass,currency,market_or_region,is_active,investable,liquidity_tier,data_source,first_available_date,last_updated_at_utc
+1.0.0,crypto,example-run-001,crypto:bitcoin,bitcoin,Bitcoin,BTC,crypto,large_cap_crypto,USD,global,true,true,high,CoinGecko,2013-04-28,2026-07-16T18:06:30Z
+1.0.0,metals,example-run-002,etf:gld,GLD,SPDR Gold Shares,GLD,etf,physical_gold_etf,USD,USA,true,true,high,Market Data Provider,2004-11-18,2026-07-16T18:06:30Z
+1.0.0,mtg,example-run-003,collectible:mtg:final-fantasy-collector-booster-display,24219,Final Fantasy Collector Booster Display,,collectible,mtg_sealed_product,USD,USA,true,true,medium,TCGplayer,2025-06-13,2026-07-16T18:06:30Z
