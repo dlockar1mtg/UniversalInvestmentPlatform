@@ -1,0 +1,9 @@
+platform,local_path,current_version,status,primary_database,main_run_command,last_successful_run,known_issue,github_repository,notes
+Crypto,C:\Users\DevonLockard\Crypto,3.3.4,Partially Operational,,,7/15/2026,Module 14 cannot find core asset rows,,Modules 1 6 10 and 13 have completed successfully
+Metals,C:\Users\DevonLockard\metals,8.1,Operational,,,,,,Dashboard and analytics currently satisfactory
+MTG,,2.10.4,Operational,,,,,,Adaptive Drift Intelligence Engine built
+Housing,C:\Users\DevonLockard\HousingPredictorv6,10,Operational,,,,,,Includes Monte Carlo and best-window analysis
+Macro,,Current Model,Operational,,,,,,CRSI and recession intelligence model
+Personal Finance,,Initial,Planning,,,,,,Income and net worth tracker exists
+Stocks and ETFs,,Not Started,Not Started,,,,,,Needed for VOO SCHD QQQM and future equities
+Universal Platform,C:\Users\DevonLockard\InvestmentPlatform,0.0.1,Foundation,,,,,,Master integration platform

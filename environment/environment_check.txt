@@ -1,0 +1,38 @@
+Universal Investment Intelligence Platform
+Development Environment Check
+============================================================
+Generated: 2026-07-16T14:23:41
+
+Operating system: Windows-11-10.0.26200-SP0
+Python version: 3.14.6 (tags/v3.14.6:c63aec6, Jun 10 2026, 10:26:10) [MSC v.1944 64 bit (AMD64)]
+Python executable: C:\Users\DevonLockard\AppData\Local\Python\pythoncore-3.14-64\python.exe
+Git executable: C:\Users\DevonLockard\AppData\Local\Programs\Git\cmd\git.EXE
+VS Code executable: NOT FOUND
+
+Git version:
+git version 2.55.0.windows.3
+
+pip version:
+pip 26.1.2 from C:\Users\DevonLockard\AppData\Local\Python\pythoncore-3.14-64\Lib\site-packages\pip (python 3.14)
+
+Package validation:
+- pandas: 3.0.3
+- duckdb: 1.5.4
+- py7zr: 1.1.3
+- pyppmd: 1.3.1
+- psutil: 7.2.2
+
+Archive command validation:
+py7zr.cli Version 1.1.3 : Copyright (C) 2019-2021 Hiroshi Miura (Python 3.14.6 [CPython MSC v.1944 64 bit (AMD64)])
+
+Workspace validation:
+- config: FOUND
+- data: FOUND
+- docs: FOUND
+- environment: FOUND
+- exchange: FOUND
+- logs: FOUND
+- registry: FOUND
+- schemas: FOUND
+- scripts: FOUND
+- tests: FOUND

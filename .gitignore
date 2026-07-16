@@ -1,0 +1,173 @@
+# ============================================================
+# Universal Investment Intelligence Platform
+# Master .gitignore
+# ============================================================
+
+# ------------------------------------------------------------
+# Python
+# ------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# ------------------------------------------------------------
+# Secrets / Local Configuration
+# ------------------------------------------------------------
+.env
+.env.*
+!.env.example
+
+*.key
+*.pem
+*.pfx
+
+credentials.*
+secrets.*
+config.local.*
+settings.local.*
+
+# ------------------------------------------------------------
+# Logs
+# ------------------------------------------------------------
+logs/*
+!logs/.gitkeep
+
+*.log
+
+# ------------------------------------------------------------
+# Databases
+# ------------------------------------------------------------
+*.duckdb
+*.duckdb.wal
+*.db
+*.db-journal
+*.sqlite
+*.sqlite3
+
+# ------------------------------------------------------------
+# Raw Archives
+# ------------------------------------------------------------
+extracted/
+
+*.7z
+*.zip
+*.rar
+*.tar
+*.gz
+*.bz2
+*.xz
+
+# ------------------------------------------------------------
+# Generated Data
+# ------------------------------------------------------------
+
+# Integration
+data/integration/*
+!data/integration/.gitkeep
+
+# Validation
+data/validation/*
+!data/validation/.gitkeep
+
+# Generated exports
+data/exports/*
+!data/exports/.gitkeep
+
+# Keep reference tables under source control
+!data/reference/
+!data/reference/**
+
+# ------------------------------------------------------------
+# Exchange Layer
+# ------------------------------------------------------------
+
+exchange/crypto/*
+exchange/metals/*
+exchange/mtg/*
+exchange/housing/*
+exchange/macro/*
+exchange/stocks/*
+exchange/personal_finance/*
+
+!exchange/crypto/.gitkeep
+!exchange/metals/.gitkeep
+!exchange/mtg/.gitkeep
+!exchange/housing/.gitkeep
+!exchange/macro/.gitkeep
+!exchange/stocks/.gitkeep
+!exchange/personal_finance/.gitkeep
+
+# ------------------------------------------------------------
+# Generated Data Files
+# ------------------------------------------------------------
+
+# Universal outputs
+*.parquet
+*.feather
+
+# Ignore generated CSV exports only
+exchange/**/*.csv
+data/exports/**/*.csv
+
+# ------------------------------------------------------------
+# Machine-Specific Environment Files
+# ------------------------------------------------------------
+
+environment/path.txt
+environment/systeminfo.txt
+environment/cpu_info.txt
+environment/memory_info.txt
+environment/disk_info.txt
+environment/pip_outdated.txt
+
+# Keep these as documentation
+!environment/DEVELOPMENT_BASELINE.md
+!environment/environment_check.txt
+!environment/pip_freeze_full.txt
+!environment/pip_list.txt
+
+# ------------------------------------------------------------
+# Backups / Temporary Files
+# ------------------------------------------------------------
+
+backup/
+backups/
+
+*.bak
+*.old
+*.orig
+*.tmp
+*.temp
+
+*_backup_*
+*_before_*
+
+# ------------------------------------------------------------
+# IDE / Editor
+# ------------------------------------------------------------
+
+.vscode/
+.idea/
+
+# ------------------------------------------------------------
+# Operating System
+# ------------------------------------------------------------
+
+.DS_Store
+Thumbs.db
+desktop.ini
