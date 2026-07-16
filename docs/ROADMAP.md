@@ -68,7 +68,7 @@ Deliverables:
 
 
 
-Status: In Progress
+Status: Complete
 
 
 
@@ -96,7 +96,39 @@ Deliverables:
 
 ### 0.5 — Integration Framework
 
-Status: Not Started
+\### 0.5 — Integration Framework
+
+
+
+Status: Complete
+
+
+
+Deliverables:
+
+
+
+\- Central DuckDB integration database
+
+\- Metadata and audit tables
+
+\- Registry database tables
+
+\- Universal contract tables
+
+\- Contract CSV importer
+
+\- Duplicate-import protection
+
+\- Transactional imports
+
+\- Universal analytical views
+
+\- Integration database validator
+
+\- Safe database reset utility
+
+\- End-to-end integration smoke test
 
 ### 0.6 — Validation Framework
 
