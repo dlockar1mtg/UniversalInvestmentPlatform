@@ -1,0 +1,24 @@
+column_name,data_type,required,description,example
+registry_version,string,yes,Platform registry contract version,1.0.0
+platform_id,string,yes,Stable lowercase platform identifier,crypto
+platform_name,string,yes,Human-readable platform name,Crypto Intelligence Platform
+repository_name,string,yes,Preferred repository name,crypto-intelligence
+local_path,string,no,Current local repository path,C:\Users\DevonLockard\Crypto
+machine_id,string,yes,Machine assigned to run the platform,primary-workstation
+platform_version,string,no,Current application version,3.3.4
+platform_status,string,yes,Manually assigned operational status,partially_operational
+integration_stage,string,yes,Current Universal Platform integration stage,inventory
+primary_database,string,no,Primary platform database path or name,crypto.duckdb
+main_run_command,string,no,Primary run command,python run_pipeline.py
+validation_command,string,no,Primary validation command,python run_validation.py
+dashboard_command,string,no,Dashboard launch command,python dashboard.py
+exchange_folder,string,yes,Universal exchange directory,exchange\crypto
+published_contracts,string,no,Pipe-delimited Universal contracts,platform_status|asset_master|recommendations
+expected_refresh_frequency,string,yes,Expected refresh cadence,daily
+freshness_threshold_hours,integer,no,Hours before output is considered stale,48
+last_verified_date,date,no,Last manually verified date,2026-07-16
+last_successful_run_at_utc,timestamp,no,Most recent confirmed successful run,2026-07-16T18:00:00Z
+known_issue,string,no,Most important current issue,Module 14 cannot find core asset rows
+github_repository,string,no,GitHub repository URL or status,not_connected
+is_enabled,boolean,yes,Whether Universal Platform should evaluate this platform,true
+notes,string,no,Additional implementation notes,Modules 1 6 10 and 13 completed successfully

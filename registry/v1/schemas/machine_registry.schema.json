@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uiip.local/registry/v1/machine_registry.schema.json",
+  "title": "UIIP Machine Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "registry_version",
+    "machine_id",
+    "machine_name",
+    "machine_role",
+    "git_available",
+    "availability_status"
+  ],
+  "properties": {
+    "registry_version": {
+      "type": "string",
+      "description": "Machine registry contract version",
+      "const": "1.0.0"
+    },
+    "machine_id": {
+      "type": "string",
+      "description": "Stable machine identifier",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "machine_name": {
+      "type": "string",
+      "description": "Human-readable machine name"
+    },
+    "machine_role": {
+      "type": "string",
+      "description": "Machine role",
+      "enum": [
+        "primary_workstation",
+        "secondary_laptop",
+        "cloud_worker",
+        "external_service",
+        "not_assigned"
+      ]
+    },
+    "operating_system": {
+      "type": "string",
+      "description": "Operating system"
+    },
+    "python_version": {
+      "type": "string",
+      "description": "Primary Python version"
+    },
+    "git_available": {
+      "type": "boolean",
+      "description": "Whether Git is available"
+    },
+    "archive_support": {
+      "type": "string",
+      "description": "Supported archive extraction method"
+    },
+    "availability_status": {
+      "type": "string",
+      "description": "Current machine availability",
+      "enum": [
+        "available",
+        "unavailable",
+        "limited",
+        "not_configured"
+      ]
+    },
+    "sync_method": {
+      "type": "string",
+      "description": "How outputs move between machines"
+    },
+    "last_verified_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Last manually verified date"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional notes"
+    }
+  }
+}

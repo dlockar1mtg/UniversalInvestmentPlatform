@@ -64,7 +64,35 @@ Deliverables:
 
 ### 0.4 — Platform Registry
 
-Status: Not Started
+\### 0.4 — Platform Registry
+
+
+
+Status: In Progress
+
+
+
+Deliverables:
+
+
+
+\- Platform registry standard
+
+\- Machine registry
+
+\- Platform registry
+
+\- Registry JSON Schemas
+
+\- Registry validator
+
+\- Machine-reference validation
+
+\- Exchange-folder validation
+
+\- Platform health report
+
+\- Freshness evaluation
 
 ### 0.5 — Integration Framework
 

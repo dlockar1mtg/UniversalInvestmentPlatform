@@ -1,0 +1,13 @@
+column_name,data_type,required,description,example
+registry_version,string,yes,Machine registry contract version,1.0.0
+machine_id,string,yes,Stable machine identifier,primary-workstation
+machine_name,string,yes,Human-readable machine name,Primary Development Workstation
+machine_role,string,yes,Machine role,primary_workstation
+operating_system,string,no,Operating system,Windows 11
+python_version,string,no,Primary Python version,3.14.6
+git_available,boolean,yes,Whether Git is available,true
+archive_support,string,no,Supported archive extraction method,py7zr
+availability_status,string,yes,Current machine availability,available
+sync_method,string,no,How outputs move between machines,local
+last_verified_date,date,no,Last manually verified date,2026-07-16
+notes,string,no,Additional notes,Primary machine for Universal Platform development

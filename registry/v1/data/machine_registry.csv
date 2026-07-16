@@ -1,0 +1,4 @@
+registry_version,machine_id,machine_name,machine_role,operating_system,python_version,git_available,archive_support,availability_status,sync_method,last_verified_date,notes
+1.0.0,primary-workstation,Primary Development Workstation,primary_workstation,Windows 11,3.14.6,true,py7zr,available,local,2026-07-16,Primary machine for Universal Platform Crypto Metals Housing and future Stocks development
+1.0.0,secondary-laptop,Secondary MTG Laptop,secondary_laptop,Windows,,true,7-Zip,available,manual_copy,2026-07-16,Current working MTG repository and historical data environment
+1.0.0,not-assigned,No Machine Assigned,not_assigned,,,false,,not_configured,none,2026-07-16,Placeholder for platforms that have not yet been assigned

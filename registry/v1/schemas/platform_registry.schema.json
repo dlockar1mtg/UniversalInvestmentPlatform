@@ -1,0 +1,150 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uiip.local/registry/v1/platform_registry.schema.json",
+  "title": "UIIP Platform Registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "registry_version",
+    "platform_id",
+    "platform_name",
+    "repository_name",
+    "machine_id",
+    "platform_status",
+    "integration_stage",
+    "exchange_folder",
+    "expected_refresh_frequency",
+    "is_enabled"
+  ],
+  "properties": {
+    "registry_version": {
+      "type": "string",
+      "description": "Platform registry contract version",
+      "const": "1.0.0"
+    },
+    "platform_id": {
+      "type": "string",
+      "description": "Stable lowercase platform identifier",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "platform_name": {
+      "type": "string",
+      "description": "Human-readable platform name"
+    },
+    "repository_name": {
+      "type": "string",
+      "description": "Preferred repository name"
+    },
+    "local_path": {
+      "type": "string",
+      "description": "Current local repository path"
+    },
+    "machine_id": {
+      "type": "string",
+      "description": "Machine assigned to run the platform",
+      "pattern": "^[a-z0-9]+(?:-[a-z0-9]+)*$"
+    },
+    "platform_version": {
+      "type": "string",
+      "description": "Current application version"
+    },
+    "platform_status": {
+      "type": "string",
+      "description": "Manually assigned operational status",
+      "enum": [
+        "operational",
+        "partially_operational",
+        "development",
+        "planning",
+        "not_started",
+        "blocked",
+        "unavailable",
+        "archived"
+      ]
+    },
+    "integration_stage": {
+      "type": "string",
+      "description": "Current Universal Platform integration stage",
+      "enum": [
+        "not_started",
+        "inventory",
+        "baseline_frozen",
+        "documented",
+        "adapter_development",
+        "export_ready",
+        "registered",
+        "integrated",
+        "validated",
+        "production"
+      ]
+    },
+    "primary_database": {
+      "type": "string",
+      "description": "Primary platform database path or name"
+    },
+    "main_run_command": {
+      "type": "string",
+      "description": "Primary run command"
+    },
+    "validation_command": {
+      "type": "string",
+      "description": "Primary validation command"
+    },
+    "dashboard_command": {
+      "type": "string",
+      "description": "Dashboard launch command"
+    },
+    "exchange_folder": {
+      "type": "string",
+      "description": "Universal exchange directory"
+    },
+    "published_contracts": {
+      "type": "string",
+      "description": "Pipe-delimited Universal contracts"
+    },
+    "expected_refresh_frequency": {
+      "type": "string",
+      "description": "Expected refresh cadence",
+      "enum": [
+        "daily",
+        "weekly",
+        "monthly",
+        "quarterly",
+        "manual",
+        "event_driven",
+        "not_applicable"
+      ]
+    },
+    "freshness_threshold_hours": {
+      "type": "integer",
+      "description": "Hours before output is considered stale",
+      "minimum": 0
+    },
+    "last_verified_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Last manually verified date"
+    },
+    "last_successful_run_at_utc": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Most recent confirmed successful run"
+    },
+    "known_issue": {
+      "type": "string",
+      "description": "Most important current issue"
+    },
+    "github_repository": {
+      "type": "string",
+      "description": "GitHub repository URL or status"
+    },
+    "is_enabled": {
+      "type": "boolean",
+      "description": "Whether Universal Platform should evaluate this platform"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional implementation notes"
+    }
+  }
+}
