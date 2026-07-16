@@ -2,6 +2,16 @@
 
 ## Phase 0 — Foundation
 
+Status: Complete
+
+
+
+Foundation certification command:
+
+
+
+`python scripts\\run\_phase\_0\_foundation\_certification.py`
+
 ### 0.1 — Development Environment Baseline
 
 Status: Complete
@@ -132,5 +142,39 @@ Deliverables:
 
 ### 0.6 — Validation Framework
 
-Status: Not Started
+\### 0.6 — Validation Framework
+
+
+
+Status: Complete
+
+
+
+Deliverables:
+
+
+
+\- Validation severity standard
+
+\- Central validation settings
+
+\- Shared validation-finding model
+
+\- Cross-contract referential-integrity validation
+
+\- Contract-version validation
+
+\- Registry consistency validation
+
+\- Score and weight range validation
+
+\- Import-audit reconciliation
+
+\- Duplicate logical-key validation
+
+\- Freshness validation
+
+\- Manifest verification
+
+\- Consolidated foundation certification
 

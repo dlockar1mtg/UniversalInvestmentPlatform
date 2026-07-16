@@ -1,0 +1,52 @@
+{
+  "validation_version": "1.0.0",
+  "supported_contract_versions": [
+    "1.0.0"
+  ],
+  "supported_registry_versions": [
+    "1.0.0"
+  ],
+  "database_version": "0.5.0",
+  "score_ranges": {
+    "normalized_score": {
+      "minimum": 0.0,
+      "maximum": 100.0
+    },
+    "confidence_score": {
+      "minimum": 0.0,
+      "maximum": 100.0
+    },
+    "risk_score": {
+      "minimum": 0.0,
+      "maximum": 100.0
+    },
+    "data_quality_score": {
+      "minimum": 0.0,
+      "maximum": 100.0
+    }
+  },
+  "probability_ranges": {
+    "minimum": 0.0,
+    "maximum": 1.0
+  },
+  "weight_ranges": {
+    "minimum": 0.0,
+    "maximum": 1.0
+  },
+  "portfolio_weight_tolerance": 0.01,
+  "manifest": {
+    "require_checksum_for_production": true,
+    "allow_missing_checksum_before_production": true
+  },
+  "freshness": {
+    "warning_multiplier": 1.0,
+    "error_multiplier": 2.0
+  },
+  "required_platforms": [
+    "universal"
+  ],
+  "required_foundation_contracts": [
+    "asset_master",
+    "recommendations"
+  ]
+}
