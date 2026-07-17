@@ -1,0 +1,39 @@
+schema_version: "2.1"
+portfolio:
+  portfolio_key: "devon-universal-portfolio"
+  name: "Devon Universal Investment Portfolio"
+  description: "Unified portfolio spanning crypto, MTG, metals, Acorns, and stocks/ETFs."
+  base_currency: "USD"
+  monthly_contribution: 3000.00
+  status: "active"
+
+accounts:
+  - account_key: "crypto-primary"
+    name: "Primary Crypto Holdings"
+    institution: "Unassigned"
+    account_type: "crypto_exchange"
+    currency: "USD"
+
+  - account_key: "mtg-collection"
+    name: "MTG Sealed Collection"
+    institution: "Self Custody"
+    account_type: "collectibles"
+    currency: "USD"
+
+  - account_key: "metals-brokerage"
+    name: "Metals Brokerage Holdings"
+    institution: "Unassigned"
+    account_type: "brokerage"
+    currency: "USD"
+
+  - account_key: "acorns-aggressive"
+    name: "Acorns Aggressive Portfolio"
+    institution: "Acorns"
+    account_type: "robo_advisor"
+    currency: "USD"
+
+  - account_key: "stocks-etfs"
+    name: "Stocks and ETFs"
+    institution: "Unassigned"
+    account_type: "brokerage"
+    currency: "USD"

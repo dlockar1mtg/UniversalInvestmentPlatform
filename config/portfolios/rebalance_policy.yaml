@@ -1,0 +1,18 @@
+schema_version: "2.1"
+rebalance_policy:
+  method: "contribution_only"
+  evaluation_frequency: "monthly"
+  drift_measure: "percentage_points"
+  absolute_drift_trigger: 0.05
+  relative_drift_trigger: 0.20
+  permit_sales: false
+  respect_allocation_bands: true
+  respect_minimum_purchase_amounts: true
+  respect_fractional_purchase_rules: true
+  prioritize_most_underweight: true
+  retain_unallocated_cash: true
+  stale_valuation_days:
+    daily: 3
+    weekly: 10
+    monthly: 40
+    illiquid: 120
