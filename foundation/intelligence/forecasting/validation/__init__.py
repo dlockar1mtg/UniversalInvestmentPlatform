@@ -1,5 +1,26 @@
 """Forecast validation and continuous-learning contracts."""
 
+from .drift_contracts import (
+    DriftDetectionProfile,
+    DriftHistory,
+    DriftHistoryEntry,
+    DriftMetric,
+    DriftRecommendation,
+    DriftSeverity,
+    DriftType,
+    ForecastDriftReport,
+    ForecastDriftSignal,
+    RegimePerformanceSnapshot,
+)
+from .drift_engine import ForecastDriftDetectionEngine
+from .drift_history import (
+    drift_history_from_dict,
+    drift_history_to_dict,
+    drift_history_to_json,
+    load_drift_history,
+    save_drift_history,
+)
+from .drift_service import ForecastDriftDetectionService
 from .forecast_archive import ForecastArchive
 from .forecast_outcome_tracker import ForecastOutcomeTracker
 from .forecast_validation_contracts import (
@@ -42,7 +63,18 @@ __all__ = [
     "ContinuousLearningProfile",
     "ContinuousLearningResult",
     "ContinuousLearningService",
+    "DriftDetectionProfile",
+    "DriftHistory",
+    "DriftHistoryEntry",
+    "DriftMetric",
+    "DriftRecommendation",
+    "DriftSeverity",
+    "DriftType",
     "ForecastArchive",
+    "ForecastDriftDetectionEngine",
+    "ForecastDriftDetectionService",
+    "ForecastDriftReport",
+    "ForecastDriftSignal",
     "ForecastOutcome",
     "ForecastOutcomeTracker",
     "ForecastPerformanceAnalyticsEngine",
@@ -60,10 +92,16 @@ __all__ = [
     "PerformanceAnalyticsProfile",
     "PerformanceGrade",
     "PerformanceGrouping",
+    "RegimePerformanceSnapshot",
     "ValidationStatus",
+    "drift_history_from_dict",
+    "drift_history_to_dict",
+    "drift_history_to_json",
     "learning_state_from_dict",
     "learning_state_to_dict",
     "learning_state_to_json",
+    "load_drift_history",
     "load_learning_state",
+    "save_drift_history",
     "save_learning_state",
 ]
