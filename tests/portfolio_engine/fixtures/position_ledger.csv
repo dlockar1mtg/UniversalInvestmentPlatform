@@ -1,0 +1,5 @@
+transaction_type,effective_at,asset_id,asset_name,asset_category,quantity,unit_price,gross_amount,fees,currency
+deposit,2026-01-01T12:00:00+00:00,,,,,,100000.00,0.00,USD
+buy,2026-01-02T12:00:00+00:00,BTC,Bitcoin,crypto,1.00000000,40000.00,40000.00,0.00,USD
+buy,2026-02-02T12:00:00+00:00,BTC,Bitcoin,crypto,1.00000000,60000.00,60000.00,0.00,USD
+sell,2026-03-02T12:00:00+00:00,BTC,Bitcoin,crypto,0.50000000,60000.00,30000.00,0.00,USD
