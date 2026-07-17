@@ -1,0 +1,4 @@
+asset_id,price,currency,valued_at,source,confidence,source_reference
+BTC,58000.00,USD,2026-03-01T12:00:00+00:00,market,high,test-market-1
+BTC,60000.00,USD,2026-03-03T12:00:00+00:00,platform,medium,test-platform-1
+MTG-BOX,300.00,USD,2026-01-01T12:00:00+00:00,market,medium,test-mtg-1
