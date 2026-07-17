@@ -69,9 +69,13 @@ SELECT
     r.error_count,
     r.status_message,
     CASE
-        WHEN r.last_import_status = 'IMPORTED' AND r.error_count = 0 THEN 'HEALTHY'
-        WHEN r.last_import_status IN ('FAILED', 'REJECTED') THEN 'DEGRADED'
-        WHEN r.last_import_status IS NULL THEN 'NOT_IMPORTED'
+        WHEN r.registry_status = 'ACTIVE'
+             AND r.last_import_status = 'IMPORTED'
+        THEN 'HEALTHY'
+        WHEN r.last_import_status IN ('FAILED', 'REJECTED')
+        THEN 'DEGRADED'
+        WHEN r.last_import_status IS NULL
+        THEN 'NOT_IMPORTED'
         ELSE 'WARNING'
     END AS health_status
 FROM universal_platform_registry r;
