@@ -6,6 +6,16 @@ from .classification import (
     ClassificationInputError,
     UniversalActionClassificationEngine,
 )
+from .confidence import (
+    DEFAULT_CONFIDENCE_WEIGHTS,
+    ConfidenceAggregationError,
+    ConfidenceBand,
+    ConfidenceConfigurationError,
+    ConfidenceInputError,
+    ConfidenceProfile,
+    ConfidenceResult,
+    UniversalConfidenceAggregationEngine,
+)
 from .contracts import (
     DecisionAction,
     DecisionContext,
@@ -38,7 +48,14 @@ __all__ = [
     "ActionClassificationError",
     "ActionClassificationResult",
     "ClassificationInputError",
+    "ConfidenceAggregationError",
+    "ConfidenceBand",
+    "ConfidenceConfigurationError",
+    "ConfidenceInputError",
+    "ConfidenceProfile",
+    "ConfidenceResult",
     "DEFAULT_COMPONENT_WEIGHTS",
+    "DEFAULT_CONFIDENCE_WEIGHTS",
     "DecisionAction",
     "DecisionContext",
     "DecisionContractError",
@@ -58,6 +75,7 @@ __all__ = [
     "IneligibleScoringError",
     "ScoringConfigurationError",
     "UniversalActionClassificationEngine",
+    "UniversalConfidenceAggregationEngine",
     "UniversalDecisionScoringEngine",
     "UniversalEligibilityEngine",
 ]
