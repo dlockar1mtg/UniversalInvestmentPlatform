@@ -1,0 +1,1 @@
+SUPPORTED=("daily","weekly","monthly","quarterly","yearly")

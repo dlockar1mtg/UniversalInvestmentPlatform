@@ -1,0 +1,39 @@
+[build-system]
+requires = ["setuptools>=69", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "universal-investment-intelligence-platform"
+version = "4.1.0"
+description = "Universal Investment Intelligence Platform"
+readme = "README.md"
+requires-python = ">=3.14"
+license = "MIT"
+
+authors = [
+    {name = "Devon Lockard"}
+]
+
+keywords = [
+    "finance",
+    "forecasting",
+    "portfolio",
+    "analytics",
+    "machine-learning"
+]
+
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.14",
+    "Operating System :: OS Independent"
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+
+[tool.black]
+line-length = 100
+
+[tool.isort]
+profile = "black"
