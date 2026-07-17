@@ -1,0 +1,41 @@
+schema_version: "2.1"
+allocation_targets:
+  - category: "crypto"
+    target_weight: 0.33
+    minimum_weight: 0.28
+    maximum_weight: 0.38
+    priority: 10
+    minimum_purchase_amount: 1.00
+    allow_fractional: true
+
+  - category: "mtg"
+    target_weight: 0.20
+    minimum_weight: 0.15
+    maximum_weight: 0.25
+    priority: 20
+    minimum_purchase_amount: 100.00
+    allow_fractional: false
+
+  - category: "metals"
+    target_weight: 0.10
+    minimum_weight: 0.07
+    maximum_weight: 0.13
+    priority: 30
+    minimum_purchase_amount: 1.00
+    allow_fractional: true
+
+  - category: "acorns"
+    target_weight: 0.10
+    minimum_weight: 0.07
+    maximum_weight: 0.13
+    priority: 40
+    minimum_purchase_amount: 5.00
+    allow_fractional: true
+
+  - category: "stocks_etfs"
+    target_weight: 0.27
+    minimum_weight: 0.22
+    maximum_weight: 0.32
+    priority: 50
+    minimum_purchase_amount: 1.00
+    allow_fractional: true
