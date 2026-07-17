@@ -27,3 +27,9 @@ from .competition import (
     CompetitionReasonCode,
     resolve_competition,
 )
+
+from .explanations import (
+    ExplanationDriver,
+    RankingExplanation,
+    build_ranking_explanation,
+)
