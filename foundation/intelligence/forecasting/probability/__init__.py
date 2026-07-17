@@ -1,4 +1,4 @@
-"""Canonical probability distribution contracts for forecast intelligence."""
+"""Probabilistic forecast contracts and simulation engines."""
 
 from .distribution_enums import (
     DistributionFamily,
@@ -23,6 +23,15 @@ from .distribution_schema import (
     validate_distribution,
     validate_distribution_payload,
 )
+from .simulation_contracts import (
+    MonteCarloDiagnostics,
+    MonteCarloSimulationProfile,
+    MonteCarloSimulationRequest,
+    MonteCarloSimulationResult,
+    SimulationProcess,
+)
+from .simulation_engine import MonteCarloSimulationEngine
+from .simulation_service import MonteCarloForecastService
 
 __all__ = [
     "DISTRIBUTION_SCHEMA_NAME",
@@ -35,6 +44,13 @@ __all__ = [
     "ForecastConfidenceInterval",
     "ForecastDistributionResult",
     "ForecastPercentile",
+    "MonteCarloDiagnostics",
+    "MonteCarloForecastService",
+    "MonteCarloSimulationEngine",
+    "MonteCarloSimulationProfile",
+    "MonteCarloSimulationRequest",
+    "MonteCarloSimulationResult",
+    "SimulationProcess",
     "TailRiskMetrics",
     "TailRiskSide",
     "distribution_from_dict",

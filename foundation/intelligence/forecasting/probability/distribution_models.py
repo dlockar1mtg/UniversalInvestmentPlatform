@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from datetime import date, datetime, timezone
-from math import isfinite
+from math import isclose, isfinite
 from types import MappingProxyType
 from typing import Any, Mapping
 from uuid import uuid4
@@ -119,12 +119,29 @@ class DistributionStatistics:
             raise ValueError("standard_deviation cannot be negative.")
         if self.minimum > self.maximum:
             raise ValueError("minimum cannot exceed maximum.")
-        if not self.minimum <= self.median <= self.maximum:
+
+        # Numerical outputs from deterministic simulations can differ by tiny
+        # floating-point amounts even when they are mathematically identical.
+        tolerance = 1e-12
+
+        if (
+            self.median < self.minimum - tolerance
+            or self.median > self.maximum + tolerance
+        ):
             raise ValueError("median must lie within minimum and maximum.")
-        if not self.minimum <= self.mean <= self.maximum:
+
+        if (
+            self.mean < self.minimum - tolerance
+            or self.mean > self.maximum + tolerance
+        ):
             raise ValueError("mean must lie within minimum and maximum.")
-        if self.mode is not None and not self.minimum <= self.mode <= self.maximum:
+
+        if self.mode is not None and (
+            self.mode < self.minimum - tolerance
+            or self.mode > self.maximum + tolerance
+        ):
             raise ValueError("mode must lie within minimum and maximum.")
+
         if self.sample_count is not None and self.sample_count <= 0:
             raise ValueError("sample_count must be positive.")
 
@@ -156,12 +173,28 @@ class TailRiskMetrics:
         _require_finite("target_return", self.target_return)
 
         if self.side is TailRiskSide.LOWER:
-            if self.expected_shortfall > self.value_at_risk:
+            if (
+                self.expected_shortfall > self.value_at_risk
+                and not isclose(
+                    self.expected_shortfall,
+                    self.value_at_risk,
+                    rel_tol=1e-12,
+                    abs_tol=1e-12,
+                )
+            ):
                 raise ValueError(
                     "Lower-tail expected_shortfall cannot exceed value_at_risk."
                 )
         elif self.side is TailRiskSide.UPPER:
-            if self.expected_shortfall < self.value_at_risk:
+            if (
+                self.expected_shortfall < self.value_at_risk
+                and not isclose(
+                    self.expected_shortfall,
+                    self.value_at_risk,
+                    rel_tol=1e-12,
+                    abs_tol=1e-12,
+                )
+            ):
                 raise ValueError(
                     "Upper-tail expected_shortfall cannot be below value_at_risk."
                 )
