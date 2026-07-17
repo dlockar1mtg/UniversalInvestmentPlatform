@@ -1,4 +1,4 @@
-"""Probabilistic forecast contracts, simulation, and Bayesian engines."""
+"""Probabilistic forecast contracts and engines."""
 
 from .bayesian_contracts import (
     BayesianUpdateDiagnostics,
@@ -36,6 +36,20 @@ from .distribution_schema import (
     validate_distribution,
     validate_distribution_payload,
 )
+from .scenario_contracts import (
+    ScenarioBranchTemplate,
+    ScenarioDirection,
+    ScenarioStageDefinition,
+    ScenarioTerminalOutcome,
+    ScenarioTreeDiagnostics,
+    ScenarioTreeNode,
+    ScenarioTreeProfile,
+    ScenarioTreeRequest,
+    ScenarioTreeResult,
+    ScenarioTreeStatus,
+)
+from .scenario_tree_engine import ScenarioTreeGenerationEngine
+from .scenario_tree_service import ScenarioTreeForecastService
 from .simulation_contracts import (
     MonteCarloDiagnostics,
     MonteCarloSimulationProfile,
@@ -74,6 +88,18 @@ __all__ = [
     "MonteCarloSimulationResult",
     "NormalEvidence",
     "NormalPrior",
+    "ScenarioBranchTemplate",
+    "ScenarioDirection",
+    "ScenarioStageDefinition",
+    "ScenarioTerminalOutcome",
+    "ScenarioTreeDiagnostics",
+    "ScenarioTreeForecastService",
+    "ScenarioTreeGenerationEngine",
+    "ScenarioTreeNode",
+    "ScenarioTreeProfile",
+    "ScenarioTreeRequest",
+    "ScenarioTreeResult",
+    "ScenarioTreeStatus",
     "SimulationProcess",
     "TailRiskMetrics",
     "TailRiskSide",
