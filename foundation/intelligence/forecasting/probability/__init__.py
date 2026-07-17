@@ -1,5 +1,18 @@
-"""Probabilistic forecast contracts and simulation engines."""
+"""Probabilistic forecast contracts, simulation, and Bayesian engines."""
 
+from .bayesian_contracts import (
+    BayesianUpdateDiagnostics,
+    BayesianUpdateFamily,
+    BayesianUpdateRequest,
+    BayesianUpdateResult,
+    BayesianUpdateStatus,
+    BetaPrior,
+    BinomialEvidence,
+    NormalEvidence,
+    NormalPrior,
+)
+from .bayesian_engine import BayesianForecastUpdateEngine
+from .bayesian_service import BayesianForecastUpdateService
 from .distribution_enums import (
     DistributionFamily,
     DistributionStatus,
@@ -34,6 +47,15 @@ from .simulation_engine import MonteCarloSimulationEngine
 from .simulation_service import MonteCarloForecastService
 
 __all__ = [
+    "BayesianForecastUpdateEngine",
+    "BayesianForecastUpdateService",
+    "BayesianUpdateDiagnostics",
+    "BayesianUpdateFamily",
+    "BayesianUpdateRequest",
+    "BayesianUpdateResult",
+    "BayesianUpdateStatus",
+    "BetaPrior",
+    "BinomialEvidence",
     "DISTRIBUTION_SCHEMA_NAME",
     "DISTRIBUTION_SCHEMA_VERSION",
     "DistributionFamily",
@@ -50,6 +72,8 @@ __all__ = [
     "MonteCarloSimulationProfile",
     "MonteCarloSimulationRequest",
     "MonteCarloSimulationResult",
+    "NormalEvidence",
+    "NormalPrior",
     "SimulationProcess",
     "TailRiskMetrics",
     "TailRiskSide",
