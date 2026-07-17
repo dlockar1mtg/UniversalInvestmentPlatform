@@ -1,5 +1,11 @@
 ﻿"""Universal investment decision intelligence."""
 
+from .classification import (
+    ActionClassificationError,
+    ActionClassificationResult,
+    ClassificationInputError,
+    UniversalActionClassificationEngine,
+)
 from .contracts import (
     DecisionAction,
     DecisionContext,
@@ -29,6 +35,9 @@ from .scoring import (
 )
 
 __all__ = [
+    "ActionClassificationError",
+    "ActionClassificationResult",
+    "ClassificationInputError",
     "DEFAULT_COMPONENT_WEIGHTS",
     "DecisionAction",
     "DecisionContext",
@@ -48,6 +57,7 @@ __all__ = [
     "EligibilityStatus",
     "IneligibleScoringError",
     "ScoringConfigurationError",
+    "UniversalActionClassificationEngine",
     "UniversalDecisionScoringEngine",
     "UniversalEligibilityEngine",
 ]
