@@ -23,6 +23,13 @@ from .score_component import DataAvailability, ScoreComponent
 from .score_dimension import ScoreDimension, UNIVERSAL_DIMENSIONS
 from .score_input import ScoreInput
 from .score_result import ScoreResult
+from .scoring_model import ScoringModelDefinition, ScoringModelStatus
+from .scoring_model_loader import load_registry_from_yaml, model_from_mapping
+from .scoring_model_registry import (
+    DEFAULT_SCORING_MODEL_REGISTRY,
+    ScoringModelRegistry,
+)
+from .scoring_model_service import ScoringModelSelection, ScoringModelService
 from .scoring_profile import ScoringProfile
 
 __all__ = [
@@ -32,6 +39,7 @@ __all__ = [
     "ConfidenceAdjustment",
     "DataAvailability",
     "DEFAULT_NORMALIZATION_REGISTRY",
+    "DEFAULT_SCORING_MODEL_REGISTRY",
     "DEFAULT_SCORE_BANDS",
     "DimensionAggregation",
     "NormalizationEngine",
@@ -43,6 +51,11 @@ __all__ = [
     "ScoreDimension",
     "ScoreInput",
     "ScoreResult",
+    "ScoringModelDefinition",
+    "ScoringModelRegistry",
+    "ScoringModelSelection",
+    "ScoringModelService",
+    "ScoringModelStatus",
     "ScoringProfile",
     "UNIVERSAL_DIMENSIONS",
     "aggregate_dimension",
@@ -50,4 +63,6 @@ __all__ = [
     "apply_confidence_adjustment",
     "apply_risk_adjustment",
     "classify_score",
+    "load_registry_from_yaml",
+    "model_from_mapping",
 ]
