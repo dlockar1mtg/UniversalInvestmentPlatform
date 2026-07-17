@@ -3,6 +3,9 @@ from .contracts import (DEFAULT_RANKING_WEIGHTS, ComparabilityStatus, PortfolioR
     PortfolioRankingInput, PortfolioRankingPolicy, PortfolioRankingResult, RankedOpportunity,
     RankingContractError, RankingFactor, RankingFactorScore, RankingStatus, RankingTier)
 __all__=[name for name in globals() if not name.startswith("_")]
+from .priority import (CompositePriorityScoringEngine,PriorityConfigurationError,
+ PriorityConsistencyError,PriorityScoreResult,PriorityScoringError,PriorityScoringProfile)
+__all__=[name for name in globals() if not name.startswith("_")]
 from .factors import (DEFAULT_ACTION_STRENGTH,IncomparableRankingInputError,
  RankingFactorConsistencyError,RankingFactorError,RankingFactorProfile,
  RankingFactorResult,UniversalRankingFactorEngine)
