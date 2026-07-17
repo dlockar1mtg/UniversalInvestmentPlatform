@@ -1,4 +1,4 @@
-"""Forecast intelligence quality, consensus, and calibration services."""
+"""Forecast intelligence quality, consensus, calibration, and weighting."""
 
 from .calibration_contracts import (
     CalibrationStrength,
@@ -30,6 +30,15 @@ from .quality_contracts import (
 from .quality_engine import ForecastQualityEngine
 from .ranking_engine import ForecastModelRankingEngine
 from .selection_service import ForecastModelSelectionService
+from .weighting_contracts import (
+    EnsembleModelSignal,
+    EnsembleWeightEntry,
+    EnsembleWeightProfile,
+    EnsembleWeightResult,
+    WeightOptimizationStatus,
+)
+from .weighting_engine import EnsembleWeightOptimizationEngine
+from .weighting_service import EnsembleWeightOptimizationService
 
 __all__ = [
     "AdaptiveConfidenceCalibrationEngine",
@@ -41,6 +50,12 @@ __all__ = [
     "ConsensusOutlier",
     "ConsensusProfile",
     "ConsensusStrength",
+    "EnsembleModelSignal",
+    "EnsembleWeightEntry",
+    "EnsembleWeightOptimizationEngine",
+    "EnsembleWeightOptimizationService",
+    "EnsembleWeightProfile",
+    "EnsembleWeightResult",
     "ForecastConfidenceCalibrationService",
     "ForecastConsensusEngine",
     "ForecastConsensusInput",
@@ -56,4 +71,5 @@ __all__ = [
     "MarketRegime",
     "ModelRankingEntry",
     "ModelSelectionResult",
+    "WeightOptimizationStatus",
 ]
