@@ -1,0 +1,14 @@
+from enum import Enum
+class ForecastType(str, Enum):
+    PRICE="PRICE"
+    RETURN="RETURN"
+    VOLATILITY="VOLATILITY"
+    RISK="RISK"
+    PROBABILITY="PROBABILITY"
+    DRIFT="DRIFT"
+    REGIME="REGIME"
+    SUPPLY="SUPPLY"
+    DEMAND="DEMAND"
+    LIQUIDITY="LIQUIDITY"
+    YIELD="YIELD"
+    CUSTOM="CUSTOM"
