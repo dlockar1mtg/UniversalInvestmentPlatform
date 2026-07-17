@@ -1,0 +1,6 @@
+category,minimum_purchase_amount,allow_fractional,purchase_increment
+crypto,1.00,true,
+mtg,100.00,false,300.00
+metals,1.00,true,
+acorns,5.00,true,
+stocks_etfs,1.00,true,

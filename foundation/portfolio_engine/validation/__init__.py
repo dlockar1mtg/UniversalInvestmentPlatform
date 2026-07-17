@@ -4,6 +4,10 @@ from .allocation_validator import (
     AllocationValidationResult,
     validate_allocation_database,
 )
+from .contribution_rebalancing_validator import (
+    ContributionRebalancingValidationResult,
+    validate_contribution_rebalancing_database,
+)
 from .domain_validator import ValidationResult, validate_portfolio_configuration
 from .ledger_validator import LedgerValidationResult, validate_ledger_database
 from .position_valuation_validator import (
@@ -13,10 +17,12 @@ from .position_valuation_validator import (
 
 __all__ = [
     "AllocationValidationResult",
+    "ContributionRebalancingValidationResult",
     "LedgerValidationResult",
     "PositionValuationValidationResult",
     "ValidationResult",
     "validate_allocation_database",
+    "validate_contribution_rebalancing_database",
     "validate_ledger_database",
     "validate_portfolio_configuration",
     "validate_position_valuation_database",
