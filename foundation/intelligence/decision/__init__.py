@@ -1,5 +1,13 @@
 ﻿"""Universal investment decision intelligence."""
 
+from .allocation import (
+    AllocationConfigurationError,
+    AllocationInputError,
+    AllocationProfile,
+    AllocationRecommendationError,
+    AllocationResult,
+    UniversalAllocationEngine,
+)
 from .classification import (
     ActionClassificationError,
     ActionClassificationResult,
@@ -15,6 +23,14 @@ from .confidence import (
     ConfidenceProfile,
     ConfidenceResult,
     UniversalConfidenceAggregationEngine,
+)
+from .constraints import (
+    ConstraintCheck,
+    ConstraintEvaluationError,
+    ConstraintEvaluationResult,
+    ConstraintInputError,
+    ConstraintStatus,
+    UniversalConstraintEngine,
 )
 from .contracts import (
     DecisionAction,
@@ -47,6 +63,11 @@ from .scoring import (
 __all__ = [
     "ActionClassificationError",
     "ActionClassificationResult",
+    "AllocationConfigurationError",
+    "AllocationInputError",
+    "AllocationProfile",
+    "AllocationRecommendationError",
+    "AllocationResult",
     "ClassificationInputError",
     "ConfidenceAggregationError",
     "ConfidenceBand",
@@ -54,6 +75,11 @@ __all__ = [
     "ConfidenceInputError",
     "ConfidenceProfile",
     "ConfidenceResult",
+    "ConstraintCheck",
+    "ConstraintEvaluationError",
+    "ConstraintEvaluationResult",
+    "ConstraintInputError",
+    "ConstraintStatus",
     "DEFAULT_COMPONENT_WEIGHTS",
     "DEFAULT_CONFIDENCE_WEIGHTS",
     "DecisionAction",
@@ -75,7 +101,9 @@ __all__ = [
     "IneligibleScoringError",
     "ScoringConfigurationError",
     "UniversalActionClassificationEngine",
+    "UniversalAllocationEngine",
     "UniversalConfidenceAggregationEngine",
+    "UniversalConstraintEngine",
     "UniversalDecisionScoringEngine",
     "UniversalEligibilityEngine",
 ]
