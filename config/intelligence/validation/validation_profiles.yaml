@@ -1,0 +1,22 @@
+schema_version: 1.0.0
+profiles:
+  baseline_v1:
+    version: 1.0.0
+    minimum_observations: 100
+    minimum_assets: 5
+    minimum_date_coverage: 0.80
+    rank_metrics:
+      - spearman_rank_correlation
+      - kendall_rank_correlation
+    performance_metrics:
+      - mean_forward_return
+      - median_forward_return
+      - top_quintile_return
+      - bottom_quintile_return
+      - hit_rate
+      - maximum_drawdown
+      - benchmark_excess_return
+    thresholds:
+      spearman_rank_correlation: 0.10
+      top_bottom_spread: 0.00
+      hit_rate: 0.50
