@@ -18,6 +18,18 @@ from .dimension_aggregation import (
     aggregate_dimension,
     aggregate_dimensions,
 )
+from .explanation import (
+    AdjustmentExplanation,
+    DimensionContribution,
+    MissingDataImpact,
+    ScoreExplanation,
+)
+from .explanation_engine import ExplanationEngine
+from .explanation_serializer import (
+    explanation_to_dict,
+    explanation_to_json,
+    write_explanation_json,
+)
 from .normalization import NormalizationResult
 from .normalization_engine import NormalizationEngine
 from .normalization_registry import (
@@ -40,6 +52,7 @@ from .scoring_model_service import ScoringModelSelection, ScoringModelService
 from .scoring_profile import ScoringProfile
 
 __all__ = [
+    "AdjustmentExplanation",
     "AssetClassScoringProfile",
     "AssetProfileScoringService",
     "CompositeDiagnostics",
@@ -51,8 +64,11 @@ __all__ = [
     "DEFAULT_SCORING_MODEL_REGISTRY",
     "DEFAULT_SCORE_BANDS",
     "DimensionAggregation",
+    "DimensionContribution",
+    "ExplanationEngine",
     "MetricNormalizationRule",
     "MetricObservation",
+    "MissingDataImpact",
     "NormalizationEngine",
     "NormalizationRegistry",
     "NormalizationResult",
@@ -60,6 +76,7 @@ __all__ = [
     "ScoreBand",
     "ScoreComponent",
     "ScoreDimension",
+    "ScoreExplanation",
     "ScoreInput",
     "ScoreResult",
     "ScoringModelDefinition",
@@ -75,8 +92,11 @@ __all__ = [
     "apply_risk_adjustment",
     "asset_profile_from_mapping",
     "classify_score",
+    "explanation_to_dict",
+    "explanation_to_json",
     "load_asset_profile",
     "load_asset_profiles",
     "load_registry_from_yaml",
     "model_from_mapping",
+    "write_explanation_json",
 ]
