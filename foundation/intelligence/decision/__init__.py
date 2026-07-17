@@ -51,6 +51,14 @@ from .eligibility import (
     EligibilityResult,
     UniversalEligibilityEngine,
 )
+from .explanation import (
+    DecisionExplanation,
+    DecisionExplanationError,
+    ExplanationConfigurationError,
+    ExplanationInputError,
+    ExplanationProfile,
+    UniversalDecisionExplanationEngine,
+)
 from .scoring import (
     DEFAULT_COMPONENT_WEIGHTS,
     DecisionScoringError,
@@ -86,6 +94,8 @@ __all__ = [
     "DecisionContext",
     "DecisionContractError",
     "DecisionEvidence",
+    "DecisionExplanation",
+    "DecisionExplanationError",
     "DecisionInput",
     "DecisionPolicy",
     "DecisionPolicyError",
@@ -98,12 +108,16 @@ __all__ = [
     "EligibilityCheck",
     "EligibilityResult",
     "EligibilityStatus",
+    "ExplanationConfigurationError",
+    "ExplanationInputError",
+    "ExplanationProfile",
     "IneligibleScoringError",
     "ScoringConfigurationError",
     "UniversalActionClassificationEngine",
     "UniversalAllocationEngine",
     "UniversalConfidenceAggregationEngine",
     "UniversalConstraintEngine",
+    "UniversalDecisionExplanationEngine",
     "UniversalDecisionScoringEngine",
     "UniversalEligibilityEngine",
 ]
