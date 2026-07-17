@@ -1,0 +1,27 @@
+schema_version: 1.0.0
+profiles:
+  expected_return_1y:
+    strategy: higher_is_better
+    parameters:
+      minimum: -0.20
+      maximum: 0.30
+      clip: true
+  annualized_volatility:
+    strategy: lower_is_better
+    parameters:
+      minimum: 0.05
+      maximum: 0.80
+      clip: true
+  rsi_14:
+    strategy: bounded_range
+    parameters:
+      minimum: 0
+      maximum: 100
+      clip: true
+  inflation_alignment:
+    strategy: target_centered
+    parameters:
+      minimum: 0
+      target: 0.02
+      maximum: 0.10
+      clip: true

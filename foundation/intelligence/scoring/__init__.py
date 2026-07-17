@@ -1,5 +1,11 @@
 """Universal scoring contracts and validation utilities."""
 
+from .normalization import NormalizationResult
+from .normalization_engine import NormalizationEngine
+from .normalization_registry import (
+    DEFAULT_NORMALIZATION_REGISTRY,
+    NormalizationRegistry,
+)
 from .score_band import ScoreBand, DEFAULT_SCORE_BANDS, classify_score
 from .score_component import DataAvailability, ScoreComponent
 from .score_dimension import ScoreDimension, UNIVERSAL_DIMENSIONS
@@ -9,7 +15,11 @@ from .scoring_profile import ScoringProfile
 
 __all__ = [
     "DataAvailability",
+    "DEFAULT_NORMALIZATION_REGISTRY",
     "DEFAULT_SCORE_BANDS",
+    "NormalizationEngine",
+    "NormalizationRegistry",
+    "NormalizationResult",
     "ScoreBand",
     "ScoreComponent",
     "ScoreDimension",
