@@ -1,0 +1,48 @@
+schema_version: 1.0.0
+bands:
+  - id: critical
+    display_name: Critical
+    minimum_score: 0
+    maximum_score: 20
+    interpretation: Extremely unfavorable
+  - id: very_weak
+    display_name: Very Weak
+    minimum_score: 20
+    maximum_score: 30
+    interpretation: Major concerns
+  - id: weak
+    display_name: Weak
+    minimum_score: 30
+    maximum_score: 40
+    interpretation: Unfavorable
+  - id: moderately_negative
+    display_name: Moderately Negative
+    minimum_score: 40
+    maximum_score: 50
+    interpretation: Some concerns
+  - id: neutral
+    display_name: Neutral
+    minimum_score: 50
+    maximum_score: 60
+    interpretation: Balanced evidence
+  - id: moderately_positive
+    display_name: Moderately Positive
+    minimum_score: 60
+    maximum_score: 70
+    interpretation: Somewhat favorable
+  - id: strong
+    display_name: Strong
+    minimum_score: 70
+    maximum_score: 80
+    interpretation: Favorable
+  - id: very_strong
+    display_name: Very Strong
+    minimum_score: 80
+    maximum_score: 90
+    interpretation: Strong opportunity
+  - id: exceptional
+    display_name: Exceptional
+    minimum_score: 90
+    maximum_score: 100
+    include_maximum: true
+    interpretation: Extremely strong evidence
