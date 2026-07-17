@@ -19,8 +19,17 @@ from .eligibility import (
     EligibilityResult,
     UniversalEligibilityEngine,
 )
+from .scoring import (
+    DEFAULT_COMPONENT_WEIGHTS,
+    DecisionScoringError,
+    DecisionScoringProfile,
+    IneligibleScoringError,
+    ScoringConfigurationError,
+    UniversalDecisionScoringEngine,
+)
 
 __all__ = [
+    "DEFAULT_COMPONENT_WEIGHTS",
     "DecisionAction",
     "DecisionContext",
     "DecisionContractError",
@@ -30,10 +39,15 @@ __all__ = [
     "DecisionPolicyError",
     "DecisionResult",
     "DecisionScore",
+    "DecisionScoringError",
+    "DecisionScoringProfile",
     "DecisionStatus",
     "DecisionValidationError",
     "EligibilityCheck",
     "EligibilityResult",
     "EligibilityStatus",
+    "IneligibleScoringError",
+    "ScoringConfigurationError",
+    "UniversalDecisionScoringEngine",
     "UniversalEligibilityEngine",
 ]
