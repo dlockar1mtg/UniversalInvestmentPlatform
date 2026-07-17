@@ -18,3 +18,12 @@ from .comparability import (ComparabilityCheck,ComparabilityConfigurationError,C
  DuplicateRankingDecisionError,RankingComparabilityEngine,RankingComparabilityError,
  RankingComparabilityProfile,RankingComparabilityResult)
 __all__=[name for name in globals() if not name.startswith("_")]
+
+from .competition import (
+    CompetitionCandidate,
+    CompetitionDisposition,
+    CompetitionOutcome,
+    CompetitionPolicy,
+    CompetitionReasonCode,
+    resolve_competition,
+)
