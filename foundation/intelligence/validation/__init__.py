@@ -7,6 +7,20 @@ from .backtest_dataset import (
     PredictionOutcomePair,
 )
 from .backtest_schedule import generate_prediction_dates
+from .benchmark_comparison_engine import (
+    BenchmarkComparisonEngine,
+    BenchmarkComparisonReport,
+)
+from .benchmark_loader import load_benchmark_registry
+from .benchmark_metrics import (
+    BenchmarkComparisonMetrics,
+    calculate_alpha,
+    calculate_benchmark_metrics,
+    calculate_beta,
+    calculate_capture_ratio,
+    calculate_relative_max_drawdown,
+)
+from .benchmark_registry import BenchmarkDefinition, BenchmarkRegistry
 from .calibration_metrics import (
     BucketPerformance,
     CalibrationSummary,
@@ -59,6 +73,11 @@ __all__ = [
     "BacktestConfiguration",
     "BacktestDataset",
     "BacktestDiagnostics",
+    "BenchmarkComparisonEngine",
+    "BenchmarkComparisonMetrics",
+    "BenchmarkComparisonReport",
+    "BenchmarkDefinition",
+    "BenchmarkRegistry",
     "BucketPerformance",
     "CalibrationSummary",
     "ClassificationMetrics",
@@ -79,16 +98,22 @@ __all__ = [
     "WalkForwardRequest",
     "assert_no_future_observations",
     "build_outcome",
+    "calculate_alpha",
+    "calculate_benchmark_metrics",
+    "calculate_beta",
     "calculate_calibration_error",
     "calculate_calibration_summary",
+    "calculate_capture_ratio",
     "calculate_classification_metrics",
     "calculate_horizon_stability",
     "calculate_maximum_drawdown",
     "calculate_rank_correlations",
+    "calculate_relative_max_drawdown",
     "calculate_total_return",
     "generate_prediction_dates",
     "group_observations_by_asset",
     "kendall_rank_correlation",
+    "load_benchmark_registry",
     "performance_by_quantile",
     "performance_by_score_band",
     "select_latest_observations",
