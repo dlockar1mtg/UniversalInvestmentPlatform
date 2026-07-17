@@ -1,0 +1,5 @@
+transaction_type,effective_at,asset_id,asset_name,asset_category,quantity,unit_price,gross_amount,fees,currency,source_platform,source_record_id
+deposit,2026-01-01T12:00:00+00:00,,,,,,3000.00,0.00,USD,test,dep-001
+buy,2026-01-02T12:00:00+00:00,BTC,Bitcoin,crypto,0.02000000,50000.00,1000.00,5.00,USD,test,buy-001
+buy,2026-01-03T12:00:00+00:00,VOO,Vanguard S&P 500 ETF,stocks_etfs,2.00000000,500.00,1000.00,1.00,USD,test,buy-002
+dividend,2026-02-01T12:00:00+00:00,VOO,Vanguard S&P 500 ETF,stocks_etfs,,,8.00,0.00,USD,test,div-001
