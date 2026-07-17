@@ -12,12 +12,16 @@ class DecisionPolicy:
     """Configurable eligibility, confidence, and allocation rules."""
 
     policy_id: str = "universal-default"
-    policy_version: str = "5.1.1"
+    policy_version: str = "5.1.2"
 
     minimum_data_quality: float = 60.0
     minimum_forecast_confidence: float = 55.0
     minimum_historical_reliability: float = 50.0
     minimum_liquidity_quality: float = 40.0
+
+    minimum_evidence_count: int = 1
+    maximum_evidence_age_days: int = 45
+    conditional_shortfall_tolerance: float = 10.0
 
     maximum_asset_weight: float = 0.20
     maximum_asset_class_weight: float = 0.50
@@ -51,6 +55,9 @@ class DecisionPolicy:
             "minimum_liquidity_quality": (
                 self.minimum_liquidity_quality
             ),
+            "conditional_shortfall_tolerance": (
+                self.conditional_shortfall_tolerance
+            ),
             "strong_buy_threshold": self.strong_buy_threshold,
             "buy_threshold": self.buy_threshold,
             "accumulate_threshold": self.accumulate_threshold,
@@ -65,16 +72,28 @@ class DecisionPolicy:
                     f"{name} must be between 0.0 and 100.0."
                 )
 
-        for name, value in {
+        weight_fields = {
             "maximum_asset_weight": self.maximum_asset_weight,
             "maximum_asset_class_weight": (
                 self.maximum_asset_class_weight
             ),
-        }.items():
+        }
+
+        for name, value in weight_fields.items():
             if not 0.0 <= float(value) <= 1.0:
                 raise DecisionPolicyError(
                     f"{name} must be between 0.0 and 1.0."
                 )
+
+        if self.minimum_evidence_count < 0:
+            raise DecisionPolicyError(
+                "minimum_evidence_count cannot be negative."
+            )
+
+        if self.maximum_evidence_age_days <= 0:
+            raise DecisionPolicyError(
+                "maximum_evidence_age_days must be positive."
+            )
 
         thresholds = (
             self.strong_buy_threshold,

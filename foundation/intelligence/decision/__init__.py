@@ -14,6 +14,11 @@ from .contracts import (
     DecisionValidationError,
     EligibilityStatus,
 )
+from .eligibility import (
+    EligibilityCheck,
+    EligibilityResult,
+    UniversalEligibilityEngine,
+)
 
 __all__ = [
     "DecisionAction",
@@ -27,5 +32,8 @@ __all__ = [
     "DecisionScore",
     "DecisionStatus",
     "DecisionValidationError",
+    "EligibilityCheck",
+    "EligibilityResult",
     "EligibilityStatus",
+    "UniversalEligibilityEngine",
 ]
