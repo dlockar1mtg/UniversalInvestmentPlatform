@@ -1,0 +1,6 @@
+category,target_weight,minimum_weight,maximum_weight
+crypto,0.33,0.28,0.38
+mtg,0.20,0.15,0.25
+metals,0.10,0.07,0.13
+acorns,0.10,0.07,0.13
+stocks_etfs,0.27,0.22,0.32

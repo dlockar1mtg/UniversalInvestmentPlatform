@@ -1,0 +1,6 @@
+asset_id,asset_category,market_value,is_stale,valued
+BTC,crypto,33000.00,false,true
+MTG-BOX,mtg,20000.00,false,true
+GLD,metals,10000.00,false,true
+ACORNS,acorns,10000.00,false,true
+VOO,stocks_etfs,27000.00,false,true
