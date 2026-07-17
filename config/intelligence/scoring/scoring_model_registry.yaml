@@ -1,0 +1,8 @@
+schema_version: 1.0.0
+models:
+  - {model_id: crypto_core_v1, asset_class: crypto, version: 1.0.0, scoring_profile_id: crypto_profile_v1, normalization_profile_id: crypto_normalization_v1, status: active, effective_from: "2026-07-17", description: Initial universal crypto scoring model.}
+  - {model_id: etf_core_v1, asset_class: etf, version: 1.0.0, scoring_profile_id: etf_profile_v1, normalization_profile_id: etf_normalization_v1, status: active, effective_from: "2026-07-17", description: Initial universal ETF scoring model.}
+  - {model_id: metals_core_v1, asset_class: metals, version: 1.0.0, scoring_profile_id: metals_profile_v1, normalization_profile_id: metals_normalization_v1, status: active, effective_from: "2026-07-17", description: Initial universal metals scoring model.}
+  - {model_id: mtg_core_v1, asset_class: mtg, version: 1.0.0, scoring_profile_id: mtg_profile_v1, normalization_profile_id: mtg_normalization_v1, status: active, effective_from: "2026-07-17", description: Initial universal MTG collectible scoring model.}
+  - {model_id: housing_core_v1, asset_class: housing, version: 1.0.0, scoring_profile_id: housing_profile_v1, normalization_profile_id: housing_normalization_v1, status: active, effective_from: "2026-07-17", description: Initial universal housing-market scoring model.}
+  - {model_id: cash_core_v1, asset_class: cash, version: 1.0.0, scoring_profile_id: cash_profile_v1, normalization_profile_id: cash_normalization_v1, status: active, effective_from: "2026-07-17", description: Initial universal cash and cash-equivalent scoring model.}

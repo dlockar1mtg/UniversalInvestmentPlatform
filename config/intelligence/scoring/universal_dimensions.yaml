@@ -1,0 +1,29 @@
+schema_version: 1.0.0
+dimensions:
+  - id: return_potential
+    display_name: Return Potential
+    description: Expected future return and upside potential.
+  - id: momentum
+    display_name: Momentum
+    description: Current price, demand, or market trend strength.
+  - id: valuation
+    display_name: Valuation
+    description: Relative attractiveness of the current price.
+  - id: quality
+    display_name: Quality
+    description: Fundamental, structural, or collectible quality.
+  - id: risk
+    display_name: Risk
+    description: Downside exposure, uncertainty, and loss severity.
+  - id: liquidity
+    display_name: Liquidity
+    description: Ease and reliability of entering or exiting the position.
+  - id: diversification
+    display_name: Diversification
+    description: Expected benefit to the existing portfolio mix.
+  - id: macro_alignment
+    display_name: Macro Alignment
+    description: Fit with the prevailing economic and market regime.
+  - id: data_confidence
+    display_name: Data Confidence
+    description: Reliability, completeness, freshness, and historical depth of evidence.

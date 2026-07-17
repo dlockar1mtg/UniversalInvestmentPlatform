@@ -1,0 +1,32 @@
+model_id: housing_core_v1
+profile_id: housing_profile_v1
+asset_class: housing
+version: 1.0.0
+normalization_profile_id: housing_normalization_v1
+status: active
+description: Initial metropolitan housing-market scoring profile.
+dimension_weights:
+  return_potential: 0.16
+  momentum: 0.08
+  valuation: 0.18
+  quality: 0.14
+  risk: 0.15
+  liquidity: 0.06
+  diversification: 0.05
+  macro_alignment: 0.13
+  data_confidence: 0.05
+minimum_coverage: 0.75
+confidence_floor: 0.75
+maximum_risk_penalty: 0.18
+metrics:
+  - {metric_name: expected_appreciation_3y, dimension: return_potential, strategy: higher_is_better, weight: 1.0, parameters: {minimum: -0.10, maximum: 0.20, clip: true}}
+  - {metric_name: price_momentum_12m, dimension: momentum, strategy: higher_is_better, weight: 1.0, parameters: {minimum: -0.15, maximum: 0.20, clip: true}}
+  - {metric_name: affordability_score, dimension: valuation, strategy: bounded_range, weight: 0.6, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: rent_value_score, dimension: valuation, strategy: bounded_range, weight: 0.4, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: demographic_quality, dimension: quality, strategy: bounded_range, weight: 0.5, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: employment_quality, dimension: quality, strategy: bounded_range, weight: 0.5, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: downside_risk_score, dimension: risk, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: market_liquidity, dimension: liquidity, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: diversification_score, dimension: diversification, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: macro_alignment, dimension: macro_alignment, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: data_confidence, dimension: data_confidence, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}

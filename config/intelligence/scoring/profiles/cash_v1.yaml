@@ -1,0 +1,28 @@
+model_id: cash_core_v1
+profile_id: cash_profile_v1
+asset_class: cash
+version: 1.0.0
+normalization_profile_id: cash_normalization_v1
+status: active
+description: Initial cash and short-duration Treasury scoring profile.
+dimension_weights:
+  return_potential: 0.15
+  valuation: 0.10
+  quality: 0.15
+  risk: 0.20
+  liquidity: 0.20
+  diversification: 0.05
+  macro_alignment: 0.10
+  data_confidence: 0.05
+minimum_coverage: 0.80
+confidence_floor: 0.85
+maximum_risk_penalty: 0.08
+metrics:
+  - {metric_name: nominal_yield, dimension: return_potential, strategy: higher_is_better, weight: 1.0, parameters: {minimum: 0, maximum: 0.08, clip: true}}
+  - {metric_name: real_yield_score, dimension: valuation, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: credit_quality, dimension: quality, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: capital_preservation, dimension: risk, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: liquidity_score, dimension: liquidity, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: diversification_score, dimension: diversification, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: macro_alignment, dimension: macro_alignment, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: data_confidence, dimension: data_confidence, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}

@@ -1,0 +1,20 @@
+schema_version: 1.0.0
+benchmarks:
+  crypto:
+    benchmark_id: bitcoin
+    description: Bitcoin buy-and-hold benchmark.
+  etf:
+    benchmark_id: VOO
+    description: S&P 500 ETF benchmark.
+  metals:
+    benchmark_id: GLD
+    description: Gold ETF benchmark.
+  mtg:
+    benchmark_id: mtg_equal_weight
+    description: Equal-weight MTG sealed product benchmark.
+  housing:
+    benchmark_id: national_housing_index
+    description: National housing appreciation benchmark.
+  cash:
+    benchmark_id: BIL
+    description: Short-duration Treasury ETF benchmark.
