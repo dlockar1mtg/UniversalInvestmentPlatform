@@ -1,0 +1,4 @@
+benchmark_key,benchmark_date,benchmark_value,currency,source
+sp500,2026-01-31,100.00,USD,test
+sp500,2026-02-28,102.00,USD,test
+sp500,2026-03-31,101.50,USD,test

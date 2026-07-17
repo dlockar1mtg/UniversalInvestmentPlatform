@@ -1,0 +1,6 @@
+attribution_level,attribution_key,beginning_weight,period_return
+category,crypto,0.33,0.10
+category,mtg,0.20,0.02
+category,metals,0.10,0.03
+category,acorns,0.10,0.01
+category,stocks_etfs,0.27,0.04
