@@ -1,0 +1,5 @@
+Command:
+python scripts\run_metals_universal_export.py --metals-root C:\Users\DevonLockard\metals
+
+Result:
+METALS UNIVERSAL EXPORT: PASS
