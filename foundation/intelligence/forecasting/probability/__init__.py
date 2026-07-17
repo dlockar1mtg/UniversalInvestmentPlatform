@@ -36,6 +36,16 @@ from .distribution_schema import (
     validate_distribution,
     validate_distribution_payload,
 )
+from .risk_analytics_contracts import (
+    DistributionComparisonEntry,
+    DistributionComparisonResult,
+    DistributionRiskGrade,
+    DistributionRiskMetrics,
+    DistributionRiskProfile,
+    TailRiskPoint,
+)
+from .risk_analytics_engine import DistributionRiskAnalyticsEngine
+from .risk_analytics_service import DistributionRiskAnalyticsService
 from .scenario_contracts import (
     ScenarioBranchTemplate,
     ScenarioDirection,
@@ -72,8 +82,15 @@ __all__ = [
     "BinomialEvidence",
     "DISTRIBUTION_SCHEMA_NAME",
     "DISTRIBUTION_SCHEMA_VERSION",
+    "DistributionComparisonEntry",
+    "DistributionComparisonResult",
     "DistributionFamily",
     "DistributionProvenance",
+    "DistributionRiskAnalyticsEngine",
+    "DistributionRiskAnalyticsService",
+    "DistributionRiskGrade",
+    "DistributionRiskMetrics",
+    "DistributionRiskProfile",
     "DistributionSchemaError",
     "DistributionStatistics",
     "DistributionStatus",
@@ -102,6 +119,7 @@ __all__ = [
     "ScenarioTreeStatus",
     "SimulationProcess",
     "TailRiskMetrics",
+    "TailRiskPoint",
     "TailRiskSide",
     "distribution_from_dict",
     "distribution_to_dict",
