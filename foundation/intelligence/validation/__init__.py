@@ -33,6 +33,18 @@ from .classification_metrics import (
     ClassificationMetrics,
     calculate_classification_metrics,
 )
+from .cross_asset_adapter import build_asset_class_summary
+from .cross_asset_contracts import (
+    AssetClassValidationSummary,
+    CrossAssetGrade,
+    CrossAssetValidationReport,
+)
+from .cross_asset_engine import CrossAssetValidationEngine
+from .cross_asset_grading import grade_asset_class
+from .cross_asset_limitations import (
+    DEFAULT_LIMITATIONS,
+    limitations_for_asset_class,
+)
 from .historical_observation import HistoricalObservation
 from .outcome_alignment import (
     build_outcome,
@@ -70,6 +82,7 @@ from .walk_forward_engine import (
 )
 
 __all__ = [
+    "AssetClassValidationSummary",
     "BacktestConfiguration",
     "BacktestDataset",
     "BacktestDiagnostics",
@@ -81,6 +94,10 @@ __all__ = [
     "BucketPerformance",
     "CalibrationSummary",
     "ClassificationMetrics",
+    "CrossAssetGrade",
+    "CrossAssetValidationEngine",
+    "CrossAssetValidationReport",
+    "DEFAULT_LIMITATIONS",
     "HistoricalObservation",
     "HorizonStabilitySummary",
     "HorizonValidationMetrics",
@@ -97,6 +114,7 @@ __all__ = [
     "WalkForwardBacktestEngine",
     "WalkForwardRequest",
     "assert_no_future_observations",
+    "build_asset_class_summary",
     "build_outcome",
     "calculate_alpha",
     "calculate_benchmark_metrics",
@@ -111,8 +129,10 @@ __all__ = [
     "calculate_relative_max_drawdown",
     "calculate_total_return",
     "generate_prediction_dates",
+    "grade_asset_class",
     "group_observations_by_asset",
     "kendall_rank_correlation",
+    "limitations_for_asset_class",
     "load_benchmark_registry",
     "performance_by_quantile",
     "performance_by_score_band",
