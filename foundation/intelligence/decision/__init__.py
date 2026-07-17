@@ -68,6 +68,17 @@ from .orchestration import (
     OrchestrationProfile,
     UniversalDecisionOrchestrator,
 )
+from .serialization import (
+    DecisionDeserializationError,
+    DecisionExportError,
+    DecisionSerializationError,
+    DecisionSerializationProfile,
+    SerializationConfigurationError,
+    SerializationSchemaError,
+    UniversalDecisionDeserializer,
+    UniversalDecisionExporter,
+    UniversalDecisionSerializer,
+)
 from .scoring import (
     DEFAULT_COMPONENT_WEIGHTS,
     DecisionScoringError,
@@ -113,6 +124,10 @@ __all__ = [
     "DecisionResult",
     "DecisionScore",
     "DecisionScoringError",
+    "DecisionDeserializationError",
+    "DecisionExportError",
+    "DecisionSerializationError",
+    "DecisionSerializationProfile",
     "DecisionScoringProfile",
     "DecisionStatus",
     "DecisionValidationError",
@@ -128,13 +143,19 @@ __all__ = [
     "OrchestrationInputError",
     "OrchestrationProfile",
     "ScoringConfigurationError",
+    "SerializationConfigurationError",
+    "SerializationSchemaError",
     "UniversalActionClassificationEngine",
     "UniversalAllocationEngine",
     "UniversalConfidenceAggregationEngine",
     "UniversalConstraintEngine",
     "UniversalDecisionExplanationEngine",
+    "UniversalDecisionDeserializer",
+    "UniversalDecisionExporter",
+    "UniversalDecisionSerializer",
     "UniversalDecisionScoringEngine",
     "UniversalDecisionOrchestrator",
     "UniversalEligibilityEngine",
 ]
+
 
