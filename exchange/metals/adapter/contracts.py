@@ -59,4 +59,9 @@ def load_contract(schema_path: Path) -> Contract:
         fields.append(ContractField(name=name, required=required, data_type=str(row.get(type_key, "string") if type_key else "string")))
     if not fields:
         raise ValueError(f"No contract fields were found in {schema_path}")
-    return Contract(schema_path.stem.replace("_schema", ""), tuple(fields))
+    contract_name = schema_path.stem
+    for suffix in ("_columns", "_schema", "_definition"):
+        if contract_name.endswith(suffix):
+            contract_name = contract_name.removesuffix(suffix)
+            break
+    return Contract(contract_name, tuple(fields))
