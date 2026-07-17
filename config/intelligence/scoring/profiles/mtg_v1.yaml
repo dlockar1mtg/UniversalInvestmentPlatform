@@ -1,0 +1,32 @@
+model_id: mtg_core_v1
+profile_id: mtg_profile_v1
+asset_class: mtg
+version: 1.0.0
+normalization_profile_id: mtg_normalization_v1
+status: active
+description: Initial MTG sealed collectible scoring profile.
+dimension_weights:
+  return_potential: 0.22
+  momentum: 0.08
+  valuation: 0.15
+  quality: 0.18
+  risk: 0.14
+  liquidity: 0.10
+  diversification: 0.05
+  macro_alignment: 0.02
+  data_confidence: 0.06
+minimum_coverage: 0.70
+confidence_floor: 0.68
+maximum_risk_penalty: 0.22
+metrics:
+  - {metric_name: expected_cagr_3y, dimension: return_potential, strategy: higher_is_better, weight: 1.0, parameters: {minimum: -0.10, maximum: 0.30, clip: true}}
+  - {metric_name: price_momentum_12m, dimension: momentum, strategy: higher_is_better, weight: 1.0, parameters: {minimum: -0.30, maximum: 0.60, clip: true}}
+  - {metric_name: entry_value_score, dimension: valuation, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: product_quality, dimension: quality, strategy: bounded_range, weight: 0.6, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: scarcity_score, dimension: quality, strategy: bounded_range, weight: 0.4, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: reprint_risk_score, dimension: risk, strategy: bounded_range, weight: 0.5, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: downside_resilience, dimension: risk, strategy: bounded_range, weight: 0.5, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: liquidity_score, dimension: liquidity, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: diversification_score, dimension: diversification, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: macro_alignment, dimension: macro_alignment, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: data_confidence, dimension: data_confidence, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}

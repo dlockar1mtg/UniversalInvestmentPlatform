@@ -1,5 +1,12 @@
 """Universal scoring contracts and validation utilities."""
 
+from .asset_profile import AssetClassScoringProfile, MetricNormalizationRule
+from .asset_profile_loader import (
+    asset_profile_from_mapping,
+    load_asset_profile,
+    load_asset_profiles,
+)
+from .asset_profile_service import AssetProfileScoringService, MetricObservation
 from .composite_engine import (
     CompositeDiagnostics,
     CompositeScore,
@@ -33,6 +40,8 @@ from .scoring_model_service import ScoringModelSelection, ScoringModelService
 from .scoring_profile import ScoringProfile
 
 __all__ = [
+    "AssetClassScoringProfile",
+    "AssetProfileScoringService",
     "CompositeDiagnostics",
     "CompositeScore",
     "CompositeScoringEngine",
@@ -42,6 +51,8 @@ __all__ = [
     "DEFAULT_SCORING_MODEL_REGISTRY",
     "DEFAULT_SCORE_BANDS",
     "DimensionAggregation",
+    "MetricNormalizationRule",
+    "MetricObservation",
     "NormalizationEngine",
     "NormalizationRegistry",
     "NormalizationResult",
@@ -62,7 +73,10 @@ __all__ = [
     "aggregate_dimensions",
     "apply_confidence_adjustment",
     "apply_risk_adjustment",
+    "asset_profile_from_mapping",
     "classify_score",
+    "load_asset_profile",
+    "load_asset_profiles",
     "load_registry_from_yaml",
     "model_from_mapping",
 ]

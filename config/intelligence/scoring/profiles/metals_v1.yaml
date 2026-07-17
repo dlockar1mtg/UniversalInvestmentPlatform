@@ -1,0 +1,30 @@
+model_id: metals_core_v1
+profile_id: metals_profile_v1
+asset_class: metals
+version: 1.0.0
+normalization_profile_id: metals_normalization_v1
+status: active
+description: Initial precious and industrial metals scoring profile.
+dimension_weights:
+  return_potential: 0.17
+  momentum: 0.10
+  valuation: 0.10
+  quality: 0.10
+  risk: 0.15
+  liquidity: 0.08
+  diversification: 0.10
+  macro_alignment: 0.15
+  data_confidence: 0.05
+minimum_coverage: 0.70
+confidence_floor: 0.72
+maximum_risk_penalty: 0.18
+metrics:
+  - {metric_name: expected_return_3y, dimension: return_potential, strategy: higher_is_better, weight: 1.0, parameters: {minimum: -0.15, maximum: 0.25, clip: true}}
+  - {metric_name: momentum_12m, dimension: momentum, strategy: higher_is_better, weight: 1.0, parameters: {minimum: -0.35, maximum: 0.50, clip: true}}
+  - {metric_name: valuation_score, dimension: valuation, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: supply_demand_quality, dimension: quality, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: volatility_3y, dimension: risk, strategy: lower_is_better, weight: 1.0, parameters: {minimum: 0.05, maximum: 0.60, clip: true}}
+  - {metric_name: liquidity_score, dimension: liquidity, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: diversification_score, dimension: diversification, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: macro_alignment, dimension: macro_alignment, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}
+  - {metric_name: data_confidence, dimension: data_confidence, strategy: bounded_range, weight: 1.0, parameters: {minimum: 0, maximum: 100, clip: true}}

@@ -1,0 +1,71 @@
+model_id: crypto_core_v1
+profile_id: crypto_profile_v1
+asset_class: crypto
+version: 1.0.0
+normalization_profile_id: crypto_normalization_v1
+status: active
+description: Initial crypto scoring profile for large-cap digital assets.
+dimension_weights:
+  return_potential: 0.20
+  momentum: 0.15
+  valuation: 0.08
+  quality: 0.15
+  risk: 0.15
+  liquidity: 0.08
+  diversification: 0.06
+  macro_alignment: 0.05
+  data_confidence: 0.08
+minimum_coverage: 0.70
+confidence_floor: 0.70
+maximum_risk_penalty: 0.20
+metrics:
+  - metric_name: expected_return_1y
+    dimension: return_potential
+    strategy: higher_is_better
+    weight: 1.0
+    parameters: {minimum: -0.40, maximum: 1.00, clip: true}
+  - metric_name: momentum_90d
+    dimension: momentum
+    strategy: higher_is_better
+    weight: 1.0
+    parameters: {minimum: -0.50, maximum: 0.75, clip: true}
+  - metric_name: valuation_percentile
+    dimension: valuation
+    strategy: lower_is_better
+    weight: 1.0
+    parameters: {minimum: 0, maximum: 100, clip: true}
+  - metric_name: network_quality
+    dimension: quality
+    strategy: bounded_range
+    weight: 1.0
+    parameters: {minimum: 0, maximum: 100, clip: true}
+  - metric_name: volatility_1y
+    dimension: risk
+    strategy: lower_is_better
+    weight: 0.6
+    parameters: {minimum: 0.20, maximum: 1.50, clip: true}
+  - metric_name: max_drawdown_1y
+    dimension: risk
+    strategy: higher_is_better
+    weight: 0.4
+    parameters: {minimum: -0.90, maximum: 0, clip: true}
+  - metric_name: liquidity_score
+    dimension: liquidity
+    strategy: bounded_range
+    weight: 1.0
+    parameters: {minimum: 0, maximum: 100, clip: true}
+  - metric_name: diversification_score
+    dimension: diversification
+    strategy: bounded_range
+    weight: 1.0
+    parameters: {minimum: 0, maximum: 100, clip: true}
+  - metric_name: macro_alignment
+    dimension: macro_alignment
+    strategy: bounded_range
+    weight: 1.0
+    parameters: {minimum: 0, maximum: 100, clip: true}
+  - metric_name: data_confidence
+    dimension: data_confidence
+    strategy: bounded_range
+    weight: 1.0
+    parameters: {minimum: 0, maximum: 100, clip: true}
