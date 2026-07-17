@@ -28,12 +28,14 @@ class DecisionResult:
     confidence: float
 
     maximum_allocation: Decimal = Decimal("0")
+    recommended_allocation: Decimal = Decimal("0")
+
     reasons: Sequence[str] = field(default_factory=tuple)
     evidence: Sequence[DecisionEvidence] = field(default_factory=tuple)
     policy_violations: Sequence[str] = field(default_factory=tuple)
 
     policy_id: str = "universal-default"
-    policy_version: str = "5.1.1"
+    policy_version: str = "5.1.2"
     generated_at: datetime = field(
         default_factory=lambda: datetime.now(timezone.utc)
     )
@@ -62,6 +64,17 @@ class DecisionResult:
         if self.maximum_allocation < Decimal("0"):
             raise DecisionValidationError(
                 "maximum_allocation cannot be negative."
+            )
+
+        if self.recommended_allocation < Decimal("0"):
+            raise DecisionValidationError(
+                "recommended_allocation cannot be negative."
+            )
+
+        if self.recommended_allocation > self.maximum_allocation:
+            raise DecisionValidationError(
+                "recommended_allocation cannot exceed "
+                "maximum_allocation."
             )
 
         if not self.policy_id.strip():

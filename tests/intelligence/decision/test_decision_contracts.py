@@ -228,3 +228,19 @@ def test_decision_result_rejects_expired_at_generation() -> None:
             generated_at=generated_at,
             expires_at=generated_at,
         )
+
+
+def test_decision_result_rejects_recommendation_above_maximum() -> None:
+    with pytest.raises(DecisionValidationError):
+        DecisionResult(
+            decision_id="DECISION-ALLOCATION-001",
+            asset_id="ETF:VOO",
+            asset_class="etf",
+            action=DecisionAction.BUY,
+            status=DecisionStatus.EVALUATED,
+            eligibility=EligibilityStatus.ELIGIBLE,
+            score=build_score(),
+            confidence=0.80,
+            maximum_allocation=Decimal("1000"),
+            recommended_allocation=Decimal("1001"),
+        )

@@ -59,6 +59,15 @@ from .explanation import (
     ExplanationProfile,
     UniversalDecisionExplanationEngine,
 )
+from .orchestration import (
+    DecisionOrchestrationError,
+    DecisionOrchestrationResult,
+    OrchestrationConfigurationError,
+    OrchestrationConsistencyError,
+    OrchestrationInputError,
+    OrchestrationProfile,
+    UniversalDecisionOrchestrator,
+)
 from .scoring import (
     DEFAULT_COMPONENT_WEIGHTS,
     DecisionScoringError,
@@ -99,6 +108,8 @@ __all__ = [
     "DecisionInput",
     "DecisionPolicy",
     "DecisionPolicyError",
+    "DecisionOrchestrationError",
+    "DecisionOrchestrationResult",
     "DecisionResult",
     "DecisionScore",
     "DecisionScoringError",
@@ -112,6 +123,10 @@ __all__ = [
     "ExplanationInputError",
     "ExplanationProfile",
     "IneligibleScoringError",
+    "OrchestrationConfigurationError",
+    "OrchestrationConsistencyError",
+    "OrchestrationInputError",
+    "OrchestrationProfile",
     "ScoringConfigurationError",
     "UniversalActionClassificationEngine",
     "UniversalAllocationEngine",
@@ -119,5 +134,7 @@ __all__ = [
     "UniversalConstraintEngine",
     "UniversalDecisionExplanationEngine",
     "UniversalDecisionScoringEngine",
+    "UniversalDecisionOrchestrator",
     "UniversalEligibilityEngine",
 ]
+
