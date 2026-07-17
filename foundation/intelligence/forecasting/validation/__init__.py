@@ -1,5 +1,22 @@
 """Forecast validation and continuous-learning contracts."""
 
+from .certification_contracts import (
+    CertificationGate,
+    CertificationGateResult,
+    CertificationStatus,
+    ForecastCertificationProfile,
+    ForecastCertificationRecord,
+    ForecastCertificationReport,
+)
+from .certification_engine import ForecastCertificationEngine
+from .certification_service import ForecastCertificationService
+from .certification_state import (
+    certification_report_from_dict,
+    certification_report_to_dict,
+    certification_report_to_json,
+    load_certification_report,
+    save_certification_report,
+)
 from .drift_contracts import (
     DriftDetectionProfile,
     DriftHistory,
@@ -59,6 +76,9 @@ from .performance_engine import ForecastPerformanceAnalyticsEngine
 from .performance_service import ForecastPerformanceAnalyticsService
 
 __all__ = [
+    "CertificationGate",
+    "CertificationGateResult",
+    "CertificationStatus",
     "ContinuousLearningEngine",
     "ContinuousLearningProfile",
     "ContinuousLearningResult",
@@ -71,6 +91,11 @@ __all__ = [
     "DriftSeverity",
     "DriftType",
     "ForecastArchive",
+    "ForecastCertificationEngine",
+    "ForecastCertificationProfile",
+    "ForecastCertificationRecord",
+    "ForecastCertificationReport",
+    "ForecastCertificationService",
     "ForecastDriftDetectionEngine",
     "ForecastDriftDetectionService",
     "ForecastDriftReport",
@@ -94,14 +119,19 @@ __all__ = [
     "PerformanceGrouping",
     "RegimePerformanceSnapshot",
     "ValidationStatus",
+    "certification_report_from_dict",
+    "certification_report_to_dict",
+    "certification_report_to_json",
     "drift_history_from_dict",
     "drift_history_to_dict",
     "drift_history_to_json",
     "learning_state_from_dict",
     "learning_state_to_dict",
     "learning_state_to_json",
+    "load_certification_report",
     "load_drift_history",
     "load_learning_state",
+    "save_certification_report",
     "save_drift_history",
     "save_learning_state",
 ]
