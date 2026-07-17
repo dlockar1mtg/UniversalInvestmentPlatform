@@ -1,5 +1,15 @@
-"""Forecast intelligence quality, ranking, selection, and consensus services."""
+"""Forecast intelligence quality, consensus, and calibration services."""
 
+from .calibration_contracts import (
+    CalibrationStrength,
+    ConfidenceCalibrationEvidence,
+    ConfidenceCalibrationProfile,
+    ConfidenceCalibrationRequest,
+    ConfidenceCalibrationResult,
+    MarketRegime,
+)
+from .calibration_engine import AdaptiveConfidenceCalibrationEngine
+from .calibration_service import ForecastConfidenceCalibrationService
 from .consensus_contracts import (
     ConsensusOutlier,
     ConsensusProfile,
@@ -22,9 +32,16 @@ from .ranking_engine import ForecastModelRankingEngine
 from .selection_service import ForecastModelSelectionService
 
 __all__ = [
+    "AdaptiveConfidenceCalibrationEngine",
+    "CalibrationStrength",
+    "ConfidenceCalibrationEvidence",
+    "ConfidenceCalibrationProfile",
+    "ConfidenceCalibrationRequest",
+    "ConfidenceCalibrationResult",
     "ConsensusOutlier",
     "ConsensusProfile",
     "ConsensusStrength",
+    "ForecastConfidenceCalibrationService",
     "ForecastConsensusEngine",
     "ForecastConsensusInput",
     "ForecastConsensusResult",
@@ -36,6 +53,7 @@ __all__ = [
     "ForecastQualityGrade",
     "ForecastQualityProfile",
     "ForecastQualityScore",
+    "MarketRegime",
     "ModelRankingEntry",
     "ModelSelectionResult",
 ]
