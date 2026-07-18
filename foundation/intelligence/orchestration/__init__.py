@@ -1,4 +1,4 @@
-"""Universal decision-orchestration contracts, adapters, and run engine."""
+"""Universal decision orchestration, execution, registry, and recovery."""
 
 from .adapters import (
     AdapterEvidence,
@@ -27,14 +27,26 @@ from .orchestrator import (
     OrchestrationEnginePolicy,
     run_universal_orchestration,
 )
+from .registry import (
+    InMemoryRunRegistry,
+    RecoveryAction,
+    RecoveryPlan,
+    RegisteredRun,
+    ReproducibilityReport,
+    RunAttempt,
+    StageCheckpoint,
+    request_fingerprint,
+)
 
 __all__ = [
     "AdapterEvidence", "CapitalInput", "DecisionRankingAdapterResult",
-    "EndToEndOrchestrationResult", "FailureScope", "OrchestrationEnginePolicy",
-    "OrchestrationOpportunity", "OrchestrationPolicyBundle", "OrchestrationRunStatus",
-    "OrchestrationStage", "PortfolioPositionSnapshot", "PortfolioSnapshot",
-    "QuarantinedOpportunity", "RankingAllocationAdapterResult", "StageRecord",
-    "StageStatus", "UniversalOrchestrationResult", "UniversalRunRequest",
-    "adapt_decisions_to_ranking", "adapt_ranking_to_allocation",
+    "EndToEndOrchestrationResult", "FailureScope", "InMemoryRunRegistry",
+    "OrchestrationEnginePolicy", "OrchestrationOpportunity", "OrchestrationPolicyBundle",
+    "OrchestrationRunStatus", "OrchestrationStage", "PortfolioPositionSnapshot",
+    "PortfolioSnapshot", "QuarantinedOpportunity", "RankingAllocationAdapterResult",
+    "RecoveryAction", "RecoveryPlan", "RegisteredRun", "ReproducibilityReport",
+    "RunAttempt", "StageCheckpoint", "StageRecord", "StageStatus",
+    "UniversalOrchestrationResult", "UniversalRunRequest",
+    "adapt_decisions_to_ranking", "adapt_ranking_to_allocation", "request_fingerprint",
     "run_universal_orchestration",
 ]
