@@ -80,3 +80,11 @@ from .execution import (
     ExecutionPlanningPolicy,
     build_execution_plan,
 )
+
+from .explanations import (
+    AllocationAuditArtifact,
+    AllocationAuditInput,
+    AllocationExplanation,
+    AllocationExplanationAuditResult,
+    build_allocation_explanation_audit,
+)
