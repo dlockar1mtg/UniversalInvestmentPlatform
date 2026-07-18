@@ -102,3 +102,12 @@ from .serialization import (
     execution_dashboard_csv,
     execution_dashboard_rows,
 )
+
+from .certification import (
+    CertificationCheck,
+    CertificationStatus,
+    Phase53CertificationReport,
+    Phase53CertificationScenario,
+    build_reference_certification_scenario,
+    certify_phase_5_3,
+)
