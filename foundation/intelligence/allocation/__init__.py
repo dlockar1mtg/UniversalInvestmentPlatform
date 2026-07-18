@@ -64,3 +64,10 @@ from .objectives import (
     calculate_allocation_objective,
     calculate_allocation_objectives,
 )
+
+from .optimizer import (
+    CapitalOptimizationResult,
+    OptimizationCandidate,
+    OptimizerPolicy,
+    optimize_capital,
+)
