@@ -44,3 +44,12 @@ from .sizing import (
     size_opportunities,
     size_opportunity,
 )
+
+from .constraints import (
+    ConstraintContext,
+    ConstraintDisposition,
+    ConstraintEligibility,
+    ConstraintEvaluation,
+    ConstraintOutcome,
+    evaluate_allocation_constraints,
+)
