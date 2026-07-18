@@ -1,4 +1,4 @@
-"""Universal decision-orchestration contracts and cross-stage adapters."""
+"""Universal decision-orchestration contracts, adapters, and run engine."""
 
 from .adapters import (
     AdapterEvidence,
@@ -22,12 +22,19 @@ from .contracts import (
     UniversalOrchestrationResult,
     UniversalRunRequest,
 )
+from .orchestrator import (
+    EndToEndOrchestrationResult,
+    OrchestrationEnginePolicy,
+    run_universal_orchestration,
+)
 
 __all__ = [
     "AdapterEvidence", "CapitalInput", "DecisionRankingAdapterResult",
-    "FailureScope", "OrchestrationOpportunity", "OrchestrationPolicyBundle",
-    "OrchestrationRunStatus", "OrchestrationStage", "PortfolioPositionSnapshot",
-    "PortfolioSnapshot", "QuarantinedOpportunity", "RankingAllocationAdapterResult",
-    "StageRecord", "StageStatus", "UniversalOrchestrationResult", "UniversalRunRequest",
+    "EndToEndOrchestrationResult", "FailureScope", "OrchestrationEnginePolicy",
+    "OrchestrationOpportunity", "OrchestrationPolicyBundle", "OrchestrationRunStatus",
+    "OrchestrationStage", "PortfolioPositionSnapshot", "PortfolioSnapshot",
+    "QuarantinedOpportunity", "RankingAllocationAdapterResult", "StageRecord",
+    "StageStatus", "UniversalOrchestrationResult", "UniversalRunRequest",
     "adapt_decisions_to_ranking", "adapt_ranking_to_allocation",
+    "run_universal_orchestration",
 ]
