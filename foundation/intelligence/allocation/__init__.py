@@ -34,3 +34,13 @@ from .supply import (
     ReserveType,
     calculate_capital_supply,
 )
+
+from .sizing import (
+    OpportunitySizingResult,
+    SizingInputs,
+    SizingPolicy,
+    SizingReasonCode,
+    SizingStatus,
+    size_opportunities,
+    size_opportunity,
+)
