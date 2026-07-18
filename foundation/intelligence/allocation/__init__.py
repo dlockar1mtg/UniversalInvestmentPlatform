@@ -88,3 +88,17 @@ from .explanations import (
     AllocationExplanationAuditResult,
     build_allocation_explanation_audit,
 )
+
+from .serialization import (
+    ALLOCATION_COLUMNS,
+    AUDIT_COLUMNS,
+    EXECUTION_COLUMNS,
+    allocation_audit_csv,
+    allocation_audit_rows,
+    allocation_bundle_dict,
+    allocation_bundle_json,
+    allocation_dashboard_csv,
+    allocation_dashboard_rows,
+    execution_dashboard_csv,
+    execution_dashboard_rows,
+)
