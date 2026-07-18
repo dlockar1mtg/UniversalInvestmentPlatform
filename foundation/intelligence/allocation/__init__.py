@@ -53,3 +53,14 @@ from .constraints import (
     ConstraintOutcome,
     evaluate_allocation_constraints,
 )
+
+from .objectives import (
+    AllocationObjectiveResult,
+    ObjectiveContribution,
+    ObjectiveInputs,
+    ObjectivePenalty,
+    ObjectivePolicy,
+    ObjectiveStatus,
+    calculate_allocation_objective,
+    calculate_allocation_objectives,
+)
