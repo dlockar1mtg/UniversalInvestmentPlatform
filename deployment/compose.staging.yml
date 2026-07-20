@@ -1,0 +1,18 @@
+services:
+  api:
+    restart: unless-stopped
+    environment:
+      UIIP_ENVIRONMENT: staging
+      UIIP_REQUIRE_HTTPS: "true"
+      UIIP_ALLOWED_HOSTS: ${UIIP_STAGING_HOST}
+      UIIP_MAX_REQUEST_BYTES: "1048576"
+  worker:
+    restart: unless-stopped
+    environment:
+      UIIP_ENVIRONMENT: staging
+  scheduler:
+    restart: unless-stopped
+    environment:
+      UIIP_ENVIRONMENT: staging
+  postgres:
+    restart: unless-stopped
