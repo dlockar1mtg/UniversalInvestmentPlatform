@@ -1,0 +1,28 @@
+services:
+  - type: web
+    runtime: docker
+    name: uiip-free-staging
+    plan: free
+    region: ohio
+    branch: main
+    dockerfilePath: ./deployment/Dockerfile
+    dockerContext: .
+    healthCheckPath: /health/ready
+    autoDeployTrigger: checksPass
+    envVars:
+      - key: UIIP_ENVIRONMENT
+        value: staging
+      - key: UIIP_DATABASE_BACKEND
+        value: postgresql
+      - key: UIIP_JOB_DATABASE_BACKEND
+        value: postgresql
+      - key: UIIP_REQUIRE_HTTPS
+        value: "true"
+      - key: UIIP_DATABASE_URL
+        sync: false
+      - key: UIIP_API_CREDENTIALS_JSON
+        sync: false
+      - key: UIIP_ALPHA_VANTAGE_API_KEY
+        sync: false
+      - key: UIIP_FRED_API_KEY
+        sync: false

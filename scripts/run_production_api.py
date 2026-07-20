@@ -1,18 +1,20 @@
-"""Start the hardened UIIP FastAPI service with Uvicorn."""
-
+"""Start hardened UIIP on local or Render-assigned networking."""
 from pathlib import Path
-import os
-import sys
-
+import os, sys
 ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+if str(ROOT) not in sys.path: sys.path.insert(0, str(ROOT))
 
 import uvicorn
+from foundation.production.free_staging import FreeStagingSettings, build_neon_repositories
 from foundation.production.http_service import HTTPServiceSettings, create_http_app
 from foundation.production.live_security import LiveSecuritySettings, install_live_security
 
+repository = None
+if os.getenv("RENDER_EXTERNAL_HOSTNAME"):
+    free_settings = FreeStagingSettings.from_environment()
+    os.environ.update(free_settings.application_environment())
+    repository, _ = build_neon_repositories(free_settings)
 settings = HTTPServiceSettings.from_environment()
-app = create_http_app(settings)
+app = create_http_app(settings, repository=repository)
 install_live_security(app, LiveSecuritySettings.from_environment())
-uvicorn.run(app, host=os.getenv("UIIP_HTTP_HOST", "127.0.0.1"), port=int(os.getenv("UIIP_HTTP_PORT", "8000")))
+uvicorn.run(app, host=os.getenv("UIIP_HTTP_HOST", "127.0.0.1"), port=int(os.getenv("PORT", os.getenv("UIIP_HTTP_PORT", "8000"))))
