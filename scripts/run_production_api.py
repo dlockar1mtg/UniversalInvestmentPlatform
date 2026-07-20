@@ -1,4 +1,4 @@
-"""Start the UIIP FastAPI service with Uvicorn."""
+"""Start the hardened UIIP FastAPI service with Uvicorn."""
 
 from pathlib import Path
 import os
@@ -10,7 +10,9 @@ if str(ROOT) not in sys.path:
 
 import uvicorn
 from foundation.production.http_service import HTTPServiceSettings, create_http_app
+from foundation.production.live_security import LiveSecuritySettings, install_live_security
 
 settings = HTTPServiceSettings.from_environment()
 app = create_http_app(settings)
+install_live_security(app, LiveSecuritySettings.from_environment())
 uvicorn.run(app, host=os.getenv("UIIP_HTTP_HOST", "127.0.0.1"), port=int(os.getenv("UIIP_HTTP_PORT", "8000")))
