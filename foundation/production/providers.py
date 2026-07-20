@@ -11,7 +11,7 @@ import json
 import os
 import re
 from typing import Callable, Mapping, Sequence
-from urllib.parse import urlencode
+from urllib.parse import urlencode, urljoin
 from urllib.request import urlopen
 
 Transport = Callable[[str, float], bytes]
@@ -177,6 +177,18 @@ class _HTMLTableParser(HTMLParser):
             self._row = None
 
 
+class _LinkParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__()
+        self.links: list[str] = []
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag == "a":
+            href = dict(attrs).get("href")
+            if href:
+                self.links.append(href)
+
+
 class EIAUraniumProvider:
     """Latest U.S. uranium weighted-average purchase price from EIA."""
 
@@ -222,7 +234,7 @@ class EIAUraniumProvider:
 class WorldBankCommodityProvider:
     """Latest monthly official commodity benchmarks from the World Bank Pink Sheet."""
 
-    URL = "https://thedocs.worldbank.org/en/doc/74e8be41ceb20fa0da750cda2f6b9e4e-0050012026/related/CMO-Historical-Data-Monthly.xlsx"
+    INDEX_URL = "https://www.worldbank.org/en/research/commodity-markets"
     TARGETS = {
         "gold": ("Gold", "usd_per_troy_ounce"),
         "silver": ("Silver", "usd_per_troy_ounce"),
@@ -234,9 +246,34 @@ class WorldBankCommodityProvider:
         "tin": ("Tin", "usd_per_metric_ton"),
     }
 
-    def __init__(self, *, transport: Transport = _default_transport, timeout: float = 30.0):
+    def __init__(
+        self,
+        *,
+        transport: Transport = _default_transport,
+        timeout: float = 30.0,
+        workbook_url: str | None = None,
+    ):
         self._transport = transport
         self._timeout = timeout
+        self._workbook_url = workbook_url
+
+    def _resolve_workbook_url(self) -> str:
+        if self._workbook_url:
+            return self._workbook_url
+        payload = _request_bytes(self.INDEX_URL, self._transport, self._timeout)
+        parser = _LinkParser()
+        try:
+            parser.feed(payload.decode("utf-8", errors="replace"))
+        except Exception as exc:
+            raise ProviderError("World Bank commodity index was not valid HTML") from exc
+        candidates = [
+            urljoin(self.INDEX_URL, link)
+            for link in parser.links
+            if "cmo-historical-data-monthly" in link.lower() and ".xlsx" in link.lower()
+        ]
+        if not candidates:
+            raise ProviderError("World Bank monthly workbook link was not found")
+        return candidates[0]
 
     @staticmethod
     def _month(value: object) -> date | None:
@@ -263,7 +300,8 @@ class WorldBankCommodityProvider:
         unknown = sorted(set(requested) - set(self.TARGETS))
         if unknown:
             raise ValueError(f"unsupported World Bank commodities: {', '.join(unknown)}")
-        payload = _request_bytes(self.URL, self._transport, self._timeout)
+        workbook_url = self._resolve_workbook_url()
+        payload = _request_bytes(workbook_url, self._transport, self._timeout)
         try:
             from openpyxl import load_workbook
             workbook = load_workbook(BytesIO(payload), read_only=True, data_only=True)
