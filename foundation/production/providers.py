@@ -234,7 +234,9 @@ class EIAUraniumProvider:
 class WorldBankCommodityProvider:
     """Latest monthly official commodity benchmarks from the World Bank Pink Sheet."""
 
-    INDEX_URL = "https://www.worldbank.org/en/research/commodity-markets"\n    FALLBACK_URL = "https://thedocs.worldbank.org/en/doc/74e8be41ceb20fa0da750cda2f6b9e4e-0050012026/related/CMO-Historical-Data-Monthly.xlsx"\n    TARGETS = {
+    INDEX_URL = "https://www.worldbank.org/en/research/commodity-markets"
+    FALLBACK_URL = "https://thedocs.worldbank.org/en/doc/74e8be41ceb20fa0da750cda2f6b9e4e-0050012026/related/CMO-Historical-Data-Monthly.xlsx"
+    TARGETS = {
         "gold": ("Gold", "usd_per_troy_ounce"),
         "silver": ("Silver", "usd_per_troy_ounce"),
         "platinum": ("Platinum", "usd_per_troy_ounce"),
