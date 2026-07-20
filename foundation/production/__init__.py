@@ -16,25 +16,30 @@ from .persistence import SQLiteProductionRepository
 from .portfolio import PortfolioCSVError, PortfolioCSVValidationError, PortfolioImportReport, PortfolioPosition, import_portfolio_csv, preview_portfolio_csv
 from .postgres import PostgresProductionRepository
 from .postgres_jobs import PostgresJobRepository
-from .providers import AlphaVantageProvider, EconomicObservation, FREDProvider, MarketQuote, ProviderError
+from .providers import (
+    AlphaVantageProvider, CommodityObservation, EconomicObservation, EIAUraniumProvider,
+    FREDProvider, MarketQuote, ProviderError, WorldBankCommodityProvider,
+)
 from .scheduling import JobStatus, RetryPolicy, ScheduledJob, SQLiteJobRepository, run_next_job
 from .security import APIKeyAuthenticator, Permission, Principal, SecretReference, redact
 from .worker import HandlerRegistry, HostedWorker, RecurringSchedule, WorkerHealth, WorkerSettings, build_job_repository, enqueue_schedule
 
 __all__ = [
-    "APIKeyAuthenticator", "APIResponse", "AlphaVantageProvider", "AuditEvent", "DashboardService",
-    "DashboardSettings", "DatabaseBackupManager", "DeliveryCertificationCheck", "DeploymentManifest",
-    "EconomicObservation", "EventRecorder", "ExternalDataProvider", "ExternalDataRecord", "FREDProvider",
-    "HTTPServiceSettings", "HandlerRegistry", "HealthReport", "HostedWorker", "IngestionPolicy", "JobStatus",
-    "LiveSecuritySettings", "MarketQuote", "MetricRegistry", "MigrationCoordinator", "NormalizedDataBatch",
-    "OperationalEvent", "OperationalStatus", "Permission", "PersistedArtifact", "Phase6CertificationReport",
-    "Phase7CertificationReport", "PortfolioCSVError", "PortfolioCSVValidationError", "PortfolioImportReport",
-    "PortfolioPosition", "PostgresJobRepository", "PostgresProductionRepository", "Principal", "ProductionAPI",
+    "APIKeyAuthenticator", "APIResponse", "AlphaVantageProvider", "AuditEvent", "CommodityObservation",
+    "DashboardService", "DashboardSettings", "DatabaseBackupManager", "DeliveryCertificationCheck",
+    "DeploymentManifest", "EIAUraniumProvider", "EconomicObservation", "EventRecorder",
+    "ExternalDataProvider", "ExternalDataRecord", "FREDProvider", "HTTPServiceSettings", "HandlerRegistry",
+    "HealthReport", "HostedWorker", "IngestionPolicy", "JobStatus", "LiveSecuritySettings", "MarketQuote",
+    "MetricRegistry", "MigrationCoordinator", "NormalizedDataBatch", "OperationalEvent", "OperationalStatus",
+    "Permission", "PersistedArtifact", "Phase6CertificationReport", "Phase7CertificationReport",
+    "PortfolioCSVError", "PortfolioCSVValidationError", "PortfolioImportReport", "PortfolioPosition",
+    "PostgresJobRepository", "PostgresProductionRepository", "Principal", "ProductionAPI",
     "ProductionCertificationCheck", "ProductionRun", "ProductionRunStatus", "ProductionRuntimeConfig",
     "ProviderError", "RecurringSchedule", "RetryPolicy", "SQLiteJobRepository", "SQLiteProductionRepository",
     "ScheduledJob", "SchemaMigration", "SecuredProductionGateway", "SecretReference", "ShutdownController",
-    "StartupResult", "WorkerHealth", "WorkerSettings", "bootstrap_production", "build_job_repository",
-    "build_repository", "certify_phase_6", "certify_phase_7", "collect_operational_status", "create_http_app",
-    "enqueue_schedule", "evaluate_health", "import_portfolio_csv", "ingest_provider", "install_live_security",
-    "preview_portfolio_csv", "redact", "run_next_job",
+    "StartupResult", "WorkerHealth", "WorkerSettings", "WorldBankCommodityProvider", "bootstrap_production",
+    "build_job_repository", "build_repository", "certify_phase_6", "certify_phase_7",
+    "collect_operational_status", "create_http_app", "enqueue_schedule", "evaluate_health",
+    "import_portfolio_csv", "ingest_provider", "install_live_security", "preview_portfolio_csv", "redact",
+    "run_next_job",
 ]
