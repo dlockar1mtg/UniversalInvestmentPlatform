@@ -1,4 +1,4 @@
-"""Monitoring, drift-detection, and reoptimization contracts."""
+"""Monitoring contracts and deterministic drift detection."""
 
 from .contracts import (
     DriftCategory, DriftDirection, DriftSignal, DriftThreshold,
@@ -7,11 +7,16 @@ from .contracts import (
     MonitoringWindow, ReoptimizationDisposition, ReoptimizationTrigger,
     TriggerSeverity,
 )
+from .drift import (
+    DriftDetectionResult, DriftDetectionStatus, MissingMetricEvidence,
+    detect_drift,
+)
 
 __all__ = [
-    "DriftCategory", "DriftDirection", "DriftSignal", "DriftThreshold",
+    "DriftCategory", "DriftDetectionResult", "DriftDetectionStatus",
+    "DriftDirection", "DriftSignal", "DriftThreshold", "MissingMetricEvidence",
     "MonitoringBaseline", "MonitoringLifecycleStatus", "MonitoringObservation",
     "MonitoringPolicyBundle", "MonitoringRunRequest", "MonitoringRunResult",
     "MonitoringWindow", "ReoptimizationDisposition", "ReoptimizationTrigger",
-    "TriggerSeverity",
+    "TriggerSeverity", "detect_drift",
 ]
