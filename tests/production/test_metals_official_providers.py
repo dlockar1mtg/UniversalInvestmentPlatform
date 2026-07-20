@@ -136,7 +136,18 @@ def test_world_bank_discovers_current_workbook_from_stable_index() -> None:
     ]
 
 
-def test_world_bank_missing_current_workbook_link_is_rejected() -> None:
-    provider = WorldBankCommodityProvider(transport=lambda *_: b"<html>no workbook</html>")
-    with pytest.raises(ProviderError, match="link was not found"):
-        provider.latest(["gold"])
+def test_world_bank_missing_discovery_link_uses_guarded_fallback() -> None:
+    workbook = _world_bank_fixture()
+    requested: list[str] = []
+
+    def transport(url: str, timeout: float) -> bytes:
+        requested.append(url)
+        return b"<html>no workbook</html>" if url == WorldBankCommodityProvider.INDEX_URL else workbook
+
+    provider = WorldBankCommodityProvider(transport=transport)
+    results = provider.latest(["gold"])
+    assert len(results) == 1
+    assert requested == [
+        WorldBankCommodityProvider.INDEX_URL,
+        WorldBankCommodityProvider.FALLBACK_URL,
+    ]
