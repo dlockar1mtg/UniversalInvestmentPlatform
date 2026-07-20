@@ -190,11 +190,12 @@ class EIAUraniumProvider:
         payload = _request_bytes(self.URL, self._transport, self._timeout)
         parser = _HTMLTableParser()
         try:
-            parser.feed(payload.decode("utf-8", errors="replace"))
+            document = payload.decode("utf-8", errors="replace")
+            parser.feed(document)
         except Exception as exc:
             raise ProviderError("EIA uranium response was not valid HTML") from exc
         page_text = " ".join(cell for row in parser.rows for cell in row).lower()
-        if "uranium" not in page_text or "price" not in page_text:
+        if "uranium" not in document.lower() or "price" not in page_text:
             raise ProviderError("EIA uranium table signature was not found")
 
         observations: list[tuple[int, Decimal]] = []
