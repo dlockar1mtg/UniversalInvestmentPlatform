@@ -210,6 +210,13 @@ def select_metals_vehicles(
         _HUNDRED - constraint.maximum_miner_share_pct,
     )
     vehicle_map = selected_registry.vehicles_by_ticker
+    cap = constraint.maximum_single_vehicle_share_pct
+    while Decimal(len(selected)) * cap < _HUNDRED:
+        additional = next((item for item in ranked if item not in selected), None)
+        if additional is None or len(selected) >= selected_policy.top_per_asset:
+            break
+        selected.append(additional)
+        selected.sort(key=lambda item: (-item.score, item.ticker))
     if effective_direct_minimum > 0 and not any(
         vehicle_map[item.ticker].vehicle_type in DIRECT_TYPES for item in selected
     ):
@@ -238,7 +245,6 @@ def select_metals_vehicles(
     direct = [item.ticker for item in selected if classifications[item.ticker] in DIRECT_TYPES]
     miners = [item.ticker for item in selected if classifications[item.ticker] in MINER_TYPES]
     weights = {item.ticker: max(item.score - Decimal("20"), Decimal("1")) for item in selected}
-    cap = constraint.maximum_single_vehicle_share_pct
 
     if not direct:
         if effective_direct_minimum > 0:
