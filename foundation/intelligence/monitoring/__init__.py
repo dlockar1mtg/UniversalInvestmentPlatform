@@ -1,4 +1,4 @@
-"""Monitoring, drift detection, and allocation-outcome reconciliation."""
+"""Monitoring, reconciliation, and controlled reoptimization triggers."""
 
 from .contracts import (
     DriftCategory, DriftDirection, DriftSignal, DriftThreshold,
@@ -15,6 +15,10 @@ from .outcomes import (
     ObservedAllocationOutcome, OutcomeMonitoringPolicy, OutcomeMonitoringStatus,
     OutcomeReasonCode, PlannedAllocationOutcome, monitor_allocation_outcomes,
 )
+from .triggers import (
+    ReoptimizationControlPolicy, TriggerControlDecision, TriggerControlState,
+    evaluate_reoptimization_trigger,
+)
 
 __all__ = [
     "AllocationOutcomeLine", "AllocationOutcomeMonitoringResult", "AllocationOutcomePlan",
@@ -23,7 +27,8 @@ __all__ = [
     "MonitoringLifecycleStatus", "MonitoringObservation", "MonitoringPolicyBundle",
     "MonitoringRunRequest", "MonitoringRunResult", "MonitoringWindow",
     "ObservedAllocationOutcome", "OutcomeMonitoringPolicy", "OutcomeMonitoringStatus",
-    "OutcomeReasonCode", "PlannedAllocationOutcome", "ReoptimizationDisposition",
-    "ReoptimizationTrigger", "TriggerSeverity", "detect_drift",
-    "monitor_allocation_outcomes",
+    "OutcomeReasonCode", "PlannedAllocationOutcome", "ReoptimizationControlPolicy",
+    "ReoptimizationDisposition", "ReoptimizationTrigger", "TriggerControlDecision",
+    "TriggerControlState", "TriggerSeverity", "detect_drift",
+    "evaluate_reoptimization_trigger", "monitor_allocation_outcomes",
 ]
