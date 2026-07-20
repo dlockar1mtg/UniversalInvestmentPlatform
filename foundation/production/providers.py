@@ -261,7 +261,10 @@ class WorldBankCommodityProvider:
     def _resolve_workbook_url(self) -> str:
         if self._workbook_url:
             return self._workbook_url
-        payload = _request_bytes(self.INDEX_URL, self._transport, self._timeout)
+        try:
+            payload = _request_bytes(self.INDEX_URL, self._transport, self._timeout)
+        except ProviderError:
+            return self.FALLBACK_URL
         parser = _LinkParser()
         try:
             parser.feed(payload.decode("utf-8", errors="replace"))
