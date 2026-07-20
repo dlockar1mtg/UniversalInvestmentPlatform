@@ -1,0 +1,290 @@
+relative_path,component,role,suffix,size_bytes,sha256,version_marker,is_test,is_backup,initial_classification,classification_reason
+.env,root,source,,806,1e8d2e6bb3dc6ca16c9f51f22cef7bcb6141e67766843ffe172d9306abd428ba,,False,False,evaluate,Requires component-level review
+.env.example,root,source,.example,141,406997b7b2b6c3cf128aae0d124dc4dbb01ced2b381056fe5fe9d5c0e2f63378,,False,False,evaluate,Requires component-level review
+advanced_metrics_v7_0_1.py,root,source,.py,3577,ff5a9f1740700275d209d42739aad115f4efcc978503f90bb562b559a1d389d1,7.0.1,False,False,evaluate,Requires component-level review
+apply_all_v5_1_upgrades.py,root,operations,.py,366,e135fef22e8bfb85b331b4c6a1dd9f549558c72cb4ae3d606c3eb27b96b6383e,5.1,False,False,archive,Legacy upgrade or operational entry point
+apply_all_v5_upgrades.py,root,operations,.py,494,169f90e2381fa5eac2c74db3e0b820f7f631446ae53d11e94c7156c9a9ffdedf,5,False,False,archive,Legacy upgrade or operational entry point
+apply_all_v6_1_upgrades.py,root,operations,.py,343,2a5d658a264882832f643ec8d50b00307a215087afc22973b0d4b640dac9e28e,6.1,False,False,archive,Legacy upgrade or operational entry point
+apply_all_v6_2_upgrades.py,root,operations,.py,313,e6a88e6368f411b8127c62ea3d39dc61bb73bc9feb94169dd2971559e73df9b2,6.2,False,False,archive,Legacy upgrade or operational entry point
+apply_all_v6_upgrades.py,root,operations,.py,382,d1ae727dee32574852305f64a6b4fda73398cd1aa69497c86ab31814e10dd7cd,6,False,False,archive,Legacy upgrade or operational entry point
+apply_all_v7_1_upgrades.py,root,operations,.py,343,ff32770f82922a4156e2171acfcfe1e457f9b1c3ea49db285cc2d39c19dd7552,7.1,False,False,archive,Legacy upgrade or operational entry point
+apply_all_v7_2_upgrades.py,root,operations,.py,342,fa6c25c02db463e153572b22caf8003400797d89fcddcb0f5be5b461908fb711,7.2,False,False,archive,Legacy upgrade or operational entry point
+apply_all_v7_upgrades.py,root,operations,.py,382,733a2147206fa6636ada2969d4c9aa0797875048c01b734f37abe4d8c7e95f77,7,False,False,archive,Legacy upgrade or operational entry point
+apply_all_v8_upgrades.py,root,operations,.py,405,c36ca21f70d871297fee125c8af717805cd7cb30691c36c9cf761e8a4364fb28,8,False,False,archive,Legacy upgrade or operational entry point
+apply_attribution_patch_v6_0_1.py,root,operations,.py,1706,7a0b760a9bc044b36f226f85020523b00c8545420d7b2974e459cc2d9ad75cca,6.0.1,False,False,archive,Legacy upgrade or operational entry point
+apply_module2_config_v2_4_2.py,root,operations,.py,3083,4954a1a56b3efb99c20de08912a7f4d777bcb1a0f8a966bf07dcc7dbe1502b5d,2.4.2,False,False,archive,Legacy upgrade or operational entry point
+apply_module2_macro_integration.py,root,operations,.py,2653,a6f8bda427e45063e772a8b2eb78aae8a63c94484b28f93cd1185ca0f2f71b1d,,False,False,archive,Legacy upgrade or operational entry point
+apply_module2_tactical_reserve_fix.py,root,operations,.py,4159,75d38eac9f1ec71d3f7f098c7c22d48d99c9da02e71413c5440c5999df6595d0,,False,False,archive,Legacy upgrade or operational entry point
+apply_module2_v5_upgrade.py,root,operations,.py,1724,ae71ff216cf1656427c7ed9f9bb0571d8cf752d316d85cb21a50a68d589f20ca,5,False,False,archive,Legacy upgrade or operational entry point
+apply_module3_config.py,root,operations,.py,1515,3c357a431e9cfc94086aa66efe00f6b636dd5f8966f809938700a2a77674e9aa,,False,False,archive,Legacy upgrade or operational entry point
+apply_module3_scenario_upgrade.py,root,operations,.py,1231,db17e9a0da3764a59bb3138e2457a6346c45a38713baea75b6b1b443682f4c12,,False,False,archive,Legacy upgrade or operational entry point
+apply_module3_v5_probability_upgrade.py,root,operations,.py,2283,a144be7f36bee0ff0754c5e9d6a95a7583b81845bc16d01558f2652d62fc4a1e,5,False,False,archive,Legacy upgrade or operational entry point
+apply_module4_v5_0_2_metadata_patch.py,root,operations,.py,4514,6670067fe1f943827ef403bbbb19a4b3d8599c4ae7dd3d4754a7c782dd099b60,5.0.2,False,False,archive,Legacy upgrade or operational entry point
+apply_module4_v5_selection_upgrade.py,root,operations,.py,3611,41005f97e37153cd36891d1a9893218544f3a4f0e655ba636505bf6e647f356c,5,False,False,archive,Legacy upgrade or operational entry point
+apply_module4_v5_selection_upgrade_v2.py,root,operations,.py,4851,64dd2508c533ef80c2a2f385375c5b0f92e02fb0fe0c7e357aa68eafd74fb207,5,False,False,archive,Legacy upgrade or operational entry point
+apply_platform_health_patch_v7_1_1.py,root,operations,.py,2963,3f3dfcdfea2934bfa1029960bfb00bc0364b4bd3af16da865a33b3e6cfd2bea2,7.1.1,False,False,archive,Legacy upgrade or operational entry point
+apply_uncertainty_views_patch_v8_0_1.py,root,operations,.py,1770,87edc7b2a761c9b5c9033dc2aa4d689b4faf85d20f3f353e379842c928433949,8.0.1,False,False,archive,Legacy upgrade or operational entry point
+apply_v4_config.py,root,operations,.py,869,f6c681770126c76bc3a7c0b14ee21595d1305b0d0b51eed6ccf8d5010f38cc8d,4,False,False,archive,Legacy upgrade or operational entry point
+apply_v5_1_config.py,root,operations,.py,905,1d5e11350c8fdd35ef0051dc7d4b9ea16b474cfc1ec380f5e1c486829ddb6e5c,5.1,False,False,archive,Legacy upgrade or operational entry point
+apply_v5_1_schema.py,root,operations,.py,416,752fbf2ec72cc601ad2fe751dfc8c60c499f0dddc35b452a95579d6557f7bd28,5.1,False,False,archive,Legacy upgrade or operational entry point
+apply_v5_config.py,root,operations,.py,1007,60f77aca0c8ca547d46ee92b1eaa1cc80de3cc2ef805573ba8af947c6aa80832,5,False,False,archive,Legacy upgrade or operational entry point
+apply_v5_schema.py,root,operations,.py,415,3b5815f51cf6b3409e476a390bf22316ede6822c5a08fd776b295014c1d4f1e4,5,False,False,archive,Legacy upgrade or operational entry point
+apply_v6_1_config.py,root,operations,.py,960,eecb672d2a046d59772d6fd7fbb734ce0e2793db8e74a1f94096f7048451d4d7,6.1,False,False,archive,Legacy upgrade or operational entry point
+apply_v6_1_schema.py,root,operations,.py,893,58aec5fa7ae2eb27c9e3f92483aa36440a2236ea60176522b9716071ff4ad78f,6.1,False,False,archive,Legacy upgrade or operational entry point
+apply_v6_2_config.py,root,operations,.py,936,1e494a22e5576001aa546a34ddb233420479c2fb266ee251de78010d7961ac48,6.2,False,False,archive,Legacy upgrade or operational entry point
+apply_v6_2_schema.py,root,operations,.py,419,eaf33f0038f8461b4e5300250cb3321b21a0353372188c0dd76c3c06fc2c763e,6.2,False,False,archive,Legacy upgrade or operational entry point
+apply_v6_config.py,root,operations,.py,901,9cc303ab885d815f6a5a5c993f8a04de85b5a41d23cee102f298a9553ef8358f,6,False,False,archive,Legacy upgrade or operational entry point
+apply_v6_schema.py,root,operations,.py,413,f7827ae56494af2354fd11da91ae5c3ea23f3c46b06f0acb2aad7f2cdfa2b770,6,False,False,archive,Legacy upgrade or operational entry point
+apply_v7_1_config.py,root,operations,.py,960,70455656cfed588d226e75765b765875d816c79e6bbc910f48268bf489ce613e,7.1,False,False,archive,Legacy upgrade or operational entry point
+apply_v7_1_schema.py,root,operations,.py,420,a7dc66103137d3a7e7a9b52f302fcca0587d6afcf95e86a874ab6c887094e007,7.1,False,False,archive,Legacy upgrade or operational entry point
+apply_v7_2_config.py,root,operations,.py,947,722767bf496fff2dabd7627fa3f280b572ba85be2a9553296ea95da4626ce79c,7.2,False,False,archive,Legacy upgrade or operational entry point
+apply_v7_2_schema.py,root,operations,.py,420,240332e3c2c4b6d1b15e5f9f570819cd15036b6096442825b6bfc50b27c2825e,7.2,False,False,archive,Legacy upgrade or operational entry point
+apply_v7_config.py,root,operations,.py,932,bc90f2d787d666d47740297d7c43bb2723b093bdc54ac646bb3e6f167d95b58c,7,False,False,archive,Legacy upgrade or operational entry point
+apply_v7_schema.py,root,operations,.py,411,955e62695d95718b9ac1f4824907f63189dd6bd6a4a4f7901679514d4491d2f2,7,False,False,archive,Legacy upgrade or operational entry point
+apply_v8_config.py,root,operations,.py,955,7c14d7084b3e9e6c052edbbda74b031456d819e637f5cf9d9c599a3723b28fdc,8,False,False,archive,Legacy upgrade or operational entry point
+apply_v8_schema.py,root,operations,.py,412,8ce523644597fb249eeb654436d60447eab7f3a83e0d1d7d7f2dd3e018542ac8,8,False,False,archive,Legacy upgrade or operational entry point
+BUILD_MANIFEST.json,root,source,.json,252,8a6a0a7b963b27a6e342bd07e7f8854cabd34527b1524260a3c5ec11175b9af2,,False,False,evaluate,Requires component-level review
+config/module7_inputs.yaml,config,configuration,.yaml,178,213b9be9c68cb1fef4c62380d5aab07df468eb7799d4914bc95173a1a4fb977b,,False,False,evaluate,Required to determine canonical v8 integration path
+config/portfolio_inputs.yaml,config,configuration,.yaml,298,6a57b66c5db0ca67e63baf8a7e32a5fc01a449886a5299fca364e11e4dbf8bee,,False,False,evaluate,Required to determine canonical v8 integration path
+config/series.yaml,config,configuration,.yaml,2618,551d6ce22e1d808ed1b4f5871d3545c72782e92d36df070e7578da9a28f5cd88,,False,False,evaluate,Required to determine canonical v8 integration path
+config/settings.yaml,config,configuration,.yaml,15619,00dd0bdaac620bf651eba0fd6832f4b6a92d7ac2eda8a2d1cdf95189a2fb9af2,,False,False,evaluate,Required to determine canonical v8 integration path
+config/settings.yaml.patch,config,configuration,.patch,957,8472eaef612888ae0c6fc20bf9b4cb4221a911488042496f290b8c3cc0116fb4,,False,False,evaluate,Required to determine canonical v8 integration path
+config/settings_before_module3_20260712_112830.yaml,config,configuration,.yaml,3080,783e5392c64aa319c4e8c1bff089b8356a6a4e6eed7f0eb3f7a7b9fea3f0575a,,False,True,archive,Historical backup or pre-upgrade source
+config/settings_before_v2_4_2_20260711_145006.yaml,config,configuration,.yaml,1939,28445646bd0f601653edf89eebbaab2084ccc3621b87a53a204a0c0004380238,2.4.2.20260711.145006,False,True,archive,Historical backup or pre-upgrade source
+config/settings_before_v4_20260712_114335.yaml,config,configuration,.yaml,5130,1e2057d0349a550d46c515af67e0487cd2e5d09aca82a66f0801987cff050161,4.20260712.114335,False,True,archive,Historical backup or pre-upgrade source
+config/settings_before_v5_20260712_181331.yaml,config,configuration,.yaml,6817,17b59e273d486405ab662c1f4fddafeeac36180a986af75734a96e7785446177,5.20260712.181331,False,True,archive,Historical backup or pre-upgrade source
+config/settings_before_v6_1_20260712_210614.yaml,config,configuration,.yaml,9772,b13e75966e8e4416624f21d93882c7cc792d729e4f78b4d828c05cfd235d9d21,6.1.20260712.210614,False,True,archive,Historical backup or pre-upgrade source
+config/settings_before_v6_20260712_203030.yaml,config,configuration,.yaml,7871,cb8323a2134bdee581b50c69114f2ced62f9d14762a8e0a85c920ecaa9e2000e,6.20260712.203030,False,True,archive,Historical backup or pre-upgrade source
+config/settings_before_v6_2_20260712_212227.yaml,config,configuration,.yaml,10483,b6233dcad629a082ad91850f1d5f689f41513eebb5bd0b1e62eb780c76868405,6.2.20260712.212227,False,True,archive,Historical backup or pre-upgrade source
+config/settings_before_v7_1_20260713_073315.yaml,config,configuration,.yaml,13493,aedd36a8d97aec696416ab2f465abea504d25ead26045c17bf7a2c7b9d9f369e,7.1.20260713.073315,False,True,archive,Historical backup or pre-upgrade source
+config/settings_before_v7_20260713_071005.yaml,config,configuration,.yaml,11103,5ddf895985b76de1dd640909304ba50a45884e818f8a2d4cd1ea7cf50a56d081,7.20260713.071005,False,True,archive,Historical backup or pre-upgrade source
+config/settings_before_v7_2_20260713_082732.yaml,config,configuration,.yaml,14257,f3d94decd14410383d99b494a29e87c3b16352430e5305fd9b557ddc0a7e1ec6,7.2.20260713.082732,False,True,archive,Historical backup or pre-upgrade source
+config/settings_before_v8_20260713_083642.yaml,config,configuration,.yaml,14728,0cb26afb14903965e53a8bb6d3f635114d910cc861fe030c6fe6b08576fc951c,8.20260713.083642,False,True,archive,Historical backup or pre-upgrade source
+config/vehicles.yaml,config,configuration,.yaml,1930,a1b6b25199667a5a276bd25f38631d8444ab771920b36c387eaf88e2410e2d23,,False,False,evaluate,Required to determine canonical v8 integration path
+docs/CURRENT_STATE.md,docs,documentation,.md,513,b8013995df528ce9b31e22ca7e6dcbbd6d7a2c1714b7c25687b41d883bca2756,,False,False,evaluate,Requires component-level review
+export_module3.py,root,integration,.py,979,c6cc1c3ff04301336601f45bee781f243f352f7fa4ac93d24a56716df8d74d25,,False,False,evaluate,Required to determine canonical v8 integration path
+export_module4.py,root,integration,.py,637,0afefa7f4015de68628ed2d6859a770a836ecc1e7b7135d19d121356c09417ab,,False,False,evaluate,Required to determine canonical v8 integration path
+export_platform.py,root,integration,.py,762,6c59c29e3b516991d7298571e77afbf7065f5858fb8dbba170adbfe54dbbb0cc,,False,False,evaluate,Required to determine canonical v8 integration path
+export_v5.py,root,integration,.py,1023,606c7c529620cb8c1338571f14735d678bd4a7493c4631e9a3c44209b8a13ca7,5,False,False,evaluate,Required to determine canonical v8 integration path
+export_v5_1.py,root,integration,.py,1050,096b0e73557c4da8e2daeabcae0c1c8d41a825dc5fe32332fc9701cc64f21728,5.1,False,False,evaluate,Required to determine canonical v8 integration path
+export_v6.py,root,integration,.py,1289,e4d3cc7fc605e595744d6d21032f125f2cea23ec0aeee13646ab93ec27a9741a,6,False,False,evaluate,Required to determine canonical v8 integration path
+export_v6_1.py,root,integration,.py,1554,f35c78b0338ea31b87d9b99d422e21aa876784fb8ad21e1fc960cea9fb35241f,6.1,False,False,evaluate,Required to determine canonical v8 integration path
+export_v6_2.py,root,integration,.py,1476,7f2b67647c325a08a91df7084e3e92bea8e747f0a733dc2e97bf3cf210510c4d,6.2,False,False,evaluate,Required to determine canonical v8 integration path
+export_v7.py,root,integration,.py,1171,d86724eeab720a7ea04f4a5f09cb45c4aee2b0a6c051daaba29bdf8bf7091942,7,False,False,evaluate,Required to determine canonical v8 integration path
+export_v7_1.py,root,integration,.py,1116,e01e8411ac347733a382d6ddba96078c3341f1d74b96e20c0b526991749fe1fa,7.1,False,False,evaluate,Required to determine canonical v8 integration path
+export_v7_2.py,root,integration,.py,1152,22522ef9aff3f9bb71ef5baea047cea9ea288023b7b9127674697192883fccfc,7.2,False,False,evaluate,Required to determine canonical v8 integration path
+export_v8.py,root,integration,.py,1117,81997830d6ed0b523396f974801f36c7ffd9feb91b4c6e1c56140f90046c5afe,8,False,False,evaluate,Required to determine canonical v8 integration path
+inspect_module2.py,root,integration,.py,1940,fce9848173b2ba778c86a935267bad7331dba00084745ab876978bdbd218ce7b,,False,False,evaluate,Required to determine canonical v8 integration path
+inspect_module3.py,root,integration,.py,1737,12ec1a53792654f2d8e98bdad485e95e212641f659bcfdea174aa4e9a98d0ec2,,False,False,evaluate,Required to determine canonical v8 integration path
+inspect_module4.py,root,integration,.py,1072,50ddb806f206066d74bf372435619e94fda0c108e4eb88fb356e3e49c6ab08e5,,False,False,evaluate,Required to determine canonical v8 integration path
+inspect_module5.py,root,integration,.py,1329,abeecd33e0f69dfeaf7560d832b9939124cd241615bafb771fea9075dd0e9aa0,,False,False,evaluate,Required to determine canonical v8 integration path
+inspect_module5_v5_1.py,root,integration,.py,1086,ddf3b55d4ae28cd55ad0e513999e27e0ff99917d0913698ad3449a9a7d26be58,5.1,False,False,evaluate,Required to determine canonical v8 integration path
+inspect_module6.py,root,integration,.py,1587,c5c3920b8b557f230c5ac454cf8e83f1c9d4a2a67f56d04d0573c0d4a4dafd0e,,False,False,evaluate,Required to determine canonical v8 integration path
+inspect_module7.py,root,integration,.py,1803,832c3308110b7475af8364dee6262474a5d08af54540dee0e31945e8bcfe385d,,False,False,evaluate,Required to determine canonical v8 integration path
+inspect_platform.py,root,integration,.py,1263,ddf9dc22bb9d6ed4a03a69b2219dabe907a1f1614bc29375dc8cce804faf27ea,,False,False,evaluate,Required to determine canonical v8 integration path
+inspect_v6_1.py,root,integration,.py,2524,9253ecbeeeea80a3c90ee06efe1049fa427f49f6ab450dc49aacedcf36e29065,6.1,False,False,evaluate,Required to determine canonical v8 integration path
+inspect_v6_2.py,root,integration,.py,1692,23f207bcda87611235b2a703f6e930066da3aef9d8925590f80862f11214c052,6.2,False,False,evaluate,Required to determine canonical v8 integration path
+inspect_v7_1.py,root,integration,.py,1289,bf83a86ba5a59aa650a4b4e5a3a3167e81bca7ae48da3c9b2ca4972ed3f03fce,7.1,False,False,evaluate,Required to determine canonical v8 integration path
+inspect_v7_2.py,root,integration,.py,1547,238207e466c57aab8f2c4c07ca85d83f34daef6bfddc72d243a72f7e55c238df,7.2,False,False,evaluate,Required to determine canonical v8 integration path
+inspect_v8.py,root,integration,.py,1958,1343da534b0487fa1a62db85d5a295a9fcec17701e91a1629070be1c6b4461e2,8,False,False,evaluate,Required to determine canonical v8 integration path
+install_advanced_metrics_v7_0_1.py,root,operations,.py,1317,a8d966b391d419c769f9003d3c43f00ca5641a2cef2fddf729b1ef493600d2f9,7.0.1,False,False,archive,Legacy upgrade or operational entry point
+install_copper_selection_v5_1_3.py,root,operations,.py,988,144fbd2a7a926da267951998c4e327f094f180fd8c752f570a1ceb08e6361f97,5.1.3,False,False,archive,Legacy upgrade or operational entry point
+install_optional_market_data.bat,root,operations,.bat,392,b3fe1bf794c11e8235230d6ec3e7fb4269afddb5cb8946e08a12e264929d5b66,,False,False,archive,Legacy upgrade or operational entry point
+metals_platform/__init__.py,__init__.py,source,.py,22,0a92bc207fdd09403083db6abfbce6f45c5b0459310a7103d4952245eedc7ed5,,False,False,evaluate,Requires component-level review
+metals_platform/analytics/__init__.py,analytics,source,.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,,False,False,replace,Universal platform already provides this capability
+metals_platform/analytics/engine.py,analytics,source,.py,30109,c986f2f61bad6fd371fd147f1a7fe3e42f0e532336a1cd049eff235164b8165a,,False,False,replace,Universal platform already provides this capability
+metals_platform/analytics/engine_before_macro_integration_20260712_114351.py,analytics,source,.py,28186,5d4a5282a9328714fe36f73b72ec974013a218dbf4f3588afe9579c6fecac09d,,False,True,archive,Historical backup or pre-upgrade source
+metals_platform/analytics/engine_before_tactical_reserve_20260712_112850.py,analytics,source,.py,27580,3bb0f44dd5feb2f098af70930c09cc60692de59e0df66159b5d4c4ad7c4e98a8,,False,True,archive,Historical backup or pre-upgrade source
+metals_platform/analytics/engine_before_v5_retention_20260712_181335.py,analytics,source,.py,29780,0125e7c2f55c3df6fc049561fa854404809bab3c65d7a9f0d7720a9d3c09c0a0,5,False,True,archive,Historical backup or pre-upgrade source
+metals_platform/analytics/module2_allocation_patch.py,analytics,source,.py,3196,574b24dd84e41dcae3f01349949ea0d104e8fb2a602a3b1bdb08a6a12a94ae03,,False,False,replace,Universal platform already provides this capability
+metals_platform/analytics/retention.py,analytics,source,.py,885,446f5ce39415246dc143f78fb4fb79964097b06ad362661028dff93ea70f4c02,,False,False,replace,Universal platform already provides this capability
+metals_platform/attribution/__init__.py,attribution,source,.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,,False,False,replace,Universal platform already provides this capability
+metals_platform/attribution/engine.py,attribution,source,.py,3961,3134590af68a59c48e7ce0139c8339835cf0647cea72985794fcee845ac91045,,False,False,replace,Universal platform already provides this capability
+metals_platform/attribution/engine_before_v6_0_1_20260712_203548.py,attribution,source,.py,3434,171743aff1308d1a0dc48dd084ab201e7bf8d0798989b7e4336ed384b3edf774,6.0.1.20260712.203548,False,True,archive,Historical backup or pre-upgrade source
+metals_platform/attribution/engine_v6_1.py,attribution,source,.py,8880,a2acd677af30b8690c08ad0e5384cc90b31d406e05053acbd8e2c3393e1638ce,6.1,False,False,replace,Universal platform already provides this capability
+metals_platform/attribution/engine_v6_2.py,attribution,source,.py,8171,4ea0d3540ffa668d823b819ecb0421dd3ae4af23e1a8a4d872ca4e53710a5d1b,6.2,False,False,replace,Universal platform already provides this capability
+metals_platform/backtest/__init__.py,backtest,source,.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,,False,False,replace,Universal platform already provides this capability
+metals_platform/backtest/engine.py,backtest,source,.py,5199,1a3e94399242a973dfb606c82a4fea3b550f7e57494435fb06140b8da682dd59,,False,False,replace,Universal platform already provides this capability
+metals_platform/backtest/engine_v6_1.py,backtest,source,.py,12624,aad7843ed3b0a8c60eccfcefd91bb97146de336ab5293213647ea79feace9796,6.1,False,False,replace,Universal platform already provides this capability
+metals_platform/backtest/institutional_metrics.py,backtest,source,.py,2188,ff6bb44589e672cb0986efaf29f239e4124c211171d3f68bba0f3ac5947b7188,,False,False,replace,Universal platform already provides this capability
+metals_platform/backtest/run_institutional_metrics.py,backtest,operations,.py,2216,9ad89f0713a56583bf080d84b73670228e4b00848869e53f4b3bdee0a7bc987f,,False,False,replace,Universal platform already provides this capability
+metals_platform/collectors/__init__.py,collectors,source,.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,,False,False,adapt,Potentially reusable Metals-specific domain capability
+metals_platform/collectors/eia_uranium.py,collectors,source,.py,2087,1828b36d3b31a42b3070768c7617d9b68f8037c6bbf44a506747a7a9fa7bbde8,,False,False,adapt,Potentially reusable Metals-specific domain capability
+metals_platform/collectors/fred.py,collectors,source,.py,1743,5f7ed8429912210b82418c321a715658b104b13a64ea9133d7379955ae7f5a3e,,False,False,adapt,Potentially reusable Metals-specific domain capability
+metals_platform/collectors/market_proxies.py,collectors,source,.py,1259,2a5b52853bd576997e7982aa1f2686dab61fd5ecb641821b9d9406a60e74bb01,,False,False,adapt,Potentially reusable Metals-specific domain capability
+metals_platform/collectors/world_bank.py,collectors,source,.py,2565,1c57bc7534bf8379375afaf748e94218dcf17e1ccb34ca9481d5d0a24bc63049,,False,False,adapt,Potentially reusable Metals-specific domain capability
+metals_platform/confidence/__init__.py,confidence,source,.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,,False,False,replace,Universal platform already provides this capability
+metals_platform/confidence/engine.py,confidence,source,.py,3307,d1ed005700688be30587271cdc34e1f990abf26ca4ed529b00f3ab9d7f169dba,,False,False,replace,Universal platform already provides this capability
+metals_platform/confidence/engine_v7_1.py,confidence,source,.py,3995,11ca675638210b982ad63ba925e7f3522ed4406f09ccd4b40ce3c83516450459,7.1,False,False,replace,Universal platform already provides this capability
+metals_platform/core/__init__.py,core,source,.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,,False,False,evaluate,Requires component-level review
+metals_platform/core/config.py,core,source,.py,1531,b2dc996a7fe462890ade4cc6cbcc9440bb4c5dfb7efe85c2b716439709dfe40c,,False,False,evaluate,Requires component-level review
+metals_platform/core/dependencies.py,core,source,.py,559,02d552b5f150b1cc40fba3a4d08685a01cd69b9f24927c792586737eabbcac4e,,False,False,evaluate,Requires component-level review
+metals_platform/core/http.py,core,source,.py,715,6c4adcc07a80bf5ea876cff014d1da0267ed977e881696f7ca17a40bf6845a1a,,False,False,evaluate,Requires component-level review
+metals_platform/core/logging_utils.py,core,source,.py,600,1d82b94955c796990a55a29dcc4169f955ae8b89f488497696b44fa64287ffb1,,False,False,evaluate,Requires component-level review
+metals_platform/core/quality.py,core,source,.py,3173,257cedd210f751046a4c0c6d94d34d2276a34c86de12166f3ef60d8446061c51,,False,False,evaluate,Requires component-level review
+metals_platform/core/rate_limit.py,core,source,.py,505,b460064841309e3dc6f7d9b42c975251782ba02c8dfa594b95fd377c690519bb,,False,False,evaluate,Requires component-level review
+metals_platform/dashboard/__init__.py,dashboard,source,.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,,False,False,replace,Universal platform already provides this capability
+metals_platform/dashboard/component_grades.py,dashboard,source,.py,247,e91f96912ed0cfd0252717f69acc12707bb7910d807acdcf287898ffa1fe67fe,,False,False,replace,Universal platform already provides this capability
+metals_platform/dashboard/engine.py,dashboard,source,.py,6315,f3faa17d4e506456167bafebff6fe687ac8902bed5d2789dffd3a2f729f9a539,,False,False,replace,Universal platform already provides this capability
+metals_platform/dashboard/engine_v6_2.py,dashboard,source,.py,4621,acc0f9bce8edbf531aab4e54ebfb0551eed964d234be4c8625603d0ba14ce9bc,6.2,False,False,replace,Universal platform already provides this capability
+metals_platform/dashboard/engine_v7.py,dashboard,source,.py,1920,9012b1b3ff1f4f6413e604c849a57c9449ed20b1d25e29d3a06479692f24ab3a,7,False,False,replace,Universal platform already provides this capability
+metals_platform/dashboard/engine_v7_1.py,dashboard,source,.py,6349,0be1418cde272c8795d14c638d868e3cb83f1eaafe4f06c3f8ff5175dc2bd021,7.1,False,False,replace,Universal platform already provides this capability
+metals_platform/dashboard/engine_v7_2.py,dashboard,source,.py,1766,440f3e47ba7328951cdd5a5caa24b5fd66d41de2379552f2624a690b0f8a630a,7.2,False,False,replace,Universal platform already provides this capability
+metals_platform/dashboard/grading_v7_1.py,dashboard,source,.py,1358,61334f644b03c2fb1c0bcb504c394dd000b15b5cd139092892f78bf4eb3f881b,7.1,False,False,replace,Universal platform already provides this capability
+metals_platform/database/__init__.py,database,source,.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,,False,False,replace,Universal platform already provides this capability
+metals_platform/database/base.py,database,source,.py,82,6821fc2d1d26e2367ec082a401fd6a5c0696b7895c904d219aa592885881edad,,False,False,replace,Universal platform already provides this capability
+metals_platform/database/db.py,database,source,.py,4654,4890ba95efd2a0c157d55c2fc8dd2c88b4468eae950b29bf67f19fb7dc4d38bf,,False,False,replace,Universal platform already provides this capability
+metals_platform/database/models.py,database,source,.py,5296,a5e1de0cbec9800a706412dc8554c986904117aee502897700646d799262db58,,False,False,replace,Universal platform already provides this capability
+metals_platform/database/module2_migration.py,database,source,.py,5815,b343009922be17e69c42557bd3363458378ca60977fd7c5424c2bf62c29303a2,,False,False,replace,Universal platform already provides this capability
+metals_platform/database/module3_schema.py,database,source,.py,2629,e581aa1b6f07cea69a75b436ef4fcf943e718de3d6722638f5030a7a2e65b299,,False,False,replace,Universal platform already provides this capability
+metals_platform/database/module4_schema.py,database,source,.py,1777,25062f8707309318fb81c3786ddb55353622d231765e1862832b18fec9e9eba8,,False,False,replace,Universal platform already provides this capability
+metals_platform/database/repository.py,database,source,.py,5565,6ee1762cb63fbb4a948e00b8187d757ad0458879d753d753d804d0b2e9daa685,,False,False,replace,Universal platform already provides this capability
+metals_platform/database/schema.py,database,source,.py,3871,677e085445f166cbd40573ae1c1a54011129cad850e3d6675e52611bbe1d4306,,False,False,replace,Universal platform already provides this capability
+metals_platform/database/session.py,database,source,.py,429,f148f9d92010971b3b029ea5c7d24a0eb957f105bca7c84d023685cc1ac696dd,,False,False,replace,Universal platform already provides this capability
+metals_platform/database/v5_1_schema.py,database,source,.py,920,aed1c3ca37abb89d751ac8c9bb0214f4a216ba51bc499b4ed7ff687ca5c81ffa,5.1,False,False,replace,Universal platform already provides this capability
+metals_platform/database/v5_schema.py,database,source,.py,3301,e3608bb371d176ef698a6dad52637220dc9643e266fb84b16aaaf03f2878eb12,5,False,False,replace,Universal platform already provides this capability
+metals_platform/database/v6_1_schema.py,database,source,.py,3117,ff127377a169cb3f593b6dd0c9ac3b8f7bb34b92bc8ca071073869c8c21537dd,6.1,False,False,replace,Universal platform already provides this capability
+metals_platform/database/v6_2_schema.py,database,source,.py,1973,27f0f6bb5f0abfb07130bc6ba173dbfb9d4f7d27c62004ec42e848df46a345d7,6.2,False,False,replace,Universal platform already provides this capability
+metals_platform/database/v6_schema.py,database,source,.py,6566,56ac7b882beb7caa50cc71f05ad55d0b34c13857813afbf1decb3d65150d88ac,6,False,False,replace,Universal platform already provides this capability
+metals_platform/database/v7_1_schema.py,database,source,.py,2134,915c84e3bee48bd6ebcc5858cf844bd7f83494f2c5598a0f1e951f95a3062fe3,7.1,False,False,replace,Universal platform already provides this capability
+metals_platform/database/v7_2_schema.py,database,source,.py,2582,cedb530719098a8b46e7c4787988fbf56a1a2268168678f731eeb0f3d183e721,7.2,False,False,replace,Universal platform already provides this capability
+metals_platform/database/v7_schema.py,database,source,.py,7730,f80bd043df54f50c6a63737d1d48c5bd5b5a24d169bf80a7797ea4f76a0c4a76,7,False,False,replace,Universal platform already provides this capability
+metals_platform/database/v8_schema.py,database,source,.py,4337,39071f5b95e695f36ca0b66614a201f3bb54949fb6362bd3bd7df5242ec7eefa,8,False,False,replace,Universal platform already provides this capability
+metals_platform/decision_support/__init__.py,decision_support,source,.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,,False,False,replace,Universal platform already provides this capability
+metals_platform/decision_support/engine.py,decision_support,source,.py,11143,889a86be74ccd062ca9cf8ed21d599d97418580deb84413c7f50bfa8666142dc,,False,False,replace,Universal platform already provides this capability
+metals_platform/decision_support/engine_v7_1.py,decision_support,source,.py,17857,b66f0c81ded38081e64a36ca2782856b098f66153199fedc2d507d1926324439,7.1,False,False,replace,Universal platform already provides this capability
+metals_platform/decision_support/engine_v7_1_before_v7_1_1_20260713_080134.py,decision_support,source,.py,16223,9cd8acb0dc286386bdf36af3b4bf220d62cc576a2a5c8d395ae86f9e2f9fef33,7.1,False,True,archive,Historical backup or pre-upgrade source
+metals_platform/decision_support/engine_v7_2.py,decision_support,source,.py,22416,caf08fc8b9b490f373242d59cab206788c67a495460e4bf5a75a1c3d344ee1bc,7.2,False,False,replace,Universal platform already provides this capability
+metals_platform/decision_support/engine_v8.py,decision_support,source,.py,12571,e39544f9f75104dd9b932569ed6ae9e81ef5d4efe5dec80bc690a2090f887549,8,False,False,replace,Universal platform already provides this capability
+metals_platform/etl/__init__.py,etl,source,.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,,False,False,evaluate,Requires component-level review
+metals_platform/etl/pipeline.py,etl,source,.py,5773,cc9e71495f3662cca2bbe4ec67cb65a00e617edc66234d9014e7374c26bc5a78,,False,False,evaluate,Requires component-level review
+metals_platform/forecasting/__init__.py,forecasting,source,.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,,False,False,replace,Universal platform already provides this capability
+metals_platform/forecasting/engine.py,forecasting,source,.py,10840,12f9671c2e2ce87ce599a4f3a66304322f61fd1b7707da0d5062608dcb83b4f3,,False,False,replace,Universal platform already provides this capability
+metals_platform/macro/__init__.py,macro,source,.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,,False,False,replace,Universal platform already provides this capability
+metals_platform/macro/engine.py,macro,source,.py,20211,467eaadb69cedfba47b2867b449483aa998b1fb450ae8dbf5b4874a914283093,,False,False,replace,Universal platform already provides this capability
+metals_platform/macro/engine_before_scenario_upgrade_20260712_114345.py,macro,source,.py,21005,b472dea7df1b95bce4ecbc965c0332b326d47368eb4a2e6d79992bbafb4964f6,,False,True,archive,Historical backup or pre-upgrade source
+metals_platform/macro/engine_before_v5_probability_20260712_181335.py,macro,source,.py,19538,85a93284f9e56b54d6f4237f2cc175401858bbd508788faa8e35a7d2c0a5a7c1,5,False,True,archive,Historical backup or pre-upgrade source
+metals_platform/macro/probabilistic_engine.py,macro,source,.py,4968,2491c6fc256607c708e980182e03f4b2f1a4eba126553c20d274b77fa02c5901,,False,False,replace,Universal platform already provides this capability
+metals_platform/macro/probability_engine.py,macro,source,.py,1109,115c3993e47e3037289e17cbb5ca83a72ff68f39f3897ce7a8976a050ad098cd,,False,False,replace,Universal platform already provides this capability
+metals_platform/macro/scenario_patch.py,macro,source,.py,665,4ce14c29e0631ec3acdb94fccf82181d83c05bc66c5fc43d81ab6efc93d1f61d,,False,False,replace,Universal platform already provides this capability
+metals_platform/models/__init__.py,models,source,.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,,False,False,evaluate,Requires component-level review
+metals_platform/models/contracts.py,models,source,.py,529,4c9acc6cfdeafdcf3c82e937b95eec7c5b3ad37a3cbbadc1e005fa6694c5c489,,False,False,evaluate,Requires component-level review
+metals_platform/optimizer/__init__.py,optimizer,source,.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,,False,False,replace,Universal platform already provides this capability
+metals_platform/optimizer/black_litterman.py,optimizer,source,.py,883,353ae5186f4d3b53d7169a53d385773d7e1e21b6e9af2fba103902afeb9ee28d,,False,False,replace,Universal platform already provides this capability
+metals_platform/optimizer/engine.py,optimizer,source,.py,5550,0e2e6ac39a5270275620e76985b95be6638b35d0e68684ce902388a50dc5158d,,False,False,replace,Universal platform already provides this capability
+metals_platform/optimizer/engine_v6_1.py,optimizer,source,.py,8023,055c2d9cfa7e8c6644203c92b905fcec9cb89288061a0b1e33b85c37cbb8ef6e,6.1,False,False,replace,Universal platform already provides this capability
+metals_platform/optimizer/engine_v6_2.py,optimizer,source,.py,12098,86aaa7b8e60850ff8e3c92bb9cd9e435935a14e6ace110138a5d6b61c79ff37f,6.2,False,False,replace,Universal platform already provides this capability
+metals_platform/optimizer/engine_v7.py,optimizer,source,.py,8005,6580dd5b8822c105afa4d69ca32a66a5b2a96733ac0abdfd56dd08acff7beda9,7,False,False,replace,Universal platform already provides this capability
+metals_platform/optimizer/uncertainty_views.py,optimizer,source,.py,3456,85980097cf311e85221fcced6ee0ade909076c74f7bcbd1267424df56b911bf3,,False,False,replace,Universal platform already provides this capability
+metals_platform/optimizer/uncertainty_views_before_v8_0_1_20260713_084032.py,optimizer,source,.py,2728,a78f1c312ca67db2fee377257450b14d5511b3d49796edc2b4c9ed22c728489f,8.0.1.20260713.084032,False,True,archive,Historical backup or pre-upgrade source
+metals_platform/portfolio/__init__.py,portfolio,source,.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,,False,False,replace,Universal platform already provides this capability
+metals_platform/portfolio/engine.py,portfolio,source,.py,13247,efaa48e9672d660fe211ebeefa090048879a8891e97cb1b81cd6d3499a9fc3b4,,False,False,replace,Universal platform already provides this capability
+metals_platform/portfolio/engine_v5_1.py,portfolio,source,.py,9990,ecd5688edfc6cf66e15e0ee1068c0a9b31948a2e35385192b16c872e8261fee9,5.1,False,False,replace,Universal platform already provides this capability
+metals_platform/portfolio/engine_v6.py,portfolio,source,.py,13203,f6d184b110125507ef15dec02d006fdb3c97b0587079672f6a91bf3fd898bcdd,6,False,False,replace,Universal platform already provides this capability
+metals_platform/portfolio/engine_v6_1.py,portfolio,source,.py,18144,953a938fca0ea502dcb63520cd01435b3e0d538156bf5c7edfb242657e883851,6.1,False,False,replace,Universal platform already provides this capability
+metals_platform/portfolio/engine_v6_2.py,portfolio,source,.py,1812,fe43cb6be8ce1077efec874cf57c6ac404367f04d55bf7014acd67943ca5ecc7,6.2,False,False,replace,Universal platform already provides this capability
+metals_platform/portfolio/execution.py,portfolio,source,.py,485,4d0fd39f19658c26adf47ea8313905a03cd80e7182c67b712af3aa246c3b6e40,,False,False,replace,Universal platform already provides this capability
+metals_platform/reporting/__init__.py,reporting,source,.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,,False,False,evaluate,Requires component-level review
+metals_platform/reporting/monthly_report.py,reporting,source,.py,5768,ed79a64008ad873f688ed1766b3279537b8e61a74df8e1b01fbcdca6bb6c95b3,,False,False,evaluate,Requires component-level review
+metals_platform/risk/__init__.py,risk,source,.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,,False,False,replace,Universal platform already provides this capability
+metals_platform/risk/engine.py,risk,source,.py,5845,d8096eccfd52e24505df6b055b3fcdf8b5f38957cd4be3087f0cc75a785b7885,,False,False,replace,Universal platform already provides this capability
+metals_platform/risk/engine_v6_1.py,risk,source,.py,9308,23f1fb27f342ddc41ce563203031662eb649f2bb7c65d0e2269bee5b3d16f5d3,6.1,False,False,replace,Universal platform already provides this capability
+metals_platform/services/__init__.py,services,source,.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,,False,False,evaluate,Requires component-level review
+metals_platform/services/quality.py,services,source,.py,1772,3acb67c70e136eb83e00137555ed527651c2c024b932d5503637ebe169803dda,,False,False,evaluate,Requires component-level review
+metals_platform/vehicles/__init__.py,vehicles,source,.py,0,e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855,,False,False,adapt,Potentially reusable Metals-specific domain capability
+metals_platform/vehicles/advanced_metrics.py,vehicles,source,.py,3577,ff5a9f1740700275d209d42739aad115f4efcc978503f90bb562b559a1d389d1,,False,False,adapt,Potentially reusable Metals-specific domain capability
+metals_platform/vehicles/advanced_metrics_before_v7_0_1_20260713_071432.py,vehicles,source,.py,1790,88c955c0e48306bcc62a8860dadfc696d501f2e8d2b8bd3f169d6c8770639980,7.0.1.20260713.071432,False,True,archive,Historical backup or pre-upgrade source
+metals_platform/vehicles/engine.py,vehicles,source,.py,12226,f9d3960b23de269769eb6ff84ae77e4ace1f28914ace5447f775dcba8e72307c,,False,False,adapt,Potentially reusable Metals-specific domain capability
+metals_platform/vehicles/engine_before_v5_0_2_metadata_20260712_183757.py,vehicles,source,.py,11406,35ababca2bf15f7666f7bffa239a71ddf361a902debba722b8846036ba904af4,5.0.2,False,True,archive,Historical backup or pre-upgrade source
+metals_platform/vehicles/engine_before_v5_selection_20260712_182124.py,vehicles,source,.py,10260,62ab448e4b5f8aa69ee722d0dbf4760315713c5356515c9217af6d9d55a6ab27,5,False,True,archive,Historical backup or pre-upgrade source
+metals_platform/vehicles/run_advanced_metrics.py,vehicles,operations,.py,2757,38b2bd656e1706282d1cc2f5f0a2426136b3c19d38fd37fe84ca7d249e3cc3e4,,False,False,adapt,Potentially reusable Metals-specific domain capability
+metals_platform/vehicles/selection.py,vehicles,source,.py,5739,33ee4fac1dc4c468cc1886b0075d24792b7b3ee5a784abee7e34f5779814839c,,False,False,adapt,Potentially reusable Metals-specific domain capability
+metals_platform/vehicles/selection_before_v5_1_3_20260712_191531.py,vehicles,source,.py,5739,33ee4fac1dc4c468cc1886b0075d24792b7b3ee5a784abee7e34f5779814839c,5.1.3.20260712.191531,False,True,archive,Historical backup or pre-upgrade source
+migrate_module2_v2_4.py,root,operations,.py,975,5400e19dfc3bfe7d317a20ba54a738297d9b36fa37ed54602cbb4fcc1c657458,2.4,False,False,archive,Legacy upgrade or operational entry point
+README.md,root,documentation,.md,2038,df21c06dbab1520702d79907e0428773fa5991b350c10b731b4604c98fb386c8,,False,False,evaluate,Requires component-level review
+README_MODULE3.md,root,documentation,.md,2010,2a5a7e24f57aaf29e21c64026b9f3151977d925bc6da3906d9c16bd0501577e2,,False,False,evaluate,Requires component-level review
+README_MODULE4.md,root,documentation,.md,1017,a20eda744168bfae4acbd9913f8bb72dedeb3a0bd596d2407052fd043b9b4813,,False,False,evaluate,Requires component-level review
+README_PATCH.md,root,documentation,.md,770,884ebc76f372f6ca9e50e047e6e17b745065358e24ace77c6dace0905725172b,,False,False,evaluate,Requires component-level review
+README_UPDATE.md,root,documentation,.md,1680,4bfe50b7a4e8197d0acbce613eed11c80583f6e36d400594a7aa7bad6dd81bc4,,False,False,evaluate,Requires component-level review
+README_V5.md,root,documentation,.md,2423,ddcaf58a5f1c0801f226cea525607807a8acd369b71a493c14bde8154fd7d152,5,False,False,evaluate,Requires component-level review
+README_V5_1.md,root,documentation,.md,1256,82f012d43f785fb026f016151a195094dc6974b666a643efcd0d5b443e50550b,5.1,False,False,evaluate,Requires component-level review
+README_V6.md,root,documentation,.md,2221,3b7279815de305ca9b632d5ad02af37560d10e6da282f04be86ea67d9ff7c383,6,False,False,evaluate,Requires component-level review
+README_V6_1.md,root,documentation,.md,2282,c231c80530b502f6d9d690aa8386a634608aebf79c29dc45d953ec32a83346c0,6.1,False,False,evaluate,Requires component-level review
+README_V6_2.md,root,documentation,.md,1433,8d5fe9a73a84e817dd7228f1d2de81926a6ccebdd7f4032c5dd96e251039d185,6.2,False,False,evaluate,Requires component-level review
+README_V7.md,root,documentation,.md,2088,cba0109f9839c39d32d802aca350a99b65c69eafbd16894509f6fc6c2641c453,7,False,False,evaluate,Requires component-level review
+README_V7_1.md,root,documentation,.md,1436,9029f1177238eef4ba79cddba77f4096e653cd9e420fd094e8d75a969a6f13e4,7.1,False,False,evaluate,Requires component-level review
+README_V7_2.md,root,documentation,.md,1437,e2e20be3b754859970e2eb2dd104555d6611256e0f17491b12d5e668e63ff24c,7.2,False,False,evaluate,Requires component-level review
+README_V8.md,root,documentation,.md,2343,cb6297c7fc906a7d67e27e56d23ae32712c1758cb2d67e48111c0e5454be8ec3,8,False,False,evaluate,Requires component-level review
+repair_attribution_runs_v6_0_1.py,root,operations,.py,742,0554f0dadb91ef5c29b79565b29b92cf30199187751349c632ef53aa7491673c,6.0.1,False,False,archive,Legacy upgrade or operational entry point
+repair_decision_runs_v7_1_1.py,root,operations,.py,701,8e5551436fd8861bfdeeba6f7e64c3197f3d1e85a97d0869d0af975d45949c35,7.1.1,False,False,archive,Legacy upgrade or operational entry point
+repair_forecast_runs_v8_0_1.py,root,operations,.py,704,f7f8c947df403413cf005841e232f3ed05f72720b9b756a363901400c8bb8a3e,8.0.1,False,False,archive,Legacy upgrade or operational entry point
+repair_module2_v2_3_2.py,root,operations,.py,1593,165be3ad0c36fdb43cf0d63ae592f80bf7e31c6f431315e2988b87bcfa4bb3c0,2.3.2,False,False,archive,Legacy upgrade or operational entry point
+repair_v2_3_1.py,root,operations,.py,1012,8042b68b42d0f7ee026e03d2ddce4910ca3556cb24c389fe4d26f51113b4a4e6,2.3.1,False,False,archive,Legacy upgrade or operational entry point
+requirements-optional.txt,root,documentation,.txt,17,0c998cc6f6459c5a4a091919d5e42ae1fadbee022099fd189c637287df1de69e,,False,False,evaluate,Requires component-level review
+requirements-v6.txt,root,documentation,.txt,47,1d9a1ef7e4a362023c7f8065fdddcc5f8d6dfc5129dea1cd04017c7a075284bc,6,False,False,evaluate,Requires component-level review
+requirements-v7.txt,root,documentation,.txt,47,1d9a1ef7e4a362023c7f8065fdddcc5f8d6dfc5129dea1cd04017c7a075284bc,7,False,False,evaluate,Requires component-level review
+requirements-v8.txt,root,documentation,.txt,47,1d9a1ef7e4a362023c7f8065fdddcc5f8d6dfc5129dea1cd04017c7a075284bc,8,False,False,evaluate,Requires component-level review
+requirements.txt,root,documentation,.txt,126,2466a3c17b787e89863f16df7fc00ceaede17a3cddfebc9514bfee195843912c,,False,False,evaluate,Requires component-level review
+reset_database.py,root,source,.py,592,18df94e7fcb175b0f9d8f2dfd8f97d2df20982eae7c2a9498097275fac5290f4,,False,False,evaluate,Requires component-level review
+run_all.py,root,operations,.py,312,231976c2ea2b97b02fe07f6b69cb152f0d9cda6a96e8430ddddf29b42456b3de,,False,False,archive,Legacy upgrade or operational entry point
+run_confidence_v7_1.py,root,operations,.py,691,57237775056d67d600a950c42b0385dbd8e29cdd71859a86bab167c577614c1c,7.1,False,False,archive,Legacy upgrade or operational entry point
+run_dashboard_v6_1.py,root,operations,.py,655,4e08860fd226bce66c98daa2b9637680e30f69b9dc6400175c53f58cbfc64c9e,6.1,False,False,archive,Legacy upgrade or operational entry point
+run_dashboard_v6_2.py,root,operations,.py,670,5e05748d3e03997ff462b77a99fff5c4b87920beda36adc9a39e1218f94e4aa6,6.2,False,False,archive,Legacy upgrade or operational entry point
+run_dashboard_v7.py,root,operations,.py,664,ae910f27c3ac7d6714c5d74efc52f1d99a5c8849cd9f6eaa090262e824239ac0,7,False,False,archive,Legacy upgrade or operational entry point
+run_dashboard_v7_1.py,root,operations,.py,671,68133c8a3d1710bb5b0039243ee79d035805b118cab097f092ab064516ab4835,7.1,False,False,archive,Legacy upgrade or operational entry point
+run_dashboard_v7_2.py,root,operations,.py,671,bb58e11a8f244effef62c963ffab530d933be86d33b7a9373d8c1f96669a0a5f,7.2,False,False,archive,Legacy upgrade or operational entry point
+run_module2.py,root,operations,.py,653,e9b967b022047995805858d2488f4a7a5bf772f9af56708b273deee2838c66a7,,False,False,archive,Legacy upgrade or operational entry point
+run_module2_and_3.py,root,operations,.py,496,48a7b078d68ec90bcf3e14e915d09080fd2a74ef30fbfa4a1b45eef6746162d3,,False,False,archive,Legacy upgrade or operational entry point
+run_module3.py,root,operations,.py,703,9ff2a48da891cf780389e72c30edf9ec378fcfcf390b907259773d6b6f1142ad,,False,False,archive,Legacy upgrade or operational entry point
+run_module4.py,root,operations,.py,547,c78a3648aac978732be1ca6b5be01cac9d520f0c9b30298adf3159b7b77e9d49,,False,False,archive,Legacy upgrade or operational entry point
+run_module5.py,root,operations,.py,654,3ca220f4cda340a1b6f631459a5792c9afb8c61a5097fd1a60d22c7b25b1bbdb,,False,False,archive,Legacy upgrade or operational entry point
+run_module5_v5_1.py,root,operations,.py,668,ea8518b85d4211535daa3d115a00b5afa0403406eed222fc1430f106612c06bd,5.1,False,False,archive,Legacy upgrade or operational entry point
+run_module5_v6.py,root,operations,.py,717,9345f1478ffcb25cb779c44b7905fa9d67bc1c6e8c08aedd7bb7d68f9c763375,6,False,False,archive,Legacy upgrade or operational entry point
+run_module5_v6_1.py,root,operations,.py,726,e08bd1f2cb932223323ee6f8303c3cdd74216c80e3f2d46d9fb2a7598406654d,6.1,False,False,archive,Legacy upgrade or operational entry point
+run_module5_v6_2.py,root,operations,.py,725,ea04fa22d253a32f9416100d956d4a9aee11ead8757abfd7864ae2ba07a2ab37,6.2,False,False,archive,Legacy upgrade or operational entry point
+run_module6.py,root,operations,.py,1179,bd524304d8c1d3a03992d350d13439b7ce8571911823a01785279b94cb96d3eb,,False,False,archive,Legacy upgrade or operational entry point
+run_module6_v6_1.py,root,operations,.py,1271,9d7fb2abe5e154121032e46afde6cac07810a95bec048a6b7f872627b2537064,6.1,False,False,archive,Legacy upgrade or operational entry point
+run_module6_v6_2.py,root,operations,.py,1269,9c5bbc27dc952a21f0a659c8b3898457306fdd949cc100a628ca3b23670056ae,6.2,False,False,archive,Legacy upgrade or operational entry point
+run_module7.py,root,operations,.py,692,0a933cb556ca00c8015924a7bfd47645b55caa2434a4020effb2e2c6af3de157,,False,False,archive,Legacy upgrade or operational entry point
+run_module7_v7_1.py,root,operations,.py,706,9c542337399180ab7eb22bf89ab63de64efac04fd5b9a30be866b702b5522b00,7.1,False,False,archive,Legacy upgrade or operational entry point
+run_module7_v7_2.py,root,operations,.py,706,a7966a33a44b75e145b18b2144e293fe109bd5d44991fe2b1d9d09634b06afc4,7.2,False,False,archive,Legacy upgrade or operational entry point
+run_module7_v8.py,root,operations,.py,699,161ad4f4c64a92f2340a5ecbc5f8a06179545a100858f8dfcddff7e35ff79352,8,False,False,archive,Legacy upgrade or operational entry point
+run_module8.py,root,operations,.py,923,7ea52a2044c9b266469b39141c98c10167013e2cc597efc8d48003d52eef3e88,,False,False,archive,Legacy upgrade or operational entry point
+run_modules_2_to_4.py,root,operations,.py,513,e4460b457a7e3c00ce06b4c0e9b3027ee12c91a536cb1d290e8e3ef4167e3aa9,,False,False,archive,Legacy upgrade or operational entry point
+run_modules_2_to_5.py,root,operations,.py,597,3d4d29db44425c7e5a4aa14d617d73ed8f070fac9cbfb867ad2abbc5fb8bc4e9,,False,False,archive,Legacy upgrade or operational entry point
+run_monthly_report_v8.py,root,operations,.py,692,fd7adb6118179850be62afb680c2ef77f8ed61eaa4c7fbfd6e92890dd31356d3,8,False,False,archive,Legacy upgrade or operational entry point
+run_platform.bat,root,operations,.bat,363,4d905d678a7b82154982ec38ffb20d22f8a3a4bd61c0e7df77c8a9fcc9e609f2,,False,False,archive,Legacy upgrade or operational entry point
+run_platform.py,root,operations,.py,1447,c38215cf1965efa76564d14dd7cdfe5fda464c5c8891d27fee51ddc16f3f43dd,,False,False,archive,Legacy upgrade or operational entry point
+run_v6_1_pipeline.py,root,operations,.py,585,fdacddce4c1b560d4e989616428f8bc47408660ea69e273187962ab6d54a408e,6.1,False,False,archive,Legacy upgrade or operational entry point
+run_v6_2_pipeline.py,root,operations,.py,555,e95a93fbf7688e191d0437a0de1d232c2250d05f5bbac679a2996a621a30dcc8,6.2,False,False,archive,Legacy upgrade or operational entry point
+run_v6_pipeline.py,root,operations,.py,500,8e0ea13c301f8d7bd8ffcf15ca013f104895ea167300191c0b30e58fd81a8302,6,False,False,archive,Legacy upgrade or operational entry point
+run_v7_1_pipeline.py,root,operations,.py,475,d7650aecdbc4f7b6d64683034de0b9d23d07d54a67eb4aba381ceebc73aafb3f,7.1,False,False,archive,Legacy upgrade or operational entry point
+run_v7_2_pipeline.py,root,operations,.py,430,33a3eba408eb0d9148e506c98f208d0111ce0df6e7cc1664200b645c284dfaff,7.2,False,False,archive,Legacy upgrade or operational entry point
+run_v7_pipeline.py,root,operations,.py,642,7e06ab9ddc9cdd69fa606d97f309c1419b17e08c165ede6cb3b3080e6dc37a5f,7,False,False,archive,Legacy upgrade or operational entry point
+run_v7_quant_upgrades.py,root,operations,.py,1552,69b6a5d769384c5608d9e31471cf7a9dd4cf102d31f056d785e0c8b89a65795b,7,False,False,archive,Legacy upgrade or operational entry point
+run_v8_pipeline.py,root,operations,.py,448,df9c998e88c90ef9ec44557111bd54354fc21f755e139b60d2f93c06cff20a80,8,False,False,archive,Legacy upgrade or operational entry point
+setup_windows.bat,root,source,.bat,323,120d2717e9ad41cd50b160fb89bc34cbb885cb994c422db8ba38538a1d1e01bf,,False,False,evaluate,Requires component-level review
+test_advanced_metrics_v7_0_1.py,root,test,.py,1128,3edda27147f8784153dce7c1050d93606736ca7c0cdc050651451a300c048c5e,7.0.1,True,False,evaluate,Test may preserve Metals-specific expected behavior
+test_copper_selection_v5_1_3.py,root,test,.py,1322,dd01d002a26bb5b3bcbf002128156a96028e40b8ce0a202ef366de0dac8ab5a0,5.1.3,True,False,evaluate,Test may preserve Metals-specific expected behavior
+tests/test_black_litterman.py,tests,test,.py,471,6351d5c5226eafb1ce59e4dd5e1b9ca8113e176d069261fef7e0397ca07baf90,,True,False,evaluate,Test may preserve Metals-specific expected behavior
+tests/test_confidence_v7_1.py,tests,test,.py,295,712f8e3381f8b34ca2f6265676711bd932eb8693aab72b8d5e0de5f239ab2082,7.1,True,False,evaluate,Test may preserve Metals-specific expected behavior
+tests/test_database.py,tests,test,.py,412,f72af7db3a9d253006c512cefe688eeaabdab85e32d0ab30b0b3b103b83771d2,,True,False,evaluate,Test may preserve Metals-specific expected behavior
+tests/test_execution.py,tests,test,.py,256,a54d200c499ec7b56ecac28776da3f7090e55495447e82486687ea087a8d4f68,,True,False,evaluate,Test may preserve Metals-specific expected behavior
+tests/test_forecasting_engine.py,tests,test,.py,294,7e7624d64015cad2e2fee831bcb8905c4d5ba64eb23181aa51c271958d0639b1,,True,False,evaluate,Test may preserve Metals-specific expected behavior
+tests/test_grading_v7_1.py,tests,test,.py,561,39edebf0302ee152facbc36c9648254344ac3602191b7991214c20ff436dd615,7.1,True,False,evaluate,Test may preserve Metals-specific expected behavior
+tests/test_macro_engine.py,tests,test,.py,298,f9e9c0abe45d71388a46022fc14bba9d786cb0ee6a5d0ee13dd4a80da56b2fba,,True,False,evaluate,Test may preserve Metals-specific expected behavior
+tests/test_module2.py,tests,test,.py,174,12cb0ae893b02e7fe455129cd1837027aa9db1d38a0e45cbb36d13d7297a70c5,,True,False,evaluate,Test may preserve Metals-specific expected behavior
+tests/test_probability_engine.py,tests,test,.py,417,07ebe3e2f65c7765dcbc672054990ad3b1d93dbbc981bb5fe741a6742975d709,,True,False,evaluate,Test may preserve Metals-specific expected behavior
+tests/test_quality.py,tests,test,.py,499,0a67a70d015f993591a6609193f6386f61ac440d5c1c4691a775cb85ac83d9f8,,True,False,evaluate,Test may preserve Metals-specific expected behavior
+tests/test_v6_1_attribution.py,tests,test,.py,222,b0820b9a3d3e20bce09a18f430523401199ba56008424ba5e0a98815f551a054,6.1,True,False,evaluate,Test may preserve Metals-specific expected behavior
+tests/test_v6_1_reserve.py,tests,test,.py,308,6147491b612cbe2b5e65692ccb5b3da2936fa3f0c2b0900890e2545d5a7b28e4,6.1,True,False,evaluate,Test may preserve Metals-specific expected behavior
+tests/test_v6_2_attribution.py,tests,test,.py,260,31294a1efb8d3aaf931daf3f1ce217ba566fbf01cc0fa75d3a0c0b55ab49cd22,6.2,True,False,evaluate,Test may preserve Metals-specific expected behavior
+tests/test_v6_2_optimizer.py,tests,test,.py,275,2cb0de75f00539ea6fa605984aac942adc97a252c3fd195ab723318a385bc5eb,6.2,True,False,evaluate,Test may preserve Metals-specific expected behavior
+tests/test_v6_trade_queue.py,tests,test,.py,362,2a51f152a1bcbc3adf898afe51dbb9b895ec6cdc27db8a980c60fdf63e48690d,6,True,False,evaluate,Test may preserve Metals-specific expected behavior
+tests/test_v7_2_engine.py,tests,test,.py,352,1569054186cf32be757b2835a7102f93591a74474b7469ee3f8934582f8d2fe9,7.2,True,False,evaluate,Test may preserve Metals-specific expected behavior
+tests/test_v7_2_schema.py,tests,test,.py,283,d89b874be227e7598f59c5825b85ec2da93e6882721010708894f3eed5ea0bdb,7.2,True,False,evaluate,Test may preserve Metals-specific expected behavior
+tests/test_v8_schema.py,tests,test,.py,262,f2705d4f9497362132e1bd8ee2900e6028cf928152c482c2433394ddb701bd84,8,True,False,evaluate,Test may preserve Metals-specific expected behavior
+tests/test_vehicle_engine.py,tests,test,.py,169,6e6ed9a7bdaef775342e84eeec067af8382e3bc1a5b623a3bc9a7b0971705e27,,True,False,evaluate,Test may preserve Metals-specific expected behavior
+tests/test_vehicle_selection.py,tests,test,.py,793,e535380e87bff9def73aa4cf82bab22446468da3960a6ff9aba6f43d0af13229,,True,False,evaluate,Test may preserve Metals-specific expected behavior
+verify_forecast_join_v8_0_1.py,root,integration,.py,1202,2f1799e34f8c4e165061b92b742aaba0f0480143737606f0147cdc6d1471e203,8.0.1,False,False,evaluate,Required to determine canonical v8 integration path
+verify_quality_schema_v7_1_1.py,root,integration,.py,637,1c2f34a518200090a9b19e419120fd25a5d85fdaa3700c98a0db01518014aa78,7.1.1,False,False,evaluate,Required to determine canonical v8 integration path

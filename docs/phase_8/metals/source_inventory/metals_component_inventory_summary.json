@@ -1,0 +1,46 @@
+{
+  "file_count": 289,
+  "total_size_bytes": 896998,
+  "components": {
+    "__init__.py": 1,
+    "analytics": 7,
+    "attribution": 5,
+    "backtest": 5,
+    "collectors": 5,
+    "confidence": 3,
+    "config": 17,
+    "core": 7,
+    "dashboard": 8,
+    "database": 19,
+    "decision_support": 6,
+    "docs": 1,
+    "etl": 2,
+    "forecasting": 2,
+    "macro": 7,
+    "models": 2,
+    "optimizer": 8,
+    "portfolio": 7,
+    "reporting": 2,
+    "risk": 3,
+    "root": 141,
+    "services": 2,
+    "tests": 20,
+    "vehicles": 9
+  },
+  "roles": {
+    "configuration": 17,
+    "documentation": 20,
+    "integration": 27,
+    "operations": 89,
+    "source": 114,
+    "test": 22
+  },
+  "initial_classifications": {
+    "adapt": 10,
+    "archive": 110,
+    "evaluate": 97,
+    "replace": 72
+  },
+  "backup_file_count": 23,
+  "test_file_count": 22
+}
