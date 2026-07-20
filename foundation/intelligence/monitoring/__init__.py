@@ -1,5 +1,6 @@
-"""Complete monitoring orchestration and unified outputs."""
+"""Certified monitoring, drift detection, and reoptimization engine."""
 
+from .certification import CertificationCheck, Phase55CertificationReport, certify_phase_5_5
 from .contracts import (
     DriftCategory, DriftDirection, DriftSignal, DriftThreshold,
     MonitoringBaseline, MonitoringLifecycleStatus, MonitoringObservation,
@@ -30,17 +31,17 @@ from .triggers import (
 
 __all__ = [
     "AUDIT_COLUMNS", "AllocationOutcomeLine", "AllocationOutcomeMonitoringResult",
-    "AllocationOutcomePlan", "DASHBOARD_COLUMNS", "DriftCategory",
+    "AllocationOutcomePlan", "CertificationCheck", "DASHBOARD_COLUMNS", "DriftCategory",
     "DriftDetectionResult", "DriftDetectionStatus", "DriftDirection", "DriftSignal",
     "DriftThreshold", "MissingMetricEvidence", "MonitoringBaseline",
     "MonitoringLifecycleStatus", "MonitoringObservation", "MonitoringOrchestrationRequest",
     "MonitoringOrchestrationResult", "MonitoringOutputPackage", "MonitoringPolicyBundle",
     "MonitoringRunRequest", "MonitoringRunResult", "MonitoringStageArtifact",
     "MonitoringWindow", "ObservedAllocationOutcome", "OutcomeMonitoringPolicy",
-    "OutcomeMonitoringStatus", "OutcomeReasonCode", "PlannedAllocationOutcome",
-    "ReoptimizationControlPolicy", "ReoptimizationDisposition", "ReoptimizationTrigger",
-    "TriggerControlDecision", "TriggerControlState", "TriggerSeverity",
-    "build_monitoring_output", "detect_drift", "evaluate_reoptimization_trigger",
-    "monitor_allocation_outcomes", "run_monitoring_orchestration",
-    "validate_monitoring_output",
+    "OutcomeMonitoringStatus", "OutcomeReasonCode", "Phase55CertificationReport",
+    "PlannedAllocationOutcome", "ReoptimizationControlPolicy", "ReoptimizationDisposition",
+    "ReoptimizationTrigger", "TriggerControlDecision", "TriggerControlState",
+    "TriggerSeverity", "build_monitoring_output", "certify_phase_5_5", "detect_drift",
+    "evaluate_reoptimization_trigger", "monitor_allocation_outcomes",
+    "run_monitoring_orchestration", "validate_monitoring_output",
 ]
