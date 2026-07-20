@@ -180,7 +180,7 @@ class _HTMLTableParser(HTMLParser):
 class EIAUraniumProvider:
     """Latest U.S. uranium weighted-average purchase price from EIA."""
 
-    URL = "https://www.eia.gov/uranium/marketing/html/table1b.php"
+    URL = "https://www.eia.gov/uranium/marketing/summarytable1b.php"
 
     def __init__(self, *, transport: Transport = _default_transport, timeout: float = 20.0):
         self._transport = transport
