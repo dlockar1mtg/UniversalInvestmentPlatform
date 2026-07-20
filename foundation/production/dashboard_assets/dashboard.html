@@ -25,6 +25,23 @@
         <article class="card"><span>Portfolio source</span><strong id="portfolio-status">—</strong><small>Configured holdings CSV</small></article>
         <article class="card"><span>Providers</span><strong id="provider-status">—</strong><small>Alpha Vantage + FRED</small></article>
       </div>
+      <section id="portfolio-panel" class="panel portfolio-panel">
+        <div class="section-title"><div><h2>Portfolio snapshot</h2><span id="portfolio-meta">No persisted snapshot</span></div><span id="portfolio-fingerprint"></span></div>
+        <div id="portfolio-empty" class="empty">No hosted portfolio snapshot is available yet.</div>
+        <div id="portfolio-data" hidden>
+          <div class="portfolio-cards">
+            <article><span>Market value</span><strong id="portfolio-market">—</strong></article>
+            <article><span>Cost basis</span><strong id="portfolio-cost">—</strong></article>
+            <article><span>Gain / loss</span><strong id="portfolio-gain">—</strong><small id="portfolio-return">—</small></article>
+            <article><span>Positions</span><strong id="portfolio-count">—</strong></article>
+          </div>
+          <div class="portfolio-layout">
+            <section><h3>Allocation by group</h3><div id="portfolio-allocation" class="allocation"></div></section>
+            <section><h3>Snapshot history</h3><div id="portfolio-history" class="history"></div></section>
+          </div>
+          <div class="table-wrap"><table><thead><tr><th>Position</th><th>Group</th><th>Quantity</th><th>Cost basis</th><th>Market value</th><th>Gain / loss</th></tr></thead><tbody id="portfolio-positions"></tbody></table></div>
+        </div>
+      </section>
       <div class="grid">
         <section class="panel"><div class="section-title"><h2>Recent activity</h2><span>Newest first</span></div><div id="events" class="events"></div></section>
         <section class="panel"><div class="section-title"><h2>Request metrics</h2><span>By method and status</span></div><div id="metrics" class="metrics"></div></section>
