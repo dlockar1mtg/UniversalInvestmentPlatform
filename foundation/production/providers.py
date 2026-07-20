@@ -234,8 +234,7 @@ class EIAUraniumProvider:
 class WorldBankCommodityProvider:
     """Latest monthly official commodity benchmarks from the World Bank Pink Sheet."""
 
-    INDEX_URL = "https://www.worldbank.org/en/research/commodity-markets"
-    TARGETS = {
+    INDEX_URL = "https://www.worldbank.org/en/research/commodity-markets"\n    FALLBACK_URL = "https://thedocs.worldbank.org/en/doc/74e8be41ceb20fa0da750cda2f6b9e4e-0050012026/related/CMO-Historical-Data-Monthly.xlsx"\n    TARGETS = {
         "gold": ("Gold", "usd_per_troy_ounce"),
         "silver": ("Silver", "usd_per_troy_ounce"),
         "platinum": ("Platinum", "usd_per_troy_ounce"),
@@ -271,9 +270,7 @@ class WorldBankCommodityProvider:
             for link in parser.links
             if "cmo-historical-data-monthly" in link.lower() and ".xlsx" in link.lower()
         ]
-        if not candidates:
-            raise ProviderError("World Bank monthly workbook link was not found")
-        return candidates[0]
+        return candidates[0] if candidates else self.FALLBACK_URL
 
     @staticmethod
     def _month(value: object) -> date | None:
