@@ -16,12 +16,35 @@ services:
     build:
       context: ..
       dockerfile: deployment/Dockerfile
-    environment:
+    environment: &runtime-environment
       UIIP_DATABASE_BACKEND: postgresql
+      UIIP_JOB_DATABASE_BACKEND: postgresql
       UIIP_DATABASE_URL: postgresql://uiip:${UIIP_POSTGRES_PASSWORD}@postgres:5432/uiip
       UIIP_HTTP_HOST: 0.0.0.0
+      UIIP_ALPHA_VANTAGE_API_KEY: ${UIIP_ALPHA_VANTAGE_API_KEY}
+      UIIP_FRED_API_KEY: ${UIIP_FRED_API_KEY}
     ports:
       - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+  worker:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
+    command: ["python", "scripts/run_production_worker.py"]
+    environment: *runtime-environment
+    depends_on:
+      postgres:
+        condition: service_healthy
+  scheduler:
+    build:
+      context: ..
+      dockerfile: deployment/Dockerfile
+    command: ["python", "scripts/run_production_scheduler.py"]
+    environment:
+      <<: *runtime-environment
+      UIIP_SCHEDULES_JSON: ${UIIP_SCHEDULES_JSON:-[]}
     depends_on:
       postgres:
         condition: service_healthy

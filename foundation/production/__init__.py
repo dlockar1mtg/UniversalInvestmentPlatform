@@ -12,21 +12,24 @@ from .operations import OperationalStatus, ShutdownController, collect_operation
 from .persistence import SQLiteProductionRepository
 from .portfolio import PortfolioCSVError, PortfolioCSVValidationError, PortfolioImportReport, PortfolioPosition, import_portfolio_csv, preview_portfolio_csv
 from .postgres import PostgresProductionRepository
+from .postgres_jobs import PostgresJobRepository
 from .providers import AlphaVantageProvider, EconomicObservation, FREDProvider, MarketQuote, ProviderError
 from .scheduling import JobStatus, RetryPolicy, ScheduledJob, SQLiteJobRepository, run_next_job
 from .security import APIKeyAuthenticator, Permission, Principal, SecretReference, redact
+from .worker import HandlerRegistry, HostedWorker, RecurringSchedule, WorkerHealth, WorkerSettings, build_job_repository, enqueue_schedule
 
 __all__ = [
     "APIKeyAuthenticator", "APIResponse", "AlphaVantageProvider", "AuditEvent", "DatabaseBackupManager",
     "DeploymentManifest", "EconomicObservation", "EventRecorder", "ExternalDataProvider", "ExternalDataRecord",
-    "FREDProvider", "HTTPServiceSettings", "HealthReport", "IngestionPolicy", "JobStatus", "MarketQuote",
-    "MetricRegistry", "MigrationCoordinator", "NormalizedDataBatch", "OperationalEvent", "OperationalStatus",
-    "Permission", "PersistedArtifact", "Phase6CertificationReport", "PortfolioCSVError",
-    "PortfolioCSVValidationError", "PortfolioImportReport", "PortfolioPosition", "PostgresProductionRepository",
-    "Principal", "ProductionAPI", "ProductionCertificationCheck", "ProductionRun", "ProductionRunStatus",
-    "ProductionRuntimeConfig", "ProviderError", "RetryPolicy", "SQLiteJobRepository", "SQLiteProductionRepository",
-    "ScheduledJob", "SchemaMigration", "SecuredProductionGateway", "SecretReference", "ShutdownController",
-    "StartupResult", "bootstrap_production", "build_repository", "certify_phase_6", "collect_operational_status",
-    "create_http_app", "evaluate_health", "import_portfolio_csv", "ingest_provider", "preview_portfolio_csv",
+    "FREDProvider", "HTTPServiceSettings", "HandlerRegistry", "HealthReport", "HostedWorker", "IngestionPolicy",
+    "JobStatus", "MarketQuote", "MetricRegistry", "MigrationCoordinator", "NormalizedDataBatch", "OperationalEvent",
+    "OperationalStatus", "Permission", "PersistedArtifact", "Phase6CertificationReport", "PortfolioCSVError",
+    "PortfolioCSVValidationError", "PortfolioImportReport", "PortfolioPosition", "PostgresJobRepository",
+    "PostgresProductionRepository", "Principal", "ProductionAPI", "ProductionCertificationCheck", "ProductionRun",
+    "ProductionRunStatus", "ProductionRuntimeConfig", "ProviderError", "RecurringSchedule", "RetryPolicy",
+    "SQLiteJobRepository", "SQLiteProductionRepository", "ScheduledJob", "SchemaMigration", "SecuredProductionGateway",
+    "SecretReference", "ShutdownController", "StartupResult", "WorkerHealth", "WorkerSettings", "bootstrap_production",
+    "build_job_repository", "build_repository", "certify_phase_6", "collect_operational_status", "create_http_app",
+    "enqueue_schedule", "evaluate_health", "import_portfolio_csv", "ingest_provider", "preview_portfolio_csv",
     "redact", "run_next_job",
 ]
