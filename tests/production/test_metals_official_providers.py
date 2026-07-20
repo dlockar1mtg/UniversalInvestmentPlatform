@@ -75,7 +75,7 @@ def test_official_provider_transport_failure_does_not_expose_details() -> None:
 
 def test_world_bank_provider_normalizes_latest_monthly_values() -> None:
     payload = _world_bank_fixture()
-    provider = WorldBankCommodityProvider(transport=lambda url, timeout: payload, timeout=6)
+    provider = WorldBankCommodityProvider(\n        transport=lambda url, timeout: payload, timeout=6,\n        workbook_url="fixture://monthly.xlsx",\n    )
     results = provider.latest(["gold", "silver", "copper", "platinum"])
     by_asset = {result.asset: result for result in results}
     assert list(by_asset) == ["gold", "silver", "copper", "platinum"]
@@ -95,7 +95,7 @@ def test_world_bank_provider_accepts_year_month_text_dates() -> None:
     sheet.append(["2026M06", 3400, 38])
     output = BytesIO()
     workbook.save(output)
-    provider = WorldBankCommodityProvider(transport=lambda *_: output.getvalue())
+    provider = WorldBankCommodityProvider(\n        transport=lambda *_: output.getvalue(), workbook_url="fixture://monthly.xlsx"\n    )
     results = provider.latest(["gold", "silver"])
     assert {result.observation_date.isoformat() for result in results} == {"2026-06-01"}
 
@@ -111,6 +111,31 @@ def test_world_bank_schema_drift_and_invalid_assets_are_rejected() -> None:
 
 
 def test_world_bank_invalid_workbook_is_rejected() -> None:
-    provider = WorldBankCommodityProvider(transport=lambda *_: b"not-an-xlsx")
+    provider = WorldBankCommodityProvider(\n        transport=lambda *_: b"not-an-xlsx", workbook_url="fixture://monthly.xlsx"\n    )
     with pytest.raises(ProviderError, match="valid XLSX"):
+        provider.latest(["gold"])
+
+
+def test_world_bank_discovers_current_workbook_from_stable_index() -> None:
+    workbook = _world_bank_fixture()
+    requested: list[str] = []
+
+    def transport(url: str, timeout: float) -> bytes:
+        requested.append(url)
+        if url == WorldBankCommodityProvider.INDEX_URL:
+            return b'<a href="https://current.example/CMO-Historical-Data-Monthly.xlsx">Monthly prices</a>'
+        return workbook
+
+    provider = WorldBankCommodityProvider(transport=transport)
+    results = provider.latest(["gold", "silver"])
+    assert len(results) == 2
+    assert requested == [
+        WorldBankCommodityProvider.INDEX_URL,
+        "https://current.example/CMO-Historical-Data-Monthly.xlsx",
+    ]
+
+
+def test_world_bank_missing_current_workbook_link_is_rejected() -> None:
+    provider = WorldBankCommodityProvider(transport=lambda *_: b"<html>no workbook</html>")
+    with pytest.raises(ProviderError, match="link was not found"):
         provider.latest(["gold"])
