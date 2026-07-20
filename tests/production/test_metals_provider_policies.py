@@ -108,7 +108,7 @@ def test_normalized_ingestion_preserves_lineage_and_is_deterministic() -> None:
     second = ingest_commodity_observations(reverse_result, policy)
     assert first.provider == "world_bank"
     assert first.batch_fingerprint == second.batch_fingerprint
-    assert [record.asset_id for record in first.records] == ["metals:gold", "metals:silver"]
+    assert [record.asset_id for record in first.records] == ["metals:commodity:gold", "metals:commodity:silver"]
     assert str(first.records[0].values["price"]) == "3400"
 
 
