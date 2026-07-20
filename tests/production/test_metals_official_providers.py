@@ -102,7 +102,8 @@ def test_world_bank_provider_accepts_year_month_text_dates() -> None:
 
 def test_world_bank_schema_drift_and_invalid_assets_are_rejected() -> None:
     provider = WorldBankCommodityProvider(
-        transport=lambda *_: _world_bank_fixture(include_silver=False)
+        transport=lambda *_: _world_bank_fixture(include_silver=False),
+        workbook_url="fixture://monthly.xlsx",
     )
     with pytest.raises(ProviderError, match="silver column"):
         provider.latest(["gold", "silver"])
