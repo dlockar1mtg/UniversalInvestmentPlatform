@@ -75,7 +75,10 @@ def test_official_provider_transport_failure_does_not_expose_details() -> None:
 
 def test_world_bank_provider_normalizes_latest_monthly_values() -> None:
     payload = _world_bank_fixture()
-    provider = WorldBankCommodityProvider(\n        transport=lambda url, timeout: payload, timeout=6,\n        workbook_url="fixture://monthly.xlsx",\n    )
+    provider = WorldBankCommodityProvider(
+        transport=lambda url, timeout: payload, timeout=6,
+        workbook_url="fixture://monthly.xlsx",
+    )
     results = provider.latest(["gold", "silver", "copper", "platinum"])
     by_asset = {result.asset: result for result in results}
     assert list(by_asset) == ["gold", "silver", "copper", "platinum"]
@@ -95,7 +98,9 @@ def test_world_bank_provider_accepts_year_month_text_dates() -> None:
     sheet.append(["2026M06", 3400, 38])
     output = BytesIO()
     workbook.save(output)
-    provider = WorldBankCommodityProvider(\n        transport=lambda *_: output.getvalue(), workbook_url="fixture://monthly.xlsx"\n    )
+    provider = WorldBankCommodityProvider(
+        transport=lambda *_: output.getvalue(), workbook_url="fixture://monthly.xlsx"
+    )
     results = provider.latest(["gold", "silver"])
     assert {result.observation_date.isoformat() for result in results} == {"2026-06-01"}
 
@@ -112,7 +117,9 @@ def test_world_bank_schema_drift_and_invalid_assets_are_rejected() -> None:
 
 
 def test_world_bank_invalid_workbook_is_rejected() -> None:
-    provider = WorldBankCommodityProvider(\n        transport=lambda *_: b"not-an-xlsx", workbook_url="fixture://monthly.xlsx"\n    )
+    provider = WorldBankCommodityProvider(
+        transport=lambda *_: b"not-an-xlsx", workbook_url="fixture://monthly.xlsx"
+    )
     with pytest.raises(ProviderError, match="valid XLSX"):
         provider.latest(["gold"])
 
