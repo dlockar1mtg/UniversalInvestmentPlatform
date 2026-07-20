@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>UIIP Operations</title>
+  <link rel="stylesheet" href="/dashboard/assets/dashboard.css">
+</head>
+<body>
+  <header class="topbar">
+    <div><span class="eyebrow">UNIVERSAL INVESTMENT PLATFORM</span><h1>Operations</h1></div>
+    <button id="refresh" class="secondary">Refresh</button>
+  </header>
+  <main>
+    <section id="auth" class="panel auth-panel">
+      <div><h2>Connect securely</h2><p>Enter a viewer or operator API key. It stays in this browser tab and is never written to the page.</p></div>
+      <form id="auth-form"><label for="api-key">API key</label><div class="input-row"><input id="api-key" type="password" autocomplete="off" required><button type="submit">Connect</button></div></form>
+    </section>
+    <div id="message" class="message" role="status" aria-live="polite">Waiting for authentication.</div>
+    <section id="content" hidden>
+      <div class="status-line"><span id="status-dot" class="dot"></span><span id="service-status">Checking service</span><span id="updated"></span></div>
+      <div class="cards">
+        <article class="card"><span>API requests</span><strong id="request-count">—</strong><small>Since service start</small></article>
+        <article class="card"><span>Recorded events</span><strong id="event-count">—</strong><small>Redacted audit activity</small></article>
+        <article class="card"><span>Portfolio source</span><strong id="portfolio-status">—</strong><small>Configured holdings CSV</small></article>
+        <article class="card"><span>Providers</span><strong id="provider-status">—</strong><small>Alpha Vantage + FRED</small></article>
+      </div>
+      <div class="grid">
+        <section class="panel"><div class="section-title"><h2>Recent activity</h2><span>Newest first</span></div><div id="events" class="events"></div></section>
+        <section class="panel"><div class="section-title"><h2>Request metrics</h2><span>By method and status</span></div><div id="metrics" class="metrics"></div></section>
+      </div>
+    </section>
+  </main>
+  <script src="/dashboard/assets/dashboard.js" defer></script>
+</body>
+</html>

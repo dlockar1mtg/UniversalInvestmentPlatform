@@ -21,8 +21,10 @@ services:
       UIIP_JOB_DATABASE_BACKEND: postgresql
       UIIP_DATABASE_URL: postgresql://uiip:${UIIP_POSTGRES_PASSWORD}@postgres:5432/uiip
       UIIP_HTTP_HOST: 0.0.0.0
+      UIIP_API_CREDENTIALS_JSON: ${UIIP_API_CREDENTIALS_JSON:-{}}
       UIIP_ALPHA_VANTAGE_API_KEY: ${UIIP_ALPHA_VANTAGE_API_KEY}
       UIIP_FRED_API_KEY: ${UIIP_FRED_API_KEY}
+      UIIP_PORTFOLIO_CSV: ${UIIP_PORTFOLIO_CSV:-portfolio_holdings.csv}
     ports:
       - "8000:8000"
     depends_on:
