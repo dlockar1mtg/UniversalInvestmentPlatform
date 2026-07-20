@@ -102,18 +102,23 @@ def install_hosted_portfolio_routes(
             count(422)
             return _error("PORTFOLIO_ENCODING", "portfolio CSV must be UTF-8", 422)
         report = preview_portfolio_csv(text, is_text=True)
-        if not report.valid:
+        if not report.valid or not report.positions:
+            errors = [
+                {"field": item.field, "message": item.message, "row_number": item.row_number}
+                for item in report.errors
+            ]
+            if not report.positions and not errors:
+                errors.append({
+                    "field": "portfolio", "message": "at least one position is required", "row_number": 2,
+                })
             count(422)
             record("PORTFOLIO_IMPORT_REJECTED", correlation_id, {
-                "principal_id": principal.principal_id, "error_count": len(report.errors),
+                "principal_id": principal.principal_id, "error_count": len(errors),
                 "credential": x_api_key,
             })
             return JSONResponse({
                 "error": {"code": "PORTFOLIO_INVALID", "message": "portfolio CSV failed validation"},
-                "errors": [
-                    {"field": item.field, "message": item.message, "row_number": item.row_number}
-                    for item in report.errors
-                ],
+                "errors": errors,
             }, status_code=422, headers={"X-Correlation-ID": correlation_id})
         candidate = create_portfolio_snapshot(
             report.positions,
