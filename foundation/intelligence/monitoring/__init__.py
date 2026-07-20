@@ -1,4 +1,4 @@
-"""Monitoring contracts and deterministic drift detection."""
+"""Monitoring, drift detection, and allocation-outcome reconciliation."""
 
 from .contracts import (
     DriftCategory, DriftDirection, DriftSignal, DriftThreshold,
@@ -8,15 +8,22 @@ from .contracts import (
     TriggerSeverity,
 )
 from .drift import (
-    DriftDetectionResult, DriftDetectionStatus, MissingMetricEvidence,
-    detect_drift,
+    DriftDetectionResult, DriftDetectionStatus, MissingMetricEvidence, detect_drift,
+)
+from .outcomes import (
+    AllocationOutcomeLine, AllocationOutcomeMonitoringResult, AllocationOutcomePlan,
+    ObservedAllocationOutcome, OutcomeMonitoringPolicy, OutcomeMonitoringStatus,
+    OutcomeReasonCode, PlannedAllocationOutcome, monitor_allocation_outcomes,
 )
 
 __all__ = [
-    "DriftCategory", "DriftDetectionResult", "DriftDetectionStatus",
-    "DriftDirection", "DriftSignal", "DriftThreshold", "MissingMetricEvidence",
-    "MonitoringBaseline", "MonitoringLifecycleStatus", "MonitoringObservation",
-    "MonitoringPolicyBundle", "MonitoringRunRequest", "MonitoringRunResult",
-    "MonitoringWindow", "ReoptimizationDisposition", "ReoptimizationTrigger",
-    "TriggerSeverity", "detect_drift",
+    "AllocationOutcomeLine", "AllocationOutcomeMonitoringResult", "AllocationOutcomePlan",
+    "DriftCategory", "DriftDetectionResult", "DriftDetectionStatus", "DriftDirection",
+    "DriftSignal", "DriftThreshold", "MissingMetricEvidence", "MonitoringBaseline",
+    "MonitoringLifecycleStatus", "MonitoringObservation", "MonitoringPolicyBundle",
+    "MonitoringRunRequest", "MonitoringRunResult", "MonitoringWindow",
+    "ObservedAllocationOutcome", "OutcomeMonitoringPolicy", "OutcomeMonitoringStatus",
+    "OutcomeReasonCode", "PlannedAllocationOutcome", "ReoptimizationDisposition",
+    "ReoptimizationTrigger", "TriggerSeverity", "detect_drift",
+    "monitor_allocation_outcomes",
 ]
