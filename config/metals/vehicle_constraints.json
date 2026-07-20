@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "minimum_score": 40,
+  "top_per_asset": 3,
+  "default_constraints": {
+    "minimum_direct_exposure_share_pct": 0,
+    "maximum_miner_share_pct": 100,
+    "maximum_single_vehicle_share_pct": 100
+  },
+  "asset_constraints": {
+    "gold": {"maximum_single_vehicle_share_pct": 60},
+    "silver": {"maximum_single_vehicle_share_pct": 60},
+    "copper": {
+      "minimum_direct_exposure_share_pct": 40,
+      "maximum_miner_share_pct": 60,
+      "maximum_single_vehicle_share_pct": 60
+    },
+    "uranium": {"maximum_single_vehicle_share_pct": 60},
+    "platinum": {"maximum_single_vehicle_share_pct": 100},
+    "tactical_reserve": {"maximum_single_vehicle_share_pct": 100}
+  }
+}
