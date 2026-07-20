@@ -9,6 +9,7 @@ from time import sleep as _sleep
 from typing import Callable, Iterable, Sequence, TypeVar
 
 from .integration import ExternalDataRecord, IngestionPolicy, NormalizedDataBatch, ingest_provider
+from .metals_registry import canonical_metals_asset_id
 from .providers import CommodityObservation, ProviderError
 
 T = TypeVar("T")
@@ -98,7 +99,7 @@ class CommodityObservationAdapter:
                 record_id=f"{item.provider}:{item.series_id}:{item.observation_date.isoformat()}",
                 provider=item.provider,
                 observed_at=observed,
-                asset_id=f"metals:{item.asset}",
+                asset_id=canonical_metals_asset_id(item.asset),
                 values={"price": Decimal(item.value)},
                 source_reference=item.series_id,
             )
