@@ -15,6 +15,11 @@ from .metals_registry import (
     MetalsAsset, MetalsRegistry, MetalsRegistryError, MetalsVehicle, canonical_metals_asset_id,
     load_metals_registry, validate_adapter_crosswalk, validate_metals_registry,
 )
+from .metals_vehicles import (
+    VehicleAllocation, VehicleCandidate, VehicleConstraint, VehicleSelectionError,
+    VehicleSelectionPolicy, VehicleSelectionResult, load_vehicle_selection_policy,
+    select_metals_vehicles,
+)
 from .observability import EventRecorder, HealthReport, MetricRegistry, OperationalEvent, SecuredProductionGateway, evaluate_health
 from .operations import OperationalStatus, ShutdownController, collect_operational_status
 from .persistence import SQLiteProductionRepository
@@ -43,10 +48,14 @@ __all__ = [
     "ProductionCertificationCheck", "ProductionRun", "ProductionRunStatus", "ProductionRuntimeConfig",
     "ProviderCollectionPolicy", "ProviderCollectionResult", "ProviderError", "RecurringSchedule", "RetryPolicy", "SQLiteJobRepository", "SQLiteProductionRepository",
     "ScheduledJob", "SchemaMigration", "SecuredProductionGateway", "SecretReference", "ShutdownController",
-    "StartupResult", "WorkerHealth", "WorkerSettings", "WorldBankCommodityProvider", "bootstrap_production",
+    "StartupResult", "VehicleAllocation", "VehicleCandidate", "VehicleConstraint", "VehicleSelectionError",
+    "VehicleSelectionPolicy", "VehicleSelectionResult", "WorkerHealth", "WorkerSettings",
+    "WorldBankCommodityProvider", "bootstrap_production",
     "build_job_repository", "build_repository", "canonical_metals_asset_id", "certify_phase_6", "certify_phase_7", "collect_with_policy",
     "collect_operational_status", "create_http_app", "enqueue_schedule", "evaluate_health",
-    "import_portfolio_csv", "ingest_commodity_observations", "ingest_provider", "install_live_security", "load_metals_registry",
-    "preview_portfolio_csv", "redact", "validate_adapter_crosswalk", "validate_metals_registry",
+    "import_portfolio_csv", "ingest_commodity_observations", "ingest_provider", "install_live_security",
+    "load_metals_registry", "load_vehicle_selection_policy",
+    "preview_portfolio_csv", "redact", "select_metals_vehicles", "validate_adapter_crosswalk",
+    "validate_metals_registry",
     "run_next_job",
 ]
