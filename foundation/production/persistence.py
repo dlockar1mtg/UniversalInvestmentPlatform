@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import closing
 from datetime import datetime
 import json
 from pathlib import Path
@@ -20,7 +21,7 @@ class SQLiteProductionRepository:
         return connection
 
     def initialize(self) -> None:
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             db.executescript("""
                 CREATE TABLE IF NOT EXISTS production_runs (
                     run_id TEXT PRIMARY KEY, source_phase TEXT NOT NULL,
@@ -41,7 +42,7 @@ class SQLiteProductionRepository:
             """)
 
     def register_run(self, run: ProductionRun) -> ProductionRun:
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             existing = db.execute("SELECT request_fingerprint, policy_fingerprint FROM production_runs WHERE run_id=?", (run.run_id,)).fetchone()
             if existing:
                 if existing != (run.request_fingerprint, run.policy_fingerprint):
@@ -54,21 +55,21 @@ class SQLiteProductionRepository:
         return run
 
     def get_run(self, run_id: str) -> ProductionRun:
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             row = db.execute("SELECT * FROM production_runs WHERE run_id=?", (run_id,)).fetchone()
         if row is None:
             raise KeyError(run_id)
         return ProductionRun(row[0], row[1], row[2], row[3], datetime.fromisoformat(row[4]), ProductionRunStatus(row[5]), json.loads(row[6]))
 
     def update_status(self, run_id: str, status: ProductionRunStatus) -> ProductionRun:
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             changed = db.execute("UPDATE production_runs SET status=? WHERE run_id=?", (status.value, run_id)).rowcount
             if not changed:
                 raise KeyError(run_id)
         return self.get_run(run_id)
 
     def append_artifact(self, artifact: PersistedArtifact) -> None:
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             existing = db.execute("SELECT content_fingerprint FROM production_artifacts WHERE artifact_id=?", (artifact.artifact_id,)).fetchone()
             if existing:
                 if existing[0] != artifact.content_fingerprint:
@@ -80,7 +81,7 @@ class SQLiteProductionRepository:
             ))
 
     def append_audit_event(self, event: AuditEvent) -> None:
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             duplicate = db.execute(
                 "SELECT 1 FROM production_audit_events WHERE event_id=? OR (run_id=? AND sequence=?)",
                 (event.event_id, event.run_id, event.sequence),
@@ -102,6 +103,6 @@ class SQLiteProductionRepository:
                 raise ValueError("audit event identity or sequence already exists") from exc
 
     def audit_events(self, run_id: str) -> tuple[AuditEvent, ...]:
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             rows = db.execute("SELECT event_id,run_id,sequence,event_type,occurred_at,evidence_json FROM production_audit_events WHERE run_id=? ORDER BY sequence", (run_id,)).fetchall()
         return tuple(AuditEvent(row[0], row[1], row[2], row[3], datetime.fromisoformat(row[4]), json.loads(row[5])) for row in rows)

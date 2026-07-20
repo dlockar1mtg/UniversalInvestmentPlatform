@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import closing
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
@@ -46,7 +47,7 @@ def collect_operational_status(config: ProductionRuntimeConfig) -> OperationalSt
     database_available = config.database_path.is_file()
     if database_available:
         try:
-            with sqlite3.connect(config.database_path) as db:
+            with closing(sqlite3.connect(config.database_path)) as db:
                 runs = dict(db.execute("SELECT status,COUNT(*) FROM production_runs GROUP BY status ORDER BY status").fetchall())
                 jobs = dict(db.execute("SELECT status,COUNT(*) FROM production_jobs GROUP BY status ORDER BY status").fetchall())
         except sqlite3.DatabaseError:

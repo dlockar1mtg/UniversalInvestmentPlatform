@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import closing
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from enum import Enum
@@ -72,7 +73,7 @@ class SQLiteJobRepository:
         return connection
 
     def initialize(self) -> None:
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             db.execute("""CREATE TABLE IF NOT EXISTS production_jobs (
                 job_id TEXT PRIMARY KEY, idempotency_key TEXT NOT NULL UNIQUE,
                 job_type TEXT NOT NULL, payload_json TEXT NOT NULL,
@@ -94,7 +95,7 @@ class SQLiteJobRepository:
     def enqueue(self, job: ScheduledJob) -> ScheduledJob:
         available = job.available_at or job.scheduled_at
         encoded = json.dumps(job.payload, sort_keys=True, separators=(",", ":"), default=str)
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             existing = db.execute("SELECT * FROM production_jobs WHERE idempotency_key=?", (job.idempotency_key,)).fetchone()
             if existing:
                 current = self._job(existing)
@@ -110,7 +111,7 @@ class SQLiteJobRepository:
         return self.get(job.job_id)
 
     def get(self, job_id: str) -> ScheduledJob:
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             row = db.execute("SELECT * FROM production_jobs WHERE job_id=?", (job_id,)).fetchone()
         if row is None:
             raise KeyError(job_id)
@@ -138,7 +139,7 @@ class SQLiteJobRepository:
             db.close()
 
     def complete(self, job_id: str, worker_id: str) -> ScheduledJob:
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             changed = db.execute("UPDATE production_jobs SET status=?,lease_owner=NULL,lease_expires_at=NULL,last_error=NULL WHERE job_id=? AND status=? AND lease_owner=?", (
                 JobStatus.COMPLETED.value, job_id, JobStatus.RUNNING.value, worker_id,
             )).rowcount
@@ -152,14 +153,14 @@ class SQLiteJobRepository:
             raise ValueError("worker does not hold the active job lease")
         status = JobStatus.DEAD_LETTER if current.attempts >= policy.maximum_attempts else JobStatus.RETRY_WAIT
         available = now if status is JobStatus.DEAD_LETTER else now + policy.delay_after(current.attempts)
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             db.execute("UPDATE production_jobs SET status=?,available_at=?,lease_owner=NULL,lease_expires_at=NULL,last_error=? WHERE job_id=?", (
                 status.value, available.isoformat(), error[:1000], job_id,
             ))
         return self.get(job_id)
 
     def recover_expired(self, now: datetime) -> tuple[str, ...]:
-        with self._connect() as db:
+        with closing(self._connect()) as db, db:
             rows = db.execute("SELECT job_id FROM production_jobs WHERE status=? AND lease_expires_at<=? ORDER BY job_id", (JobStatus.RUNNING.value, now.isoformat())).fetchall()
             identifiers = tuple(row["job_id"] for row in rows)
             if identifiers:

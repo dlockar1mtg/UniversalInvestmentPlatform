@@ -62,6 +62,8 @@ def test_database_backup_verification_and_restore_preserve_runs(tmp_path):
     assert len(manager.create_backup(backup)) == 64 and manager.verify(backup)
     manager.restore(backup, restored)
     assert SQLiteProductionRepository(restored).get_run("run-1").run_id == "run-1"
+    backup.unlink()
+    assert not backup.exists()
 
 
 def test_diagnostics_and_shutdown_are_deterministic_and_first_signal_wins(tmp_path):

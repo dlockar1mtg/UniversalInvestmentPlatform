@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from contextlib import closing
 from dataclasses import dataclass
 from datetime import datetime
 from hashlib import sha256
@@ -68,7 +69,7 @@ class MigrationCoordinator:
 
     def apply(self, migrations: tuple[SchemaMigration, ...]) -> tuple[str, ...]:
         applied = []
-        with sqlite3.connect(self.database_path) as db:
+        with closing(sqlite3.connect(self.database_path)) as db:
             db.execute("CREATE TABLE IF NOT EXISTS production_schema_migrations (migration_id TEXT PRIMARY KEY, checksum TEXT NOT NULL, applied_at TEXT NOT NULL)")
             for migration in sorted(migrations, key=lambda item: item.migration_id):
                 row = db.execute("SELECT checksum FROM production_schema_migrations WHERE migration_id=?", (migration.migration_id,)).fetchone()
@@ -79,6 +80,7 @@ class MigrationCoordinator:
                 db.executescript(migration.sql)
                 db.execute("INSERT INTO production_schema_migrations VALUES (?,?,datetime('now'))", (migration.migration_id, migration.checksum))
                 applied.append(migration.migration_id)
+            db.commit()
         return tuple(applied)
 
 
@@ -104,7 +106,7 @@ def bootstrap_production(
     applied = MigrationCoordinator(config.database_path).apply(manifest.migrations)
 
     def database_ready() -> bool:
-        with sqlite3.connect(config.database_path) as db:
+        with closing(sqlite3.connect(config.database_path)) as db:
             return db.execute("PRAGMA quick_check").fetchone()[0] == "ok"
 
     health = evaluate_health({
@@ -123,7 +125,7 @@ class DatabaseBackupManager:
     def create_backup(self, destination: str | Path) -> str:
         target = Path(destination)
         target.parent.mkdir(parents=True, exist_ok=True)
-        with sqlite3.connect(self.source_database) as source, sqlite3.connect(target) as backup:
+        with closing(sqlite3.connect(self.source_database)) as source, closing(sqlite3.connect(target)) as backup:
             source.backup(backup)
         data = target.read_bytes()
         if not data:
@@ -133,7 +135,7 @@ class DatabaseBackupManager:
     @staticmethod
     def verify(path: str | Path) -> bool:
         try:
-            with sqlite3.connect(path) as db:
+            with closing(sqlite3.connect(path)) as db:
                 return db.execute("PRAGMA quick_check").fetchone()[0] == "ok"
         except sqlite3.DatabaseError:
             return False
