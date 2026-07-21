@@ -1,0 +1,27 @@
+{
+  "file_count": 491,
+  "total_size_bytes": 3052482,
+  "components": {
+    "config": 35,
+    "ml": 9,
+    "optimization": 5,
+    "root": 442
+  },
+  "roles": {
+    "configuration": 35,
+    "documentation": 43,
+    "integration": 90,
+    "operations": 215,
+    "source": 65,
+    "test": 43
+  },
+  "initial_classifications": {
+    "adapt": 2,
+    "archive": 253,
+    "evaluate": 179,
+    "reference_only": 43,
+    "replace": 14
+  },
+  "backup_file_count": 38,
+  "test_file_count": 43
+}
