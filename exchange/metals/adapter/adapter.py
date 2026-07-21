@@ -407,11 +407,26 @@ def _platform_status(ctx: BuildContext, contract: Contract, exports: Path) -> pd
     failed=int((freshness.get("freshness_status", pd.Series(dtype=str)).astype(str).str.upper() != "PASS").sum()) if not freshness.empty else 0
     oldest=float(pd.to_numeric(freshness.get("age_days", pd.Series(dtype=float)), errors="coerce").max()) if not freshness.empty else float("nan")
     status="READY" if failed == 0 and (pd.isna(oldest) or oldest <= ctx.config.stale_after_days) else "DEGRADED"
+    observed_dates = pd.to_datetime(
+        freshness.get("last_observation", pd.Series(dtype="object")),
+        errors="coerce",
+        utc=True,
+    )
+    latest_observation = observed_dates.max()
+    data_as_of = (
+        latest_observation.date().isoformat()
+        if pd.notna(latest_observation) else ctx.generated_at_utc[:10]
+    )
+    source_run = h.get("decision_run_id", ctx.package_id)
     record={
-        "platform_status_id": f"metals:{h.get('decision_run_id', ctx.package_id)}", "platform_id": ctx.config.platform_id,
+        "platform_status_id": f"metals:{source_run}", "platform_id": ctx.config.platform_id,
         "platform_name": "Metals Intelligence Platform", "platform_version": "v8.1",
-        "source_interface": ctx.config.source_interface, "status": status, "run_status": "SUCCESS",
-        "as_of_date": ctx.generated_at_utc[:10], "decision_run_id": h.get("decision_run_id"),
+        "source_interface": ctx.config.source_interface, "status": status,
+        "run_id": str(source_run), "run_started_at_utc": ctx.generated_at_utc,
+        "run_completed_at_utc": ctx.generated_at_utc,
+        "run_status": "SUCCESS" if status == "READY" else "PARTIAL",
+        "data_as_of_date": data_as_of, "warning_count": failed, "error_count": 0,
+        "as_of_date": data_as_of, "decision_run_id": h.get("decision_run_id"),
         "data_freshness_score": h.get("data_freshness_score"), "model_confidence_score": h.get("model_confidence_score"),
         "recommendation_quality_score": h.get("recommendation_quality_score"),
         "pipeline_completeness_score": h.get("pipeline_completeness_score"),
