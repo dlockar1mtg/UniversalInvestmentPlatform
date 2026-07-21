@@ -4,7 +4,12 @@ import json
 from pathlib import Path
 
 import duckdb
+import pandas as pd
 import pytest
+
+from exchange.metals.adapter import adapter as adapter_module
+from exchange.metals.adapter.config import load_config
+from exchange.metals.adapter.contracts import Contract, ContractField
 
 from exchange.metals.adapter.native_surfaces import (
     BRIDGE_SURFACES,
@@ -86,3 +91,45 @@ def test_failed_export_does_not_publish_manifest(tmp_path: Path) -> None:
     with pytest.raises(NativeSurfaceError, match="required legacy view"):
         export_bridge_surfaces(tmp_path)
     assert not (tmp_path / "data" / "exports" / MANIFEST_NAME).exists()
+
+
+def test_risk_builder_receives_bridge_export_root(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    exports = tmp_path / "exports"
+    database = tmp_path / "missing.duckdb"
+    captured = []
+
+    def load_surface(root, surface, **kwargs):
+        captured.append((Path(root), surface))
+        if surface == "portfolio_risk_metrics":
+            return pd.DataFrame([
+                {
+                    "risk_run_id": "risk-1",
+                    "as_of_date": "2026-07-21",
+                    "portfolio_volatility": 0.1,
+                }
+            ])
+        return pd.DataFrame()
+
+    monkeypatch.setattr(adapter_module, "load_bridge_surface", load_surface)
+    context = adapter_module.BuildContext(
+        Path.cwd(),
+        tmp_path,
+        tmp_path / "output",
+        tmp_path / "schemas",
+        load_config(Path("exchange/metals/config/adapter_config.json")),
+        "package-1",
+        "2026-07-21T12:00:00+00:00",
+    )
+    contract = Contract(
+        "risk_metrics",
+        (ContractField("risk_metric_id", True),),
+    )
+    result = adapter_module._risk_metrics(context, contract, exports, database)
+    assert result.iloc[0]["risk_metric_id"] == "metals:risk-1:portfolio"
+    assert captured == [
+        (exports, "portfolio_risk_metrics"),
+        (exports, "risk_contributions"),
+    ]
