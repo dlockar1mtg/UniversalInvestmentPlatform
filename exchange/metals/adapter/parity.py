@@ -209,22 +209,39 @@ def certify_metals_parity(
         raise MetalsParityError("native opportunity assets are missing from universal recommendations")
     checks.append(ParityCheck("recommendation_identity", len(opportunity_assets), "opportunity assets preserved"))
 
-    source_positions = native["positions"]
+    source_positions = native["positions"].copy()
     target_positions = universal["positions"]
     _require_columns(source_positions, {"ticker", "shares"}, "native portfolio positions")
-    _require_columns(target_positions, {"ticker", "shares"}, "universal portfolio positions")
+    _require_columns(
+        target_positions,
+        {"universal_asset_id", "quantity", "position_value"},
+        "universal portfolio positions",
+    )
+    source_positions["universal_asset_id"] = (
+        "metals:vehicle:" + source_positions["ticker"].astype(str).str.upper()
+    )
     positions = source_positions.merge(
         target_positions,
-        on="ticker",
+        on="universal_asset_id",
         suffixes=("_native", "_universal"),
         how="outer",
         indicator=True,
     )
     if len(positions) != len(source_positions) or not positions["_merge"].eq("both").all():
-        raise MetalsParityError("universal position keys do not match native positions")
-    if not _close(positions["shares_native"], positions["shares_universal"]):
-        raise MetalsParityError("position share quantities changed during transformation")
-    checks.append(ParityCheck("portfolio_positions", len(positions), "tickers and quantities preserved"))
+        raise MetalsParityError("universal position asset identifiers do not match native tickers")
+    if not _close(positions["shares"], positions["quantity"]):
+        raise MetalsParityError("position quantities changed during transformation")
+    if "market_value" in positions and not _close(
+        positions["market_value"], positions["position_value"]
+    ):
+        raise MetalsParityError("position values changed during transformation")
+    checks.append(
+        ParityCheck(
+            "portfolio_positions",
+            len(positions),
+            "canonical vehicle identifiers, quantities, and values preserved",
+        )
+    )
 
     expected_risk_rows = len(native["portfolio_risk"]) + len(native["risk_contributions"])
     if len(universal["risk"]) != expected_risk_rows:
