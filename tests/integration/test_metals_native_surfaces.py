@@ -24,8 +24,8 @@ def build_database(root: Path, *, omit: str | None = None) -> Path:
             if key == omit:
                 continue
             connection.execute(
-                f'CREATE VIEW "{view}" AS SELECT ? AS surface_name, 1 AS record_value',
-                [key],
+                f"""CREATE VIEW "{view}" AS
+                SELECT '{key}' AS surface_name, 1 AS record_value"""
             )
     finally:
         connection.close()
