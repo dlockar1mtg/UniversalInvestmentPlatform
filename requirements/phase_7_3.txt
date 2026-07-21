@@ -1,1 +1,2 @@
 -r phase_7_1.txt
+pandas>=2.2,<3
