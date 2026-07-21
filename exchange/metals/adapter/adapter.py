@@ -324,7 +324,7 @@ def _recommendations(ctx: BuildContext, contract: Contract, exports: Path, datab
     return _records_to_contract(records, contract)
 
 
-def _risk_metrics(ctx: BuildContext, contract: Contract, database: Path) -> pd.DataFrame:
+def _risk_metrics(ctx: BuildContext, contract: Contract, exports: Path, database: Path) -> pd.DataFrame:
     portfolio = load_bridge_surface(exports, "portfolio_risk_metrics", database=database, allow_legacy_database_fallback=ctx.allow_legacy_database_fallback)
     contributions = load_bridge_surface(exports, "risk_contributions", database=database, allow_legacy_database_fallback=ctx.allow_legacy_database_fallback)
     records=[]
@@ -444,7 +444,7 @@ def build_package(universal_root: Path, metals_root: Path, output_root: Path | N
         "asset_master": _asset_master(ctx, contracts["asset_master"], exports, database),
         "forecasts": _forecasts(ctx, contracts["forecasts"], exports),
         "recommendations": _recommendations(ctx, contracts["recommendations"], exports, database),
-        "risk_metrics": _risk_metrics(ctx, contracts["risk_metrics"], database),
+        "risk_metrics": _risk_metrics(ctx, contracts["risk_metrics"], exports, database),
         "portfolio_positions": _positions(ctx, contracts["portfolio_positions"], database),
         "platform_status": _platform_status(ctx, contracts["platform_status"], exports),
     }
