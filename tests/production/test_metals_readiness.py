@@ -1,8 +1,14 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from pathlib import Path
 
+import pandas as pd
 import pytest
+
+from exchange.metals.adapter import adapter as adapter_module
+from exchange.metals.adapter.config import load_config
+from exchange.metals.adapter.contracts import Contract, ContractField
 
 from foundation.production.metals_readiness import (
     _component,
@@ -59,3 +65,55 @@ def test_component_wrapper_converts_exceptions_to_failure() -> None:
     }
     assert failed["status"] == "FAILED"
     assert failed["error_type"] == "RuntimeError"
+
+
+@pytest.mark.parametrize(
+    ("freshness_status", "expected_status", "expected_warnings"),
+    [("PASS", "SUCCESS", 0), ("STALE", "PARTIAL", 1)],
+)
+def test_platform_status_maps_native_freshness_to_canonical_contract(
+    tmp_path: Path,
+    freshness_status: str,
+    expected_status: str,
+    expected_warnings: int,
+) -> None:
+    exports = tmp_path / "exports"
+    exports.mkdir()
+    pd.DataFrame([
+        {"decision_run_id": 9, "explanation": "health evidence"}
+    ]).to_csv(exports / "latest_platform_health_score.csv", index=False)
+    pd.DataFrame([
+        {
+            "series_key": "gold",
+            "last_observation": "2026-07-20",
+            "age_days": 1,
+            "freshness_status": freshness_status,
+        }
+    ]).to_csv(exports / "latest_data_freshness_details.csv", index=False)
+    context = adapter_module.BuildContext(
+        Path.cwd(),
+        tmp_path,
+        tmp_path / "output",
+        tmp_path / "schemas",
+        load_config(Path("exchange/metals/config/adapter_config.json")),
+        "package-1",
+        "2026-07-21T12:00:00+00:00",
+    )
+    contract = Contract(
+        "platform_status",
+        (
+            ContractField("run_id", True),
+            ContractField("run_started_at_utc", True),
+            ContractField("run_completed_at_utc", False),
+            ContractField("run_status", True),
+            ContractField("data_as_of_date", True),
+            ContractField("warning_count", True),
+            ContractField("error_count", True),
+        ),
+    )
+    row = adapter_module._platform_status(context, contract, exports).iloc[0]
+    assert str(row["run_id"]) == "9"
+    assert row["run_status"] == expected_status
+    assert row["data_as_of_date"] == "2026-07-20"
+    assert row["warning_count"] == expected_warnings
+    assert row["error_count"] == 0
