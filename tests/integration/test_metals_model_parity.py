@@ -140,3 +140,57 @@ def test_native_forecast_maps_to_universal_contract_fields(tmp_path: Path) -> No
     assert row["probability_positive_return"] == pytest.approx(0.75)
     assert row["forecast_confidence"] == pytest.approx(82)
     assert row["model_version"] == "metals-v8.1"
+
+
+def test_native_position_maps_to_canonical_vehicle_contract(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    native = pd.DataFrame([
+        {
+            "portfolio_run_id": 4,
+            "account_name": "Brokerage",
+            "account_type": "taxable",
+            "ticker": "gld",
+            "shares": 2.5,
+            "current_price": 300,
+            "market_value": 750,
+            "cost_basis_per_share": 250,
+            "total_cost_basis": 625,
+            "unrealized_gain_loss": 125,
+            "holding_days": 100,
+        }
+    ])
+    monkeypatch.setattr(
+        adapter_module,
+        "load_bridge_surface",
+        lambda *args, **kwargs: native,
+    )
+    context = adapter_module.BuildContext(
+        Path.cwd(),
+        tmp_path,
+        tmp_path / "output",
+        tmp_path / "schemas",
+        load_config(Path("exchange/metals/config/adapter_config.json")),
+        "package-1",
+        "2026-07-21T12:00:00+00:00",
+    )
+    contract = Contract(
+        "portfolio_positions",
+        (
+            ContractField("universal_asset_id", True),
+            ContractField("quantity", False),
+            ContractField("unit_value", False),
+            ContractField("position_value", True),
+            ContractField("cost_basis", False),
+            ContractField("source_platform", False),
+        ),
+    )
+    result = adapter_module._positions(context, contract, tmp_path / "missing.duckdb")
+    row = result.iloc[0]
+    assert row["universal_asset_id"] == "metals:vehicle:GLD"
+    assert row["quantity"] == pytest.approx(2.5)
+    assert row["unit_value"] == pytest.approx(300)
+    assert row["position_value"] == pytest.approx(750)
+    assert row["cost_basis"] == pytest.approx(625)
+    assert row["source_platform"] == "metals"
