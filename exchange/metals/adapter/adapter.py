@@ -274,10 +274,16 @@ def _forecasts(ctx: BuildContext, contract: Contract, exports: Path) -> pd.DataF
             "forecast_date": ctx.generated_at_utc[:10], "horizon": f"{horizon}m", "horizon_months": horizon,
             "forecast_horizon_months": horizon,
             "expected_return": r.get("expected_return"), "expected_return_pct": r.get("expected_return"),
+            "expected_total_return": r.get("expected_return"),
             "lower_bound": r.get("lower_bound"), "upper_bound": r.get("upper_bound"),
             "forecast_volatility": r.get("forecast_volatility"), "volatility": r.get("forecast_volatility"),
             "downside_probability": r.get("downside_probability"), "dominant_regime": r.get("dominant_regime"),
+            "probability_positive_return": (
+                1.0 - float(r.get("downside_probability"))
+                if pd.notna(r.get("downside_probability")) else pd.NA
+            ),
             "model_agreement": r.get("model_agreement"), "confidence": r.get("model_agreement"),
+            "forecast_confidence": r.get("model_agreement"), "model_version": "metals-v8.1",
             "return_unit": "decimal", "currency": ctx.config.currency,
             "source_system": ctx.config.source_interface, "contract_version": ctx.config.contract_version,
             "generated_at_utc": ctx.generated_at_utc,
