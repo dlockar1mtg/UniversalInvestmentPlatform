@@ -7,14 +7,42 @@
   "account_id": "metals-all-accounts",
   "stale_after_days": 600,
   "asset_crosswalk": {
-    "gold": {"asset_id": "metals:commodity:gold", "symbol": "XAU"},
-    "silver": {"asset_id": "metals:commodity:silver", "symbol": "XAG"},
-    "copper": {"asset_id": "metals:commodity:copper", "symbol": "HG"},
-    "uranium": {"asset_id": "metals:commodity:uranium", "symbol": "U3O8"},
-    "platinum": {"asset_id": "metals:commodity:platinum", "symbol": "XPT"},
-    "aluminum": {"asset_id": "metals:commodity:aluminum", "symbol": "AL"},
-    "zinc": {"asset_id": "metals:commodity:zinc", "symbol": "ZN"},
-    "nickel": {"asset_id": "metals:commodity:nickel", "symbol": "NI"},
-    "tin": {"asset_id": "metals:commodity:tin", "symbol": "SN"}
-  }
+    "gold": {
+      "asset_id": "metals:commodity:gold",
+      "symbol": "XAU"
+    },
+    "silver": {
+      "asset_id": "metals:commodity:silver",
+      "symbol": "XAG"
+    },
+    "copper": {
+      "asset_id": "metals:commodity:copper",
+      "symbol": "HG"
+    },
+    "uranium": {
+      "asset_id": "metals:commodity:uranium",
+      "symbol": "U3O8"
+    },
+    "platinum": {
+      "asset_id": "metals:commodity:platinum",
+      "symbol": "XPT"
+    },
+    "aluminum": {
+      "asset_id": "metals:commodity:aluminum",
+      "symbol": "AL"
+    },
+    "zinc": {
+      "asset_id": "metals:commodity:zinc",
+      "symbol": "ZN"
+    },
+    "nickel": {
+      "asset_id": "metals:commodity:nickel",
+      "symbol": "NI"
+    },
+    "tin": {
+      "asset_id": "metals:commodity:tin",
+      "symbol": "SN"
+    }
+  },
+  "adapter_version": "2.0.0"
 }
