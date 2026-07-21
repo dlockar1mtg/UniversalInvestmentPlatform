@@ -56,9 +56,14 @@ def _first(row: dict[str, Any], *names: str, default: Any = "") -> Any:
 
 
 def _asset_id(config: AdapterConfig, asset: str, kind: str = "metal") -> str:
-    key = str(asset).strip().lower()
+    raw = str(asset).strip()
+    key = raw.lower()
     configured = config.asset_crosswalk.get(key, {}).get("asset_id")
-    return configured or f"metals:{kind}:{key}"
+    if configured:
+        return configured
+    if kind == "vehicle":
+        return f"metals:vehicle:{raw.upper()}"
+    return f"metals:{kind}:{key}"
 
 
 def _symbol(config: AdapterConfig, asset: str) -> str:
@@ -381,11 +386,13 @@ def _positions(ctx: BuildContext, contract: Contract, database: Path) -> pd.Data
             "account_name": r.get("account_name"), "account_type": r.get("account_type"),
             "asset_id": _asset_id(ctx.config, ticker, "vehicle"), "universal_asset_id": _asset_id(ctx.config, ticker, "vehicle"),
             "ticker": ticker,
-            "quantity": r.get("shares"), "shares": r.get("shares"), "current_price": r.get("current_price"),
+            "quantity": r.get("shares"), "shares": r.get("shares"),
+            "unit_value": r.get("current_price"), "current_price": r.get("current_price"),
             "market_value": r.get("market_value"), "position_value": _first(r, "market_value", "total_cost_basis", default=0),
-            "cost_basis_per_unit": r.get("cost_basis_per_share"),
+            "cost_basis": r.get("total_cost_basis"), "cost_basis_per_unit": r.get("cost_basis_per_share"),
             "cost_basis_per_share": r.get("cost_basis_per_share"), "total_cost_basis": r.get("total_cost_basis"),
             "unrealized_gain_loss": r.get("unrealized_gain_loss"), "holding_days": r.get("holding_days"),
+            "source_platform": ctx.config.platform_id,
             "currency": ctx.config.currency, "as_of_date": ctx.generated_at_utc[:10],
             "source_run_id": run, "source_system": ctx.config.source_interface,
             "contract_version": ctx.config.contract_version, "generated_at_utc": ctx.generated_at_utc,
