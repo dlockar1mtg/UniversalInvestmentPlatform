@@ -93,12 +93,23 @@ def evaluate_metals_readiness(
         if age < timedelta(0) or age > maximum_package_age:
             raise RuntimeError("package is outside the permitted freshness window")
         status = pd.read_csv(package / "platform_status.csv")
-        if status.empty or "status" not in status or not status["status"].astype(str).str.upper().eq("READY").all():
-            raise RuntimeError("Metals platform status is not READY")
+        required = {"run_status", "warning_count", "error_count"}
+        if status.empty or not required <= set(status.columns):
+            raise RuntimeError("Metals platform status is missing canonical operational fields")
+        run_ready = status["run_status"].astype(str).str.upper().eq("SUCCESS").all()
+        warnings = int(pd.to_numeric(status["warning_count"], errors="coerce").fillna(0).sum())
+        errors = int(pd.to_numeric(status["error_count"], errors="coerce").fillna(0).sum())
+        if not run_ready or warnings or errors:
+            raise RuntimeError(
+                f"Metals platform run is not clean: status={status['run_status'].iloc[0]}, "
+                f"warnings={warnings}, errors={errors}"
+            )
         return {
             "package_id": summary.get("package_id"),
             "age_seconds": int(age.total_seconds()),
-            "platform_status": "READY",
+            "run_status": "SUCCESS",
+            "warning_count": warnings,
+            "error_count": errors,
         }
 
     def parity_check() -> Mapping[str, object]:
