@@ -3,6 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 import csv
+import json
 from foundation.import_engine.exceptions import ManifestError, PackageNotFoundError
 MANIFEST_FILENAME="export_manifest.csv"
 PLATFORM_STATUS_FILENAME="platform_status.csv"
@@ -78,13 +79,48 @@ def _parse_manifest(package_path,manifest_path):
         entries.append(ManifestEntry(dataset_name,filename,expected_row_count,expected_sha256,required,validation_status))
     if not entries: raise ManifestError(f"Manifest contains no dataset rows: {manifest_path}")
     return tuple(entries)
+def _read_package_summary(package_path):
+    summary_path=package_path/"package_summary.json"
+    if not summary_path.is_file(): return {}
+    try:
+        payload=json.loads(summary_path.read_text(encoding="utf-8-sig"))
+    except (UnicodeDecodeError,json.JSONDecodeError,OSError) as exc:
+        raise ManifestError(
+            f"Unable to parse package summary: {summary_path}"
+        ) from exc
+    if not isinstance(payload,dict):
+        raise ManifestError(
+            f"Package summary must contain a JSON object: {summary_path}"
+        )
+    return payload
+
+
+def _summary_value(summary,candidates,default=""):
+    normalized={
+        str(key).strip().lower():value
+        for key,value in summary.items()
+    }
+    for candidate in candidates:
+        value=normalized.get(candidate.lower())
+        if value is None: continue
+        cleaned=str(value).strip()
+        if cleaned: return cleaned
+    return default
+
+
 def _parse_identity(package_path,platform_status_path):
     rows=_read_csv_rows(platform_status_path)
     if not rows: raise ManifestError(f"Platform status contains no rows: {platform_status_path}")
     row=rows[0]
+    summary=_read_package_summary(package_path)
     platform_id=_first_value(row,("platform_id","platform","source_platform"))
     run_id=_first_value(row,("run_id","platform_run_id","source_run_id"))
     adapter_version=_first_value(row,("adapter_version","integration_adapter_version"))
+    if not adapter_version:
+        adapter_version=_summary_value(
+            summary,
+            ("adapter_version","integration_adapter_version"),
+        )
     contract_version=_first_value(row,("contract_version","schema_version"),default='v1')
     generated_at_utc=_first_value(row,("generated_at_utc","run_completed_at_utc","last_updated_at_utc"))
     package_id=_first_value(row,("package_id","export_package_id"),default=run_id or package_path.name)
