@@ -11,6 +11,7 @@ from .http_service import HTTPServiceSettings, build_repository, create_http_app
 from .integration import ExternalDataProvider, ExternalDataRecord, IngestionPolicy, NormalizedDataBatch, ingest_provider
 from .live_security import LiveSecuritySettings, install_live_security
 from .metals_providers import CommodityObservationAdapter, ProviderCollectionPolicy, ProviderCollectionResult, collect_with_policy, ingest_commodity_observations
+from .metals_final import certify_phase_8_metals, scan_runtime_isolation
 from .metals_readiness import evaluate_metals_readiness, summarize_metals_readiness
 from .metals_registry import (
     MetalsAsset, MetalsRegistry, MetalsRegistryError, MetalsVehicle, canonical_metals_asset_id,
@@ -52,12 +53,14 @@ __all__ = [
     "StartupResult", "VehicleAllocation", "VehicleCandidate", "VehicleConstraint", "VehicleSelectionError",
     "VehicleSelectionPolicy", "VehicleSelectionResult", "WorkerHealth", "WorkerSettings",
     "WorldBankCommodityProvider", "bootstrap_production",
-    "build_job_repository", "build_repository", "canonical_metals_asset_id", "certify_phase_6", "certify_phase_7", "collect_with_policy",
+    "build_job_repository", "build_repository", "canonical_metals_asset_id", "certify_phase_6", "certify_phase_7",
+    "certify_phase_8_metals", "collect_with_policy",
     "collect_operational_status", "create_http_app", "enqueue_schedule", "evaluate_health",
     "evaluate_metals_readiness",
     "import_portfolio_csv", "ingest_commodity_observations", "ingest_provider", "install_live_security",
     "load_metals_registry", "load_vehicle_selection_policy",
-    "preview_portfolio_csv", "redact", "select_metals_vehicles", "summarize_metals_readiness",
+    "preview_portfolio_csv", "redact", "scan_runtime_isolation", "select_metals_vehicles",
+    "summarize_metals_readiness",
     "validate_adapter_crosswalk",
     "validate_metals_registry",
     "run_next_job",
