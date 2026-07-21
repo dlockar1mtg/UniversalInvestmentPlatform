@@ -10,31 +10,58 @@ from .deployment import DatabaseBackupManager, DeploymentManifest, MigrationCoor
 from .http_service import HTTPServiceSettings, build_repository, create_http_app
 from .integration import ExternalDataProvider, ExternalDataRecord, IngestionPolicy, NormalizedDataBatch, ingest_provider
 from .live_security import LiveSecuritySettings, install_live_security
+from .metals_providers import CommodityObservationAdapter, ProviderCollectionPolicy, ProviderCollectionResult, collect_with_policy, ingest_commodity_observations
+from .metals_final import certify_phase_8_metals, scan_runtime_isolation
+from .metals_readiness import evaluate_metals_readiness, summarize_metals_readiness
+from .metals_registry import (
+    MetalsAsset, MetalsRegistry, MetalsRegistryError, MetalsVehicle, canonical_metals_asset_id,
+    load_metals_registry, validate_adapter_crosswalk, validate_metals_registry,
+)
+from .metals_vehicles import (
+    VehicleAllocation, VehicleCandidate, VehicleConstraint, VehicleSelectionError,
+    VehicleSelectionPolicy, VehicleSelectionResult, load_vehicle_selection_policy,
+    select_metals_vehicles,
+)
 from .observability import EventRecorder, HealthReport, MetricRegistry, OperationalEvent, SecuredProductionGateway, evaluate_health
 from .operations import OperationalStatus, ShutdownController, collect_operational_status
 from .persistence import SQLiteProductionRepository
 from .portfolio import PortfolioCSVError, PortfolioCSVValidationError, PortfolioImportReport, PortfolioPosition, import_portfolio_csv, preview_portfolio_csv
 from .postgres import PostgresProductionRepository
 from .postgres_jobs import PostgresJobRepository
-from .providers import AlphaVantageProvider, EconomicObservation, FREDProvider, MarketQuote, ProviderError
+from .providers import (
+    AlphaVantageProvider, CommodityObservation, EconomicObservation, EIAUraniumProvider,
+    FREDProvider, MarketQuote, ProviderError, WorldBankCommodityProvider,
+)
 from .scheduling import JobStatus, RetryPolicy, ScheduledJob, SQLiteJobRepository, run_next_job
 from .security import APIKeyAuthenticator, Permission, Principal, SecretReference, redact
 from .worker import HandlerRegistry, HostedWorker, RecurringSchedule, WorkerHealth, WorkerSettings, build_job_repository, enqueue_schedule
 
 __all__ = [
-    "APIKeyAuthenticator", "APIResponse", "AlphaVantageProvider", "AuditEvent", "DashboardService",
-    "DashboardSettings", "DatabaseBackupManager", "DeliveryCertificationCheck", "DeploymentManifest",
-    "EconomicObservation", "EventRecorder", "ExternalDataProvider", "ExternalDataRecord", "FREDProvider",
-    "HTTPServiceSettings", "HandlerRegistry", "HealthReport", "HostedWorker", "IngestionPolicy", "JobStatus",
-    "LiveSecuritySettings", "MarketQuote", "MetricRegistry", "MigrationCoordinator", "NormalizedDataBatch",
-    "OperationalEvent", "OperationalStatus", "Permission", "PersistedArtifact", "Phase6CertificationReport",
-    "Phase7CertificationReport", "PortfolioCSVError", "PortfolioCSVValidationError", "PortfolioImportReport",
-    "PortfolioPosition", "PostgresJobRepository", "PostgresProductionRepository", "Principal", "ProductionAPI",
+    "APIKeyAuthenticator", "APIResponse", "AlphaVantageProvider", "AuditEvent", "CommodityObservation",
+    "CommodityObservationAdapter",
+    "DashboardService", "DashboardSettings", "DatabaseBackupManager", "DeliveryCertificationCheck",
+    "DeploymentManifest", "EIAUraniumProvider", "EconomicObservation", "EventRecorder",
+    "ExternalDataProvider", "ExternalDataRecord", "FREDProvider", "HTTPServiceSettings", "HandlerRegistry",
+    "HealthReport", "HostedWorker", "IngestionPolicy", "JobStatus", "LiveSecuritySettings", "MarketQuote",
+    "MetalsAsset", "MetalsRegistry", "MetalsRegistryError", "MetalsVehicle", "MetricRegistry", "MigrationCoordinator", "NormalizedDataBatch", "OperationalEvent", "OperationalStatus",
+    "Permission", "PersistedArtifact", "Phase6CertificationReport", "Phase7CertificationReport",
+    "PortfolioCSVError", "PortfolioCSVValidationError", "PortfolioImportReport", "PortfolioPosition",
+    "PostgresJobRepository", "PostgresProductionRepository", "Principal", "ProductionAPI",
     "ProductionCertificationCheck", "ProductionRun", "ProductionRunStatus", "ProductionRuntimeConfig",
-    "ProviderError", "RecurringSchedule", "RetryPolicy", "SQLiteJobRepository", "SQLiteProductionRepository",
+    "ProviderCollectionPolicy", "ProviderCollectionResult", "ProviderError", "RecurringSchedule", "RetryPolicy", "SQLiteJobRepository", "SQLiteProductionRepository",
     "ScheduledJob", "SchemaMigration", "SecuredProductionGateway", "SecretReference", "ShutdownController",
-    "StartupResult", "WorkerHealth", "WorkerSettings", "bootstrap_production", "build_job_repository",
-    "build_repository", "certify_phase_6", "certify_phase_7", "collect_operational_status", "create_http_app",
-    "enqueue_schedule", "evaluate_health", "import_portfolio_csv", "ingest_provider", "install_live_security",
-    "preview_portfolio_csv", "redact", "run_next_job",
+    "StartupResult", "VehicleAllocation", "VehicleCandidate", "VehicleConstraint", "VehicleSelectionError",
+    "VehicleSelectionPolicy", "VehicleSelectionResult", "WorkerHealth", "WorkerSettings",
+    "WorldBankCommodityProvider", "bootstrap_production",
+    "build_job_repository", "build_repository", "canonical_metals_asset_id", "certify_phase_6", "certify_phase_7",
+    "certify_phase_8_metals", "collect_with_policy",
+    "collect_operational_status", "create_http_app", "enqueue_schedule", "evaluate_health",
+    "evaluate_metals_readiness",
+    "import_portfolio_csv", "ingest_commodity_observations", "ingest_provider", "install_live_security",
+    "load_metals_registry", "load_vehicle_selection_policy",
+    "preview_portfolio_csv", "redact", "scan_runtime_isolation", "select_metals_vehicles",
+    "summarize_metals_readiness",
+    "validate_adapter_crosswalk",
+    "validate_metals_registry",
+    "run_next_job",
 ]

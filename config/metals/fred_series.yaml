@@ -1,0 +1,15 @@
+version: 1
+provider: fred
+series:
+  - {series_id: DFII10, role: real_yield_10y, frequency: daily, maximum_age_days: 7}
+  - {series_id: DGS10, role: nominal_yield_10y, frequency: daily, maximum_age_days: 7}
+  - {series_id: T10YIE, role: breakeven_inflation_10y, frequency: daily, maximum_age_days: 7}
+  - {series_id: CPIAUCSL, role: consumer_prices, frequency: monthly, maximum_age_days: 75}
+  - {series_id: PCEPI, role: pce_prices, frequency: monthly, maximum_age_days: 75}
+  - {series_id: DTWEXBGS, role: broad_dollar_index, frequency: weekly, maximum_age_days: 21}
+  - {series_id: M2SL, role: money_supply, frequency: monthly, maximum_age_days: 75}
+  - {series_id: INDPRO, role: industrial_production, frequency: monthly, maximum_age_days: 75}
+  - {series_id: UNRATE, role: unemployment_rate, frequency: monthly, maximum_age_days: 45}
+  - {series_id: DFF, role: federal_funds_rate, frequency: daily, maximum_age_days: 7}
+  - {series_id: DCOILWTICO, role: oil_price_wti, frequency: daily, maximum_age_days: 10}
+  - {series_id: VIXCLS, role: market_volatility, frequency: daily, maximum_age_days: 7}

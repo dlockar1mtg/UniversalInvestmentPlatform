@@ -16,9 +16,14 @@ def main() -> int:
     parser.add_argument("--output-root", type=Path, default=None)
     parser.add_argument("--schema-root", type=Path, default=None)
     parser.add_argument("--config", type=Path, default=None)
+    parser.add_argument(
+        "--allow-legacy-database-fallback",
+        action="store_true",
+        help="Explicitly permit read-only DuckDB access when verified bridge exports are absent.",
+    )
     args=parser.parse_args()
     try:
-        package=build_package(args.universal_root,args.metals_root,args.output_root,args.config,args.schema_root)
+        package=build_package(args.universal_root,args.metals_root,args.output_root,args.config,args.schema_root,args.allow_legacy_database_fallback)
     except Exception as exc:
         print(f"METALS UNIVERSAL EXPORT: FAILED\n{exc}",file=sys.stderr)
         return 1

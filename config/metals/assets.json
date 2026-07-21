@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "platform_id": "metals",
+  "currency": "USD",
+  "assets": [
+    {"asset_id":"metals:commodity:gold","slug":"gold","name":"Gold","symbol":"XAU","asset_class":"commodity","unit":"usd_per_troy_ounce","providers":{"world_bank":"WORLD_BANK::GOLD_MONTHLY"},"benchmark_vehicle":"GLD"},
+    {"asset_id":"metals:commodity:silver","slug":"silver","name":"Silver","symbol":"XAG","asset_class":"commodity","unit":"usd_per_troy_ounce","providers":{"world_bank":"WORLD_BANK::SILVER_MONTHLY"},"benchmark_vehicle":"SLV"},
+    {"asset_id":"metals:commodity:copper","slug":"copper","name":"Copper","symbol":"HG","asset_class":"commodity","unit":"usd_per_metric_ton","providers":{"world_bank":"WORLD_BANK::COPPER_MONTHLY"},"benchmark_vehicle":"CPER"},
+    {"asset_id":"metals:commodity:uranium","slug":"uranium","name":"Uranium","symbol":"U3O8","asset_class":"commodity","unit":"usd_per_pound_u3o8","providers":{"eia":"EIA::URANIUM_WEIGHTED_AVG"},"benchmark_vehicle":"URA"},
+    {"asset_id":"metals:commodity:platinum","slug":"platinum","name":"Platinum","symbol":"XPT","asset_class":"commodity","unit":"usd_per_troy_ounce","providers":{"world_bank":"WORLD_BANK::PLATINUM_MONTHLY"},"benchmark_vehicle":"PPLT"},
+    {"asset_id":"metals:commodity:aluminum","slug":"aluminum","name":"Aluminum","symbol":"AL","asset_class":"commodity","unit":"usd_per_metric_ton","providers":{"world_bank":"WORLD_BANK::ALUMINUM_MONTHLY"},"benchmark_vehicle":null},
+    {"asset_id":"metals:commodity:zinc","slug":"zinc","name":"Zinc","symbol":"ZN","asset_class":"commodity","unit":"usd_per_metric_ton","providers":{"world_bank":"WORLD_BANK::ZINC_MONTHLY"},"benchmark_vehicle":null},
+    {"asset_id":"metals:commodity:nickel","slug":"nickel","name":"Nickel","symbol":"NI","asset_class":"commodity","unit":"usd_per_metric_ton","providers":{"world_bank":"WORLD_BANK::NICKEL_MONTHLY"},"benchmark_vehicle":null},
+    {"asset_id":"metals:commodity:tin","slug":"tin","name":"Tin","symbol":"SN","asset_class":"commodity","unit":"usd_per_metric_ton","providers":{"world_bank":"WORLD_BANK::TIN_MONTHLY"},"benchmark_vehicle":null},
+    {"asset_id":"metals:reserve:usd","slug":"tactical_reserve","name":"U.S. Dollar Tactical Reserve","symbol":"USD","asset_class":"cash","unit":"usd","providers":{},"benchmark_vehicle":"BIL"}
+  ]
+}

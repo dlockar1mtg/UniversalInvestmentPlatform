@@ -1,0 +1,35 @@
+component,final_disposition,reusable_scope,universal_destination,reason,next_action
+analytics,replace,None,foundation/intelligence and portfolio engine,Universal scoring and allocation supersede the legacy engine,Preserve output parity cases only
+attribution,replace,None,foundation portfolio analytics,Universal attribution capability already exists,Archive legacy engines
+backtest,replace,None,foundation/intelligence/validation,Universal historical validation supersedes Metals backtests,Preserve Metals benchmark fixtures
+collectors,selective_adapt,EIA uranium and World Bank commodity parsing,foundation/production/providers.py,Unique official-source normalization remains valuable,Build provider adapters with injectable transport
+confidence,replace,None,foundation intelligence scoring and forecasting,Universal confidence contracts supersede legacy logic,Archive
+config,selective_adapt,Metals series catalog vehicle catalog and exposure constraints,config/metals,Domain mappings remain necessary,Translate into universal configuration contracts
+core,replace,None,foundation production runtime,HTTP config logging and rate limiting are cross-cutting concerns,Use universal services
+dashboard,replace,None,delivery dashboard and API,Universal delivery surface supersedes legacy dashboards,Validate required Metals views
+database,replace,None,universal import ledger and production persistence,Legacy DuckDB schemas must not be merged,Retain only export parity fixtures
+decision_support,replace,None,foundation/intelligence decision engine,Phase 5 decision intelligence supersedes the legacy engine,Preserve Metals-specific rationale examples
+etl,replace,None,foundation production ingestion,Universal ingestion and audit services supersede legacy ETL,Connect official providers to universal contracts
+forecasting,replace,None,foundation/intelligence/forecasting,Phase 4 forecasting supersedes legacy forecasts,Use Metals history as validation data
+macro,replace,None,universal macro intelligence,Macro logic is cross-asset rather than Metals-owned,Map Metals sensitivities into universal factors
+models,replace,None,universal contracts and schemas,Legacy SeriesMetadata and CollectionPayload are local contracts,Map provider output into universal contracts
+optimizer,replace,None,universal allocation and rebalancing engines,Universal optimization supersedes legacy implementations,Preserve Metals allocation constraints
+portfolio,replace,None,universal portfolio ledger and valuation,Universal portfolio domain owns holdings and valuation,Map Metals positions to universal assets
+reporting,replace,None,delivery reporting,Universal reporting owns presentation,Specify required Metals report fields
+risk,replace,None,universal risk and distribution analytics,Universal risk analytics supersede legacy risk engines,Preserve domain thresholds if unique
+services,replace,None,foundation production services,Generic quality services belong to universal runtime,Use universal quality gates
+vehicles,selective_adapt,Vehicle catalog direct exposure minimum miner cap and Metals tracking mappings,foundation/intelligence/metals,Metals-specific vehicle construction remains valuable,Extract pure deterministic rules
+tests,selective_adapt,Collector parser fixtures and vehicle constraint behavior,tests/intelligence/metals,Domain behavior needs regression protection,Rewrite without legacy database dependencies
+root_operations,archive,None,docs/phase_8/metals/source_inventory,Upgrade patch repair and old runner scripts are historical,Do not import
+documentation,reference_only,Canonical v8 behavior and output definitions,docs/phase_8/metals,Useful for parity and traceability,Summarize rather than copy all version docs
+sql,replace,None,universal persistence schemas,Legacy schema chain is superseded,Do not import
+exports,selective_adapt,Canonical v8 universal-export field mapping,exchange/metals and universal import contracts,Existing Phase 1 adapter must be compared with final v8 outputs,Run export gap analysis
+eia_uranium,adapt,Uranium annual weighted-average benchmark parser,foundation/production/providers.py,No equivalent official uranium provider exists,Implement EIA provider
+world_bank,adapt,Monthly commodity workbook parser,foundation/production/providers.py,Adds official gold silver platinum copper and base-metal benchmarks,Implement World Bank provider
+fred,replace_with_configuration,Metals FRED series identifiers,config/metals/fred_series.yaml,Universal FRED provider already exists,Move only series configuration
+market_proxies,replace,None,AlphaVantageProvider and universal quote ingestion,Yahoo Finance wrapper duplicates provider infrastructure,Map tickers to supported provider symbols
+advanced_metrics,replace,None,universal risk and performance analytics,Metrics are generic and spread stability is a constant placeholder,Add parity tests only where needed
+vehicle_selection,adapt,Direct exposure minimum miner maximum and single vehicle cap,foundation/intelligence/metals/vehicle_selection.py,Constraints are Metals-specific and deterministic,Extract with contract tests
+vehicle_engine,selective_extract,Catalog mappings expense ratios and underlying benchmark map,config/metals and Metals vehicle service,Database orchestration and scoring duplicate universal systems,Extract data and rules only
+advanced_metrics_runner,replace,None,universal analytics orchestration,Legacy runner is tightly coupled to legacy DuckDB,Do not import
+package_markers,archive,None,None,Empty files contain no capability,Do not import

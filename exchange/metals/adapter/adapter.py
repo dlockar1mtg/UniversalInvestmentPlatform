@@ -9,11 +9,11 @@ import json
 import shutil
 import uuid
 
-import duckdb
 import pandas as pd
 
 from .config import AdapterConfig, load_config
 from .contracts import Contract, load_contract
+from .native_surfaces import load_bridge_surface
 
 CONTRACTS = (
     "asset_master",
@@ -44,6 +44,7 @@ class BuildContext:
     config: AdapterConfig
     package_id: str
     generated_at_utc: str
+    allow_legacy_database_fallback: bool = False
 
 
 def _first(row: dict[str, Any], *names: str, default: Any = "") -> Any:
@@ -55,9 +56,14 @@ def _first(row: dict[str, Any], *names: str, default: Any = "") -> Any:
 
 
 def _asset_id(config: AdapterConfig, asset: str, kind: str = "metal") -> str:
-    key = str(asset).strip().lower()
+    raw = str(asset).strip()
+    key = raw.lower()
     configured = config.asset_crosswalk.get(key, {}).get("asset_id")
-    return configured or f"metals:{kind}:{key}"
+    if configured:
+        return configured
+    if kind == "vehicle":
+        return f"metals:vehicle:{raw.upper()}"
+    return f"metals:{kind}:{key}"
 
 
 def _symbol(config: AdapterConfig, asset: str) -> str:
@@ -79,16 +85,6 @@ def _read_csv(path: Path, required: bool = True) -> pd.DataFrame:
             raise FileNotFoundError(f"Required Metals native export not found: {path}")
         return pd.DataFrame()
     return pd.read_csv(path)
-
-
-def _query_latest(database: Path, view: str) -> pd.DataFrame:
-    if not database.exists():
-        raise FileNotFoundError(f"Metals DuckDB not found: {database}")
-    connection = duckdb.connect(str(database), read_only=True)
-    try:
-        return connection.execute(f'SELECT * FROM "{view}"').fetchdf()
-    finally:
-        connection.close()
 
 
 def _load_contracts(ctx: BuildContext) -> dict[str, Contract]:
@@ -241,7 +237,7 @@ def _apply_universal_aliases(name: str, frame: pd.DataFrame, ctx: BuildContext) 
 def _asset_master(ctx: BuildContext, contract: Contract, exports: Path, database: Path) -> pd.DataFrame:
     forecasts = _read_csv(exports / "latest_metal_forecasts.csv")
     rankings = _read_csv(exports / "latest_metal_opportunity_rankings.csv")
-    vehicles = _query_latest(database, "latest_vehicle_recommendations")
+    vehicles = load_bridge_surface(exports, "vehicle_recommendations", database=database, allow_legacy_database_fallback=ctx.allow_legacy_database_fallback)
     metal_names = sorted(set(forecasts.get("metal", pd.Series(dtype=str)).dropna().astype(str)) | set(rankings.get("metal", pd.Series(dtype=str)).dropna().astype(str)))
     records: list[dict[str, Any]] = []
     for metal in metal_names:
@@ -283,10 +279,16 @@ def _forecasts(ctx: BuildContext, contract: Contract, exports: Path) -> pd.DataF
             "forecast_date": ctx.generated_at_utc[:10], "horizon": f"{horizon}m", "horizon_months": horizon,
             "forecast_horizon_months": horizon,
             "expected_return": r.get("expected_return"), "expected_return_pct": r.get("expected_return"),
+            "expected_total_return": r.get("expected_return"),
             "lower_bound": r.get("lower_bound"), "upper_bound": r.get("upper_bound"),
             "forecast_volatility": r.get("forecast_volatility"), "volatility": r.get("forecast_volatility"),
             "downside_probability": r.get("downside_probability"), "dominant_regime": r.get("dominant_regime"),
+            "probability_positive_return": (
+                1.0 - float(r.get("downside_probability"))
+                if pd.notna(r.get("downside_probability")) else pd.NA
+            ),
             "model_agreement": r.get("model_agreement"), "confidence": r.get("model_agreement"),
+            "forecast_confidence": r.get("model_agreement"), "model_version": "metals-v8.1",
             "return_unit": "decimal", "currency": ctx.config.currency,
             "source_system": ctx.config.source_interface, "contract_version": ctx.config.contract_version,
             "generated_at_utc": ctx.generated_at_utc,
@@ -296,7 +298,7 @@ def _forecasts(ctx: BuildContext, contract: Contract, exports: Path) -> pd.DataF
 
 def _recommendations(ctx: BuildContext, contract: Contract, exports: Path, database: Path) -> pd.DataFrame:
     opportunities = _read_csv(exports / "latest_metal_opportunity_rankings.csv")
-    history = _query_latest(database, "latest_recommendation_history")
+    history = load_bridge_surface(exports, "recommendation_history", database=database, allow_legacy_database_fallback=ctx.allow_legacy_database_fallback)
     records=[]
     for _, row in opportunities.iterrows():
         r=row.to_dict(); metal=str(r.get("metal", "")); run=r.get("decision_run_id")
@@ -333,9 +335,9 @@ def _recommendations(ctx: BuildContext, contract: Contract, exports: Path, datab
     return _records_to_contract(records, contract)
 
 
-def _risk_metrics(ctx: BuildContext, contract: Contract, database: Path) -> pd.DataFrame:
-    portfolio = _query_latest(database, "latest_portfolio_risk_metrics")
-    contributions = _query_latest(database, "latest_risk_contributions")
+def _risk_metrics(ctx: BuildContext, contract: Contract, exports: Path, database: Path) -> pd.DataFrame:
+    portfolio = load_bridge_surface(exports, "portfolio_risk_metrics", database=database, allow_legacy_database_fallback=ctx.allow_legacy_database_fallback)
+    contributions = load_bridge_surface(exports, "risk_contributions", database=database, allow_legacy_database_fallback=ctx.allow_legacy_database_fallback)
     records=[]
     for _, row in portfolio.iterrows():
         r=row.to_dict(); run=r.get("risk_run_id")
@@ -374,7 +376,7 @@ def _risk_metrics(ctx: BuildContext, contract: Contract, database: Path) -> pd.D
 
 
 def _positions(ctx: BuildContext, contract: Contract, database: Path) -> pd.DataFrame:
-    native=_query_latest(database, "latest_portfolio_positions")
+    native=load_bridge_surface(ctx.metals_root / "data" / "exports", "portfolio_positions", database=database, allow_legacy_database_fallback=ctx.allow_legacy_database_fallback)
     records=[]
     for _, row in native.iterrows():
         r=row.to_dict(); ticker=str(r.get("ticker", "")); run=r.get("portfolio_run_id")
@@ -384,11 +386,13 @@ def _positions(ctx: BuildContext, contract: Contract, database: Path) -> pd.Data
             "account_name": r.get("account_name"), "account_type": r.get("account_type"),
             "asset_id": _asset_id(ctx.config, ticker, "vehicle"), "universal_asset_id": _asset_id(ctx.config, ticker, "vehicle"),
             "ticker": ticker,
-            "quantity": r.get("shares"), "shares": r.get("shares"), "current_price": r.get("current_price"),
+            "quantity": r.get("shares"), "shares": r.get("shares"),
+            "unit_value": r.get("current_price"), "current_price": r.get("current_price"),
             "market_value": r.get("market_value"), "position_value": _first(r, "market_value", "total_cost_basis", default=0),
-            "cost_basis_per_unit": r.get("cost_basis_per_share"),
+            "cost_basis": r.get("total_cost_basis"), "cost_basis_per_unit": r.get("cost_basis_per_share"),
             "cost_basis_per_share": r.get("cost_basis_per_share"), "total_cost_basis": r.get("total_cost_basis"),
             "unrealized_gain_loss": r.get("unrealized_gain_loss"), "holding_days": r.get("holding_days"),
+            "source_platform": ctx.config.platform_id,
             "currency": ctx.config.currency, "as_of_date": ctx.generated_at_utc[:10],
             "source_run_id": run, "source_system": ctx.config.source_interface,
             "contract_version": ctx.config.contract_version, "generated_at_utc": ctx.generated_at_utc,
@@ -403,11 +407,26 @@ def _platform_status(ctx: BuildContext, contract: Contract, exports: Path) -> pd
     failed=int((freshness.get("freshness_status", pd.Series(dtype=str)).astype(str).str.upper() != "PASS").sum()) if not freshness.empty else 0
     oldest=float(pd.to_numeric(freshness.get("age_days", pd.Series(dtype=float)), errors="coerce").max()) if not freshness.empty else float("nan")
     status="READY" if failed == 0 and (pd.isna(oldest) or oldest <= ctx.config.stale_after_days) else "DEGRADED"
+    observed_dates = pd.to_datetime(
+        freshness.get("last_observation", pd.Series(dtype="object")),
+        errors="coerce",
+        utc=True,
+    )
+    latest_observation = observed_dates.max()
+    data_as_of = (
+        latest_observation.date().isoformat()
+        if pd.notna(latest_observation) else ctx.generated_at_utc[:10]
+    )
+    source_run = h.get("decision_run_id", ctx.package_id)
     record={
-        "platform_status_id": f"metals:{h.get('decision_run_id', ctx.package_id)}", "platform_id": ctx.config.platform_id,
+        "platform_status_id": f"metals:{source_run}", "platform_id": ctx.config.platform_id,
         "platform_name": "Metals Intelligence Platform", "platform_version": "v8.1",
-        "source_interface": ctx.config.source_interface, "status": status, "run_status": "SUCCESS",
-        "as_of_date": ctx.generated_at_utc[:10], "decision_run_id": h.get("decision_run_id"),
+        "source_interface": ctx.config.source_interface, "status": status,
+        "run_id": str(source_run), "run_started_at_utc": ctx.generated_at_utc,
+        "run_completed_at_utc": ctx.generated_at_utc,
+        "run_status": "SUCCESS" if status == "READY" else "PARTIAL",
+        "data_as_of_date": data_as_of, "warning_count": failed, "error_count": 0,
+        "as_of_date": data_as_of, "decision_run_id": h.get("decision_run_id"),
         "data_freshness_score": h.get("data_freshness_score"), "model_confidence_score": h.get("model_confidence_score"),
         "recommendation_quality_score": h.get("recommendation_quality_score"),
         "pipeline_completeness_score": h.get("pipeline_completeness_score"),
@@ -438,21 +457,22 @@ def _validate_frame(frame: pd.DataFrame, contract: Contract) -> list[str]:
 
 
 def build_package(universal_root: Path, metals_root: Path, output_root: Path | None = None,
-                  config_path: Path | None = None, schema_root: Path | None = None) -> Path:
+                  config_path: Path | None = None, schema_root: Path | None = None,
+                  allow_legacy_database_fallback: bool = False) -> Path:
     universal_root=universal_root.resolve(); metals_root=metals_root.resolve()
     generated=datetime.now(timezone.utc); package_id=f"metals-{generated.strftime('%Y%m%dT%H%M%SZ')}-{uuid.uuid4().hex[:8]}"
     output_root=(output_root or universal_root / "data" / "integration" / "metals").resolve()
     package_dir=output_root / package_id
     schema_root=(schema_root or universal_root / "schemas" / "v1" / "csv").resolve()
     config_path=(config_path or universal_root / "exchange" / "metals" / "config" / "adapter_config.json").resolve()
-    ctx=BuildContext(universal_root, metals_root, output_root, schema_root, load_config(config_path), package_id, generated.isoformat())
+    ctx=BuildContext(universal_root, metals_root, output_root, schema_root, load_config(config_path), package_id, generated.isoformat(), allow_legacy_database_fallback)
     contracts=_load_contracts(ctx); exports=metals_root / "data" / "exports"; database=metals_root / "data" / "metals_intelligence.duckdb"
     package_dir.mkdir(parents=True, exist_ok=False); support_dir=package_dir / "supporting_native"; support_dir.mkdir()
     frames={
         "asset_master": _asset_master(ctx, contracts["asset_master"], exports, database),
         "forecasts": _forecasts(ctx, contracts["forecasts"], exports),
         "recommendations": _recommendations(ctx, contracts["recommendations"], exports, database),
-        "risk_metrics": _risk_metrics(ctx, contracts["risk_metrics"], database),
+        "risk_metrics": _risk_metrics(ctx, contracts["risk_metrics"], exports, database),
         "portfolio_positions": _positions(ctx, contracts["portfolio_positions"], database),
         "platform_status": _platform_status(ctx, contracts["platform_status"], exports),
     }
@@ -488,6 +508,7 @@ def build_package(universal_root: Path, metals_root: Path, output_root: Path | N
     manifest_path=package_dir / "export_manifest.csv"; manifest.to_csv(manifest_path,index=False)
     all_issues=[f"{name}: {issue}" for name,issues in validation.items() for issue in issues]
     summary={"package_id":package_id,"platform_id":ctx.config.platform_id,"source_interface":ctx.config.source_interface,
+             "adapter_version":ctx.config.adapter_version,
              "contract_version":ctx.config.contract_version,"generated_at_utc":ctx.generated_at_utc,
              "validation_status":"PASS" if not all_issues else "FAIL","issues":all_issues,
              "files":[p.relative_to(package_dir).as_posix() for p in package_dir.rglob('*') if p.is_file()]}
