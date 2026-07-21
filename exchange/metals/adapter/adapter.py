@@ -508,6 +508,7 @@ def build_package(universal_root: Path, metals_root: Path, output_root: Path | N
     manifest_path=package_dir / "export_manifest.csv"; manifest.to_csv(manifest_path,index=False)
     all_issues=[f"{name}: {issue}" for name,issues in validation.items() for issue in issues]
     summary={"package_id":package_id,"platform_id":ctx.config.platform_id,"source_interface":ctx.config.source_interface,
+             "adapter_version":ctx.config.adapter_version,
              "contract_version":ctx.config.contract_version,"generated_at_utc":ctx.generated_at_utc,
              "validation_status":"PASS" if not all_issues else "FAIL","issues":all_issues,
              "files":[p.relative_to(package_dir).as_posix() for p in package_dir.rglob('*') if p.is_file()]}
