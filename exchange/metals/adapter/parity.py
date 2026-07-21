@@ -166,7 +166,7 @@ def certify_metals_parity(
     target_forecasts = universal["forecasts"]
     _require_columns(
         target_forecasts,
-        {"universal_asset_id", "forecast_horizon_months", "expected_return"},
+        {"universal_asset_id", "forecast_horizon_months", "expected_total_return"},
         "universal forecasts",
     )
     merged = source_forecasts.merge(
@@ -179,13 +179,24 @@ def certify_metals_parity(
     )
     if len(merged) != len(source_forecasts) or not merged["_merge"].eq("both").all():
         raise MetalsParityError("universal forecast keys do not match native forecasts")
-    for column in ("expected_return", "lower_bound", "upper_bound"):
-        native_column = f"{column}_native"
-        universal_column = f"{column}_universal"
-        if native_column in merged and universal_column in merged:
-            if not _close(merged[native_column], merged[universal_column]):
-                raise MetalsParityError(f"forecast transformation drift: {column}")
-    checks.append(ParityCheck("forecast_transformation", len(merged), "keys and numeric values preserved"))
+    if not _close(merged["expected_return"], merged["expected_total_return"]):
+        raise MetalsParityError("forecast transformation drift: expected_total_return")
+    if "probability_positive_return" in merged:
+        expected_probability = 1.0 - pd.to_numeric(
+            merged["downside_probability"], errors="coerce"
+        )
+        if not _close(expected_probability, merged["probability_positive_return"]):
+            raise MetalsParityError("forecast transformation drift: probability_positive_return")
+    if "forecast_confidence" in merged:
+        if not _close(merged["model_agreement"], merged["forecast_confidence"]):
+            raise MetalsParityError("forecast transformation drift: forecast_confidence")
+    checks.append(
+        ParityCheck(
+            "forecast_transformation",
+            len(merged),
+            "keys, total returns, probabilities, and confidence preserved",
+        )
+    )
 
     opportunity_assets = {
         f"metals:commodity:{metal.lower()}"
