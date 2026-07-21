@@ -10,12 +10,12 @@ class AdapterConfig:
     platform_id: str
     source_interface: str
     contract_version: str
-    adapter_version: str
     currency: str
     portfolio_id: str
     account_id: str
     stale_after_days: int
     asset_crosswalk: dict[str, dict[str, str]]
+    adapter_version: str = "2.0.0"
 
 
 def load_config(path: Path) -> AdapterConfig:
