@@ -9,11 +9,11 @@ import json
 import shutil
 import uuid
 
-import duckdb
 import pandas as pd
 
 from .config import AdapterConfig, load_config
 from .contracts import Contract, load_contract
+from .native_surfaces import load_bridge_surface
 
 CONTRACTS = (
     "asset_master",
@@ -44,6 +44,7 @@ class BuildContext:
     config: AdapterConfig
     package_id: str
     generated_at_utc: str
+    allow_legacy_database_fallback: bool = False
 
 
 def _first(row: dict[str, Any], *names: str, default: Any = "") -> Any:
@@ -79,16 +80,6 @@ def _read_csv(path: Path, required: bool = True) -> pd.DataFrame:
             raise FileNotFoundError(f"Required Metals native export not found: {path}")
         return pd.DataFrame()
     return pd.read_csv(path)
-
-
-def _query_latest(database: Path, view: str) -> pd.DataFrame:
-    if not database.exists():
-        raise FileNotFoundError(f"Metals DuckDB not found: {database}")
-    connection = duckdb.connect(str(database), read_only=True)
-    try:
-        return connection.execute(f'SELECT * FROM "{view}"').fetchdf()
-    finally:
-        connection.close()
 
 
 def _load_contracts(ctx: BuildContext) -> dict[str, Contract]:
@@ -241,7 +232,7 @@ def _apply_universal_aliases(name: str, frame: pd.DataFrame, ctx: BuildContext) 
 def _asset_master(ctx: BuildContext, contract: Contract, exports: Path, database: Path) -> pd.DataFrame:
     forecasts = _read_csv(exports / "latest_metal_forecasts.csv")
     rankings = _read_csv(exports / "latest_metal_opportunity_rankings.csv")
-    vehicles = _query_latest(database, "latest_vehicle_recommendations")
+    vehicles = load_bridge_surface(exports, "vehicle_recommendations", database=database, allow_legacy_database_fallback=ctx.allow_legacy_database_fallback)
     metal_names = sorted(set(forecasts.get("metal", pd.Series(dtype=str)).dropna().astype(str)) | set(rankings.get("metal", pd.Series(dtype=str)).dropna().astype(str)))
     records: list[dict[str, Any]] = []
     for metal in metal_names:
@@ -296,7 +287,7 @@ def _forecasts(ctx: BuildContext, contract: Contract, exports: Path) -> pd.DataF
 
 def _recommendations(ctx: BuildContext, contract: Contract, exports: Path, database: Path) -> pd.DataFrame:
     opportunities = _read_csv(exports / "latest_metal_opportunity_rankings.csv")
-    history = _query_latest(database, "latest_recommendation_history")
+    history = load_bridge_surface(exports, "recommendation_history", database=database, allow_legacy_database_fallback=ctx.allow_legacy_database_fallback)
     records=[]
     for _, row in opportunities.iterrows():
         r=row.to_dict(); metal=str(r.get("metal", "")); run=r.get("decision_run_id")
@@ -334,8 +325,8 @@ def _recommendations(ctx: BuildContext, contract: Contract, exports: Path, datab
 
 
 def _risk_metrics(ctx: BuildContext, contract: Contract, database: Path) -> pd.DataFrame:
-    portfolio = _query_latest(database, "latest_portfolio_risk_metrics")
-    contributions = _query_latest(database, "latest_risk_contributions")
+    portfolio = load_bridge_surface(exports, "portfolio_risk_metrics", database=database, allow_legacy_database_fallback=ctx.allow_legacy_database_fallback)
+    contributions = load_bridge_surface(exports, "risk_contributions", database=database, allow_legacy_database_fallback=ctx.allow_legacy_database_fallback)
     records=[]
     for _, row in portfolio.iterrows():
         r=row.to_dict(); run=r.get("risk_run_id")
@@ -374,7 +365,7 @@ def _risk_metrics(ctx: BuildContext, contract: Contract, database: Path) -> pd.D
 
 
 def _positions(ctx: BuildContext, contract: Contract, database: Path) -> pd.DataFrame:
-    native=_query_latest(database, "latest_portfolio_positions")
+    native=load_bridge_surface(ctx.metals_root / "data" / "exports", "portfolio_positions", database=database, allow_legacy_database_fallback=ctx.allow_legacy_database_fallback)
     records=[]
     for _, row in native.iterrows():
         r=row.to_dict(); ticker=str(r.get("ticker", "")); run=r.get("portfolio_run_id")
@@ -438,14 +429,15 @@ def _validate_frame(frame: pd.DataFrame, contract: Contract) -> list[str]:
 
 
 def build_package(universal_root: Path, metals_root: Path, output_root: Path | None = None,
-                  config_path: Path | None = None, schema_root: Path | None = None) -> Path:
+                  config_path: Path | None = None, schema_root: Path | None = None,
+                  allow_legacy_database_fallback: bool = False) -> Path:
     universal_root=universal_root.resolve(); metals_root=metals_root.resolve()
     generated=datetime.now(timezone.utc); package_id=f"metals-{generated.strftime('%Y%m%dT%H%M%SZ')}-{uuid.uuid4().hex[:8]}"
     output_root=(output_root or universal_root / "data" / "integration" / "metals").resolve()
     package_dir=output_root / package_id
     schema_root=(schema_root or universal_root / "schemas" / "v1" / "csv").resolve()
     config_path=(config_path or universal_root / "exchange" / "metals" / "config" / "adapter_config.json").resolve()
-    ctx=BuildContext(universal_root, metals_root, output_root, schema_root, load_config(config_path), package_id, generated.isoformat())
+    ctx=BuildContext(universal_root, metals_root, output_root, schema_root, load_config(config_path), package_id, generated.isoformat(), allow_legacy_database_fallback)
     contracts=_load_contracts(ctx); exports=metals_root / "data" / "exports"; database=metals_root / "data" / "metals_intelligence.duckdb"
     package_dir.mkdir(parents=True, exist_ok=False); support_dir=package_dir / "supporting_native"; support_dir.mkdir()
     frames={
