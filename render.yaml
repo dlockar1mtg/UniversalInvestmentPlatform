@@ -26,3 +26,7 @@ services:
         sync: false
       - key: UIIP_FRED_API_KEY
         sync: false
+      - key: EBAY_DELETION_ENDPOINT_URL
+        value: https://uiip-free-staging.onrender.com/api/compliance/ebay/account-deletion
+      - key: EBAY_DELETION_VERIFICATION_TOKEN
+        sync: false
