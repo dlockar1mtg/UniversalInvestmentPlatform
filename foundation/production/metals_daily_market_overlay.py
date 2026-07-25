@@ -5,7 +5,7 @@ from __future__ import annotations
 import csv
 import json
 from dataclasses import asdict, dataclass
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Iterable, Mapping
 
@@ -131,7 +131,7 @@ def summarize_daily_market_overlay(rows: Iterable[DailyMarketOverlayRow]) -> dic
     severity_rank = {"INFO": 0, "WARNING": 1, "CRITICAL": 2}
     highest = max((row.alert_severity for row in materialized), key=lambda value: severity_rank[value], default="INFO")
     return {
-        "generated_at_utc": datetime.utcnow().isoformat() + "Z",
+        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
         "vehicle_count": len(materialized),
         "current_vehicle_count": sum(row.freshness_status == "CURRENT" for row in materialized),
         "alert_count": sum(row.alert_severity != "INFO" for row in materialized),
