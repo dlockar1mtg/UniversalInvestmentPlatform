@@ -1,0 +1,40 @@
+{
+  "registry_version": "1.0.0",
+  "platform_id": "metals",
+  "runtime": "UniversalInvestmentPlatform",
+  "external_runtime_required": false,
+  "default_horizons_months": [12, 36, 60],
+  "models": [
+    {
+      "model_id": "uip-metals-native-trend-v1",
+      "status": "production_candidate",
+      "purpose": "Generate deterministic Metals forecasts from UIP-owned benchmark and vehicle observations.",
+      "required_inputs": ["benchmark_observations", "vehicle_observations"],
+      "components": [
+        {"component_id": "benchmark_momentum", "weight": 0.45},
+        {"component_id": "vehicle_confirmation", "weight": 0.35},
+        {"component_id": "data_completeness", "weight": 0.20}
+      ],
+      "forecast_bounds": {"minimum_annual_return": -0.35, "maximum_annual_return": 0.50},
+      "confidence_policy": {
+        "minimum": 0.25,
+        "maximum": 0.90,
+        "base": 0.45,
+        "history_bonus_per_observation": 0.03,
+        "vehicle_confirmation_bonus": 0.10
+      },
+      "recommendation_policy": {
+        "strong_buy_min_return": 0.12,
+        "buy_min_return": 0.05,
+        "hold_min_return": -0.05,
+        "reduce_min_return": -0.12,
+        "otherwise": "AVOID"
+      },
+      "limitations": [
+        "Trend-based forecasts are not guarantees.",
+        "Sparse histories reduce confidence.",
+        "The model must fail closed when required UIP-owned observations are absent."
+      ]
+    }
+  ]
+}
