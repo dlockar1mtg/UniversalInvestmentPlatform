@@ -1,0 +1,4 @@
+forecast_id,asset_id,vehicle_ticker,horizon_days,forecast_return_pct,forecast_probability_up,recommendation,signal_price,realized_price,benchmark_return_pct,regime,portfolio_weight_pct,estimated_slippage_pct
+metals-val-001,gold,IAU,30,4.5,0.72,BUY,70.00,73.50,4.20,expansion,8.0,0.05
+metals-val-002,silver,SLV,30,-2.0,0.35,SELL,50.00,48.00,-3.50,contraction,4.0,0.08
+metals-val-003,copper,CPER,90,6.0,0.68,BUY,35.00,36.40,3.20,expansion,3.0,0.15
