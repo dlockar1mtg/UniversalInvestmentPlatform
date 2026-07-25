@@ -1,0 +1,5 @@
+asset_id,vehicle_ticker,approved,metadata_current,average_daily_volume,spread_pct,expense_ratio_pct,roll_drag_pct,miner_beta,single_company_concentration_pct,single_country_concentration_pct,currency_exposure_pct,tax_structure,overlap_pct,factor_exposure_score
+gold,IAU,true,true,5000000,0.03,0.25,0.0,0.0,0.0,0.0,0.0,grantor_trust,10.0,20.0
+silver,SLV,true,true,8000000,0.06,0.50,0.0,0.0,0.0,0.0,0.0,grantor_trust,48.0,35.0
+copper,COPX,true,true,750000,0.18,0.65,0.0,1.9,17.0,52.0,62.0,regulated_investment_company,28.0,74.0
+aluminum,JJU,false,false,0,5.0,0.75,3.0,0.0,0.0,0.0,0.0,unverified,0.0,0.0

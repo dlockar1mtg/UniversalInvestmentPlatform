@@ -1,0 +1,20 @@
+{
+  "version": "1.0.0",
+  "policy": {
+    "base_allocation_cap_pct": 10.0,
+    "minimum_average_daily_volume": 100000,
+    "maximum_spread_pct": 0.75,
+    "maximum_expense_ratio_pct": 1.00,
+    "maximum_roll_drag_pct": 2.00,
+    "maximum_miner_beta": 1.75,
+    "maximum_single_company_concentration_pct": 20.0,
+    "maximum_single_country_concentration_pct": 45.0,
+    "maximum_currency_exposure_pct": 50.0,
+    "maximum_overlap_pct": 35.0,
+    "maximum_factor_exposure_score": 70.0,
+    "allowed_tax_structures": ["grantor_trust", "regulated_investment_company", "partnership", "debt_security"],
+    "blocked_tax_structures": ["unknown", "unverified"],
+    "hard_block_if_unapproved": true,
+    "hard_block_if_metadata_stale": true
+  }
+}
