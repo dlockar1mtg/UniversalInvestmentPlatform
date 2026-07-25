@@ -1,0 +1,59 @@
+name: Metals Production Cycle
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "23 12 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: uiip-metals-production-cycle
+  cancel-in-progress: false
+
+jobs:
+  metals-cycle:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: staging
+    env:
+      UIIP_DATABASE_URL: ${{ secrets.UIIP_DATABASE_URL }}
+      UIIP_FRED_API_KEY: ${{ secrets.UIIP_FRED_API_KEY }}
+      UIIP_ALPHA_VANTAGE_API_KEY: ${{ secrets.UIIP_ALPHA_VANTAGE_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+      - run: pip install -r requirements.txt -r requirements/phase_7_3.txt
+      - name: Validate required secrets
+        run: python -c "import os; assert os.environ.get('UIIP_DATABASE_URL')"
+      - name: Collect vehicle metadata
+        run: python scripts/collect_metals_vehicle_metadata.py
+      - name: Collect daily market input
+        run: python scripts/collect_metals_daily_market_input.py
+      - name: Ingest UIP-native observations
+        run: python scripts/ingest_metals_native_observations.py --vehicle data/operations/metals/daily_market_input.csv --run-id "gha-${{ github.run_id }}" --strict
+      - name: Run UIP-native forecasts
+        run: python scripts/run_metals_native_cycle.py --strict
+      - name: Publish UIP-native package
+        run: python scripts/publish_metals_uip_native_package.py --run-id "gha-${{ github.run_id }}" --strict
+      - name: Resolve latest package root
+        id: package
+        shell: bash
+        run: echo "path=$(python -c 'import json; print(json.load(open("data/integration/metals/uip_native_packages/latest.json"))["package_root"])')" >> "$GITHUB_OUTPUT"
+      - name: Run standalone-free readiness
+        run: python scripts/check_metals_native_readiness.py --package-root "${{ steps.package.outputs.path }}" --strict
+      - name: Validate migration contract
+        run: python scripts/check_metals_runtime_migration.py --strict
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: metals-production-${{ github.run_id }}
+          path: |
+            data/operations/metals/native_cycle/
+            data/operations/metals/native_readiness/
+            data/integration/metals/uip_native_packages/
+          retention-days: 30
