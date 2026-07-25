@@ -77,6 +77,6 @@ def test_repository_contract_is_incomplete_without_missing_implemented_targets()
 
     assert report.status == "INCOMPLETE"
     assert report.missing_target_count == 0
-    assert report.implemented_count == 7
-    assert report.planned_count == 6
+    assert report.implemented_count == 8
+    assert report.planned_count == 5
     assert report.reason_codes == ("REQUIRED_CAPABILITIES_INCOMPLETE",)
