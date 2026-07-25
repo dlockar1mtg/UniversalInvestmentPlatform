@@ -10,7 +10,7 @@ from foundation.production.metals_vehicle_metadata_collection import (
 )
 
 
-def _template(path: Path) -> Path:
+def _template(path: Path, ticker: str = "GLD") -> Path:
     with path.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.writer(handle)
         writer.writerow([
@@ -23,7 +23,7 @@ def _template(path: Path) -> Path:
             "source_name",
             "source_url",
         ])
-        writer.writerow(["GLD", "", "", "", "", "", "", "https://issuer.example/gld"])
+        writer.writerow([ticker, "", "", "", "", "", "", f"https://issuer.example/{ticker.lower()}"])
     return path
 
 
@@ -59,6 +59,24 @@ def test_collection_preserves_missing_provider_values(tmp_path: Path) -> None:
     assert rows[0].assets_under_management_usd is None
     assert rows[0].average_daily_volume_shares is None
     assert rows[0].median_bid_ask_spread_pct is None
+
+
+def test_collection_uses_issuer_spread_fallback_for_bil(tmp_path: Path) -> None:
+    rows = collect_vehicle_metadata(
+        template_path=_template(tmp_path / "template.csv", ticker="BIL"),
+        quote_loader=lambda ticker: {
+            "totalAssets": 47_054_600_000,
+            "averageVolume": 9_901_829,
+            "bid": None,
+            "ask": None,
+        },
+        as_of=date(2026, 7, 25),
+    )
+
+    row = rows[0]
+    assert row.expense_ratio_pct == 0.1353
+    assert row.median_bid_ask_spread_pct == 0.01
+    assert "issuer-published 30-day median bid/ask spread" in row.source_name
 
 
 def test_write_collected_metadata_round_trips(tmp_path: Path) -> None:
