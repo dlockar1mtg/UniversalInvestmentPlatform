@@ -1,0 +1,16 @@
+{
+  "retirement_id": "metals-legacy-validation",
+  "legacy_system_name": "Standalone Metals Platform",
+  "schedule_disabled": true,
+  "schedule_disabled_at": "2026-06-01T00:00:00Z",
+  "observation_window_days": 30,
+  "observation_window_completed": true,
+  "legacy_runtime_execution_count": 0,
+  "legacy_database_access_count": 0,
+  "archive_path": "archive/metals/standalone-metals-platform.zip",
+  "archive_checksum_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "archive_checksum_verified": true,
+  "recovery_procedure_path": "docs/operations/metals_legacy_recovery.md",
+  "owner": "platform-operations",
+  "evidence_as_of": "2026-07-01T00:00:00Z"
+}

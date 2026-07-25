@@ -1,0 +1,16 @@
+{
+  "retirement_id": "",
+  "legacy_system_name": "Standalone Metals Platform",
+  "schedule_disabled": false,
+  "schedule_disabled_at": "",
+  "observation_window_days": 30,
+  "observation_window_completed": false,
+  "legacy_runtime_execution_count": -1,
+  "legacy_database_access_count": -1,
+  "archive_path": "",
+  "archive_checksum_sha256": "",
+  "archive_checksum_verified": false,
+  "recovery_procedure_path": "",
+  "owner": "",
+  "evidence_as_of": ""
+}
