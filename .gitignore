@@ -88,6 +88,10 @@ data/validation/*
 data/exports/*
 !data/exports/.gitkeep
 
+# Runtime operations evidence
+data/operations/*
+!data/operations/.gitkeep
+
 # Keep reference tables under source control
 !data/reference/
 !data/reference/**
