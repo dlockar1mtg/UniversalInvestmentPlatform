@@ -3,8 +3,13 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 import duckdb
 
@@ -15,7 +20,6 @@ from foundation.import_engine.loader import import_package
 from foundation.import_engine.package import discover_package
 from foundation.integrations.mtg.universal_adapter import build_universal_mtg_package
 
-ROOT = Path(__file__).resolve().parents[1]
 DEFAULT_OUTPUT = ROOT / "data" / "integration" / "mtg" / "latest"
 DEFAULT_REPORT = ROOT / "data" / "validation" / "imports" / "mtg_phase_10_11"
 
