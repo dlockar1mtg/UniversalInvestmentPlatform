@@ -1,0 +1,12 @@
+ticker,expense_ratio_pct,assets_under_management_usd,average_daily_volume_shares,median_bid_ask_spread_pct,metadata_as_of_date,source_name,source_url
+BIL,0.1353,47077847040.0,9901829.0,0.01,2026-07-25,issuer expense ratio + issuer-published 30-day median bid/ask spread + Yahoo Finance market data,https://www.ssga.com/us/en/intermediary/etfs/spdr-bloomberg-1-3-month-t-bill-etf-bil
+COPX,0.65,7154050560.0,3717006.0,0.256739,2026-07-25,issuer expense ratio + Yahoo Finance market data,https://www.globalxetfs.com/funds/copx
+CPER,1.06,737944704.0,649337.0,1.11529,2026-07-25,issuer expense ratio + Yahoo Finance market data,https://www.uscfinvestments.com/cper
+GLD,0.4,130053275648.0,6958793.0,0.137007,2026-07-25,issuer expense ratio + Yahoo Finance market data,https://www.ssga.com/us/en/intermediary/etfs/spdr-gold-shares-gld
+IAU,0.25,60138172416.0,6033604.0,0.078678,2026-07-25,issuer expense ratio + Yahoo Finance market data,https://www.ishares.com/us/products/239561/ishares-gold-trust-fund
+PPLT,0.6,1773133312.0,2443453.0,0.138793,2026-07-25,issuer expense ratio + Yahoo Finance market data,https://www.abrdn.com/en-us/etf/pplt
+SGOL,0.17,6743476736.0,2493217.0,0.02591,2026-07-25,issuer expense ratio + Yahoo Finance market data,https://www.abrdn.com/en-us/etf/sgol
+SIVR,0.3,3950569728.0,1348456.0,0.962849,2026-07-25,issuer expense ratio + Yahoo Finance market data,https://www.abrdn.com/en-us/etf/sivr
+SLV,0.5,28194189312.0,20620854.0,0.0,2026-07-25,issuer expense ratio + Yahoo Finance market data,https://www.ishares.com/us/products/239855/ishares-silver-trust-fund
+URA,0.69,5997526528.0,3622861.0,0.525723,2026-07-25,issuer expense ratio + Yahoo Finance market data,https://www.globalxetfs.com/funds/ura
+URNM,0.75,1899928704.0,628583.0,0.141514,2026-07-25,issuer expense ratio + Yahoo Finance market data,https://sprottetfs.com/urnm-sprott-uranium-miners-etf/

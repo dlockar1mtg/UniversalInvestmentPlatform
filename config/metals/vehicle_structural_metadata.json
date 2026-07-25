@@ -1,0 +1,127 @@
+{
+  "schema_version": "1.0",
+  "platform_id": "metals",
+  "vehicles": [
+    {
+      "ticker": "BIL",
+      "issuer": "State Street Global Advisors",
+      "legal_structure": "exchange_traded_fund",
+      "exposure_type": "short_term_us_treasury_bills",
+      "exposure_share_pct": 100.0,
+      "concentration_description": "U.S. Treasury bills with remaining maturities of one to three months",
+      "tax_structure": "regulated_investment_company",
+      "investability_classification": "directly_investable",
+      "metadata_source_url": "https://www.ssga.com/us/en/intermediary/etfs/spdr-bloomberg-1-3-month-t-bill-etf-bil"
+    },
+    {
+      "ticker": "COPX",
+      "issuer": "Global X",
+      "legal_structure": "exchange_traded_fund",
+      "exposure_type": "copper_mining_equities",
+      "exposure_share_pct": null,
+      "concentration_description": "Diversified equity exposure to companies involved in copper mining",
+      "tax_structure": "regulated_investment_company",
+      "investability_classification": "diversified_fund_only",
+      "metadata_source_url": "https://www.globalxetfs.com/funds/copx"
+    },
+    {
+      "ticker": "CPER",
+      "issuer": "USCF Investments",
+      "legal_structure": "commodity_pool",
+      "exposure_type": "copper_futures",
+      "exposure_share_pct": 100.0,
+      "concentration_description": "Rules-based copper futures exposure subject to contract selection and roll effects",
+      "tax_structure": "publicly_traded_partnership",
+      "investability_classification": "futures_only",
+      "metadata_source_url": "https://www.uscfinvestments.com/cper"
+    },
+    {
+      "ticker": "GLD",
+      "issuer": "State Street Global Advisors",
+      "legal_structure": "physical_commodity_trust",
+      "exposure_type": "physical_gold_bullion",
+      "exposure_share_pct": 100.0,
+      "concentration_description": "Single-commodity physical gold exposure",
+      "tax_structure": "grantor_trust",
+      "investability_classification": "directly_investable",
+      "metadata_source_url": "https://www.ssga.com/us/en/intermediary/etfs/spdr-gold-shares-gld"
+    },
+    {
+      "ticker": "IAU",
+      "issuer": "BlackRock iShares",
+      "legal_structure": "physical_commodity_trust",
+      "exposure_type": "physical_gold_bullion",
+      "exposure_share_pct": 100.0,
+      "concentration_description": "Single-commodity physical gold exposure",
+      "tax_structure": "grantor_trust",
+      "investability_classification": "directly_investable",
+      "metadata_source_url": "https://www.ishares.com/us/products/239561/ishares-gold-trust-fund"
+    },
+    {
+      "ticker": "PPLT",
+      "issuer": "abrdn",
+      "legal_structure": "physical_commodity_trust",
+      "exposure_type": "physical_platinum_bullion",
+      "exposure_share_pct": 100.0,
+      "concentration_description": "Single-commodity physical platinum exposure",
+      "tax_structure": "grantor_trust",
+      "investability_classification": "directly_investable",
+      "metadata_source_url": "https://www.abrdn.com/en-us/etf/pplt"
+    },
+    {
+      "ticker": "SGOL",
+      "issuer": "abrdn",
+      "legal_structure": "physical_commodity_trust",
+      "exposure_type": "physical_gold_bullion",
+      "exposure_share_pct": 100.0,
+      "concentration_description": "Single-commodity physical gold exposure",
+      "tax_structure": "grantor_trust",
+      "investability_classification": "directly_investable",
+      "metadata_source_url": "https://www.abrdn.com/en-us/etf/sgol"
+    },
+    {
+      "ticker": "SIVR",
+      "issuer": "abrdn",
+      "legal_structure": "physical_commodity_trust",
+      "exposure_type": "physical_silver_bullion",
+      "exposure_share_pct": 100.0,
+      "concentration_description": "Single-commodity physical silver exposure",
+      "tax_structure": "grantor_trust",
+      "investability_classification": "directly_investable",
+      "metadata_source_url": "https://www.abrdn.com/en-us/etf/sivr"
+    },
+    {
+      "ticker": "SLV",
+      "issuer": "BlackRock iShares",
+      "legal_structure": "physical_commodity_trust",
+      "exposure_type": "physical_silver_bullion",
+      "exposure_share_pct": 100.0,
+      "concentration_description": "Single-commodity physical silver exposure",
+      "tax_structure": "grantor_trust",
+      "investability_classification": "directly_investable",
+      "metadata_source_url": "https://www.ishares.com/us/products/239855/ishares-silver-trust-fund"
+    },
+    {
+      "ticker": "URA",
+      "issuer": "Global X",
+      "legal_structure": "exchange_traded_fund",
+      "exposure_type": "uranium_industry_equities",
+      "exposure_share_pct": null,
+      "concentration_description": "Diversified equity exposure to uranium mining and nuclear-component companies",
+      "tax_structure": "regulated_investment_company",
+      "investability_classification": "diversified_fund_only",
+      "metadata_source_url": "https://www.globalxetfs.com/funds/ura"
+    },
+    {
+      "ticker": "URNM",
+      "issuer": "Sprott Asset Management",
+      "legal_structure": "exchange_traded_fund",
+      "exposure_type": "uranium_mining_equities",
+      "exposure_share_pct": null,
+      "concentration_description": "Diversified equity exposure to uranium miners and physical uranium holdings",
+      "tax_structure": "regulated_investment_company",
+      "investability_classification": "diversified_fund_only",
+      "metadata_source_url": "https://sprottetfs.com/urnm-sprott-uranium-miners-etf/"
+    }
+  ]
+}
