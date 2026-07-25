@@ -1,0 +1,64 @@
+{
+  "effective_date": "2026-07-25",
+  "policy": {
+    "required_metals": ["aluminum", "zinc", "nickel", "tin"],
+    "approval_requires": [
+      "current_listing_evidence",
+      "current_market_metadata",
+      "acceptable_liquidity",
+      "acceptable_spread",
+      "approved_legal_structure"
+    ],
+    "fail_closed": true
+  },
+  "metals": [
+    {
+      "metal_id": "aluminum",
+      "benchmark_symbol": "ALI=F",
+      "coverage_status": "RESEARCH_ONLY",
+      "approved_vehicle_ticker": null,
+      "candidate_vehicles": ["JJU"],
+      "candidate_structure": "exchange_traded_note",
+      "candidate_exposure": "futures_linked_single_metal",
+      "decision_reason": "Legacy single-metal ETN identified, but current listing and liquidity evidence are not approved.",
+      "selection_eligible": false,
+      "source_refs": ["SEC Barclays ETN listing", "ETF Database inactive classification"]
+    },
+    {
+      "metal_id": "zinc",
+      "benchmark_symbol": null,
+      "coverage_status": "RESEARCH_ONLY",
+      "approved_vehicle_ticker": null,
+      "candidate_vehicles": [],
+      "candidate_structure": null,
+      "candidate_exposure": null,
+      "decision_reason": "No approved U.S.-accessible single-metal vehicle with current listing and liquidity evidence was identified.",
+      "selection_eligible": false,
+      "source_refs": []
+    },
+    {
+      "metal_id": "nickel",
+      "benchmark_symbol": null,
+      "coverage_status": "RESEARCH_ONLY",
+      "approved_vehicle_ticker": null,
+      "candidate_vehicles": ["JJN"],
+      "candidate_structure": "exchange_traded_note",
+      "candidate_exposure": "futures_linked_single_metal",
+      "decision_reason": "Legacy single-metal ETN identified, but current listing and liquidity evidence are not approved.",
+      "selection_eligible": false,
+      "source_refs": ["SEC Barclays ETN listing"]
+    },
+    {
+      "metal_id": "tin",
+      "benchmark_symbol": null,
+      "coverage_status": "RESEARCH_ONLY",
+      "approved_vehicle_ticker": null,
+      "candidate_vehicles": ["JJT"],
+      "candidate_structure": "exchange_traded_note",
+      "candidate_exposure": "futures_linked_single_metal",
+      "decision_reason": "Legacy single-metal ETN identified, but current listing and liquidity evidence are not approved.",
+      "selection_eligible": false,
+      "source_refs": ["Legacy iPath Series B product documentation"]
+    }
+  ]
+}
