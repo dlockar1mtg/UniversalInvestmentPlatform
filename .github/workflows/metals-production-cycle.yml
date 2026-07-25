@@ -32,10 +32,17 @@ jobs:
         run: python -c "import os; assert os.environ.get('UIIP_DATABASE_URL')"
       - name: Collect vehicle metadata
         run: python scripts/collect_metals_vehicle_metadata.py
+      - name: Collect official benchmark input
+        run: python scripts/collect_metals_benchmark_input.py
       - name: Collect daily market input
         run: python scripts/collect_metals_daily_market_input.py
       - name: Ingest UIP-native observations
-        run: python scripts/ingest_metals_native_observations.py --vehicle data/operations/metals/daily_market_input.csv --run-id "gha-${{ github.run_id }}" --strict
+        run: >-
+          python scripts/ingest_metals_native_observations.py
+          --benchmark data/operations/metals/benchmark_input.csv
+          --vehicle data/operations/metals/daily_market_input.csv
+          --run-id "gha-${{ github.run_id }}"
+          --strict
       - name: Run UIP-native forecasts
         run: python scripts/run_metals_native_cycle.py --strict
       - name: Publish UIP-native package
@@ -43,7 +50,13 @@ jobs:
       - name: Resolve latest package root
         id: package
         shell: bash
-        run: echo "path=$(python -c 'import json; print(json.load(open("data/integration/metals/uip_native_packages/latest.json"))["package_root"])')" >> "$GITHUB_OUTPUT"
+        run: |
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          from pathlib import Path
+          payload = json.loads(Path("data/integration/metals/uip_native_packages/latest.json").read_text())
+          print(f"path={payload['package_root']}")
+          PY
       - name: Run standalone-free readiness
         run: python scripts/check_metals_native_readiness.py --package-root "${{ steps.package.outputs.path }}" --strict
       - name: Validate migration contract
@@ -53,6 +66,8 @@ jobs:
         with:
           name: metals-production-${{ github.run_id }}
           path: |
+            data/operations/metals/benchmark_input.csv
+            data/operations/metals/daily_market_input.csv
             data/operations/metals/native_cycle/
             data/operations/metals/native_readiness/
             data/integration/metals/uip_native_packages/
