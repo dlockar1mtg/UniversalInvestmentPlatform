@@ -1,0 +1,2 @@
+# Runtime dependencies for UIP-native Metals production collection.
+yfinance>=0.2.54,<1
