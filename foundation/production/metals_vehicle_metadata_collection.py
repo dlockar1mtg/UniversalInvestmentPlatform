@@ -10,7 +10,7 @@ from typing import Callable, Mapping
 
 
 ISSUER_EXPENSE_RATIOS: dict[str, float] = {
-    "BIL": 0.1354,
+    "BIL": 0.1353,
     "COPX": 0.65,
     "CPER": 1.06,
     "GLD": 0.40,
@@ -21,6 +21,13 @@ ISSUER_EXPENSE_RATIOS: dict[str, float] = {
     "SLV": 0.50,
     "URA": 0.69,
     "URNM": 0.75,
+}
+
+# Issuer-published 30-day median bid/ask spreads used only when the market-data
+# provider does not return a usable spread or bid/ask pair. Values remain dated
+# by the collection run and retain the issuer URL from the source template.
+ISSUER_MEDIAN_BID_ASK_SPREAD_PCT: dict[str, float] = {
+    "BIL": 0.01,
 }
 
 
@@ -75,8 +82,18 @@ def collect_vehicle_metadata(
             or quote.get("threeMonthAverageVolume")
         )
         spread = _positive(quote.get("medianBidAskSpreadPct"))
+        spread_source = "Yahoo Finance market data"
         if spread is None:
             spread = _spread_pct(quote.get("bid"), quote.get("ask"))
+        if spread is None:
+            spread = ISSUER_MEDIAN_BID_ASK_SPREAD_PCT.get(ticker)
+            if spread is not None:
+                spread_source = "issuer-published 30-day median bid/ask spread"
+
+        source_name = f"issuer expense ratio + {spread_source}"
+        if aum is not None or volume is not None:
+            source_name += " + Yahoo Finance market data"
+
         results.append(
             CollectedVehicleMetadata(
                 ticker=ticker,
@@ -85,7 +102,7 @@ def collect_vehicle_metadata(
                 average_daily_volume_shares=volume,
                 median_bid_ask_spread_pct=spread,
                 metadata_as_of_date=as_of.isoformat(),
-                source_name="issuer expense ratio + Yahoo Finance market data",
+                source_name=source_name,
                 source_url=row["source_url"].strip(),
             )
         )
