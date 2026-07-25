@@ -1,5 +1,5 @@
 {
-  "contract_version": "1.0.0",
+  "contract_version": "1.0.1",
   "source_runtime": "C:/Users/DevonLockard/metals",
   "target_runtime": "UniversalInvestmentPlatform",
   "target_execution": "github-hosted-actions",
@@ -10,7 +10,7 @@
     {"capability_id":"daily_vehicle_market_collection","required":true,"legacy_source":"metals_platform/collectors/market_proxies.py","uip_target":"scripts/collect_metals_daily_market_input.py","migration_state":"IMPLEMENTED","github_hosted_compatible":true},
     {"capability_id":"vehicle_metadata_collection","required":true,"legacy_source":"legacy configuration and market lookups","uip_target":"scripts/collect_metals_vehicle_metadata.py","migration_state":"IMPLEMENTED","github_hosted_compatible":true},
     {"capability_id":"benchmark_and_divergence_overlay","required":true,"legacy_source":"legacy analytics","uip_target":"foundation/production/metals_daily_market_overlay.py","migration_state":"IMPLEMENTED","github_hosted_compatible":true},
-    {"capability_id":"methodology_registry","required":true,"legacy_source":"legacy model implementation documentation","uip_target":"config/metals/model_methodology_registry.json","migration_state":"IMPLEMENTED","github_hosted_compatible":true},
+    {"capability_id":"methodology_registry","required":true,"legacy_source":"legacy model implementation documentation","uip_target":"config/metals/model_methodology_registry.json","migration_state":"PLANNED","github_hosted_compatible":true},
     {"capability_id":"forecast_outcome_tracking","required":true,"legacy_source":"legacy forecast outputs","uip_target":"foundation/production/metals_outcome_tracking.py","migration_state":"IMPLEMENTED","github_hosted_compatible":true},
     {"capability_id":"risk_aware_constraints","required":true,"legacy_source":"legacy vehicle selection logic","uip_target":"foundation/production/metals_risk_aware_constraints.py","migration_state":"IMPLEMENTED","github_hosted_compatible":true},
     {"capability_id":"canonical_asset_and_vehicle_registry","required":true,"legacy_source":"legacy configuration","uip_target":"config/metals","migration_state":"IMPLEMENTED","github_hosted_compatible":true},
