@@ -57,8 +57,14 @@ def load_vehicle_csv(path: Path, *, run_id: str, collected_at_utc: str | None = 
     with path.open(newline="", encoding="utf-8-sig") as handle:
         for raw in csv.DictReader(handle):
             ticker = _first(raw, "ticker", "symbol", "vehicle_id")
-            observation_date = _first(raw, "observation_date", "date", "market_date")
-            close = _first(raw, "close", "price", "market_price")
+            observation_date = _first(
+                raw,
+                "observation_date",
+                "date",
+                "market_date",
+                "trading_date",
+            )
+            close = _first(raw, "close", "price", "market_price", "close_price")
             source = _first(raw, "source", "provider", "source_name", default="universal-market-provider")
             if not all((ticker, observation_date, close)):
                 raise ValueError(f"Incomplete vehicle observation in {path}: {raw}")
@@ -67,8 +73,12 @@ def load_vehicle_csv(path: Path, *, run_id: str, collected_at_utc: str | None = 
                     ticker=ticker,
                     observation_date=observation_date,
                     close=float(close),
-                    adjusted_close=_optional_float(_first(raw, "adjusted_close", "adj_close")),
-                    volume=_optional_float(_first(raw, "volume")),
+                    adjusted_close=_optional_float(
+                        _first(raw, "adjusted_close", "adj_close", "adjusted_close_price")
+                    ),
+                    volume=_optional_float(
+                        _first(raw, "volume", "average_daily_volume_shares")
+                    ),
                     source=source,
                     collected_at_utc=collected,
                     run_id=run_id,
