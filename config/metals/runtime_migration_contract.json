@@ -1,6 +1,6 @@
 {
-  "contract_version": "1.2.0",
-  "source_runtime": "C:/Users/DevonLockard/metals",
+  "contract_version": "1.3.0",
+  "source_runtime": "legacy-standalone-metals",
   "target_runtime": "UniversalInvestmentPlatform",
   "target_execution": "github-hosted-actions",
   "durable_backend": "postgresql",
@@ -16,8 +16,8 @@
     {"capability_id":"canonical_asset_and_vehicle_registry","required":true,"legacy_source":"legacy configuration","uip_target":"config/metals","migration_state":"IMPLEMENTED","github_hosted_compatible":true},
     {"capability_id":"native_observation_persistence","required":true,"legacy_source":"data/metals_intelligence.duckdb","uip_target":"foundation/production/metals_native_store.py","migration_state":"IMPLEMENTED","github_hosted_compatible":true},
     {"capability_id":"native_forecast_and_decision_execution","required":true,"legacy_source":"run_v8_pipeline.py and metals_platform engines","uip_target":"foundation/production/metals_native_cycle.py","migration_state":"IMPLEMENTED","github_hosted_compatible":true},
-    {"capability_id":"universal_package_without_external_root","required":true,"legacy_source":"data/exports and data/metals_intelligence.duckdb","uip_target":"exchange/metals/adapter/uip_native.py","migration_state":"PLANNED","github_hosted_compatible":true},
-    {"capability_id":"standalone_free_readiness_gate","required":true,"legacy_source":"external metals_root readiness checks","uip_target":"foundation/production/metals_native_readiness.py","migration_state":"PLANNED","github_hosted_compatible":true},
-    {"capability_id":"github_actions_full_metals_cycle","required":true,"legacy_source":"manual PowerShell production cycle","uip_target":".github/workflows/metals-production-cycle.yml","migration_state":"PLANNED","github_hosted_compatible":true}
+    {"capability_id":"universal_package_without_external_root","required":true,"legacy_source":"data/exports and data/metals_intelligence.duckdb","uip_target":"exchange/metals/adapter/uip_native.py","migration_state":"IMPLEMENTED","github_hosted_compatible":true},
+    {"capability_id":"standalone_free_readiness_gate","required":true,"legacy_source":"external metals_root readiness checks","uip_target":"foundation/production/metals_native_readiness.py","migration_state":"IMPLEMENTED","github_hosted_compatible":true},
+    {"capability_id":"github_actions_full_metals_cycle","required":true,"legacy_source":"manual PowerShell production cycle","uip_target":".github/workflows/metals-production-cycle.yml","migration_state":"IMPLEMENTED","github_hosted_compatible":true}
   ]
 }
