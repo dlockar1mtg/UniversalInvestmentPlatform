@@ -17,14 +17,14 @@ from foundation.production.metals_outcome_tracking import (
     summarize_metals_outcomes,
 )
 
-INPUT_PATH = REPO_ROOT / "data" / "operations" / "metals" / "outcome_tracking_input.csv"
+DEFAULT_INPUT_PATH = REPO_ROOT / "data" / "operations" / "metals" / "outcome_tracking_input.csv"
 OUTPUT_ROOT = REPO_ROOT / "data" / "operations" / "metals" / "outcome_tracking"
 
 
-def _load() -> tuple[MetalsOutcomeObservation, ...]:
-    if not INPUT_PATH.exists():
+def _load(input_path: Path) -> tuple[MetalsOutcomeObservation, ...]:
+    if not input_path.exists():
         return ()
-    with INPUT_PATH.open(newline="", encoding="utf-8") as handle:
+    with input_path.open(newline="", encoding="utf-8") as handle:
         return tuple(MetalsOutcomeObservation(
             forecast_id=row["forecast_id"],
             asset_id=row["asset_id"],
@@ -44,9 +44,11 @@ def _load() -> tuple[MetalsOutcomeObservation, ...]:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--input", type=Path, default=DEFAULT_INPUT_PATH)
     parser.add_argument("--strict", action="store_true")
     args = parser.parse_args()
-    observations = _load()
+    input_path = args.input if args.input.is_absolute() else REPO_ROOT / args.input
+    observations = _load(input_path)
     rows = evaluate_metals_outcomes(observations)
     summary = summarize_metals_outcomes(rows)
     publish_metals_outcomes(rows, summary, OUTPUT_ROOT)
@@ -54,6 +56,7 @@ def main() -> int:
     print()
     print(f"METALS OUTCOME TRACKING: {summary['status']}")
     print(f"Outcomes: {summary['outcome_count']}")
+    print(f"Input: {input_path}")
     print(f"Output: {OUTPUT_ROOT}")
     if args.strict and summary["status"] != "PASS":
         return 1
