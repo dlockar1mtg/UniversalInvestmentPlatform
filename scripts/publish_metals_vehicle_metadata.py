@@ -12,7 +12,9 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
+from foundation.production.metals_registry import load_metals_registry  # noqa: E402
 from foundation.production.metals_vehicle_metadata import (  # noqa: E402
+    MetalsVehicleMetadataError,
     build_vehicle_metadata_dataset,
     load_market_metadata,
     load_structural_metadata,
@@ -49,8 +51,22 @@ def parse_arguments() -> argparse.Namespace:
 
 def main() -> int:
     args = parse_arguments()
+    registry = load_metals_registry(ROOT / "config" / "metals")
     structural = load_structural_metadata(args.structural_metadata)
     market = load_market_metadata(args.market_metadata)
+
+    registry_tickers = set(registry.vehicles_by_ticker)
+    structural_tickers = set(structural)
+    if registry_tickers != structural_tickers:
+        missing = sorted(registry_tickers - structural_tickers)
+        extra = sorted(structural_tickers - registry_tickers)
+        raise MetalsVehicleMetadataError(
+            f"structural metadata must cover canonical registry; missing={missing}, extra={extra}"
+        )
+    unknown_market = sorted(set(market) - registry_tickers)
+    if unknown_market:
+        raise MetalsVehicleMetadataError(f"unknown market metadata tickers: {unknown_market}")
+
     rows = build_vehicle_metadata_dataset(structural, market, as_of=args.as_of)
     summary = summarize_vehicle_metadata(rows)
     write_vehicle_metadata_outputs(rows, summary, args.output_root)
