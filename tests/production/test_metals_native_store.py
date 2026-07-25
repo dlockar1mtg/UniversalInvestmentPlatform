@@ -51,6 +51,26 @@ def test_loads_and_persists_collected_surfaces(tmp_path: Path):
     assert summary.latest_vehicle_date == "2026-07-25"
 
 
+def test_loads_uip_daily_market_schema(tmp_path: Path):
+    vehicle = tmp_path / "daily_market_input.csv"
+    vehicle.write_text(
+        "ticker,trading_date,close_price,previous_close_price,benchmark_symbol,"
+        "benchmark_close_price,benchmark_previous_close_price,expense_ratio_pct,"
+        "average_daily_volume_shares,median_bid_ask_spread_pct,metadata_as_of_date\n"
+        "BIL,2026-07-24,91.61,91.58,^IRX,3.805,3.80,0.1353,9901829,0.01,2026-07-25\n",
+        encoding="utf-8",
+    )
+
+    rows = load_vehicle_csv(vehicle, run_id="uip-daily")
+
+    assert len(rows) == 1
+    assert rows[0].ticker == "BIL"
+    assert rows[0].observation_date == "2026-07-24"
+    assert rows[0].close == pytest.approx(91.61)
+    assert rows[0].volume == pytest.approx(9901829.0)
+    assert rows[0].source == "universal-market-provider"
+
+
 def test_upsert_is_idempotent(tmp_path: Path):
     benchmark = tmp_path / "benchmark.csv"
     benchmark.write_text(
