@@ -1,0 +1,12 @@
+ticker,expense_ratio_pct,assets_under_management_usd,average_daily_volume_shares,median_bid_ask_spread_pct,metadata_as_of_date,source_name,source_url
+BIL,,,,,,,https://www.ssga.com/us/en/intermediary/etfs/spdr-bloomberg-1-3-month-t-bill-etf-bil
+COPX,,,,,,,https://www.globalxetfs.com/funds/copx
+CPER,,,,,,,https://www.uscfinvestments.com/cper
+GLD,,,,,,,https://www.ssga.com/us/en/intermediary/etfs/spdr-gold-shares-gld
+IAU,,,,,,,https://www.ishares.com/us/products/239561/ishares-gold-trust-fund
+PPLT,,,,,,,https://www.abrdn.com/en-us/etf/pplt
+SGOL,,,,,,,https://www.abrdn.com/en-us/etf/sgol
+SIVR,,,,,,,https://www.abrdn.com/en-us/etf/sivr
+SLV,,,,,,,https://www.ishares.com/us/products/239855/ishares-silver-trust-fund
+URA,,,,,,,https://www.globalxetfs.com/funds/ura
+URNM,,,,,,,https://sprottetfs.com/urnm-sprott-uranium-miners-etf/
