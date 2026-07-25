@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import re
 import subprocess
 import sys
 import uuid
@@ -10,6 +11,12 @@ from dataclasses import asdict, dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Callable, Sequence
+
+
+_IMPORT_ID_PATTERN = re.compile(
+    r"^Import ID:\s*([0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12})\s*$",
+    re.MULTILINE,
+)
 
 
 @dataclass(frozen=True)
@@ -64,6 +71,12 @@ def _iso(value: datetime) -> str:
 def _tail(value: str, maximum_characters: int = 12000) -> str:
     value = value or ""
     return value[-maximum_characters:]
+
+
+def extract_import_id(output: str) -> str | None:
+    """Extract the final transactional import UUID from runner output."""
+    matches = _IMPORT_ID_PATTERN.findall(output or "")
+    return matches[-1].lower() if matches else None
 
 
 def load_package_evidence(package_root: Path) -> dict[str, str | None]:
@@ -199,6 +212,16 @@ def run_metals_cycle(
             stderr_tail=_tail(stderr),
         )
         record.stages.append(stage_result)
+        if stage.name == "transactional_import" and return_code == 0:
+            record.import_id = extract_import_id(stdout)
+            if record.import_id is None:
+                record.status = "FAILED"
+                record.failed_stage = stage.name
+                record.errors.append(
+                    "Transactional import passed but no import ID was found in its output."
+                )
+                persist_cycle_record(record, history_root)
+                break
         persist_cycle_record(record, history_root)
         if return_code != 0 and stage.required:
             record.status = "FAILED"
