@@ -37,6 +37,19 @@ $ExitCode = $LASTEXITCODE
 
 if ($ExitCode -ne 0) {
     Write-Error "Metals production cycle failed with exit code $ExitCode."
+    exit $ExitCode
 }
 
-exit $ExitCode
+Write-Host ""
+Write-Host "========================================================================"
+Write-Host "Metals Operations Visibility Publication"
+Write-Host "========================================================================"
+
+& python "scripts\publish_metals_operations_visibility.py"
+$VisibilityExitCode = $LASTEXITCODE
+if ($VisibilityExitCode -ne 0) {
+    Write-Error "Metals operations visibility failed with exit code $VisibilityExitCode."
+    exit $VisibilityExitCode
+}
+
+exit 0
