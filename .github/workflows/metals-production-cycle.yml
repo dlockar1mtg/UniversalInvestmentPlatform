@@ -27,7 +27,12 @@ jobs:
         with:
           python-version: "3.14"
           cache: pip
-      - run: pip install -r requirements.txt -r requirements/phase_7_3.txt
+      - name: Install dependencies
+        run: >-
+          pip install
+          -r requirements.txt
+          -r requirements/phase_7_3.txt
+          -r requirements/metals_production.txt
       - name: Validate required secrets
         run: python -c "import os; assert os.environ.get('UIIP_DATABASE_URL')"
       - name: Collect vehicle metadata
