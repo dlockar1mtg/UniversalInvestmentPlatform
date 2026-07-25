@@ -69,14 +69,13 @@ def test_empty_contract_is_incomplete(tmp_path: Path):
     assert "MISSING_CAPABILITIES" in report.reason_codes
 
 
-def test_repository_contract_is_incomplete_without_missing_implemented_targets():
+def test_repository_contract_is_complete_without_external_targets():
     contract_path = REPOSITORY_ROOT / "config" / "metals" / "runtime_migration_contract.json"
     contract = json.loads(contract_path.read_text(encoding="utf-8"))
-
     report = evaluate_contract(contract, REPOSITORY_ROOT)
-
-    assert report.status == "INCOMPLETE"
+    assert report.status == "PASS"
     assert report.missing_target_count == 0
-    assert report.implemented_count == 10
-    assert report.planned_count == 3
-    assert report.reason_codes == ("REQUIRED_CAPABILITIES_INCOMPLETE",)
+    assert report.external_dependency_count == 0
+    assert report.implemented_count == 13
+    assert report.planned_count == 0
+    assert report.reason_codes == ("RUNTIME_MIGRATION_COMPLETE",)
