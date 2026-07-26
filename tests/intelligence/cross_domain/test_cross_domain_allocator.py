@@ -7,7 +7,18 @@ def _package(domain: str, opportunities: list[DomainOpportunity], status: str = 
     return DomainPackage(domain=domain, status=status, generated_at_utc="2026-07-26T00:00:00+00:00", opportunities=tuple(opportunities))
 
 
-def _opportunity(domain: str, asset_id: str, score: float, minimum: float, maximum: float, signal: str = "STRONG_BUY", confidence: float = 90.0) -> DomainOpportunity:
+def _opportunity(
+    domain: str,
+    asset_id: str,
+    score: float,
+    minimum: float,
+    maximum: float,
+    signal: str = "STRONG_BUY",
+    confidence: float = 90.0,
+    *,
+    increment: float | None = None,
+    whole_units_required: bool = True,
+) -> DomainOpportunity:
     return DomainOpportunity(
         opportunity_id=f"{domain}:{asset_id}",
         domain=domain,
@@ -19,9 +30,9 @@ def _opportunity(domain: str, asset_id: str, score: float, minimum: float, maxim
         allocation_score=score,
         confidence_score=confidence,
         minimum_allocation=minimum,
-        allocation_increment=minimum,
+        allocation_increment=increment if increment is not None else minimum,
         maximum_allocation=maximum,
-        whole_units_required=True,
+        whole_units_required=whole_units_required,
     )
 
 
@@ -65,3 +76,56 @@ def test_minimum_cash_reserve_is_preserved() -> None:
     result = allocate_capital([mtg], AllocationPolicy(monthly_budget=3000, minimum_cash_reserve_pct=10))
     assert result["invested_amount"] == 2700
     assert result["cash_allocation"] == 300
+
+
+def test_precise_liquid_increments_do_not_create_cartesian_explosion() -> None:
+    metals = _package("metals", [
+        _opportunity(
+            "metals",
+            f"asset-{index}",
+            90 - index,
+            1,
+            3000,
+            confidence=90 - index,
+            increment=1,
+            whole_units_required=False,
+        )
+        for index in range(6)
+    ])
+    result = allocate_capital([metals], AllocationPolicy(monthly_budget=3000))
+    assert result["optimizer_strategy"] == "hybrid-discrete-liquid-v1"
+    assert result["invested_amount"] == 3000
+    assert result["allocation_count"] == 1
+    assert result["allocations"][0]["allocated_amount"] == 3000
+
+
+def test_mixed_whole_unit_and_liquid_opportunities_are_supported() -> None:
+    mtg = _package("mtg", [
+        _opportunity(
+            "mtg",
+            "collector-box",
+            95,
+            434.07,
+            868.14,
+            confidence=95,
+            increment=434.07,
+            whole_units_required=True,
+        )
+    ])
+    metals = _package("metals", [
+        _opportunity(
+            "metals",
+            "gold-etf",
+            80,
+            1,
+            3000,
+            confidence=80,
+            increment=1,
+            whole_units_required=False,
+        )
+    ])
+    result = allocate_capital([mtg, metals], AllocationPolicy(monthly_budget=3000))
+    assert result["optimizer_strategy"] == "hybrid-discrete-liquid-v1"
+    assert result["invested_amount"] <= 3000
+    assert any(row["domain"] == "mtg" for row in result["allocations"])
+    assert any(row["domain"] == "metals" for row in result["allocations"])
