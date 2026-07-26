@@ -1,0 +1,39 @@
+name: MTG Production Foundation
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: uip-mtg-production-foundation
+  cancel-in-progress: false
+
+jobs:
+  mtg-foundation:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      UIP_MTG_LIVE_EXECUTION: "false"
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+      - name: Install test dependencies
+        run: pip install -r requirements.txt
+      - name: Run isolated MTG production tests
+        run: pytest -q tests/production/test_mtg_production_cycle.py
+      - name: Run safe-hold production foundation
+        run: >-
+          python scripts/run_mtg_production_cycle.py
+          --source-root ../mtg-source-not-checked-out
+          --run-id "gha-${{ github.run_id }}"
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: mtg-production-foundation-${{ github.run_id }}
+          path: data/operations/mtg/production_cycle/
+          retention-days: 30
