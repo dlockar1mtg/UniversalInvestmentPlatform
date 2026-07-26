@@ -13,6 +13,7 @@ from typing import Mapping
 
 EXCLUDED_PARTS = {"tests", "test", "docs", ".github"}
 EXCLUDED_PREFIXES = ("apply_", "install_", "repair_", "patch_", "test_")
+EXCLUDED_FILENAMES = {"tcgcsv.py"}
 ROLE_RULES: dict[str, tuple[str, ...]] = {
     "UNIVERSAL_EXPORT": ("universal_export", "export"),
     "PRODUCTION_CLOSEOUT": ("production_closeout", "unified_mtg_closeout", "closeout"),
@@ -23,7 +24,7 @@ ROLE_RULES: dict[str, tuple[str, ...]] = {
     "RECOMMENDATION": ("recommendation",),
     "PORTFOLIO": ("portfolio",),
 }
-COLLECTION_MARKERS = ("collect", "collector", "download", "ingest", "fetch", "api")
+COLLECTION_MARKERS = ("collect", "collector", "download", "ingest", "fetch", "api", "run_daily")
 
 
 @dataclass(frozen=True)
@@ -56,22 +57,32 @@ class EntrypointReport:
 def _excluded(path: str) -> bool:
     normalized = Path(path)
     lower_parts = {part.lower() for part in normalized.parts}
-    return bool(lower_parts & EXCLUDED_PARTS) or normalized.name.lower().startswith(EXCLUDED_PREFIXES)
+    name = normalized.name.lower()
+    return (
+        bool(lower_parts & EXCLUDED_PARTS)
+        or name.startswith(EXCLUDED_PREFIXES)
+        or name in EXCLUDED_FILENAMES
+    )
 
 
 def _role_eligible(role: str, path: str) -> bool:
     lower = path.lower()
+    normalized = lower.replace("\\", "/")
     name = Path(path).name.lower()
     if name == "__init__.py":
         return False
     if role in {"EBAY_COLLECTION", "TCGPLAYER_COLLECTION"}:
         if name.startswith(("certify_", "validate_", "build_")):
             return False
-        return any(marker in lower for marker in COLLECTION_MARKERS)
+        if role == "TCGPLAYER_COLLECTION" and name == "tcgcsv.py":
+            return False
+        return any(marker in normalized for marker in COLLECTION_MARKERS)
     if role == "EBAY_CERTIFICATION":
-        return "ebay" in lower and name.startswith(("certify_", "validate_", "check_"))
+        return "ebay" in normalized and name.startswith(("certify_", "validate_", "check_"))
     if role == "FORECAST":
-        return name.startswith(("run_", "build_", "generate_", "forecast_")) or "/forecast/" in lower.replace("\\", "/")
+        if name in {"validation.py", "contracts.py", "schema.py"}:
+            return False
+        return name.startswith(("run_", "build_", "generate_", "forecast_"))
     if role == "RECOMMENDATION":
         return name.startswith(("run_", "build_", "generate_", "recommend_")) or "recommendation" in name
     return True
