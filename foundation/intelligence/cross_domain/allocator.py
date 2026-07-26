@@ -15,7 +15,13 @@ from .contracts import (
 )
 
 DEPLOYABLE_SIGNALS = {"STRONG_BUY", "BUY", "ACCUMULATE"}
-OPTIMIZER_STRATEGY = "hybrid-discrete-liquid-v1"
+OPTIMIZER_STRATEGY = "hybrid-risk-adjusted-v2"
+UTILITY_WEIGHTS = {
+    "allocation_score": 0.45,
+    "evidence_confidence": 0.20,
+    "expected_return_strength": 0.25,
+    "risk_safety": 0.10,
+}
 
 
 def _number(value: object, default: float = 0.0) -> float:
@@ -24,6 +30,19 @@ def _number(value: object, default: float = 0.0) -> float:
         return float(text) if text else default
     except ValueError:
         return default
+
+
+def _optional_number(value: object) -> float | None:
+    if value is None or str(value).strip() == "":
+        return None
+    try:
+        return float(str(value).replace("$", "").replace(",", "").strip())
+    except ValueError:
+        return None
+
+
+def _clamp(value: float, low: float = 0.0, high: float = 100.0) -> float:
+    return max(low, min(high, value))
 
 
 def load_domain_package(path: Path) -> DomainPackage:
@@ -92,17 +111,57 @@ def _candidate_levels(opportunity: DomainOpportunity, policy: AllocationPolicy) 
     return sorted(set(levels))
 
 
-def _utility_density(opportunity: DomainOpportunity) -> float:
-    return (
-        (opportunity.allocation_score / 100.0)
-        * (0.5 + opportunity.confidence_score / 200.0)
+def _utility_components(opportunity: DomainOpportunity) -> dict[str, float]:
+    allocation_score = _clamp(opportunity.allocation_score)
+    base_confidence = _clamp(opportunity.confidence_score)
+
+    forecast_confidence = _optional_number(opportunity.metadata.get("forecast_confidence"))
+    evidence_confidence = (
+        (base_confidence + _clamp(forecast_confidence)) / 2.0
+        if forecast_confidence is not None
+        else base_confidence
     )
 
+    expected_upside_pct = _optional_number(opportunity.metadata.get("expected_upside_pct"))
+    expected_return = _optional_number(opportunity.metadata.get("expected_return"))
+    if expected_upside_pct is not None:
+        return_pct = expected_upside_pct
+    elif expected_return is not None:
+        return_pct = expected_return * 100.0 if abs(expected_return) <= 2.0 else expected_return
+    else:
+        return_pct = 0.0
+    expected_return_strength = _clamp(50.0 + return_pct)
 
-def _largest_feasible_amount(
-    opportunity: DomainOpportunity,
-    available: float,
-) -> float:
+    probability_of_loss = _optional_number(opportunity.metadata.get("probability_of_loss"))
+    risk_score = _optional_number(opportunity.metadata.get("risk_score"))
+    if probability_of_loss is not None:
+        risk_pct = probability_of_loss * 100.0 if abs(probability_of_loss) <= 1.0 else probability_of_loss
+    elif risk_score is not None:
+        risk_pct = risk_score
+    else:
+        risk_pct = 50.0
+    risk_safety = _clamp(100.0 - risk_pct)
+
+    cross_domain_score = (
+        allocation_score * UTILITY_WEIGHTS["allocation_score"]
+        + evidence_confidence * UTILITY_WEIGHTS["evidence_confidence"]
+        + expected_return_strength * UTILITY_WEIGHTS["expected_return_strength"]
+        + risk_safety * UTILITY_WEIGHTS["risk_safety"]
+    )
+    return {
+        "allocation_score_component": round(allocation_score, 4),
+        "evidence_confidence_component": round(evidence_confidence, 4),
+        "expected_return_strength_component": round(expected_return_strength, 4),
+        "risk_safety_component": round(risk_safety, 4),
+        "cross_domain_score": round(_clamp(cross_domain_score), 4),
+    }
+
+
+def _utility_density(opportunity: DomainOpportunity) -> float:
+    return _utility_components(opportunity)["cross_domain_score"] / 100.0
+
+
+def _largest_feasible_amount(opportunity: DomainOpportunity, available: float) -> float:
     increment = opportunity.allocation_increment or opportunity.minimum_allocation
     minimum = opportunity.minimum_allocation or increment
     maximum = min(opportunity.maximum_allocation, available)
@@ -123,7 +182,6 @@ def _fill_liquid_opportunities(
     domain_spend = dict(base_domain_spend)
     total = round(base_total, 2)
     domain_limit = policy.deployable_budget * policy.maximum_domain_weight_pct / 100.0
-
     ordered = sorted(
         liquid,
         key=lambda opportunity: (
@@ -143,17 +201,11 @@ def _fill_liquid_opportunities(
             continue
         amounts[opportunity.opportunity_id] = amount
         total = round(total + amount, 2)
-        domain_spend[opportunity.domain] = round(
-            domain_spend.get(opportunity.domain, 0.0) + amount,
-            2,
-        )
+        domain_spend[opportunity.domain] = round(domain_spend.get(opportunity.domain, 0.0) + amount, 2)
     return amounts, domain_spend, total
 
 
-def allocate_capital(
-    packages: Iterable[DomainPackage],
-    policy: AllocationPolicy,
-) -> dict[str, Any]:
+def allocate_capital(packages: Iterable[DomainPackage], policy: AllocationPolicy) -> dict[str, Any]:
     package_list = list(packages)
     invalid_domains = sorted(pkg.domain for pkg in package_list if pkg.status != "PASS")
     opportunities = [
@@ -181,23 +233,13 @@ def allocate_capital(
             if amount <= 0:
                 continue
             amounts[opportunity.opportunity_id] = amount
-            domain_spend[opportunity.domain] = round(
-                domain_spend.get(opportunity.domain, 0.0) + amount,
-                2,
-            )
+            domain_spend[opportunity.domain] = round(domain_spend.get(opportunity.domain, 0.0) + amount, 2)
             if domain_spend[opportunity.domain] > domain_limit + 1e-9:
                 valid = False
                 break
         if not valid:
             continue
-
-        amounts, domain_spend, total = _fill_liquid_opportunities(
-            liquid,
-            policy,
-            amounts,
-            domain_spend,
-            total,
-        )
+        amounts, domain_spend, total = _fill_liquid_opportunities(liquid, policy, amounts, domain_spend, total)
         utility = sum(
             amount * _utility_density(opportunity)
             for opportunity in opportunities
@@ -215,6 +257,7 @@ def allocate_capital(
         if amount <= 0:
             continue
         units = amount / opportunity.allocation_increment if opportunity.allocation_increment else 0.0
+        components = _utility_components(opportunity)
         allocations.append({
             "opportunity_id": opportunity.opportunity_id,
             "domain": opportunity.domain,
@@ -224,10 +267,11 @@ def allocate_capital(
             "signal": opportunity.signal,
             "allocation_score": opportunity.allocation_score,
             "confidence_score": opportunity.confidence_score,
+            **components,
             "allocated_amount": round(amount, 2),
             "planned_units": round(units, 4) if opportunity.whole_units_required else "",
             "whole_units_required": opportunity.whole_units_required,
-            "reason_codes": ["CROSS_DOMAIN_ALLOCATION_SELECTED"],
+            "reason_codes": ["RISK_ADJUSTED_CROSS_DOMAIN_ALLOCATION_SELECTED"],
         })
 
     invested = round(sum(row["allocated_amount"] for row in allocations), 2)
@@ -235,7 +279,7 @@ def allocate_capital(
     by_domain: dict[str, float] = {}
     for row in allocations:
         by_domain[row["domain"]] = round(by_domain.get(row["domain"], 0.0) + row["allocated_amount"], 2)
-    reason_codes = ["CROSS_DOMAIN_CAPITAL_ALLOCATION_COMPLETED"]
+    reason_codes = ["RISK_ADJUSTED_CROSS_DOMAIN_CAPITAL_ALLOCATION_COMPLETED"]
     if invested == 0:
         reason_codes.append("NO_OPPORTUNITY_CLEARED_DEPLOYMENT_POLICY")
     if invalid_domains:
@@ -245,6 +289,7 @@ def allocate_capital(
         "status": "PASS",
         "policy_version": ALLOCATION_POLICY_VERSION,
         "optimizer_strategy": OPTIMIZER_STRATEGY,
+        "utility_weights": UTILITY_WEIGHTS,
         "monthly_budget": round(policy.monthly_budget, 2),
         "deployable_budget": policy.deployable_budget,
         "invested_amount": invested,
