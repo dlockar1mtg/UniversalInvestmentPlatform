@@ -58,6 +58,23 @@ def test_resolver_rejects_certification_scripts_as_collectors_and_init_as_foreca
     assert "FORECAST" not in report.selections
 
 
+def test_resolver_rejects_tcgcsv_placeholder_and_forecast_validation_module() -> None:
+    payload = {
+        "candidates": [
+            _row("scripts/build_phase_10_10_universal_export.py", ["EXPORT"], 20),
+            _row("scripts/certify_phase_10_9_unified_mtg_closeout.py", ["CERTIFICATION"], 20),
+            _row("scripts/run_daily_ebay_collection.py", ["EBAY"], 20),
+            _row("collectors/tcgcsv.py", ["TCGPLAYER"], 100),
+            _row("collectors/tcgcsv_collector.py", ["TCGPLAYER"], 20),
+            _row("terminal2/forecast/validation.py", ["FORECAST"], 100),
+        ]
+    }
+    report = resolve_entrypoints(payload)
+    assert report.status == "PASS"
+    assert report.selections["TCGPLAYER_COLLECTION"].path == "collectors/tcgcsv_collector.py"
+    assert "FORECAST" not in report.selections
+
+
 def test_resolver_fails_closed_when_required_roles_are_missing() -> None:
     report = resolve_entrypoints({"candidates": [_row("scripts/run_forecast.py", ["FORECAST"]) ]})
     assert report.status == "INCOMPLETE"
