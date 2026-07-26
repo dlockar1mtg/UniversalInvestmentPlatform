@@ -24,8 +24,13 @@ jobs:
           cache: pip
       - name: Install test dependencies
         run: pip install -r requirements.txt
+      - name: Validate MTG production contracts
+        run: python scripts/check_mtg_production_contracts.py --strict
       - name: Run isolated MTG production tests
-        run: pytest -q tests/production/test_mtg_production_cycle.py
+        run: >-
+          pytest -q
+          tests/production/test_mtg_production_cycle.py
+          tests/production/test_mtg_production_contracts.py
       - name: Run safe-hold production foundation
         run: >-
           python scripts/run_mtg_production_cycle.py
