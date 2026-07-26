@@ -1,28 +1,29 @@
 """Resolve authoritative MTG source entry points from static audit evidence.
 
-This module never imports or executes the MTG source repository. It ranks only
-executable source files and explicitly excludes tests, documentation, installers,
-and apply-style bundle scripts from authoritative selection.
+This module never imports or executes the MTG source repository. It fails closed
+when a file is only related to a capability but is not suitable as that role's
+operational entry point.
 """
 from __future__ import annotations
 
 import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Iterable, Mapping
+from typing import Mapping
 
 EXCLUDED_PARTS = {"tests", "test", "docs", ".github"}
 EXCLUDED_PREFIXES = ("apply_", "install_", "repair_", "patch_", "test_")
 ROLE_RULES: dict[str, tuple[str, ...]] = {
     "UNIVERSAL_EXPORT": ("universal_export", "export"),
     "PRODUCTION_CLOSEOUT": ("production_closeout", "unified_mtg_closeout", "closeout"),
-    "EBAY_COLLECTION": ("ebay", "collect"),
+    "EBAY_COLLECTION": ("ebay",),
     "EBAY_CERTIFICATION": ("ebay", "certif"),
-    "TCGPLAYER_COLLECTION": ("tcgplayer", "tcgcsv", "collect", "download", "ingest"),
+    "TCGPLAYER_COLLECTION": ("tcgplayer", "tcgcsv"),
     "FORECAST": ("forecast",),
     "RECOMMENDATION": ("recommendation",),
     "PORTFOLIO": ("portfolio",),
 }
+COLLECTION_MARKERS = ("collect", "collector", "download", "ingest", "fetch", "api")
 
 
 @dataclass(frozen=True)
@@ -58,9 +59,27 @@ def _excluded(path: str) -> bool:
     return bool(lower_parts & EXCLUDED_PARTS) or normalized.name.lower().startswith(EXCLUDED_PREFIXES)
 
 
+def _role_eligible(role: str, path: str) -> bool:
+    lower = path.lower()
+    name = Path(path).name.lower()
+    if name == "__init__.py":
+        return False
+    if role in {"EBAY_COLLECTION", "TCGPLAYER_COLLECTION"}:
+        if name.startswith(("certify_", "validate_", "build_")):
+            return False
+        return any(marker in lower for marker in COLLECTION_MARKERS)
+    if role == "EBAY_CERTIFICATION":
+        return "ebay" in lower and name.startswith(("certify_", "validate_", "check_"))
+    if role == "FORECAST":
+        return name.startswith(("run_", "build_", "generate_", "forecast_")) or "/forecast/" in lower.replace("\\", "/")
+    if role == "RECOMMENDATION":
+        return name.startswith(("run_", "build_", "generate_", "recommend_")) or "recommendation" in name
+    return True
+
+
 def _rank(role: str, row: Mapping[str, object]) -> EntrypointCandidate | None:
     path = str(row.get("path", ""))
-    if not path or not bool(row.get("executable")) or _excluded(path):
+    if not path or not bool(row.get("executable")) or _excluded(path) or not _role_eligible(role, path):
         return None
     lower = path.lower()
     terms = ROLE_RULES[role]
@@ -68,11 +87,14 @@ def _rank(role: str, row: Mapping[str, object]) -> EntrypointCandidate | None:
     if hits == 0:
         return None
     score = int(row.get("score", 0)) + hits * 20
-    reasons: list[str] = ["EXECUTABLE_SOURCE_FILE", f"ROLE_TERM_HITS:{hits}"]
+    reasons: list[str] = ["EXECUTABLE_SOURCE_FILE", "ROLE_ELIGIBILITY_CONFIRMED", f"ROLE_TERM_HITS:{hits}"]
     name = Path(path).name.lower()
     if name.startswith(("run_", "build_", "certify_", "collect_", "export_", "validate_")):
         score += 10
         reasons.append("PRODUCTION_STYLE_NAME")
+    if role in {"EBAY_COLLECTION", "TCGPLAYER_COLLECTION"} and "collectors/" in lower.replace("\\", "/"):
+        score += 25
+        reasons.append("COLLECTOR_PACKAGE")
     if "phase_10_10" in lower and role == "UNIVERSAL_EXPORT":
         score += 25
         reasons.append("CERTIFIED_PHASE_10_10_EXPORT")
@@ -101,7 +123,7 @@ def resolve_entrypoints(audit_payload: Mapping[str, object]) -> EntrypointReport
                 path=winner.path,
                 score=winner.score,
                 authoritative=True,
-                reason_codes=winner.reason_codes + ("HIGHEST_RANKED_CANDIDATE",),
+                reason_codes=winner.reason_codes + ("HIGHEST_ELIGIBLE_CANDIDATE",),
             )
         else:
             reasons.append(f"MISSING_{role}_ENTRYPOINT")
