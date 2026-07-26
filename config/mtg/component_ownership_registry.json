@@ -1,0 +1,23 @@
+{
+  "registry_version": "1.0.0",
+  "domain": "MTG",
+  "control_plane": "UniversalInvestmentPlatform",
+  "source_repository": "dlockar1mtg/mtg-investment-terminal",
+  "entries": [
+    {"domain": "product_identity", "owner": "MTG_SOURCE", "status": "AUTHORITATIVE"},
+    {"domain": "tcgplayer_identity", "owner": "MTG_SOURCE", "status": "AUTHORITATIVE"},
+    {"domain": "ebay_identity", "owner": "MTG_SOURCE", "status": "AUTHORITATIVE"},
+    {"domain": "raw_marketplace_observations", "owner": "MTG_SOURCE", "status": "AUTHORITATIVE"},
+    {"domain": "daily_marketplace_summaries", "owner": "MTG_SOURCE", "status": "AUTHORITATIVE"},
+    {"domain": "lane_forecasts", "owner": "MTG_SOURCE", "status": "AUTHORITATIVE"},
+    {"domain": "lane_recommendations", "owner": "MTG_SOURCE", "status": "AUTHORITATIVE"},
+    {"domain": "private_portfolio", "owner": "MTG_SOURCE", "status": "AUTHORITATIVE"},
+    {"domain": "certified_export", "owner": "MTG_SOURCE", "status": "AUTHORITATIVE"},
+    {"domain": "scheduling", "owner": "UIP", "status": "AUTHORITATIVE"},
+    {"domain": "run_governance", "owner": "UIP", "status": "AUTHORITATIVE"},
+    {"domain": "universal_import", "owner": "UIP", "status": "AUTHORITATIVE"},
+    {"domain": "cross_asset_allocation", "owner": "UIP", "status": "AUTHORITATIVE"},
+    {"domain": "alert_publication", "owner": "UIP", "status": "AUTHORITATIVE"},
+    {"domain": "combined_production_health", "owner": "UIP", "status": "DEFERRED_UNTIL_CRYPTO_STAGING_COMPLETE"}
+  ]
+}
