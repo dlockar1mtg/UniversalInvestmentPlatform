@@ -15,6 +15,7 @@ from .contracts import (
 )
 
 DEPLOYABLE_SIGNALS = {"STRONG_BUY", "BUY", "ACCUMULATE"}
+OPTIMIZER_STRATEGY = "hybrid-discrete-liquid-v1"
 
 
 def _number(value: object, default: float = 0.0) -> float:
@@ -65,24 +66,88 @@ def load_domain_package(path: Path) -> DomainPackage:
     )
 
 
+def _is_deployable(opportunity: DomainOpportunity, policy: AllocationPolicy) -> bool:
+    return bool(
+        opportunity.eligible_for_new_capital
+        and opportunity.signal in DEPLOYABLE_SIGNALS
+        and opportunity.allocation_score >= policy.minimum_deployment_score
+        and opportunity.maximum_allocation > 0
+        and (opportunity.allocation_increment or opportunity.minimum_allocation) > 0
+    )
+
+
 def _candidate_levels(opportunity: DomainOpportunity, policy: AllocationPolicy) -> list[float]:
-    if (
-        not opportunity.eligible_for_new_capital
-        or opportunity.signal not in DEPLOYABLE_SIGNALS
-        or opportunity.allocation_score < policy.minimum_deployment_score
-        or opportunity.maximum_allocation <= 0
-    ):
+    if not _is_deployable(opportunity, policy):
         return [0.0]
     increment = opportunity.allocation_increment or opportunity.minimum_allocation
-    if increment <= 0:
-        return [0.0]
+    minimum = opportunity.minimum_allocation or increment
     maximum = min(opportunity.maximum_allocation, policy.deployable_budget)
+    if minimum <= 0 or increment <= 0 or maximum + 1e-9 < minimum:
+        return [0.0]
     levels = [0.0]
-    value = opportunity.minimum_allocation
+    value = minimum
     while value <= maximum + 1e-9:
         levels.append(round(value, 2))
         value += increment
     return sorted(set(levels))
+
+
+def _utility_density(opportunity: DomainOpportunity) -> float:
+    return (
+        (opportunity.allocation_score / 100.0)
+        * (0.5 + opportunity.confidence_score / 200.0)
+    )
+
+
+def _largest_feasible_amount(
+    opportunity: DomainOpportunity,
+    available: float,
+) -> float:
+    increment = opportunity.allocation_increment or opportunity.minimum_allocation
+    minimum = opportunity.minimum_allocation or increment
+    maximum = min(opportunity.maximum_allocation, available)
+    if increment <= 0 or minimum <= 0 or maximum + 1e-9 < minimum:
+        return 0.0
+    steps = int((maximum - minimum + 1e-9) // increment)
+    return round(minimum + steps * increment, 2)
+
+
+def _fill_liquid_opportunities(
+    liquid: list[DomainOpportunity],
+    policy: AllocationPolicy,
+    base_amounts: dict[str, float],
+    base_domain_spend: dict[str, float],
+    base_total: float,
+) -> tuple[dict[str, float], dict[str, float], float]:
+    amounts = dict(base_amounts)
+    domain_spend = dict(base_domain_spend)
+    total = round(base_total, 2)
+    domain_limit = policy.deployable_budget * policy.maximum_domain_weight_pct / 100.0
+
+    ordered = sorted(
+        liquid,
+        key=lambda opportunity: (
+            -_utility_density(opportunity),
+            -opportunity.allocation_score,
+            -opportunity.confidence_score,
+            opportunity.domain,
+            opportunity.opportunity_id,
+        ),
+    )
+    for opportunity in ordered:
+        remaining_budget = round(policy.deployable_budget - total, 2)
+        remaining_domain = round(domain_limit - domain_spend.get(opportunity.domain, 0.0), 2)
+        available = min(remaining_budget, remaining_domain)
+        amount = _largest_feasible_amount(opportunity, available)
+        if amount <= 0:
+            continue
+        amounts[opportunity.opportunity_id] = amount
+        total = round(total + amount, 2)
+        domain_spend[opportunity.domain] = round(
+            domain_spend.get(opportunity.domain, 0.0) + amount,
+            2,
+        )
+    return amounts, domain_spend, total
 
 
 def allocate_capital(
@@ -96,33 +161,57 @@ def allocate_capital(
         for package in package_list
         if package.status == "PASS"
         for opportunity in package.opportunities
+        if _is_deployable(opportunity, policy)
     ]
-    levels = [_candidate_levels(opportunity, policy) for opportunity in opportunities]
-    best: tuple[float, float, tuple[float, ...]] | None = None
+    discrete = [opportunity for opportunity in opportunities if opportunity.whole_units_required]
+    liquid = [opportunity for opportunity in opportunities if not opportunity.whole_units_required]
+    discrete_levels = [_candidate_levels(opportunity, policy) for opportunity in discrete]
     domain_limit = policy.deployable_budget * policy.maximum_domain_weight_pct / 100.0
 
-    for combination in product(*levels) if levels else [tuple()]:
+    best: tuple[float, float, tuple[float, ...], dict[str, float]] | None = None
+    combinations = product(*discrete_levels) if discrete_levels else [tuple()]
+    for combination in combinations:
         total = round(sum(combination), 2)
         if total > policy.deployable_budget + 1e-9:
             continue
-        by_domain: dict[str, float] = {}
-        for opportunity, amount in zip(opportunities, combination):
-            by_domain[opportunity.domain] = by_domain.get(opportunity.domain, 0.0) + amount
-        if any(amount > domain_limit + 1e-9 for amount in by_domain.values()):
+        domain_spend: dict[str, float] = {}
+        amounts: dict[str, float] = {}
+        valid = True
+        for opportunity, amount in zip(discrete, combination):
+            if amount <= 0:
+                continue
+            amounts[opportunity.opportunity_id] = amount
+            domain_spend[opportunity.domain] = round(
+                domain_spend.get(opportunity.domain, 0.0) + amount,
+                2,
+            )
+            if domain_spend[opportunity.domain] > domain_limit + 1e-9:
+                valid = False
+                break
+        if not valid:
             continue
-        utility = sum(
-            amount
-            * (opportunity.allocation_score / 100.0)
-            * (0.5 + opportunity.confidence_score / 200.0)
-            for opportunity, amount in zip(opportunities, combination)
+
+        amounts, domain_spend, total = _fill_liquid_opportunities(
+            liquid,
+            policy,
+            amounts,
+            domain_spend,
+            total,
         )
-        candidate = (round(utility, 8), total, tuple(combination))
-        if best is None or candidate > best:
+        utility = sum(
+            amount * _utility_density(opportunity)
+            for opportunity in opportunities
+            for amount in [amounts.get(opportunity.opportunity_id, 0.0)]
+        )
+        ordered_amounts = tuple(amounts.get(opportunity.opportunity_id, 0.0) for opportunity in opportunities)
+        candidate = (round(utility, 8), total, ordered_amounts, amounts)
+        if best is None or candidate[:3] > best[:3]:
             best = candidate
 
-    selected = best[2] if best else tuple(0.0 for _ in opportunities)
+    selected_amounts = best[3] if best else {}
     allocations: list[dict[str, Any]] = []
-    for opportunity, amount in zip(opportunities, selected):
+    for opportunity in opportunities:
+        amount = selected_amounts.get(opportunity.opportunity_id, 0.0)
         if amount <= 0:
             continue
         units = amount / opportunity.allocation_increment if opportunity.allocation_increment else 0.0
@@ -146,7 +235,6 @@ def allocate_capital(
     by_domain: dict[str, float] = {}
     for row in allocations:
         by_domain[row["domain"]] = round(by_domain.get(row["domain"], 0.0) + row["allocated_amount"], 2)
-    status = "PASS"
     reason_codes = ["CROSS_DOMAIN_CAPITAL_ALLOCATION_COMPLETED"]
     if invested == 0:
         reason_codes.append("NO_OPPORTUNITY_CLEARED_DEPLOYMENT_POLICY")
@@ -154,8 +242,9 @@ def allocate_capital(
         reason_codes.append("ONE_OR_MORE_DOMAIN_PACKAGES_EXCLUDED")
 
     return {
-        "status": status,
+        "status": "PASS",
         "policy_version": ALLOCATION_POLICY_VERSION,
+        "optimizer_strategy": OPTIMIZER_STRATEGY,
         "monthly_budget": round(policy.monthly_budget, 2),
         "deployable_budget": policy.deployable_budget,
         "invested_amount": invested,
