@@ -1,0 +1,46 @@
+{
+  "contract_version": "1.0.0",
+  "record_type": "MTG_MARKETPLACE_OBSERVATION",
+  "append_only": true,
+  "deterministic_key_fields": [
+    "marketplace",
+    "source_item_id",
+    "canonical_product_id",
+    "observed_at_utc",
+    "listing_state"
+  ],
+  "required_fields": [
+    "observation_id",
+    "observed_at_utc",
+    "observation_date",
+    "canonical_product_id",
+    "marketplace",
+    "source_endpoint",
+    "source_item_id",
+    "listing_state",
+    "condition",
+    "finish",
+    "language",
+    "item_price_usd",
+    "shipping_usd",
+    "total_landed_price_usd",
+    "match_state",
+    "match_score",
+    "data_quality_score",
+    "collector_run_id",
+    "inserted_at_utc"
+  ],
+  "allowed_marketplaces": ["TCGPLAYER", "EBAY"],
+  "allowed_match_states": ["ACCEPTED", "REVIEW", "REJECTED"],
+  "pricing_eligibility": {
+    "required_match_state": "ACCEPTED",
+    "minimum_match_score": 0.82,
+    "minimum_data_quality_score": 0.70,
+    "require_total_landed_price": true
+  },
+  "privacy": {
+    "seller_identifier_policy": "HASH_OR_OMIT",
+    "raw_authorization_payloads_allowed": false,
+    "credentials_allowed": false
+  }
+}
