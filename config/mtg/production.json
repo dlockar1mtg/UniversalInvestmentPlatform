@@ -1,0 +1,30 @@
+{
+  "contract_version": "1.0.0",
+  "domain": "MTG",
+  "control_plane": "UniversalInvestmentPlatform",
+  "source_repository": "dlockar1mtg/mtg-investment-terminal",
+  "source_path": "../mtg-source",
+  "execution": {
+    "live_enabled_by_default": false,
+    "workflow_schedule_enabled": false,
+    "manual_dispatch_only": true,
+    "crypto_dependency": false,
+    "metals_dependency": false
+  },
+  "stages": [
+    "readiness",
+    "marketplace_collection",
+    "source_certification",
+    "universal_export",
+    "uip_import",
+    "reconciliation",
+    "alert_publication"
+  ],
+  "safety": {
+    "require_explicit_live_gate": true,
+    "live_gate_environment_variable": "UIP_MTG_LIVE_EXECUTION",
+    "fail_closed": true,
+    "allow_crypto_invocation": false,
+    "allow_metals_invocation": false
+  }
+}
