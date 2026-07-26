@@ -17,8 +17,8 @@ def test_resolver_prefers_certified_export_and_closeout() -> None:
             _row("scripts/build_universal_export_old.py", ["EXPORT"], 80),
             _row("scripts/certify_phase_10_9_unified_mtg_closeout.py", ["CERTIFICATION"], 49),
             _row("scripts/run_production_closeout.py", ["CERTIFICATION"], 60),
-            _row("scripts/collect_ebay_prices.py", ["EBAY"], 40),
-            _row("scripts/collect_tcgcsv_prices.py", ["TCGPLAYER"], 40),
+            _row("collectors/ebay_collector.py", ["EBAY"], 40),
+            _row("collectors/tcgcsv_collector.py", ["TCGPLAYER"], 40),
         ]
     }
     report = resolve_entrypoints(payload)
@@ -32,14 +32,30 @@ def test_resolver_excludes_installers_apply_scripts_and_tests() -> None:
         "candidates": [
             _row("scripts/apply_ebay_collection_bundle.py", ["EBAY"], 100),
             _row("tests/test_ebay_collection.py", ["EBAY"], 100),
-            _row("scripts/collect_ebay_prices.py", ["EBAY"], 20),
+            _row("collectors/ebay_collector.py", ["EBAY"], 20),
             _row("scripts/build_phase_10_10_universal_export.py", ["EXPORT"], 20),
             _row("scripts/certify_phase_10_9_unified_mtg_closeout.py", ["CERTIFICATION"], 20),
-            _row("scripts/collect_tcgcsv_prices.py", ["TCGPLAYER"], 20),
+            _row("collectors/tcgcsv_collector.py", ["TCGPLAYER"], 20),
         ]
     }
     report = resolve_entrypoints(payload)
-    assert report.selections["EBAY_COLLECTION"].path == "scripts/collect_ebay_prices.py"
+    assert report.selections["EBAY_COLLECTION"].path == "collectors/ebay_collector.py"
+
+
+def test_resolver_rejects_certification_scripts_as_collectors_and_init_as_forecast() -> None:
+    payload = {
+        "candidates": [
+            _row("scripts/build_phase_10_10_universal_export.py", ["EXPORT"], 20),
+            _row("scripts/certify_phase_10_9_unified_mtg_closeout.py", ["CERTIFICATION"], 20),
+            _row("scripts/certify_collector_booster_box_production_closeout.py", ["EBAY", "TCGPLAYER"], 100),
+            _row("terminal2/forecast/__init__.py", ["FORECAST"], 100),
+        ]
+    }
+    report = resolve_entrypoints(payload)
+    assert report.status == "INCOMPLETE"
+    assert "EBAY_COLLECTION" not in report.selections
+    assert "TCGPLAYER_COLLECTION" not in report.selections
+    assert "FORECAST" not in report.selections
 
 
 def test_resolver_fails_closed_when_required_roles_are_missing() -> None:
