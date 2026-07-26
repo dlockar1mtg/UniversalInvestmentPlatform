@@ -18,6 +18,7 @@ def main() -> int:
     parser.add_argument("--allocation-ceiling", type=float, required=True)
     parser.add_argument("--minimum-deployment-score", type=float, default=55.0)
     parser.add_argument("--allocation-increment", type=float, default=1.0)
+    parser.add_argument("--forecast-horizon-months", type=int, default=12)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
     payload = write_metals_domain_package(
@@ -26,6 +27,7 @@ def main() -> int:
         allocation_ceiling=args.allocation_ceiling,
         minimum_deployment_score=args.minimum_deployment_score,
         allocation_increment=args.allocation_increment,
+        forecast_horizon_months=args.forecast_horizon_months,
     )
     print(json.dumps(payload, indent=2))
     return 0 if payload.get("domain_status") == "PASS" else 1
