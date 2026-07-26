@@ -4,7 +4,6 @@ from __future__ import annotations
 import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Iterable
 
 TEXT_SUFFIXES = {".py", ".ps1", ".yml", ".yaml", ".json", ".md", ".toml", ".txt"}
 CAPABILITY_TERMS = {
@@ -48,8 +47,11 @@ class SourceAuditReport:
         }
 
 
-def _eligible(path: Path) -> bool:
-    return path.is_file() and path.suffix.lower() in TEXT_SUFFIXES and not any(part in SKIP_PARTS for part in path.parts)
+def _eligible(relative_path: Path) -> bool:
+    return (
+        relative_path.suffix.lower() in TEXT_SUFFIXES
+        and not any(part in SKIP_PARTS for part in relative_path.parts)
+    )
 
 
 def _classify(path: Path, text: str) -> CapabilityCandidate | None:
@@ -74,6 +76,8 @@ def audit_source(source_root: Path) -> SourceAuditReport:
     scanned = 0
     candidates: list[CapabilityCandidate] = []
     for path in root.rglob("*"):
+        if not path.is_file():
+            continue
         relative = path.relative_to(root)
         if not _eligible(relative):
             continue
