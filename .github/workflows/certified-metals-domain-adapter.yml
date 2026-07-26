@@ -1,0 +1,48 @@
+name: Certified Metals Domain Adapter CI
+
+on:
+  pull_request:
+    paths:
+      - ".github/workflows/certified-metals-domain-adapter.yml"
+      - "foundation/intelligence/cross_domain/**"
+      - "scripts/build_metals_domain_package.py"
+      - "tests/intelligence/cross_domain/test_metals_domain_adapter.py"
+      - "docs/phase_6/PHASE_6_1_CERTIFIED_METALS_DOMAIN_ADAPTER.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  metals-domain-adapter:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout UIP
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install test dependency
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install "pytest>=8,<9"
+
+      - name: Validate imports and syntax
+        run: |
+          python -m compileall -q foundation scripts
+          python - <<'PY'
+          from foundation.intelligence.cross_domain.adapters.metals import build_metals_domain_package
+          from foundation.intelligence.cross_domain.allocator import allocate_capital
+          print("Certified Metals adapter imports passed")
+          PY
+
+      - name: Run Metals adapter and cross-domain tests
+        run: |
+          python -m pytest \
+            tests/intelligence/cross_domain/test_cross_domain_allocator.py \
+            tests/intelligence/cross_domain/test_metals_domain_adapter.py \
+            -q
