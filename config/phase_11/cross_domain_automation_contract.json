@@ -1,0 +1,87 @@
+{
+  "contract_version": "1.0.0",
+  "domains": {
+    "metals": {
+      "repository_path": "C:/Users/DevonLockard/InvestmentPlatform",
+      "workflow_paths": [
+        ".github/workflows/metals-production-cycle.yml"
+      ],
+      "required_schedules": [
+        "30 10 * * *"
+      ],
+      "required_secrets": [
+        "UIIP_DATABASE_URL"
+      ],
+      "optional_secrets": [
+        "UIIP_FRED_API_KEY",
+        "UIIP_ALPHA_VANTAGE_API_KEY"
+      ],
+      "required_markers": [
+        "workflow_dispatch:",
+        "schedule:",
+        "concurrency:",
+        "actions/upload-artifact@v4",
+        "publish_metals_uip_native_package.py"
+      ],
+      "delivery_markers": [
+        "data/integration/metals/uip_native_packages/"
+      ]
+    },
+    "crypto": {
+      "repository_path": "C:/Users/DevonLockard/crypto",
+      "workflow_paths": [
+        ".github/workflows/crypto-production-cycle.yml"
+      ],
+      "required_schedules": [
+        "15 11 * * *",
+        "45 10 * * 0"
+      ],
+      "required_secrets": [],
+      "optional_secrets": [
+        "FRED_API_KEY",
+        "COINGECKO_API_KEY"
+      ],
+      "required_markers": [
+        "workflow_dispatch:",
+        "schedule:",
+        "concurrency:",
+        "actions/upload-artifact@v4",
+        "prepare_crypto_uip_delivery.py"
+      ],
+      "delivery_markers": [
+        "data/operations/crypto/uip_delivery/"
+      ]
+    },
+    "mtg": {
+      "repository_path": "C:/Users/DevonLockard/mtg-investment-terminal",
+      "workflow_paths": [
+        ".github/workflows/mtg-marketplace-production.yml",
+        ".github/workflows/mtg-full-marketplace-universe.yml"
+      ],
+      "required_schedules": [
+        "15 12 * * *",
+        "30 11 * * 0"
+      ],
+      "required_secrets": [
+        "EBAY_CLIENT_ID",
+        "EBAY_CLIENT_SECRET"
+      ],
+      "optional_secrets": [],
+      "required_markers": [
+        "workflow_dispatch:",
+        "schedule:",
+        "concurrency:",
+        "actions/upload-artifact@v4"
+      ],
+      "delivery_required": false,
+      "delivery_markers": [
+        "data/validation/phase_10/universal_export/"
+      ],
+      "known_gaps": [
+        "MTG scheduled marketplace workflow does not yet build and publish the universal UIP delivery package.",
+        "MTG universal export depends on Phase 10.9 certified artifacts that must be reproducible on a clean GitHub-hosted runner.",
+        "MTG exports portfolio_summary.csv rather than the standard portfolio_positions.csv contract."
+      ]
+    }
+  }
+}
