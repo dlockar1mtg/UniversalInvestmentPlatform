@@ -1,0 +1,19 @@
+{
+  "checks": {
+    "asset_master_nonempty": true,
+    "forecasts_nonempty": true,
+    "manifest_checksums_created": true,
+    "portfolio_positions_inferred": false,
+    "recommendations_nonempty": true,
+    "risk_metrics_nonempty": true,
+    "source_database_read_only": true
+  },
+  "contract_version": "1.0.0",
+  "errors": [],
+  "holdings_available": false,
+  "run_id": "gha-30258545266-1",
+  "status": "PASS",
+  "warnings": [
+    "No validated holdings input was provided. portfolio_positions.csv contains its canonical header and zero records."
+  ]
+}
