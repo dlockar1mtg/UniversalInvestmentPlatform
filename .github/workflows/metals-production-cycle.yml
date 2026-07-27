@@ -3,7 +3,7 @@ name: Metals Production Cycle
 on:
   workflow_dispatch:
   schedule:
-    - cron: "23 12 * * *"
+    - cron: "30 10 * * *"
 
 permissions:
   contents: read
