@@ -1,0 +1,4 @@
+# Certified integration packages are checksum-governed artifacts.
+# Their bytes must never be modified by Git line-ending conversion.
+data/integration/**/*.csv -text
+data/integration/**/*.json -text
