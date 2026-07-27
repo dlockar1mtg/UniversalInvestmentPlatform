@@ -47,3 +47,26 @@ also depends on Phase 10.9 certified artifacts and currently publishes
 
 This gap must be closed before the UIP can automatically ingest MTG alongside
 Metals and Crypto.
+
+## MTG Hosted Delivery Alignment
+
+Phase 11C established a checksum-governed MTG hosted baseline and a clean-runner
+UIP delivery builder. The scheduled marketplace production workflow now builds
+and uploads the standard MTG UIP contract, including:
+
+- `asset_master.csv`
+- `forecasts.csv`
+- `recommendations.csv`
+- `risk_metrics.csv`
+- `portfolio_positions.csv`
+- `platform_status.csv`
+- `diagnostics.csv`
+- `package_summary.json`
+
+The hosted foundation contains 1,141 governed products across Secret Lair,
+Collector Booster Box, and Pre-Collector Booster Box lanes. Position-level
+holdings remain privacy-protected; the standard positions file is currently
+published with its governed schema and zero private rows.
+
+The readiness contract now treats MTG delivery as required and recognizes
+`data/operations/mtg_uip_delivery/` as the production delivery location.

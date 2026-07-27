@@ -1,5 +1,5 @@
 {
-  "contract_version": "1.0.0",
+  "contract_version": "1.1.0",
   "domains": {
     "metals": {
       "repository_path": "C:/Users/DevonLockard/InvestmentPlatform",
@@ -71,17 +71,16 @@
         "workflow_dispatch:",
         "schedule:",
         "concurrency:",
-        "actions/upload-artifact@v4"
+        "actions/upload-artifact@v4",
+        "build_mtg_hosted_uip_delivery.py",
+        "portfolio_positions.csv",
+        "package_summary.json"
       ],
-      "delivery_required": false,
+      "delivery_required": true,
       "delivery_markers": [
-        "data/validation/phase_10/universal_export/"
+        "data/operations/mtg_uip_delivery/"
       ],
-      "known_gaps": [
-        "MTG scheduled marketplace workflow does not yet build and publish the universal UIP delivery package.",
-        "MTG universal export depends on Phase 10.9 certified artifacts that must be reproducible on a clean GitHub-hosted runner.",
-        "MTG exports portfolio_summary.csv rather than the standard portfolio_positions.csv contract."
-      ]
+      "known_gaps": []
     }
   }
 }
