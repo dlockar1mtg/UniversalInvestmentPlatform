@@ -102,6 +102,7 @@ def inspect_domain(domain: str, stage_root: Path, copy_package: bool) -> dict[st
 
 def database_snapshot() -> dict[str, Any]:
     candidates = [
+        ROOT / "data" / "universal" / "universal_investment.duckdb",
         ROOT / "data" / "integration" / "universal_investment.duckdb",
         ROOT / "data" / "platform.duckdb",
         ROOT / "data" / "universal_investment_platform.duckdb",
