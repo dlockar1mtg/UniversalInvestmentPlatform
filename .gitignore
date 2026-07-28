@@ -175,3 +175,6 @@ backups/
 .DS_Store
 Thumbs.db
 desktop.ini
+
+# Local production control-plane paths
+/config/production_control_plane.local.json
