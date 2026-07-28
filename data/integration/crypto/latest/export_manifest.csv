@@ -1,7 +1,0 @@
-contract_version,platform_id,run_id,dataset_name,file_name,record_count,file_size_bytes,sha256,schema_version,generated_at_utc,validation_status
-1.0.0,crypto,gha-30258545266-1,asset_master,asset_master.csv,6,1273,8ca2103ca1621f37a8508e5ffb56f53bc2234179798abef34ef507a9185c0696,1.0.0,2026-07-27T10:59:48.924293Z,PASS
-1.0.0,crypto,gha-30258545266-1,forecasts,forecasts.csv,132,34586,ab6a8ad302be4de483bac5c9b64b438c57962195c61de5877f9eef4bc68aff1b,1.0.0,2026-07-27T10:59:48.924293Z,PASS
-1.0.0,crypto,gha-30258545266-1,platform_status,platform_status.csv,1,653,1af6341dfe42a8f180516e3a6a18e6fb8b290c8eb7b82ed99ebd2bde64a29e8a,1.0.0,2026-07-27T10:59:48.924293Z,PASS
-1.0.0,crypto,gha-30258545266-1,portfolio_positions,portfolio_positions.csv,0,248,f69329d78800bbe344d34e943fdf47106227432bfe8cc5de3b16a1c5e33c47cd,1.0.0,2026-07-27T10:59:48.924293Z,PASS
-1.0.0,crypto,gha-30258545266-1,recommendations,recommendations.csv,6,2294,96650ed367083e7962b077fc6d199f9a02aff2f49dc9dfaa4dfa0c68d44e7a6c,1.0.0,2026-07-27T10:59:48.924293Z,PASS
-1.0.0,crypto,gha-30258545266-1,risk_metrics,risk_metrics.csv,6,2063,2057e3cd82db1cb4814080d72c5b9edac0aedcbaed1e2b0f900d5623920ab4ac,1.0.0,2026-07-27T10:59:48.924293Z,PASS
