@@ -112,12 +112,33 @@ def main() -> int:
             "forecasts": _count(connection, "forecasts_history", adapted.package_id),
             "recommendations": _count(connection, "recommendations_history", adapted.package_id),
             "risk_metrics": _count(connection, "risk_metrics_history", adapted.package_id),
+            "historical_performance": _count(
+                connection,
+                "historical_performance_history",
+                adapted.package_id,
+            ),
             "platform_status": _count(connection, "platform_status_history", adapted.package_id),
         }
         asset_ids = _ids(connection, "asset_master_history", adapted.package_id)
         forecast_ids = _ids(connection, "forecasts_history", adapted.package_id)
         recommendation_ids = _ids(connection, "recommendations_history", adapted.package_id)
         risk_ids = _ids(connection, "risk_metrics_history", adapted.package_id)
+        historical_ids = _ids(
+            connection,
+            "historical_performance_history",
+            adapted.package_id,
+        )
+        historical_eligible = int(
+            connection.execute(
+                """
+                SELECT COUNT(*)
+                FROM historical_performance_history
+                WHERE _package_id = ?
+                  AND performance_eligible = TRUE
+                """,
+                [adapted.package_id],
+            ).fetchone()[0]
+        )
         package_row = connection.execute(
             "SELECT package_status, successful_import_id FROM universal_packages WHERE package_id = ?",
             [adapted.package_id],
@@ -139,11 +160,17 @@ def main() -> int:
         "forecast_ids_subset_assets": forecast_ids <= asset_ids,
         "recommendation_ids_match_assets": recommendation_ids == asset_ids,
         "risk_ids_match_assets": risk_ids == asset_ids,
+        "historical_rows_equal_973": actual.get(
+            "historical_performance"
+        ) == 973,
+        "historical_ids_subset_assets": historical_ids <= asset_ids,
+        "historical_ids_equal_973": len(historical_ids) == 973,
+        "historical_eligible_equal_782": historical_eligible == 782,
         "position_level_holdings_not_imported": "portfolio_positions" not in expected,
         "universal_package_status_imported": package_row is not None and package_row[0] == "IMPORTED",
         "successful_import_id_matches": package_row is not None and str(package_row[1]) == import_id,
         "universal_import_status_imported": import_row is not None and import_row[0] == "IMPORTED",
-        "import_dataset_count_equal_5": import_row is not None and int(import_row[1]) == 5,
+        "import_dataset_count_equal_6": import_row is not None and int(import_row[1]) == 6,
         "imported_row_total_reconciles": import_row is not None and int(import_row[2]) == sum(expected.values()),
         "import_error_count_zero": import_row is not None and int(import_row[3]) == 0,
         "quota_calls_zero": True,
@@ -184,6 +211,8 @@ def main() -> int:
         f"- Forecast rows: {actual['forecasts']}",
         f"- Recommendations: {actual['recommendations']}",
         f"- Risk rows: {actual['risk_metrics']}",
+        f"- Historical-performance rows: {actual['historical_performance']}",
+        f"- Historical-performance eligible: {historical_eligible}",
         f"- Platform status rows: {actual['platform_status']}",
         f"- Total imported rows: {sum(actual.values())}",
         "- Position-level holdings imported: No",

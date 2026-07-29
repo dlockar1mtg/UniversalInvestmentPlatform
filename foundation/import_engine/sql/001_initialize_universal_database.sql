@@ -227,6 +227,44 @@ CREATE TABLE IF NOT EXISTS platform_status_history (
     _imported_at_utc TIMESTAMP NOT NULL
 );
 
+
+CREATE TABLE IF NOT EXISTS historical_performance_history (
+    run_id VARCHAR,
+    universal_asset_id VARCHAR,
+    platform_id VARCHAR,
+    performance_status VARCHAR,
+    performance_eligible BOOLEAN,
+    historical_start_date DATE,
+    historical_end_date DATE,
+    historical_start_value DOUBLE,
+    historical_end_value DOUBLE,
+    elapsed_days BIGINT,
+    observation_count BIGINT,
+    distinct_date_count BIGINT,
+    source_count BIGINT,
+    historical_sources VARCHAR,
+    total_return_pct DOUBLE,
+    cagr_pct DOUBLE,
+    annualized_return_pct DOUBLE,
+    minimum_value DOUBLE,
+    maximum_value DOUBLE,
+    data_quality VARCHAR,
+    suppression_reason VARCHAR,
+    currency VARCHAR,
+    source_system VARCHAR,
+    model_version VARCHAR,
+    generated_at_utc TIMESTAMP,
+    notes VARCHAR,
+    metadata_json VARCHAR,
+    _import_id VARCHAR NOT NULL,
+    _package_id VARCHAR NOT NULL,
+    _source_platform VARCHAR NOT NULL,
+    _source_filename VARCHAR NOT NULL,
+    _source_row_number BIGINT NOT NULL,
+    _manifest_sha256 VARCHAR,
+    _imported_at_utc TIMESTAMP NOT NULL
+);
+
 CREATE TABLE IF NOT EXISTS macro_signals_history (
     run_id VARCHAR,
     signal_id VARCHAR,
@@ -322,6 +360,22 @@ FROM (
             ORDER BY _imported_at_utc DESC, generated_at_utc DESC
         ) AS _row_rank
     FROM platform_status_history
+)
+WHERE _row_rank = 1;
+
+
+CREATE OR REPLACE VIEW historical_performance_current AS
+SELECT * EXCLUDE (_row_rank)
+FROM (
+    SELECT *,
+        ROW_NUMBER() OVER (
+            PARTITION BY universal_asset_id
+            ORDER BY
+                _imported_at_utc DESC,
+                historical_end_date DESC,
+                generated_at_utc DESC
+        ) AS _row_rank
+    FROM historical_performance_history
 )
 WHERE _row_rank = 1;
 

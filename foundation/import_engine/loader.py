@@ -30,6 +30,7 @@ SUPPORTED_DATASETS = {
     "forecasts": "forecasts_history",
     "recommendations": "recommendations_history",
     "risk_metrics": "risk_metrics_history",
+    "historical_performance": "historical_performance_history",
     "portfolio_positions": "portfolio_positions_history",
     "platform_status": "platform_status_history",
     "macro_signals": "macro_signals_history",
