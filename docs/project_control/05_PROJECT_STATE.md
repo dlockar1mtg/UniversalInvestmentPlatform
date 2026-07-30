@@ -292,11 +292,10 @@ Not authorized:
 
 1. Reconstruct MTG historical performance.
 2. Port compatible MTG orchestration.
-3. Port compatible MTG orchestration.
-4. Reconcile cross-domain production automation.
-5. Certify MTG end to end.
-6. Evaluate Phase 11 automation.
-7. Re-certify Crypto and Metals within combined automation.
+3. Reconcile cross-domain production automation.
+4. Certify MTG end to end.
+5. Evaluate Phase 11 automation.
+6. Re-certify Crypto and Metals within combined automation.
 
 ## State principle
 
