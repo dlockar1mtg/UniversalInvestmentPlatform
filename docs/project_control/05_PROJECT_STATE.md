@@ -288,9 +288,9 @@ Not authorized:
 
 1. Reconcile the ordered migration chain.
 2. Create a new reconciliation branch from the certified baseline.
-3. Create a new reconciliation branch from the certified baseline.
-4. Reconstruct MTG historical performance.
-5. Port compatible MTG orchestration.
+3. Reconstruct MTG historical performance.
+4. Port compatible MTG orchestration.
+5. Reconcile cross-domain production automation.
 6. certify MTG end to end.
 7. evaluate Phase 11 automation.
 8. re-certify Crypto and Metals within combined automation.
