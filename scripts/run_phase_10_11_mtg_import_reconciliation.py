@@ -14,6 +14,7 @@ if str(ROOT) not in sys.path:
 import duckdb
 
 from foundation.import_engine.config import ImportEngineConfig
+from foundation.import_engine.database import initialize_database
 from foundation.import_engine.exceptions import DuplicatePackageError
 from foundation.import_engine.integrity import validate_package_integrity
 from foundation.import_engine.loader import import_package
@@ -25,16 +26,7 @@ DEFAULT_REPORT = ROOT / "data" / "validation" / "imports" / "mtg_phase_10_11"
 
 
 def _initialize_database(config: ImportEngineConfig) -> None:
-    config.ensure_directories()
-    sql_path = ROOT / "foundation" / "import_engine" / "sql" / "001_initialize_universal_database.sql"
-    migration_path = ROOT / "foundation" / "import_engine" / "sql" / "002_audit_registry_integration.sql"
-    connection = duckdb.connect(str(config.database_path))
-    try:
-        connection.execute(sql_path.read_text(encoding="utf-8"))
-        if migration_path.is_file():
-            connection.execute(migration_path.read_text(encoding="utf-8"))
-    finally:
-        connection.close()
+    initialize_database(config)
 
 
 def _ids(connection: duckdb.DuckDBPyConnection, table: str, package_id: str) -> set[str]:

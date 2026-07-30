@@ -8,9 +8,9 @@ authority:
   generated_catalog_markdown: docs/project_control/generated/UIP_DATABASE_SCHEMA_CATALOG.md
   semantic_dictionary: docs/project_control/UIP_DATA_DICTIONARY.md
 generation:
-  generated_at_utc: '2026-07-30T15:48:06.230503+00:00'
-  source_database: data/universal/universal_investment.duckdb
-  source_database_sha256: dcc390bba481d649f591847ec32332f725b0b62473dcc4104d51e8c532076116
+  generated_at_utc: '2026-07-30T21:16:52.141195+00:00'
+  source_database: C:\Users\DevonLockard\AppData\Local\Temp\uip-historical-performance-schema-control\universal_investment_upgraded.duckdb
+  source_database_sha256: 2723537263957f71d41fe2fe048b4650a9d90ca145cc4244896811145673a9e3
   read_only_introspection: true
 migration_policy:
   ordered_by_numeric_filename_prefix: true
@@ -36,7 +36,13 @@ migrations:
   sha256: 130f47a6e95bbc8e2479466e2ea6f42d05e726f7fc22f94fd4a2f96fdbef7624
   size_bytes: 880
   purpose: import audit and platform registry
+- order: 4
+  filename: 004_historical_performance.sql
+  path: foundation/import_engine/sql/004_historical_performance.sql
+  sha256: ae86fefd6113eb98d2a87f293797e34d4216001d7d55ba21276185d202c40041
+  size_bytes: 1728
+  purpose: create or extend canonical tables
 observed_database:
-  object_count: 23
-  tables: 12
-  views: 11
+  object_count: 25
+  tables: 13
+  views: 12

@@ -50,6 +50,15 @@ CORE_DATASET_DESCRIPTIONS = {
     "risk_metrics_current": (
         "Current risk-metric view derived from risk_metrics_history."
     ),
+    "historical_performance_history": (
+        "Append-only history of source-published historical performance, "
+        "including eligibility, suppression, period, return, quality, "
+        "and lineage evidence."
+    ),
+    "historical_performance_current": (
+        "Current historical-performance record for each platform and "
+        "universal asset, selected deterministically from history."
+    ),
     "portfolio_positions_history": (
         "Append-only history of canonical portfolio positions imported or "
         "derived for a platform run."
@@ -335,7 +344,11 @@ def inspect_database(paths: Paths) -> dict[str, Any]:
             )
 
         return {
-            "database_path": paths.database.relative_to(paths.repo).as_posix(),
+            "database_path": (
+            paths.database.relative_to(paths.repo).as_posix()
+            if paths.database.is_relative_to(paths.repo)
+            else str(paths.database)
+        ),
             "database_size_bytes": paths.database.stat().st_size,
             "database_sha256": sha256(paths.database),
             "inspected_at_utc": datetime.now(timezone.utc).isoformat(),
@@ -659,16 +672,6 @@ def validate(paths: Paths) -> list[str]:
     missing = sorted(expected_baseline_objects - observed)
     if missing:
         errors.append("Expected baseline objects missing: " + ", ".join(missing))
-
-    historical_active = {
-        "main.historical_performance_history",
-        "main.historical_performance_current",
-    } & observed
-    if historical_active:
-        errors.append(
-            "Historical-performance objects unexpectedly active in baseline: "
-            + ", ".join(sorted(historical_active))
-        )
 
     return errors
 

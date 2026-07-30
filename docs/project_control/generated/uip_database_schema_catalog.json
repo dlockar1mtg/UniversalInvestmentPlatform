@@ -1,10 +1,10 @@
 {
-  "database_path": "data/universal/universal_investment.duckdb",
+  "database_path": "C:\\Users\\DevonLockard\\AppData\\Local\\Temp\\uip-historical-performance-schema-control\\universal_investment_upgraded.duckdb",
   "database_size_bytes": 11546624,
-  "database_sha256": "dcc390bba481d649f591847ec32332f725b0b62473dcc4104d51e8c532076116",
-  "inspected_at_utc": "2026-07-30T15:48:06.222874+00:00",
+  "database_sha256": "2723537263957f71d41fe2fe048b4650a9d90ca145cc4244896811145673a9e3",
+  "inspected_at_utc": "2026-07-30T21:16:52.135630+00:00",
   "read_only": true,
-  "object_count": 23,
+  "object_count": 25,
   "objects": [
     {
       "schema": "main",
@@ -786,6 +786,603 @@
         }
       ],
       "constraints": [
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        }
+      ],
+      "indexes": [],
+      "view_definition": null
+    },
+    {
+      "schema": "main",
+      "name": "historical_performance_current",
+      "qualified_name": "main.historical_performance_current",
+      "type": "VIEW",
+      "row_count": 0,
+      "description": "Current historical-performance record for each platform and universal asset, selected deterministically from history.",
+      "columns": [
+        {
+          "position": 1,
+          "name": "contract_version",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 2,
+          "name": "platform_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 3,
+          "name": "run_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 4,
+          "name": "universal_asset_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 5,
+          "name": "performance_status",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 6,
+          "name": "performance_eligible",
+          "data_type": "BOOLEAN",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 7,
+          "name": "historical_start_date",
+          "data_type": "DATE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 8,
+          "name": "historical_end_date",
+          "data_type": "DATE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 9,
+          "name": "historical_start_value",
+          "data_type": "DOUBLE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 10,
+          "name": "historical_end_value",
+          "data_type": "DOUBLE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 11,
+          "name": "elapsed_days",
+          "data_type": "BIGINT",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 12,
+          "name": "observation_count",
+          "data_type": "BIGINT",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 13,
+          "name": "distinct_date_count",
+          "data_type": "BIGINT",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 14,
+          "name": "source_count",
+          "data_type": "BIGINT",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 15,
+          "name": "historical_sources",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 16,
+          "name": "total_return_pct",
+          "data_type": "DOUBLE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 17,
+          "name": "cagr_pct",
+          "data_type": "DOUBLE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 18,
+          "name": "annualized_return_pct",
+          "data_type": "DOUBLE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 19,
+          "name": "minimum_value",
+          "data_type": "DOUBLE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 20,
+          "name": "maximum_value",
+          "data_type": "DOUBLE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 21,
+          "name": "data_quality",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 22,
+          "name": "suppression_reason",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 23,
+          "name": "currency",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 24,
+          "name": "source_system",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 25,
+          "name": "model_version",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 26,
+          "name": "generated_at_utc",
+          "data_type": "TIMESTAMP",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 27,
+          "name": "notes",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 28,
+          "name": "metadata_json",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 29,
+          "name": "_import_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 30,
+          "name": "_package_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 31,
+          "name": "_source_platform",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 32,
+          "name": "_source_filename",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 33,
+          "name": "_source_row_number",
+          "data_type": "BIGINT",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 34,
+          "name": "_manifest_sha256",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 35,
+          "name": "_imported_at_utc",
+          "data_type": "TIMESTAMP",
+          "nullable": true,
+          "default": null
+        }
+      ],
+      "constraints": [],
+      "indexes": [],
+      "view_definition": "CREATE VIEW historical_performance_current AS SELECT * EXCLUDE (_row_rank) FROM (SELECT *, row_number() OVER (PARTITION BY platform_id, universal_asset_id ORDER BY _imported_at_utc DESC, historical_end_date DESC NULLS LAST, generated_at_utc DESC) AS _row_rank FROM historical_performance_history) WHERE (_row_rank = 1);"
+    },
+    {
+      "schema": "main",
+      "name": "historical_performance_history",
+      "qualified_name": "main.historical_performance_history",
+      "type": "BASE TABLE",
+      "row_count": 0,
+      "description": "Append-only history of source-published historical performance, including eligibility, suppression, period, return, quality, and lineage evidence.",
+      "columns": [
+        {
+          "position": 1,
+          "name": "contract_version",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 2,
+          "name": "platform_id",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 3,
+          "name": "run_id",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 4,
+          "name": "universal_asset_id",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 5,
+          "name": "performance_status",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 6,
+          "name": "performance_eligible",
+          "data_type": "BOOLEAN",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 7,
+          "name": "historical_start_date",
+          "data_type": "DATE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 8,
+          "name": "historical_end_date",
+          "data_type": "DATE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 9,
+          "name": "historical_start_value",
+          "data_type": "DOUBLE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 10,
+          "name": "historical_end_value",
+          "data_type": "DOUBLE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 11,
+          "name": "elapsed_days",
+          "data_type": "BIGINT",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 12,
+          "name": "observation_count",
+          "data_type": "BIGINT",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 13,
+          "name": "distinct_date_count",
+          "data_type": "BIGINT",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 14,
+          "name": "source_count",
+          "data_type": "BIGINT",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 15,
+          "name": "historical_sources",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 16,
+          "name": "total_return_pct",
+          "data_type": "DOUBLE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 17,
+          "name": "cagr_pct",
+          "data_type": "DOUBLE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 18,
+          "name": "annualized_return_pct",
+          "data_type": "DOUBLE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 19,
+          "name": "minimum_value",
+          "data_type": "DOUBLE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 20,
+          "name": "maximum_value",
+          "data_type": "DOUBLE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 21,
+          "name": "data_quality",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 22,
+          "name": "suppression_reason",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 23,
+          "name": "currency",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 24,
+          "name": "source_system",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 25,
+          "name": "model_version",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 26,
+          "name": "generated_at_utc",
+          "data_type": "TIMESTAMP",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 27,
+          "name": "notes",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 28,
+          "name": "metadata_json",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 29,
+          "name": "_import_id",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 30,
+          "name": "_package_id",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 31,
+          "name": "_source_platform",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 32,
+          "name": "_source_filename",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 33,
+          "name": "_source_row_number",
+          "data_type": "BIGINT",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 34,
+          "name": "_manifest_sha256",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 35,
+          "name": "_imported_at_utc",
+          "data_type": "TIMESTAMP",
+          "nullable": false,
+          "default": null
+        }
+      ],
+      "constraints": [
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
         {
           "type": "NOT NULL",
           "text": "NOT NULL",

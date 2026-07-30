@@ -7,34 +7,13 @@ from pathlib import Path
 import duckdb
 
 from foundation.import_engine.config import ImportEngineConfig
-
-
-SCHEMA_FILE = "foundation/import_engine/sql/001_initialize_universal_database.sql"
+from foundation.import_engine.migrations import apply_ordered_migrations
 
 
 def initialize_database(config: ImportEngineConfig) -> None:
     """Create or upgrade the Universal DuckDB database."""
 
-    config.ensure_directories()
-
-    schema_path = config.repository_root / SCHEMA_FILE
-
-    if not schema_path.is_file():
-        raise FileNotFoundError(f"Database schema file not found: {schema_path}")
-
-    sql = schema_path.read_text(encoding="utf-8")
-
-    connection = duckdb.connect(str(config.database_path))
-
-    try:
-        connection.execute("BEGIN TRANSACTION")
-        connection.execute(sql)
-        connection.execute("COMMIT")
-    except Exception:
-        connection.execute("ROLLBACK")
-        raise
-    finally:
-        connection.close()
+    apply_ordered_migrations(config)
 
 
 def list_database_objects(config: ImportEngineConfig) -> list[tuple[str, str]]:

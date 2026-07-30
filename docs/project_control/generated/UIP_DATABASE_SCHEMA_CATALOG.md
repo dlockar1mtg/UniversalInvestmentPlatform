@@ -2,13 +2,13 @@
 
 ## Generation evidence
 
-- Database: `data/universal/universal_investment.duckdb`
-- Database SHA-256: `dcc390bba481d649f591847ec32332f725b0b62473dcc4104d51e8c532076116`
+- Database: `C:\Users\DevonLockard\AppData\Local\Temp\uip-historical-performance-schema-control\universal_investment_upgraded.duckdb`
+- Database SHA-256: `2723537263957f71d41fe2fe048b4650a9d90ca145cc4244896811145673a9e3`
 - Database size: `11546624` bytes
-- Inspected at: `2026-07-30T15:48:06.222874+00:00`
+- Inspected at: `2026-07-30T21:16:52.135630+00:00`
 - Inspection mode: `READ_ONLY`
-- Database objects: `23`
-- Ordered SQL files: `3`
+- Database objects: `25`
+- Ordered SQL files: `4`
 
 This catalog is generated from read-only DuckDB introspection. It records observed implementation evidence; it does not by itself authorize a schema change.
 
@@ -19,6 +19,7 @@ This catalog is generated from read-only DuckDB introspection. It records observ
 | 1 | `foundation/import_engine/sql/001_initialize_universal_database.sql` | `702d1e48edb79d6c0595586b12332619d71d4cb87201f3c3a12d40c1409225da` | create or extend canonical tables |
 | 2 | `foundation/import_engine/sql/002_audit_registry_integration.sql` | `9563d6ca0a0b120d4de15a6fd78d47fd4d3f4c5afa530886a8289c8011b1cc5d` | create or extend canonical tables; import audit and platform registry |
 | 3 | `foundation/import_engine/sql/003_health_status_latest_attempt.sql` | `130f47a6e95bbc8e2479466e2ea6f42d05e726f7fc22f94fd4a2f96fdbef7624` | import audit and platform registry |
+| 4 | `foundation/import_engine/sql/004_historical_performance.sql` | `ae86fefd6113eb98d2a87f293797e34d4216001d7d55ba21276185d202c40041` | create or extend canonical tables |
 
 ## Database objects
 
@@ -187,6 +188,122 @@ CREATE VIEW forecasts_current AS SELECT * EXCLUDE (_row_rank) FROM (SELECT *, ro
 
 **Constraints**
 
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+
+### `main.historical_performance_current`
+
+- Type: `VIEW`
+- Observed rows: `0`
+- Description: Current historical-performance record for each platform and universal asset, selected deterministically from history.
+
+| Position | Column | Type | Nullable | Default |
+|---:|---|---|---|---|
+| 1 | `contract_version` | `VARCHAR` | `YES` | `` |
+| 2 | `platform_id` | `VARCHAR` | `YES` | `` |
+| 3 | `run_id` | `VARCHAR` | `YES` | `` |
+| 4 | `universal_asset_id` | `VARCHAR` | `YES` | `` |
+| 5 | `performance_status` | `VARCHAR` | `YES` | `` |
+| 6 | `performance_eligible` | `BOOLEAN` | `YES` | `` |
+| 7 | `historical_start_date` | `DATE` | `YES` | `` |
+| 8 | `historical_end_date` | `DATE` | `YES` | `` |
+| 9 | `historical_start_value` | `DOUBLE` | `YES` | `` |
+| 10 | `historical_end_value` | `DOUBLE` | `YES` | `` |
+| 11 | `elapsed_days` | `BIGINT` | `YES` | `` |
+| 12 | `observation_count` | `BIGINT` | `YES` | `` |
+| 13 | `distinct_date_count` | `BIGINT` | `YES` | `` |
+| 14 | `source_count` | `BIGINT` | `YES` | `` |
+| 15 | `historical_sources` | `VARCHAR` | `YES` | `` |
+| 16 | `total_return_pct` | `DOUBLE` | `YES` | `` |
+| 17 | `cagr_pct` | `DOUBLE` | `YES` | `` |
+| 18 | `annualized_return_pct` | `DOUBLE` | `YES` | `` |
+| 19 | `minimum_value` | `DOUBLE` | `YES` | `` |
+| 20 | `maximum_value` | `DOUBLE` | `YES` | `` |
+| 21 | `data_quality` | `VARCHAR` | `YES` | `` |
+| 22 | `suppression_reason` | `VARCHAR` | `YES` | `` |
+| 23 | `currency` | `VARCHAR` | `YES` | `` |
+| 24 | `source_system` | `VARCHAR` | `YES` | `` |
+| 25 | `model_version` | `VARCHAR` | `YES` | `` |
+| 26 | `generated_at_utc` | `TIMESTAMP` | `YES` | `` |
+| 27 | `notes` | `VARCHAR` | `YES` | `` |
+| 28 | `metadata_json` | `VARCHAR` | `YES` | `` |
+| 29 | `_import_id` | `VARCHAR` | `YES` | `` |
+| 30 | `_package_id` | `VARCHAR` | `YES` | `` |
+| 31 | `_source_platform` | `VARCHAR` | `YES` | `` |
+| 32 | `_source_filename` | `VARCHAR` | `YES` | `` |
+| 33 | `_source_row_number` | `BIGINT` | `YES` | `` |
+| 34 | `_manifest_sha256` | `VARCHAR` | `YES` | `` |
+| 35 | `_imported_at_utc` | `TIMESTAMP` | `YES` | `` |
+
+<details>
+<summary>View definition</summary>
+
+```sql
+CREATE VIEW historical_performance_current AS SELECT * EXCLUDE (_row_rank) FROM (SELECT *, row_number() OVER (PARTITION BY platform_id, universal_asset_id ORDER BY _imported_at_utc DESC, historical_end_date DESC NULLS LAST, generated_at_utc DESC) AS _row_rank FROM historical_performance_history) WHERE (_row_rank = 1);
+```
+
+</details>
+
+### `main.historical_performance_history`
+
+- Type: `BASE TABLE`
+- Observed rows: `0`
+- Description: Append-only history of source-published historical performance, including eligibility, suppression, period, return, quality, and lineage evidence.
+
+| Position | Column | Type | Nullable | Default |
+|---:|---|---|---|---|
+| 1 | `contract_version` | `VARCHAR` | `NO` | `` |
+| 2 | `platform_id` | `VARCHAR` | `NO` | `` |
+| 3 | `run_id` | `VARCHAR` | `NO` | `` |
+| 4 | `universal_asset_id` | `VARCHAR` | `NO` | `` |
+| 5 | `performance_status` | `VARCHAR` | `NO` | `` |
+| 6 | `performance_eligible` | `BOOLEAN` | `NO` | `` |
+| 7 | `historical_start_date` | `DATE` | `YES` | `` |
+| 8 | `historical_end_date` | `DATE` | `YES` | `` |
+| 9 | `historical_start_value` | `DOUBLE` | `YES` | `` |
+| 10 | `historical_end_value` | `DOUBLE` | `YES` | `` |
+| 11 | `elapsed_days` | `BIGINT` | `YES` | `` |
+| 12 | `observation_count` | `BIGINT` | `YES` | `` |
+| 13 | `distinct_date_count` | `BIGINT` | `YES` | `` |
+| 14 | `source_count` | `BIGINT` | `YES` | `` |
+| 15 | `historical_sources` | `VARCHAR` | `YES` | `` |
+| 16 | `total_return_pct` | `DOUBLE` | `YES` | `` |
+| 17 | `cagr_pct` | `DOUBLE` | `YES` | `` |
+| 18 | `annualized_return_pct` | `DOUBLE` | `YES` | `` |
+| 19 | `minimum_value` | `DOUBLE` | `YES` | `` |
+| 20 | `maximum_value` | `DOUBLE` | `YES` | `` |
+| 21 | `data_quality` | `VARCHAR` | `NO` | `` |
+| 22 | `suppression_reason` | `VARCHAR` | `YES` | `` |
+| 23 | `currency` | `VARCHAR` | `NO` | `` |
+| 24 | `source_system` | `VARCHAR` | `NO` | `` |
+| 25 | `model_version` | `VARCHAR` | `YES` | `` |
+| 26 | `generated_at_utc` | `TIMESTAMP` | `NO` | `` |
+| 27 | `notes` | `VARCHAR` | `YES` | `` |
+| 28 | `metadata_json` | `VARCHAR` | `YES` | `` |
+| 29 | `_import_id` | `VARCHAR` | `NO` | `` |
+| 30 | `_package_id` | `VARCHAR` | `NO` | `` |
+| 31 | `_source_platform` | `VARCHAR` | `NO` | `` |
+| 32 | `_source_filename` | `VARCHAR` | `NO` | `` |
+| 33 | `_source_row_number` | `BIGINT` | `NO` | `` |
+| 34 | `_manifest_sha256` | `VARCHAR` | `YES` | `` |
+| 35 | `_imported_at_utc` | `TIMESTAMP` | `NO` | `` |
+
+**Constraints**
+
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
 - `NOT NULL`: `NOT NULL`
 - `NOT NULL`: `NOT NULL`
 - `NOT NULL`: `NOT NULL`

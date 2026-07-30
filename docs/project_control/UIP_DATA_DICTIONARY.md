@@ -60,6 +60,22 @@ Append-only history of source and UIP forecast observations.
 - Observed rows during generation: `5254`
 - Column definitions: see the generated schema catalog.
 
+### `main.historical_performance_current`
+
+Current historical-performance record for each platform and universal asset, selected deterministically from history.
+
+- Physical type: `VIEW`
+- Observed rows during generation: `0`
+- Column definitions: see the generated schema catalog.
+
+### `main.historical_performance_history`
+
+Append-only history of source-published historical performance, including eligibility, suppression, period, return, quality, and lineage evidence.
+
+- Physical type: `BASE TABLE`
+- Observed rows during generation: `0`
+- Column definitions: see the generated schema catalog.
+
 ### `main.macro_signals_current`
 
 Current macro-signal view.

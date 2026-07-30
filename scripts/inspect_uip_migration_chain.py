@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 import hashlib
 import json
 import re
@@ -11,6 +12,15 @@ from pathlib import Path
 from typing import Any
 
 import duckdb
+
+ROOT = Path(__file__).resolve().parents[1]
+
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from foundation.import_engine.migrations import (
+    discover_ordered_migrations,
+)
 
 
 def sha256(path: Path) -> str:
@@ -226,7 +236,10 @@ def render_markdown(report: dict[str, Any]) -> str:
         "",
         f"- Generated: `{report['generated_at_utc']}`",
         f"- Current database: `{report['current_database']['path']}`",
-        f"- Current database SHA-256: `{report['current_database']['sha256']}`",
+            f"- Current database SHA-256 before inspection: "
+            f"`{report['current_database']['sha256_before']}`",
+            f"- Current database SHA-256 after inspection: "
+            f"`{report['current_database']['sha256_after']}`",
         "- Current database opened read-only: `true`",
         "- Reconstruction database: temporary disposable DuckDB file",
         "",
@@ -265,12 +278,18 @@ def render_markdown(report: dict[str, Any]) -> str:
             f"- Canonical-only lines: `{report['backup_comparison']['canonical_only_line_count']}`",
             f"- Backup-only lines: `{report['backup_comparison']['backup_only_line_count']}`",
             "",
+            "## Temporary baseline upgrade",
+            "",
+            f"- Execution result: `{report['temporary_upgrade']['status']}`",
+            f"- Executed files: `{report['temporary_upgrade']['executed_files']}`",
+            f"- Baseline objects: `{report['current_database']['object_count']}`",
+            f"- Upgraded objects: `{report['temporary_upgrade']['object_count']}`",
+            "",
             "## Fresh reconstruction",
             "",
             f"- Execution result: `{report['reconstruction']['status']}`",
             f"- Executed files: `{report['reconstruction']['executed_files']}`",
             f"- Reconstructed objects: `{report['reconstruction']['object_count']}`",
-            f"- Current objects: `{report['current_database']['object_count']}`",
             "",
             "## Schema comparison",
             "",
@@ -315,25 +334,45 @@ def render_markdown(report: dict[str, Any]) -> str:
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--repo", type=Path, required=True)
+    parser.add_argument(
+        "--database",
+        type=Path,
+        default=None,
+        help=(
+            "Optional existing DuckDB baseline. Defaults to "
+            "data/universal/universal_investment.duckdb under --repo."
+        ),
+    )
     args = parser.parse_args()
 
     repo = args.repo.resolve()
     sql_dir = repo / "foundation" / "import_engine" / "sql"
-    current_db = repo / "data" / "universal" / "universal_investment.duckdb"
+    current_db = (
+        args.database.resolve()
+        if args.database
+        else (
+            repo
+            / "data"
+            / "universal"
+            / "universal_investment.duckdb"
+        )
+    )
     output_dir = repo / "docs" / "project_control" / "generated"
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    active_names = [
-        "001_initialize_universal_database.sql",
-        "002_audit_registry_integration.sql",
-        "003_health_status_latest_attempt.sql",
+    migrations = discover_ordered_migrations(repo)
+    active_paths = [
+        migration.path
+        for migration in migrations
     ]
-    backup_name = "002_audit_registry_integration_before_1_3_6_2_20260717_085304.sql"
 
-    active_paths = [sql_dir / name for name in active_names]
+    backup_name = (
+        "002_audit_registry_integration_before_1_3_6_2_"
+        "20260717_085304.sql"
+    )
     backup_path = sql_dir / backup_name
 
-    for path in [*active_paths, backup_path, current_db]:
+    for path in [*active_paths, current_db]:
         if not path.exists():
             raise RuntimeError(f"Required path missing: {path}")
 
@@ -343,82 +382,239 @@ def main() -> int:
     finally:
         current_connection.close()
 
-    canonical_002_lines = set(active_paths[1].read_text(encoding="utf-8").splitlines())
-    backup_002_lines = set(backup_path.read_text(encoding="utf-8").splitlines())
+    canonical_002_lines = set(
+        active_paths[1].read_text(
+            encoding="utf-8"
+        ).splitlines()
+    )
+
+    backup_002_lines = (
+        set(
+            backup_path.read_text(
+                encoding="utf-8"
+            ).splitlines()
+        )
+        if backup_path.exists()
+        else set()
+    )
+
+    production_sha256_before = sha256(current_db)
 
     reconstruction_status = "PASS"
     reconstruction_error = None
     reconstructed_objects: list[dict[str, Any]] = []
-    executed_files = 0
+    reconstructed_executed_files = 0
 
-    temp_dir = Path(tempfile.mkdtemp(prefix="uip_migration_reconcile_"))
-    temp_db = temp_dir / "reconstructed.duckdb"
+    upgrade_status = "PASS"
+    upgrade_error = None
+    upgraded_objects: list[dict[str, Any]] = []
+    upgrade_executed_files = 0
+
+    temp_dir = Path(
+        tempfile.mkdtemp(
+            prefix="uip_migration_reconcile_"
+        )
+    )
+    fresh_db = temp_dir / "fresh_reconstruction.duckdb"
+    upgraded_db = temp_dir / "upgraded_copy.duckdb"
 
     try:
-        connection = duckdb.connect(str(temp_db))
+        shutil.copy2(current_db, upgraded_db)
+
+        upgrade_connection = duckdb.connect(
+            str(upgraded_db)
+        )
         try:
+            upgrade_connection.execute(
+                "BEGIN TRANSACTION"
+            )
+
             for migration_path in active_paths:
-                sql = migration_path.read_text(encoding="utf-8")
-                connection.execute(sql)
-                executed_files += 1
-            reconstructed_objects = object_inventory(connection)
+                sql = migration_path.read_text(
+                    encoding="utf-8"
+                )
+                upgrade_connection.execute(sql)
+                upgrade_executed_files += 1
+
+            upgrade_connection.execute("COMMIT")
+            upgraded_objects = object_inventory(
+                upgrade_connection
+            )
+        except Exception as exc:
+            upgrade_status = "FAIL"
+            upgrade_error = repr(exc)
+
+            try:
+                upgrade_connection.execute("ROLLBACK")
+            except Exception:
+                pass
+        finally:
+            upgrade_connection.close()
+
+        reconstruction_connection = duckdb.connect(
+            str(fresh_db)
+        )
+        try:
+            reconstruction_connection.execute(
+                "BEGIN TRANSACTION"
+            )
+
+            for migration_path in active_paths:
+                sql = migration_path.read_text(
+                    encoding="utf-8"
+                )
+                reconstruction_connection.execute(sql)
+                reconstructed_executed_files += 1
+
+            reconstruction_connection.execute("COMMIT")
+            reconstructed_objects = object_inventory(
+                reconstruction_connection
+            )
         except Exception as exc:
             reconstruction_status = "FAIL"
             reconstruction_error = repr(exc)
+
+            try:
+                reconstruction_connection.execute(
+                    "ROLLBACK"
+                )
+            except Exception:
+                pass
         finally:
-            connection.close()
+            reconstruction_connection.close()
     finally:
-        shutil.rmtree(temp_dir, ignore_errors=True)
+        shutil.rmtree(
+            temp_dir,
+            ignore_errors=True,
+        )
 
-    comparison = compare_objects(current_objects, reconstructed_objects)
+    production_sha256_after = sha256(current_db)
+    production_database_modified = (
+        production_sha256_before
+        != production_sha256_after
+    )
 
-    if reconstruction_status != "PASS":
-        disposition = "MIGRATION_CHAIN_EXECUTION_FAILURE_REQUIRES_REPAIR"
-    elif comparison["matches"]:
-        disposition = "MIGRATION_CHAIN_REPRODUCES_CURRENT_SCHEMA"
+    upgrade_to_fresh_comparison = compare_objects(
+        upgraded_objects,
+        reconstructed_objects,
+    )
+    baseline_to_upgrade_comparison = compare_objects(
+        current_objects,
+        upgraded_objects,
+    )
+
+    if production_database_modified:
+        disposition = (
+            "PRODUCTION_DATABASE_HASH_CHANGED_REQUIRES_REPAIR"
+        )
+    elif upgrade_status != "PASS":
+        disposition = (
+            "MIGRATION_UPGRADE_EXECUTION_FAILURE_REQUIRES_REPAIR"
+        )
+    elif reconstruction_status != "PASS":
+        disposition = (
+            "MIGRATION_CHAIN_EXECUTION_FAILURE_REQUIRES_REPAIR"
+        )
+    elif not upgrade_to_fresh_comparison["matches"]:
+        disposition = (
+            "UPGRADED_AND_FRESH_SCHEMA_DRIFT_REQUIRES_RECONCILIATION"
+        )
     else:
-        disposition = "MIGRATION_CHAIN_DRIFT_DETECTED_REQUIRES_RECONCILIATION"
+        disposition = (
+            "MIGRATION_CHAIN_REPRODUCES_UPGRADED_SCHEMA"
+        )
 
     report = {
-        "generated_at_utc": datetime.now(timezone.utc).isoformat(),
+        "generated_at_utc": (
+            datetime.now(timezone.utc).isoformat()
+        ),
         "current_database": {
-            "path": current_db.relative_to(repo).as_posix(),
-            "sha256": sha256(current_db),
+            "path": (
+                current_db.relative_to(repo).as_posix()
+                if current_db.is_relative_to(repo)
+                else str(current_db)
+            ),
+            "sha256_before": production_sha256_before,
+            "sha256_after": production_sha256_after,
             "size_bytes": current_db.stat().st_size,
             "object_count": len(current_objects),
             "objects": current_objects,
         },
         "active_migrations": [
             {
-                "order": index,
-                "path": path.relative_to(repo).as_posix(),
-                **inspect_sql(path),
+                "order": migration.order,
+                "path": migration.path.relative_to(
+                    repo
+                ).as_posix(),
+                **inspect_sql(migration.path),
             }
-            for index, path in enumerate(active_paths, start=1)
+            for migration in migrations
         ],
-        "preserved_evidence": [
-            {
-                "path": backup_path.relative_to(repo).as_posix(),
-                **inspect_sql(backup_path),
-            }
-        ],
+        "preserved_evidence": (
+            [
+                {
+                    "path": backup_path.relative_to(
+                        repo
+                    ).as_posix(),
+                    **inspect_sql(backup_path),
+                }
+            ]
+            if backup_path.exists()
+            else []
+        ),
         "backup_comparison": {
-            "identical": sha256(active_paths[1]) == sha256(backup_path),
-            "canonical_only_line_count": len(canonical_002_lines - backup_002_lines),
-            "backup_only_line_count": len(backup_002_lines - canonical_002_lines),
-            "canonical_only_lines": sorted(canonical_002_lines - backup_002_lines),
-            "backup_only_lines": sorted(backup_002_lines - canonical_002_lines),
+            "available": backup_path.exists(),
+            "identical": (
+                sha256(active_paths[1])
+                == sha256(backup_path)
+                if backup_path.exists()
+                else None
+            ),
+            "canonical_only_line_count": len(
+                canonical_002_lines
+                - backup_002_lines
+            ),
+            "backup_only_line_count": len(
+                backup_002_lines
+                - canonical_002_lines
+            ),
+            "canonical_only_lines": sorted(
+                canonical_002_lines
+                - backup_002_lines
+            ),
+            "backup_only_lines": sorted(
+                backup_002_lines
+                - canonical_002_lines
+            ),
+        },
+        "temporary_upgrade": {
+            "status": upgrade_status,
+            "error": upgrade_error,
+            "executed_files": upgrade_executed_files,
+            "object_count": len(upgraded_objects),
+            "objects": upgraded_objects,
         },
         "reconstruction": {
             "status": reconstruction_status,
             "error": reconstruction_error,
-            "executed_files": executed_files,
-            "object_count": len(reconstructed_objects),
+            "executed_files": (
+                reconstructed_executed_files
+            ),
+            "object_count": len(
+                reconstructed_objects
+            ),
             "objects": reconstructed_objects,
         },
-        "schema_comparison": comparison,
+        "baseline_to_upgrade_comparison": (
+            baseline_to_upgrade_comparison
+        ),
+        "schema_comparison": (
+            upgrade_to_fresh_comparison
+        ),
         "disposition": disposition,
-        "production_database_modified": False,
+        "production_database_modified": (
+            production_database_modified
+        ),
     }
 
     json_path = output_dir / "uip_migration_chain_reconciliation.json"
@@ -430,16 +626,49 @@ def main() -> int:
     )
     md_path.write_text(render_markdown(report), encoding="utf-8")
 
-    print(f"RECONSTRUCTION: {reconstruction_status}")
+    print(f"TEMPORARY UPGRADE: {upgrade_status}")
+    if upgrade_error:
+        print(f"UPGRADE ERROR: {upgrade_error}")
+
+    print(f"FRESH RECONSTRUCTION: {reconstruction_status}")
     if reconstruction_error:
-        print(f"ERROR: {reconstruction_error}")
-    print(f"CURRENT OBJECTS: {len(current_objects)}")
-    print(f"RECONSTRUCTED OBJECTS: {len(reconstructed_objects)}")
-    print(f"SCHEMA MATCH: {comparison['matches']}")
+        print(
+            f"RECONSTRUCTION ERROR: "
+            f"{reconstruction_error}"
+        )
+
+    print(
+        f"PRODUCTION BASELINE OBJECTS: "
+        f"{len(current_objects)}"
+    )
+    print(
+        f"TEMPORARY UPGRADED OBJECTS: "
+        f"{len(upgraded_objects)}"
+    )
+    print(
+        f"FRESH RECONSTRUCTED OBJECTS: "
+        f"{len(reconstructed_objects)}"
+    )
+    print(
+        "UPGRADED VS FRESH SCHEMA MATCH: "
+        f"{upgrade_to_fresh_comparison['matches']}"
+    )
+    print(
+        "PRODUCTION DATABASE MODIFIED: "
+        f"{production_database_modified}"
+    )
     print(f"DISPOSITION: {disposition}")
     print(f"REPORT: {md_path}")
     print(f"JSON: {json_path}")
-    return 0 if reconstruction_status == "PASS" else 1
+
+    passed = (
+        upgrade_status == "PASS"
+        and reconstruction_status == "PASS"
+        and upgrade_to_fresh_comparison["matches"]
+        and not production_database_modified
+    )
+
+    return 0 if passed else 1
 
 
 if __name__ == "__main__":
