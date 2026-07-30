@@ -574,6 +574,48 @@ Reversal:
 
 `FULLY_REVERSIBLE`
 
+---
+
+## UIP-CHG-2026-025 — Create Controlled MTG Reconciliation Branch
+
+Date: 2026-07-30
+Status: IMPLEMENTED
+Type: BRANCH_CONTROL, RECOVERY_CONTROL, MTG_INTEGRATION
+Approval authority: Devon Lockard
+
+Decision:
+
+Create a clean MTG historical-performance reconciliation branch from the approved governance baseline rather than merging or directly continuing the defective Phase 10.12 recovery implementation.
+
+Implementation evidence:
+
+- source governance commit: `df8e796`
+- new branch: `recovery/mtg-historical-performance-reconciliation`
+- worktree: `C:\Users\DevonLockard\InvestmentPlatform-MTG-Reconciliation`
+- remote branch published: confirmed
+- remote tracking configured: confirmed
+- old recovery commit tested: `c6606d0b31add9fb356db8c3c15bc44af3b8175f`
+- old recovery commit included in ancestry: no
+- protected interpretation resources present in worktree: no
+- protected recovery-inspection resources present in worktree: no
+- starting working tree status: clean
+
+Preserved evidence policy:
+
+The old Phase 10.12 branch and commit remain available as implementation evidence. They must not be merged or cherry-picked wholesale. Individual concepts may be selectively reimplemented only after contract, migration, test, and certification review.
+
+New state:
+
+`MTG_RECONCILIATION_BRANCH_CREATED`
+
+Next required action:
+
+`RECONSTRUCT_MTG_HISTORICAL_PERFORMANCE`
+
+Reversal:
+
+`FULLY_REVERSIBLE`
+
 # Future change procedure
 
 Before material work:

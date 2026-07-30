@@ -19,7 +19,7 @@ Current roadmap phase:
 Phase A — Project control and recovery stabilization
 
 Current milestone:
-Controlled MTG reconciliation branch creation
+MTG historical-performance reconstruction
 
 Current certification:
 BASELINE_TEST_SUITE_PASS
@@ -28,10 +28,12 @@ SCHEMA_CONTROL_ARTIFACTS_COMMITTED
 SCHEMA_CONTROL_VALIDATION_PASS
 MIGRATION_CHAIN_RECONCILIATION_PASS
 MIGRATION_CHAIN_REPRODUCES_CURRENT_SCHEMA
+MTG_RECONCILIATION_BRANCH_CREATED
+OLD_PHASE_10_12_IMPLEMENTATION_EXCLUDED
 PHASE_A_NOT_YET_CERTIFIED
 
 Next authorized action:
-CREATE_MTG_RECONCILIATION_BRANCH
+RECONSTRUCT_MTG_HISTORICAL_PERFORMANCE
 ```
 
 ## Repository authority
@@ -288,8 +290,8 @@ Not authorized:
 
 ## Next integration sequence
 
-1. Create a new MTG reconciliation branch from the certified baseline.
-2. Reconstruct MTG historical performance.
+1. Reconstruct MTG historical performance.
+2. Port compatible MTG orchestration.
 3. Port compatible MTG orchestration.
 4. Reconcile cross-domain production automation.
 5. Certify MTG end to end.

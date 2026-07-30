@@ -99,9 +99,9 @@ Recovered targeted-test evidence:
 
 Current next authorized action:
 
-`CREATE_MTG_RECONCILIATION_BRANCH`
+`RECONSTRUCT_MTG_HISTORICAL_PERFORMANCE`
 
-The ordered migration chain was certified in `8201e9b` and reproduces the current 23-object database schema. The next action is to create a controlled MTG reconciliation branch from the certified stable baseline.
+The controlled MTG reconciliation branch was created from `df8e796`, pushed to GitHub, and verified to exclude the defective Phase 10.12 recovery implementation. The next action is controlled reconstruction of MTG historical performance.
 
 ## Session summary template
 

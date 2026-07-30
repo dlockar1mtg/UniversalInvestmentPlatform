@@ -226,14 +226,15 @@ Completed milestones:
 - `PROJECT_CONTROL_CENTER_COMMITTED`
 - `SCHEMA_CONTROL_ARTIFACTS_COMMITTED`
 - `MIGRATION_CHAIN_RECONCILIATION_PASS`
+- `MTG_RECONCILIATION_BRANCH_CREATED`
 
 Current milestone:
 
-`Controlled MTG reconciliation branch creation`
+`MTG historical-performance reconstruction`
 
 Next authorized action:
 
-`CREATE_MTG_RECONCILIATION_BRANCH`
+`RECONSTRUCT_MTG_HISTORICAL_PERFORMANCE`
 
 Expected subsequent action:
 
