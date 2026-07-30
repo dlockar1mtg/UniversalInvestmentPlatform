@@ -225,14 +225,15 @@ Completed milestones:
 - `INSPECT_RECOVERED_REPOSITORY`
 - `PROJECT_CONTROL_CENTER_COMMITTED`
 - `SCHEMA_CONTROL_ARTIFACTS_COMMITTED`
+- `MIGRATION_CHAIN_RECONCILIATION_PASS`
 
 Current milestone:
 
-`Ordered migration-chain reconciliation`
+`Controlled MTG reconciliation branch creation`
 
 Next authorized action:
 
-`RECONCILE_ORDERED_MIGRATION_CHAIN`
+`CREATE_MTG_RECONCILIATION_BRANCH`
 
 Expected subsequent action:
 

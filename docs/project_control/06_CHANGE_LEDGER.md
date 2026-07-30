@@ -518,6 +518,62 @@ Reversal:
 
 `FULLY_REVERSIBLE`
 
+---
+
+## UIP-CHG-2026-024 — Certify Ordered Migration Chain
+
+Date: 2026-07-30
+Status: IMPLEMENTED
+Type: DATABASE_SCHEMA, CERTIFICATION, RECOVERY_CONTROL
+Approval authority: Devon Lockard
+
+Decision:
+
+Certify that the active ordered migration chain reproduces the current UIP baseline database schema.
+
+Implementation evidence:
+
+- branch: `recovery/uip-project-control-center`
+- commit: `8201e9b`
+- inspector: `scripts/inspect_uip_migration_chain.py`
+- Markdown evidence: `docs/project_control/generated/UIP_MIGRATION_CHAIN_RECONCILIATION.md`
+- JSON evidence: `docs/project_control/generated/uip_migration_chain_reconciliation.json`
+- active migration files executed: 3
+- current database objects: 23
+- reconstructed database objects: 23
+- missing reconstructed objects: 0
+- extra reconstructed objects: 0
+- definition mismatches: 0
+- object types: matched
+- columns and nullability: matched
+- constraints: matched
+- indexes: matched
+- view definitions: matched
+- fresh reconstruction: PASS
+- production database hash before and after: unchanged
+
+Certified disposition:
+
+`MIGRATION_CHAIN_REPRODUCES_CURRENT_SCHEMA`
+
+Preserved non-authoritative evidence:
+
+`002_audit_registry_integration_before_1_3_6_2_20260717_085304.sql`
+
+The preserved file differs from canonical migration `002`, but it is not part of the active migration authority.
+
+New state:
+
+`MIGRATION_CHAIN_RECONCILIATION_PASS`
+
+Next required action:
+
+`CREATE_MTG_RECONCILIATION_BRANCH`
+
+Reversal:
+
+`FULLY_REVERSIBLE`
+
 # Future change procedure
 
 Before material work:

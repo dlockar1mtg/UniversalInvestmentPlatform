@@ -99,9 +99,9 @@ Recovered targeted-test evidence:
 
 Current next authorized action:
 
-`RECONCILE_ORDERED_MIGRATION_CHAIN`
+`CREATE_MTG_RECONCILIATION_BRANCH`
 
-The schema-control artifacts were committed in `bae641f`. The next action is to reconcile the ordered migration chain before reconstructing the MTG historical-performance integration.
+The ordered migration chain was certified in `8201e9b` and reproduces the current 23-object database schema. The next action is to create a controlled MTG reconciliation branch from the certified stable baseline.
 
 ## Session summary template
 
