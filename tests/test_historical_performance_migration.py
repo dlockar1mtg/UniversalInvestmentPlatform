@@ -192,4 +192,3 @@ def test_failed_migration_rolls_back_full_chain(
         connection.close()
 
     assert objects == []
-

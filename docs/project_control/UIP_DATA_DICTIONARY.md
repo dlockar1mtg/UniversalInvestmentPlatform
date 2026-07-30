@@ -235,11 +235,11 @@ Canonical registry of integrated source platforms.
 - Current views must be deterministic and traceable to history rows.
 - Decision-relevant records require complete lineage.
 
-## Historical-performance reserved semantic contract
+## Historical-performance semantic contract
 
-`historical_performance_history` and `historical_performance_current` are not present in the inspected baseline database. They are reserved for the controlled MTG historical-performance reconstruction and must not be treated as active schema until an ordered migration, universal contract, tests, and certification are approved.
+`historical_performance_history` and `historical_performance_current` are active schema objects introduced through the ordered historical-performance migration. They preserve universal historical-performance evidence and expose the latest observation for each platform and universal asset.
 
-Expected semantic purpose:
+Semantic purpose:
 
 - preserve point-in-time performance evidence published by a source domain;
 - distinguish eligible from suppressed performance observations;
