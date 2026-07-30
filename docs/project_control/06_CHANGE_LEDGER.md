@@ -433,7 +433,7 @@ Reversal:
 
 ---
 
-## UIP-CHG-2026-022 ? Commit Project Control Center
+## UIP-CHG-2026-022 — Commit Project Control Center
 
 Date: 2026-07-30  
 Status: IMPLEMENTED  
