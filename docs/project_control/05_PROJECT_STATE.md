@@ -19,14 +19,15 @@ Current roadmap phase:
 Phase A — Project control and recovery stabilization
 
 Current milestone:
-Project Control Center creation
+Schema authority and catalog generation
 
 Current certification:
 BASELINE_TEST_SUITE_PASS
+PROJECT_CONTROL_CENTER_COMMITTED
 PHASE_A_NOT_YET_CERTIFIED
 
 Next authorized action:
-CREATE_PROJECT_CONTROL_CENTER_FILES
+GENERATE_SCHEMA_CONTROL_ARTIFACTS
 ```
 
 ## Repository authority
@@ -283,8 +284,8 @@ Not authorized:
 
 ## Next integration sequence
 
-1. Commit Project Control Center.
-2. Generate database schema control artifacts.
+1. Generate database schema control artifacts.
+2. Reconcile the ordered migration chain.
 3. Create a new reconciliation branch from the certified baseline.
 4. Reconstruct MTG historical performance.
 5. Port compatible MTG orchestration.

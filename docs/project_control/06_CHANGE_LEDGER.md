@@ -431,6 +431,39 @@ Reversal:
 
 `NOT_YET_IMPLEMENTED`
 
+---
+
+## UIP-CHG-2026-022 ? Commit Project Control Center
+
+Date: 2026-07-30  
+Status: IMPLEMENTED  
+Type: ARCHITECTURE, ROADMAP, DATA_GOVERNANCE  
+Approval authority: Devon Lockard
+
+Decision:
+
+Commit the seven approved and harmonized Project Control Center documents to the governance branch.
+
+Implementation evidence:
+
+- branch: `recovery/uip-project-control-center`
+- commit: `607f425`
+- files committed: 7
+- inserted lines: 1,834
+- protected recovery resources remained untracked
+
+New state:
+
+`PROJECT_CONTROL_CENTER_COMMITTED`
+
+Next required action:
+
+`GENERATE_SCHEMA_CONTROL_ARTIFACTS`
+
+Reversal:
+
+`FULLY_REVERSIBLE`
+
 # Future change procedure
 
 Before material work:

@@ -220,13 +220,18 @@ Active phase:
 
 `Phase A`
 
-Completed milestone:
+Completed milestones:
 
-`INSPECT_RECOVERED_REPOSITORY`
+- `INSPECT_RECOVERED_REPOSITORY`
+- `PROJECT_CONTROL_CENTER_COMMITTED`
+
+Current milestone:
+
+`Schema authority and catalog generation`
 
 Next authorized action:
 
-`CREATE_PROJECT_CONTROL_CENTER_FILES`
+`GENERATE_SCHEMA_CONTROL_ARTIFACTS`
 
 Expected subsequent action:
 

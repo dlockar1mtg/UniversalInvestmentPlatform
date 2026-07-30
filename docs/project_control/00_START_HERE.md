@@ -99,9 +99,9 @@ Recovered targeted-test evidence:
 
 Current next authorized action:
 
-`CREATE_PROJECT_CONTROL_CENTER_FILES`
+`GENERATE_SCHEMA_CONTROL_ARTIFACTS`
 
-After these files are committed, the next expected action is controlled reconstruction of the MTG historical-performance integration from the certified stable baseline.
+The Project Control Center was committed in `607f425`. The next action is to generate the database schema manifest, schema catalog, and semantic data dictionary before reconstructing the MTG historical-performance integration.
 
 ## Session summary template
 
