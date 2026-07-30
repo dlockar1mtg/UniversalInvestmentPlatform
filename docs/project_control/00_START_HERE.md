@@ -99,9 +99,9 @@ Recovered targeted-test evidence:
 
 Current next authorized action:
 
-`GENERATE_SCHEMA_CONTROL_ARTIFACTS`
+`RECONCILE_ORDERED_MIGRATION_CHAIN`
 
-The Project Control Center was committed in `607f425`. The next action is to generate the database schema manifest, schema catalog, and semantic data dictionary before reconstructing the MTG historical-performance integration.
+The schema-control artifacts were committed in `bae641f`. The next action is to reconcile the ordered migration chain before reconstructing the MTG historical-performance integration.
 
 ## Session summary template
 

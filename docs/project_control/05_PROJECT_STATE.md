@@ -19,15 +19,17 @@ Current roadmap phase:
 Phase A — Project control and recovery stabilization
 
 Current milestone:
-Schema authority and catalog generation
+Ordered migration-chain reconciliation
 
 Current certification:
 BASELINE_TEST_SUITE_PASS
 PROJECT_CONTROL_CENTER_COMMITTED
+SCHEMA_CONTROL_ARTIFACTS_COMMITTED
+SCHEMA_CONTROL_VALIDATION_PASS
 PHASE_A_NOT_YET_CERTIFIED
 
 Next authorized action:
-GENERATE_SCHEMA_CONTROL_ARTIFACTS
+RECONCILE_ORDERED_MIGRATION_CHAIN
 ```
 
 ## Repository authority
@@ -284,8 +286,8 @@ Not authorized:
 
 ## Next integration sequence
 
-1. Generate database schema control artifacts.
-2. Reconcile the ordered migration chain.
+1. Reconcile the ordered migration chain.
+2. Create a new reconciliation branch from the certified baseline.
 3. Create a new reconciliation branch from the certified baseline.
 4. Reconstruct MTG historical performance.
 5. Port compatible MTG orchestration.

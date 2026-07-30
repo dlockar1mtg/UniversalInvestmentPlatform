@@ -464,6 +464,60 @@ Reversal:
 
 `FULLY_REVERSIBLE`
 
+---
+
+## UIP-CHG-2026-023 — Establish Database Schema Control Artifacts
+
+Date: 2026-07-30
+Status: IMPLEMENTED
+Type: DATA_GOVERNANCE, DATABASE_SCHEMA, RECOVERY_CONTROL
+Approval authority: Devon Lockard
+
+Decision:
+
+Generate, validate, commit, and publish the UIP database schema-control artifacts from the active ordered SQL files and read-only DuckDB introspection.
+
+Implementation evidence:
+
+- branch: `recovery/uip-project-control-center`
+- commit: `bae641f`
+- generator: `scripts/generate_uip_schema_control_artifacts.py`
+- schema manifest: `schemas/database/schema_manifest.yaml`
+- semantic dictionary: `docs/project_control/UIP_DATA_DICTIONARY.md`
+- generated Markdown catalog: `docs/project_control/generated/UIP_DATABASE_SCHEMA_CATALOG.md`
+- generated JSON catalog: `docs/project_control/generated/uip_database_schema_catalog.json`
+- observed database objects: 23
+- observed base tables: 12
+- observed views: 11
+- active ordered SQL files: 3
+- read-only schema introspection: confirmed
+- schema-control validation: PASS
+- Markdown and JSON object agreement: PASS
+- production database modification: none
+- protected recovery resources remained untracked
+
+Active ordered SQL authority:
+
+1. `001_initialize_universal_database.sql`
+2. `002_audit_registry_integration.sql`
+3. `003_health_status_latest_attempt.sql`
+
+Preserved non-canonical evidence excluded from migration authority:
+
+`002_audit_registry_integration_before_1_3_6_2_20260717_085304.sql`
+
+New state:
+
+`SCHEMA_CONTROL_ARTIFACTS_COMMITTED`
+
+Next required action:
+
+`RECONCILE_ORDERED_MIGRATION_CHAIN`
+
+Reversal:
+
+`FULLY_REVERSIBLE`
+
 # Future change procedure
 
 Before material work:

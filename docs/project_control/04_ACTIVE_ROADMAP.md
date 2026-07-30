@@ -224,14 +224,15 @@ Completed milestones:
 
 - `INSPECT_RECOVERED_REPOSITORY`
 - `PROJECT_CONTROL_CENTER_COMMITTED`
+- `SCHEMA_CONTROL_ARTIFACTS_COMMITTED`
 
 Current milestone:
 
-`Schema authority and catalog generation`
+`Ordered migration-chain reconciliation`
 
 Next authorized action:
 
-`GENERATE_SCHEMA_CONTROL_ARTIFACTS`
+`RECONCILE_ORDERED_MIGRATION_CHAIN`
 
 Expected subsequent action:
 
