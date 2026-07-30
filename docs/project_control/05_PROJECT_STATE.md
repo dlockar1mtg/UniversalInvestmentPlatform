@@ -291,11 +291,10 @@ Not authorized:
 1. Create a new MTG reconciliation branch from the certified baseline.
 2. Reconstruct MTG historical performance.
 3. Port compatible MTG orchestration.
-4. Port compatible MTG orchestration.
-5. Reconcile cross-domain production automation.
-6. certify MTG end to end.
-7. evaluate Phase 11 automation.
-8. re-certify Crypto and Metals within combined automation.
+4. Reconcile cross-domain production automation.
+5. Certify MTG end to end.
+6. Evaluate Phase 11 automation.
+7. Re-certify Crypto and Metals within combined automation.
 
 ## State principle
 
