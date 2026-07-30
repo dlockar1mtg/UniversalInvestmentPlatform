@@ -60,6 +60,22 @@ ENUMS: dict[str, dict[str, list[Any]]] = {
     "risk_metrics": {
         "risk_level": ["low", "medium", "high", "extreme"],
     },
+    "historical_performance": {
+        "performance_status": [
+            "eligible",
+            "suppressed",
+            "insufficient_data",
+            "not_available",
+            "error",
+        ],
+        "data_quality": [
+            "high",
+            "medium",
+            "low",
+            "insufficient",
+            "unknown",
+        ],
+    },
     "macro_signals": {
         "signal_direction": ["rising", "falling", "stable", "mixed"],
     },
@@ -121,6 +137,9 @@ PATTERNS: dict[str, dict[str, str]] = {
         "universal_asset_id": r"^[a-z0-9]+(?:[:][a-z0-9-]+)+$",
     },
     "portfolio_positions": {
+        "universal_asset_id": r"^[a-z0-9]+(?:[:][a-z0-9-]+)+$",
+    },
+    "historical_performance": {
         "universal_asset_id": r"^[a-z0-9]+(?:[:][a-z0-9-]+)+$",
     },
 }

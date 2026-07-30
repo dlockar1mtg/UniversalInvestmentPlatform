@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://uiip.local/schemas/v1/historical_performance.schema.json",
+  "title": "UIIP Historical Performance v1",
+  "description": "One historical_performance record conforming to Universal Data Contracts 1.0.0.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "platform_id",
+    "run_id",
+    "universal_asset_id",
+    "performance_status",
+    "performance_eligible",
+    "data_quality",
+    "currency",
+    "source_system",
+    "generated_at_utc"
+  ],
+  "properties": {
+    "contract_version": {
+      "type": "string",
+      "description": "Universal contract version",
+      "examples": [
+        "1.0.0"
+      ],
+      "const": "1.0.0"
+    },
+    "platform_id": {
+      "type": "string",
+      "description": "Source platform identifier",
+      "examples": [
+        "mtg"
+      ]
+    },
+    "run_id": {
+      "type": "string",
+      "description": "Originating run identifier",
+      "examples": [
+        "53807130-a90a-4570-ba75-18b17e88ee5d"
+      ]
+    },
+    "universal_asset_id": {
+      "type": "string",
+      "description": "Universal asset identifier",
+      "examples": [
+        "mtg:secret-lair-example"
+      ],
+      "pattern": "^[a-z0-9]+(?:[:][a-z0-9-]+)+$"
+    },
+    "performance_status": {
+      "type": "string",
+      "description": "Historical-performance calculation status",
+      "examples": [
+        "eligible"
+      ],
+      "enum": [
+        "eligible",
+        "suppressed",
+        "insufficient_data",
+        "not_available",
+        "error"
+      ]
+    },
+    "performance_eligible": {
+      "type": "boolean",
+      "description": "Whether historical performance is suitable for analytical use",
+      "examples": [
+        "true"
+      ]
+    },
+    "historical_start_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Earliest date included in the historical period",
+      "examples": [
+        "2021-07-16"
+      ]
+    },
+    "historical_end_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Latest date included in the historical period",
+      "examples": [
+        "2026-07-16"
+      ]
+    },
+    "historical_start_value": {
+      "type": "number",
+      "description": "Asset value at the beginning of the historical period",
+      "examples": [
+        "100"
+      ]
+    },
+    "historical_end_value": {
+      "type": "number",
+      "description": "Asset value at the end of the historical period",
+      "examples": [
+        "165"
+      ]
+    },
+    "elapsed_days": {
+      "type": "integer",
+      "description": "Elapsed calendar days between start and end dates",
+      "examples": [
+        "1826"
+      ]
+    },
+    "observation_count": {
+      "type": "integer",
+      "description": "Number of historical observations used",
+      "examples": [
+        "48"
+      ]
+    },
+    "distinct_date_count": {
+      "type": "integer",
+      "description": "Number of distinct historical observation dates",
+      "examples": [
+        "48"
+      ]
+    },
+    "source_count": {
+      "type": "integer",
+      "description": "Number of distinct historical data sources",
+      "examples": [
+        "2"
+      ]
+    },
+    "historical_sources": {
+      "type": "string",
+      "description": "Delimited or serialized description of historical sources",
+      "examples": [
+        "tcgplayer|mtgjson"
+      ]
+    },
+    "total_return_pct": {
+      "type": "number",
+      "description": "Total return over the historical period expressed as a decimal",
+      "examples": [
+        "0.65"
+      ]
+    },
+    "cagr_pct": {
+      "type": "number",
+      "description": "Compound annual growth rate expressed as a decimal",
+      "examples": [
+        "0.1053"
+      ]
+    },
+    "annualized_return_pct": {
+      "type": "number",
+      "description": "Annualized historical return expressed as a decimal",
+      "examples": [
+        "0.1053"
+      ]
+    },
+    "minimum_value": {
+      "type": "number",
+      "description": "Minimum observed value during the historical period",
+      "examples": [
+        "92"
+      ]
+    },
+    "maximum_value": {
+      "type": "number",
+      "description": "Maximum observed value during the historical period",
+      "examples": [
+        "175"
+      ]
+    },
+    "data_quality": {
+      "type": "string",
+      "description": "Historical-data quality classification",
+      "examples": [
+        "high"
+      ],
+      "enum": [
+        "high",
+        "medium",
+        "low",
+        "insufficient",
+        "unknown"
+      ]
+    },
+    "suppression_reason": {
+      "type": "string",
+      "description": "Reason historical performance is unavailable or suppressed",
+      "examples": [
+        "insufficient_history"
+      ]
+    },
+    "currency": {
+      "type": "string",
+      "description": "Currency used for historical values",
+      "examples": [
+        "USD"
+      ]
+    },
+    "source_system": {
+      "type": "string",
+      "description": "System that produced the historical-performance record",
+      "examples": [
+        "mtg-investment-terminal"
+      ]
+    },
+    "model_version": {
+      "type": "string",
+      "description": "Historical-performance model or adapter version",
+      "examples": [
+        "mtg-import-adapter-1.1.0"
+      ]
+    },
+    "generated_at_utc": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Generation timestamp",
+      "examples": [
+        "2026-07-16T18:06:30Z"
+      ]
+    },
+    "notes": {
+      "type": "string",
+      "description": "Additional historical-performance notes",
+      "examples": [
+        "Certified source history"
+      ]
+    },
+    "metadata_json": {
+      "type": "string",
+      "description": "Serialized supplemental metadata",
+      "examples": [
+        "{}"
+      ]
+    }
+  }
+}
