@@ -1,0 +1,6 @@
+filename,identifier_column,unique_ids,ids_matching_asset_master,ids_missing_from_asset_master,asset_master_ids_missing_from_dataset,coverage_pct_of_asset_master
+asset_master.csv,asset_id,1141,1141,0,0,100.0
+forecasts.csv,asset_id,1141,1141,0,0,100.0
+recommendations.csv,asset_id,1141,1141,0,0,100.0
+risk_metrics.csv,asset_id,1141,1141,0,0,100.0
+historical_performance.csv,universal_mtg_product_id,973,973,0,168,85.2761

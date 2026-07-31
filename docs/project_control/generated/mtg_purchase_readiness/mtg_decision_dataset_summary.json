@@ -1,0 +1,55 @@
+{
+  "evidence_confidence_counts": {
+    "LIMITED": 614,
+    "MODERATE": 277,
+    "NONE": 250
+  },
+  "forecast_eligible": 83,
+  "generated_at_utc": "2026-07-31T13:41:19.180753+00:00",
+  "historical_records_missing": 168,
+  "historical_records_present": 973,
+  "historically_eligible": 782,
+  "lane_counts": {
+    "COLLECTOR_BOOSTER_BOX": 49,
+    "PRE_COLLECTOR_BOOSTER_BOX": 119,
+    "SECRET_LAIR": 973
+  },
+  "lane_tier_counts": {
+    "COLLECTOR_BOOSTER_BOX": {
+      "D": 38,
+      "INSUFFICIENT_DATA": 1,
+      "WATCH": 10
+    },
+    "PRE_COLLECTOR_BOOSTER_BOX": {
+      "B": 65,
+      "D": 18,
+      "INSUFFICIENT_DATA": 36
+    },
+    "SECRET_LAIR": {
+      "B": 384,
+      "C": 99,
+      "D": 457,
+      "WATCH": 33
+    }
+  },
+  "outputs": {
+    "collector_booster_boxes": "mtg_collector_booster_box_tiers.csv",
+    "complete_master": "mtg_complete_product_tiers.csv",
+    "pre_collector_booster_boxes": "mtg_pre_collector_booster_box_tiers.csv",
+    "secret_lairs": "mtg_secret_lair_tiers.csv"
+  },
+  "package_id": "mtg-hosted-20260728T224613Z",
+  "recommendation_eligible": 65,
+  "scoring_note": "Inclusive evidence-weighted tiering. Every certified product remains in the output. Eligibility affects score, tier, and evidence confidence but never removes a product.",
+  "source_package": "C:\\Users\\DevonLockard\\mtg-investment-terminal\\data\\operations\\mtg_uip_delivery\\latest",
+  "status": "PASS",
+  "tier_counts": {
+    "B": 449,
+    "C": 99,
+    "D": 513,
+    "INSUFFICIENT_DATA": 37,
+    "WATCH": 43
+  },
+  "total_products": 1141,
+  "unique_products": 1141
+}

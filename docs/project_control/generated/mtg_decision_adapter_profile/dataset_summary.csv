@@ -1,0 +1,8 @@
+filename,row_count,column_count,selected_identifier,identifier_nonblank_count,identifier_blank_count,identifier_unique_count,identifier_duplicate_row_count,checksum_status
+asset_master.csv,1141,11,asset_id,1141,0,1141,0,PASS
+forecasts.csv,1141,21,asset_id,1141,0,1141,0,PASS
+recommendations.csv,1141,10,asset_id,1141,0,1141,0,PASS
+risk_metrics.csv,1141,9,asset_id,1141,0,1141,0,PASS
+historical_performance.csv,973,28,universal_mtg_product_id,973,0,973,0,PASS
+portfolio_positions.csv,0,9,asset_id,0,0,0,0,PASS
+platform_status.csv,1,9,,0,1,0,0,PASS

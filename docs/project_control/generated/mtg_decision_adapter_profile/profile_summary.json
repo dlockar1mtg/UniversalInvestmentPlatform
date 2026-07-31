@@ -1,0 +1,14 @@
+{
+  "all_1141_products_reconciled": true,
+  "all_checksums_pass": true,
+  "asset_master_rows": 1141,
+  "asset_master_unique_products": 1141,
+  "certified_product_count": 1141,
+  "forecast_rows": 1141,
+  "generated_at_utc": "2026-07-31T13:22:29.096999+00:00",
+  "historical_performance_rows": 973,
+  "package_id": "mtg-hosted-20260728T224613Z",
+  "profile_status": "PASS",
+  "recommendation_rows": 1141,
+  "risk_metric_rows": 1141
+}

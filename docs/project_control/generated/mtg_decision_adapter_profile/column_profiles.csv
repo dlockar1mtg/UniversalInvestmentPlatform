@@ -1,0 +1,98 @@
+filename,column_name,nonblank_count,blank_count,distinct_nonblank_count,sample_values
+asset_master.csv,asset_id,1141,0,1141,"[""MTG:COLLECTOR_BOOSTER_BOX:TCGCSV-2823-238745"", ""MTG:COLLECTOR_BOOSTER_BOX:TCGCSV-23874-604253"", ""MTG:COLLECTOR_BOOSTER_BOX:TCGCSV-24421-648650"", ""MTG:COLLECTOR_BOOSTER_BOX:TCGCSV-23447-541238"", ""MTG:COLLECTOR_BOOSTER_BOX:TCGCSV-2708-221323"", ""MTG:COLLECTOR_BOOSTER_BOX:TCGCSV-3047-267023"", ""MTG:COLLECTOR_BOOSTER_BOX:TCGCSV-23020-484929"", ""MTG:COLLECTOR_BOOSTER_BOX:TCGCSV-2653-214818""]"
+asset_master.csv,asset_name,1141,0,1141,"[""Adventures in the Forgotten Realms Collector Booster Display"", ""Aetherdrift Collector Booster Display"", ""Avatar: The Last Airbender Collector Booster Display"", ""Bloomburrow Collector Booster Display"", ""Commander Legends Collector Booster Display"", ""Commander Legends: Battle for Baldur's Gate Collector Booster Display"", ""Commander Masters Collector Booster Display"", ""Core Set 2021 Collector Booster Display""]"
+asset_master.csv,asset_class,1141,0,1,"[""MTG""]"
+asset_master.csv,asset_subclass,1141,0,3,"[""COLLECTOR_BOOSTER_BOX"", ""PRE_COLLECTOR_BOOSTER_BOX"", ""SECRET_LAIR""]"
+asset_master.csv,source_product_id,1141,0,1141,"[""TCGCSV-2823-238745"", ""TCGCSV-23874-604253"", ""TCGCSV-24421-648650"", ""TCGCSV-23447-541238"", ""TCGCSV-2708-221323"", ""TCGCSV-3047-267023"", ""TCGCSV-23020-484929"", ""TCGCSV-2653-214818""]"
+asset_master.csv,tcgplayer_product_id,168,973,168,"[""238745"", ""604253"", ""648650"", ""541238"", ""221323"", ""267023"", ""484929"", ""214818""]"
+asset_master.csv,product_class,1141,0,3,"[""COLLECTOR_BOOSTER_BOX"", ""PRE_COLLECTOR_BOOSTER_BOX"", ""SECRET_LAIR""]"
+asset_master.csv,canonical_set_name,168,973,167,"[""Adventures in the Forgotten Realms"", ""Aetherdrift"", ""Avatar: The Last Airbender"", ""Bloomburrow"", ""Commander Legends"", ""Commander Legends: Battle for Baldur's Gate"", ""Commander Masters"", ""Core Set 2021""]"
+asset_master.csv,release_date,119,1022,118,"[""2007-07-13"", ""2001-04-11"", ""2003-07-28"", ""2005-07-29"", ""2017-01-20"", ""2009-04-30"", ""1996-06-10"", ""1993-08-05""]"
+asset_master.csv,registry_status,1141,0,1,"[""GOVERNED""]"
+asset_master.csv,currency,1141,0,1,"[""USD""]"
+forecasts.csv,asset_id,1141,0,1141,"[""MTG:SECRET_LAIR:SL-00DFD5FAF7A6FF"", ""MTG:SECRET_LAIR:SL-014CB03DE34288"", ""MTG:SECRET_LAIR:SL-0170AA960296CD"", ""MTG:SECRET_LAIR:SL-01A33A04CE8DA9"", ""MTG:SECRET_LAIR:SL-01DC7B8F9D05F8"", ""MTG:SECRET_LAIR:SL-01E98F93055799"", ""MTG:SECRET_LAIR:SL-01F4014DB0F8CA"", ""MTG:SECRET_LAIR:SL-02041401623B89""]"
+forecasts.csv,source_product_id,1141,0,1141,"[""SL-00DFD5FAF7A6FF"", ""SL-014CB03DE34288"", ""SL-0170AA960296CD"", ""SL-01A33A04CE8DA9"", ""SL-01DC7B8F9D05F8"", ""SL-01E98F93055799"", ""SL-01F4014DB0F8CA"", ""SL-02041401623B89""]"
+forecasts.csv,tcgplayer_product_id,168,973,168,"[""449559"", ""451880"", ""475584"", ""489207"", ""484912"", ""515906"", ""484929"", ""496041""]"
+forecasts.csv,forecast_eligible,1141,0,2,"[""NO"", ""YES""]"
+forecasts.csv,forecast_status,1141,0,6,"[""WIDE_VALUATION_RANGE"", ""VALUATION_RANGE_READY"", ""STRUCTURAL_VALUATION_RANGE"", ""NATIVE_RANGE_READY"", ""SUPPRESSED"", ""SCENARIO_READY""]"
+forecasts.csv,forecast_method,1141,0,4,"[""NATIVE_VALUATION_RANGE"", ""NATIVE_MONTE_CARLO_RANGE"", ""NO_NUMERIC_FORECAST"", ""TIER_GUARDED_SCENARIO_BANDS""]"
+forecasts.csv,current_market_value_usd,1133,8,580,"[""66.5"", ""47.5"", ""325.0"", ""60.9"", ""180.0"", ""58.0"", ""75.36"", ""487.5""]"
+forecasts.csv,native_forecast_low_usd,1021,120,356,"[""66.5"", ""45.0"", ""81.25"", ""56.8"", ""148.0"", ""51.99"", ""18.84"", ""121.88""]"
+forecasts.csv,native_forecast_base_usd,1021,120,474,"[""66.5"", ""47.5"", ""325.0"", ""60.9"", ""180.0"", ""58.0"", ""75.36"", ""487.5""]"
+forecasts.csv,native_forecast_high_usd,1021,120,361,"[""66.5"", ""50.0"", ""568.75"", ""65.0"", ""227.99"", ""60.48"", ""131.88"", ""853.12""]"
+forecasts.csv,one_year_downside_usd,0,1141,0,[]
+forecasts.csv,one_year_base_usd,0,1141,0,[]
+forecasts.csv,one_year_upside_usd,0,1141,0,[]
+forecasts.csv,three_year_downside_usd,0,1141,0,[]
+forecasts.csv,three_year_base_usd,0,1141,0,[]
+forecasts.csv,three_year_upside_usd,0,1141,0,[]
+forecasts.csv,five_year_downside_usd,0,1141,0,[]
+forecasts.csv,five_year_base_usd,0,1141,0,[]
+forecasts.csv,five_year_upside_usd,0,1141,0,[]
+forecasts.csv,confidence,1141,0,345,"[""40.75"", ""69.95"", ""15.0"", ""50.15"", ""77.45"", ""69.8"", ""44.54"", ""55.0""]"
+forecasts.csv,currency,1141,0,1,"[""USD""]"
+recommendations.csv,asset_id,1141,0,1141,"[""MTG:SECRET_LAIR:SL-00DFD5FAF7A6FF"", ""MTG:SECRET_LAIR:SL-014CB03DE34288"", ""MTG:SECRET_LAIR:SL-0170AA960296CD"", ""MTG:SECRET_LAIR:SL-01A33A04CE8DA9"", ""MTG:SECRET_LAIR:SL-01DC7B8F9D05F8"", ""MTG:SECRET_LAIR:SL-01E98F93055799"", ""MTG:SECRET_LAIR:SL-01F4014DB0F8CA"", ""MTG:SECRET_LAIR:SL-02041401623B89""]"
+recommendations.csv,source_product_id,1141,0,1141,"[""SL-00DFD5FAF7A6FF"", ""SL-014CB03DE34288"", ""SL-0170AA960296CD"", ""SL-01A33A04CE8DA9"", ""SL-01DC7B8F9D05F8"", ""SL-01E98F93055799"", ""SL-01F4014DB0F8CA"", ""SL-02041401623B89""]"
+recommendations.csv,tcgplayer_product_id,168,973,168,"[""449559"", ""451880"", ""475584"", ""489207"", ""484912"", ""515906"", ""484929"", ""496041""]"
+recommendations.csv,recommendation_eligible,1141,0,2,"[""NO"", ""YES""]"
+recommendations.csv,recommendation_status,1141,0,3,"[""AWAITING_HORIZON_FORECAST_CERTIFICATION"", ""ELIGIBLE"", ""GUARDED""]"
+recommendations.csv,recommendation_action,1141,0,3,"[""HOLD_REVIEW"", ""NO_ACTION"", ""WATCH""]"
+recommendations.csv,recommendation_rationale,1141,0,7,"[""Native current-value range retained; forward recommendation withheld until a horizon model is independently certified."", ""Native valuation range retained; directional recommendation is withheld until horizon-specific forecasts are certified."", ""No accepted observed market value; recommendation is suppressed."", ""No accepted governed market value. Numeric forecast and recommendation are suppressed."", ""Market value failed at least one plausibility gate. Numeric forecast and recommendation are suppressed pending evidence remediation."", ""Forecast-safe observed value exists, but the evidence remains provisional. Recommendation remains guarded."", ""Observed governed value passed market-plausibility review. Directional trading action remains withheld until historical-return and liquidity features are certified.""]"
+recommendations.csv,suppression_reason,795,346,18,"[""QUALITY_REVIEW_REQUIRED:LOW_CONFIDENCE|SINGLE_OBSERVATION|WEAK_SELLER_DIVERSITY"", ""QUALITY_EXCLUDED:NO_ACCEPTED_EVIDENCE"", ""QUALITY_REVIEW_REQUIRED:LOW_CONFIDENCE"", ""QUALITY_REVIEW_REQUIRED:LOW_CONFIDENCE|WEAK_SELLER_DIVERSITY"", ""QUALITY_REVIEW_REQUIRED:WIDE_PRICE_RANGE"", ""QUALITY_EXCLUDED:EXTREME_MEDIAN_VALUE|HIGH_MEDIAN_VALUE|LOW_CONFIDENCE|SINGLE_OBSERVATION|WEAK_SELLER_DIVERSITY"", ""QUALITY_REVIEW_REQUIRED:HIGH_MEDIAN_VALUE|LOW_CONFIDENCE"", ""QUALITY_REVIEW_REQUIRED:HIGH_MEDIAN_VALUE|LOW_CONFIDENCE|SINGLE_OBSERVATION|WEAK_SELLER_DIVERSITY""]"
+recommendations.csv,confidence,1141,0,345,"[""40.75"", ""69.95"", ""15.0"", ""50.15"", ""77.45"", ""69.8"", ""44.54"", ""55.0""]"
+recommendations.csv,currency,1141,0,1,"[""USD""]"
+risk_metrics.csv,asset_id,1141,0,1141,"[""MTG:SECRET_LAIR:SL-00DFD5FAF7A6FF"", ""MTG:SECRET_LAIR:SL-014CB03DE34288"", ""MTG:SECRET_LAIR:SL-0170AA960296CD"", ""MTG:SECRET_LAIR:SL-01A33A04CE8DA9"", ""MTG:SECRET_LAIR:SL-01DC7B8F9D05F8"", ""MTG:SECRET_LAIR:SL-01E98F93055799"", ""MTG:SECRET_LAIR:SL-01F4014DB0F8CA"", ""MTG:SECRET_LAIR:SL-02041401623B89""]"
+risk_metrics.csv,source_product_id,1141,0,1141,"[""SL-00DFD5FAF7A6FF"", ""SL-014CB03DE34288"", ""SL-0170AA960296CD"", ""SL-01A33A04CE8DA9"", ""SL-01DC7B8F9D05F8"", ""SL-01E98F93055799"", ""SL-01F4014DB0F8CA"", ""SL-02041401623B89""]"
+risk_metrics.csv,tcgplayer_product_id,168,973,168,"[""449559"", ""451880"", ""475584"", ""489207"", ""484912"", ""515906"", ""484929"", ""496041""]"
+risk_metrics.csv,admission_tier,1141,0,3,"[""PROVISIONAL_MODEL"", ""FULL_MODEL"", ""STRUCTURAL_ONLY""]"
+risk_metrics.csv,quality_disposition,1141,0,8,"[""REVIEW_REQUIRED"", ""PASS"", ""EXCLUDE_FROM_MODEL"", ""EVALUATED"", ""STRUCTURAL_SUPPRESSED"", ""STRUCTURAL_ONLY"", ""PROVISIONAL_GUARDED"", ""FORECAST_READY""]"
+risk_metrics.csv,quality_flags,795,346,18,"[""QUALITY_REVIEW_REQUIRED:LOW_CONFIDENCE|SINGLE_OBSERVATION|WEAK_SELLER_DIVERSITY"", ""QUALITY_EXCLUDED:NO_ACCEPTED_EVIDENCE"", ""QUALITY_REVIEW_REQUIRED:LOW_CONFIDENCE"", ""QUALITY_REVIEW_REQUIRED:LOW_CONFIDENCE|WEAK_SELLER_DIVERSITY"", ""QUALITY_REVIEW_REQUIRED:WIDE_PRICE_RANGE"", ""QUALITY_EXCLUDED:EXTREME_MEDIAN_VALUE|HIGH_MEDIAN_VALUE|LOW_CONFIDENCE|SINGLE_OBSERVATION|WEAK_SELLER_DIVERSITY"", ""QUALITY_REVIEW_REQUIRED:HIGH_MEDIAN_VALUE|LOW_CONFIDENCE"", ""QUALITY_REVIEW_REQUIRED:HIGH_MEDIAN_VALUE|LOW_CONFIDENCE|SINGLE_OBSERVATION|WEAK_SELLER_DIVERSITY""]"
+risk_metrics.csv,confidence,1141,0,345,"[""40.75"", ""69.95"", ""15.0"", ""50.15"", ""77.45"", ""69.8"", ""44.54"", ""55.0""]"
+risk_metrics.csv,forecast_eligible,1141,0,2,"[""NO"", ""YES""]"
+risk_metrics.csv,recommendation_eligible,1141,0,2,"[""NO"", ""YES""]"
+historical_performance.csv,investment_product_id,973,0,973,"[""SL-00DFD5FAF7A6FF"", ""SL-014CB03DE34288"", ""SL-0170AA960296CD"", ""SL-01A33A04CE8DA9"", ""SL-01DC7B8F9D05F8"", ""SL-01E98F93055799"", ""SL-01F4014DB0F8CA"", ""SL-02041401623B89""]"
+historical_performance.csv,universal_mtg_product_id,973,0,973,"[""MTG:SECRET_LAIR:SL-00DFD5FAF7A6FF"", ""MTG:SECRET_LAIR:SL-014CB03DE34288"", ""MTG:SECRET_LAIR:SL-0170AA960296CD"", ""MTG:SECRET_LAIR:SL-01A33A04CE8DA9"", ""MTG:SECRET_LAIR:SL-01DC7B8F9D05F8"", ""MTG:SECRET_LAIR:SL-01E98F93055799"", ""MTG:SECRET_LAIR:SL-01F4014DB0F8CA"", ""MTG:SECRET_LAIR:SL-02041401623B89""]"
+historical_performance.csv,canonical_product_name,973,0,973,"[""Drop: Secret Lair x Dungeons & Dragons: Whispers in Candlekeep - Non-Foil Edition \u2014 Nonfoil Edition"", ""Drop: Artist Series: Victor Adame Minguez - Traditional Foil Edition \u2014 Foil Edition"", ""Cats Are the Best Superdrop: Nine Lives Non-Foil Bundle \u2014 Nonfoil Edition"", ""Drop: The Dracula Lands - Traditional Foil Edition \u2014 Foil Edition"", ""Drop: Totally Spaced Out - Galaxy Foil Edition \u2014 Foil Edition"", ""Drop: Artist Series: Sam Burley - Traditional Foil Edition \u2014 Foil Edition"", ""Drop: Flower Power - Rainbow Foil Edition \u2014 Foil Edition"", ""Superdrop: The World's Bundliest Bundle \u2014 Standard Edition""]"
+historical_performance.csv,asset_class,973,0,1,"[""SECRET_LAIR""]"
+historical_performance.csv,currency,973,0,1,"[""USD""]"
+historical_performance.csv,historical_performance_status,973,0,4,"[""HISTORICAL_PERFORMANCE_READY"", ""INSUFFICIENT_SPAN"", ""NO_HISTORY"", ""INSUFFICIENT_HISTORY""]"
+historical_performance.csv,historical_performance_eligible,973,0,2,"[""YES"", ""NO""]"
+historical_performance.csv,historical_start_date,909,64,30,"[""2026-03-01"", ""2024-02-08"", ""2026-07-01"", ""2025-11-01"", ""2024-05-01"", ""2026-07-23"", ""2025-07-01"", ""2024-07-01""]"
+historical_performance.csv,historical_end_date,909,64,20,"[""2026-07-23"", ""2026-06-01"", ""2025-04-01"", ""2024-07-01"", ""2024-04-01"", ""2025-03-01"", ""2026-03-01"", ""2025-08-01""]"
+historical_performance.csv,historical_start_value_usd,909,64,785,"[""111.87"", ""29.19"", ""400.0"", ""32.38"", ""93.37"", ""34.6"", ""54.22"", ""53.18""]"
+historical_performance.csv,historical_end_value_usd,909,64,844,"[""59.78"", ""32.33"", ""400.0"", ""56.61"", ""160.02"", ""52.66"", ""79.87"", ""53.04""]"
+historical_performance.csv,historical_elapsed_days,909,64,48,"[""144"", ""896"", ""22"", ""264"", ""212"", ""813"", ""0"", ""387""]"
+historical_performance.csv,historical_observation_count,973,0,32,"[""6"", ""31"", ""2"", ""10"", ""0"", ""7"", ""28"", ""1""]"
+historical_performance.csv,historical_distinct_dates,973,0,32,"[""6"", ""31"", ""2"", ""10"", ""0"", ""7"", ""28"", ""1""]"
+historical_performance.csv,historical_source_count,973,0,3,"[""2"", ""0"", ""1""]"
+historical_performance.csv,historical_sources,909,64,3,"[""TCGCSV|TCGCSV_ARCHIVE_MONTHLY"", ""TCGCSV_ARCHIVE_MONTHLY"", ""TCGCSV""]"
+historical_performance.csv,historical_total_return_pct,782,191,771,"[""-46.562975"", ""10.757109"", ""74.830142"", ""71.382671"", ""52.196532"", ""47.307267"", ""-0.263257"", ""-5.12932""]"
+historical_performance.csv,historical_cagr_pct,782,191,772,"[""-79.59684"", ""4.252745"", ""25.573881"", ""24.558538"", ""18.673807"", ""70.898081"", ""-0.107397"", ""-2.123559""]"
+historical_performance.csv,historical_annualized_return_pct,782,191,772,"[""-79.59684"", ""4.252745"", ""25.573881"", ""24.558538"", ""18.673807"", ""70.898081"", ""-0.107397"", ""-2.123559""]"
+historical_performance.csv,historical_min_value_usd,909,64,834,"[""55.9"", ""23.24"", ""400.0"", ""32.38"", ""93.37"", ""29.4"", ""45.76"", ""50.65""]"
+historical_performance.csv,historical_max_value_usd,909,64,802,"[""111.87"", ""32.33"", ""400.0"", ""61.06"", ""175.59"", ""58.94"", ""79.87"", ""58.88""]"
+historical_performance.csv,historical_data_quality,973,0,6,"[""LIMITED"", ""STRONG"", ""SHORT_SPAN"", ""MODERATE"", ""NONE"", ""SINGLE_SNAPSHOT""]"
+historical_performance.csv,historical_suppression_reason,191,782,3,"[""REQUIRES_AT_LEAST_30_ELAPSED_DAYS"", ""NO_VALID_DATED_PRICE_OBSERVATIONS"", ""REQUIRES_AT_LEAST_TWO_DISTINCT_OBSERVATION_DATES""]"
+historical_performance.csv,forecast_eligible,973,0,1,"[""NO""]"
+historical_performance.csv,recommendation_eligible,973,0,1,"[""NO""]"
+historical_performance.csv,one_year_base_usd,0,973,0,[]
+historical_performance.csv,three_year_base_usd,0,973,0,[]
+historical_performance.csv,five_year_base_usd,0,973,0,[]
+portfolio_positions.csv,position_id,0,0,0,[]
+portfolio_positions.csv,asset_id,0,0,0,[]
+portfolio_positions.csv,quantity,0,0,0,[]
+portfolio_positions.csv,unit_cost_usd,0,0,0,[]
+portfolio_positions.csv,cost_basis_usd,0,0,0,[]
+portfolio_positions.csv,current_unit_value_usd,0,0,0,[]
+portfolio_positions.csv,market_value_usd,0,0,0,[]
+portfolio_positions.csv,currency,0,0,0,[]
+portfolio_positions.csv,source_system,0,0,0,[]
+platform_status.csv,platform,1,0,1,"[""MTG""]"
+platform_status.csv,status,1,0,1,"[""PASS""]"
+platform_status.csv,interface_name,1,0,1,"[""mtg-hosted-uip-delivery-v1""]"
+platform_status.csv,contract_version,1,0,1,"[""1""]"
+platform_status.csv,products,1,0,1,"[""1141""]"
+platform_status.csv,forecast_eligible,1,0,1,"[""83""]"
+platform_status.csv,recommendation_eligible,1,0,1,"[""65""]"
+platform_status.csv,diagnostics,1,0,1,"[""0""]"
+platform_status.csv,generated_at_utc,1,0,1,"[""2026-07-28T22:46:13.269710+00:00""]"
