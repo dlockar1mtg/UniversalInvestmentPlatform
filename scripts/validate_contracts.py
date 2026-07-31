@@ -51,6 +51,11 @@ PRIMARY_KEYS: dict[str, list[str]] = {
         "universal_asset_id",
         "as_of_date",
     ],
+    "historical_performance": [
+        "platform_id",
+        "run_id",
+        "universal_asset_id",
+    ],
     "portfolio_positions": [
         "portfolio_id",
         "universal_asset_id",
@@ -305,6 +310,128 @@ def validate_business_rules(
                 errors.append(
                     "forecast_date cannot be earlier than "
                     "forecast_origin_date"
+                )
+
+    if contract_name == "historical_performance":
+        eligible = row.get("performance_eligible")
+        status = row.get("performance_status")
+        suppression_reason = row.get("suppression_reason")
+
+        start_date = row.get("historical_start_date")
+        end_date = row.get("historical_end_date")
+        start_value = row.get("historical_start_value")
+        end_value = row.get("historical_end_value")
+        elapsed_days = row.get("elapsed_days")
+        observation_count = row.get("observation_count")
+        distinct_date_count = row.get("distinct_date_count")
+        source_count = row.get("source_count")
+
+        if start_date and end_date:
+            parsed_start = date.fromisoformat(start_date)
+            parsed_end = date.fromisoformat(end_date)
+
+            if parsed_end < parsed_start:
+                errors.append(
+                    "historical_end_date must be on or after "
+                    "historical_start_date"
+                )
+
+            calculated_days = (parsed_end - parsed_start).days
+
+            if (
+                elapsed_days is not None
+                and elapsed_days != calculated_days
+            ):
+                errors.append(
+                    "elapsed_days must equal the difference between "
+                    "historical_start_date and historical_end_date"
+                )
+
+        nonnegative_fields = {
+            "historical_start_value": start_value,
+            "historical_end_value": end_value,
+            "elapsed_days": elapsed_days,
+            "observation_count": observation_count,
+            "distinct_date_count": distinct_date_count,
+            "source_count": source_count,
+            "minimum_value": row.get("minimum_value"),
+            "maximum_value": row.get("maximum_value"),
+        }
+
+        for field_name, value in nonnegative_fields.items():
+            if value is not None and value < 0:
+                errors.append(
+                    f"{field_name} must be greater than or equal to zero"
+                )
+
+        minimum_value = row.get("minimum_value")
+        maximum_value = row.get("maximum_value")
+
+        if (
+            minimum_value is not None
+            and maximum_value is not None
+            and minimum_value > maximum_value
+        ):
+            errors.append(
+                "minimum_value must be less than or equal to maximum_value"
+            )
+
+        if (
+            observation_count is not None
+            and distinct_date_count is not None
+            and distinct_date_count > observation_count
+        ):
+            errors.append(
+                "distinct_date_count may not exceed observation_count"
+            )
+
+        if eligible is True:
+            required_evidence = {
+                "historical_start_date": start_date,
+                "historical_end_date": end_date,
+                "historical_start_value": start_value,
+                "historical_end_value": end_value,
+                "elapsed_days": elapsed_days,
+                "observation_count": observation_count,
+                "distinct_date_count": distinct_date_count,
+                "source_count": source_count,
+            }
+
+            missing_evidence = [
+                field_name
+                for field_name, value in required_evidence.items()
+                if value is None
+            ]
+
+            if missing_evidence:
+                errors.append(
+                    "eligible historical performance requires: "
+                    + ", ".join(missing_evidence)
+                )
+
+            if suppression_reason:
+                errors.append(
+                    "eligible historical performance may not have "
+                    "a suppression_reason"
+                )
+
+            if status != "eligible":
+                errors.append(
+                    "performance_status must be eligible when "
+                    "performance_eligible is true"
+                )
+
+        if eligible is False:
+            if not suppression_reason:
+                errors.append(
+                    "suppressed historical performance requires "
+                    "suppression_reason"
+                )
+
+            if status == "eligible":
+                errors.append(
+                    "performance_status may not be eligible when "
+                    "performance_eligible is false"
                 )
 
     if contract_name == "platform_status":

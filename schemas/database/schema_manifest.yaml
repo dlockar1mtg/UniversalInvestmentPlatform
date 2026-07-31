@@ -1,0 +1,48 @@
+manifest_version: 1
+platform: Universal Investment Platform
+database_engine: DuckDB
+authority:
+  migration_manifest: schemas/database/schema_manifest.yaml
+  migration_directory: foundation/import_engine/sql
+  generated_catalog_json: docs/project_control/generated/uip_database_schema_catalog.json
+  generated_catalog_markdown: docs/project_control/generated/UIP_DATABASE_SCHEMA_CATALOG.md
+  semantic_dictionary: docs/project_control/UIP_DATA_DICTIONARY.md
+generation:
+  generated_at_utc: '2026-07-30T21:16:52.141195+00:00'
+  source_database: C:\Users\DevonLockard\AppData\Local\Temp\uip-historical-performance-schema-control\universal_investment_upgraded.duckdb
+  source_database_sha256: 2723537263957f71d41fe2fe048b4650a9d90ca145cc4244896811145673a9e3
+  read_only_introspection: true
+migration_policy:
+  ordered_by_numeric_filename_prefix: true
+  fresh_database_initialization_uses_full_chain: true
+  production_changes_require_new_ordered_migration: true
+  editing_prior_migration_for_deployed_schema_change_is_prohibited: true
+migrations:
+- order: 1
+  filename: 001_initialize_universal_database.sql
+  path: foundation/import_engine/sql/001_initialize_universal_database.sql
+  sha256: 702d1e48edb79d6c0595586b12332619d71d4cb87201f3c3a12d40c1409225da
+  size_bytes: 9954
+  purpose: create or extend canonical tables
+- order: 2
+  filename: 002_audit_registry_integration.sql
+  path: foundation/import_engine/sql/002_audit_registry_integration.sql
+  sha256: 9563d6ca0a0b120d4de15a6fd78d47fd4d3f4c5afa530886a8289c8011b1cc5d
+  size_bytes: 2735
+  purpose: create or extend canonical tables; import audit and platform registry
+- order: 3
+  filename: 003_health_status_latest_attempt.sql
+  path: foundation/import_engine/sql/003_health_status_latest_attempt.sql
+  sha256: 130f47a6e95bbc8e2479466e2ea6f42d05e726f7fc22f94fd4a2f96fdbef7624
+  size_bytes: 880
+  purpose: import audit and platform registry
+- order: 4
+  filename: 004_historical_performance.sql
+  path: foundation/import_engine/sql/004_historical_performance.sql
+  sha256: ae86fefd6113eb98d2a87f293797e34d4216001d7d55ba21276185d202c40041
+  size_bytes: 1728
+  purpose: create or extend canonical tables
+observed_database:
+  object_count: 25
+  tables: 13
+  views: 12

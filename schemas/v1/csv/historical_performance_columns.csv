@@ -1,0 +1,29 @@
+column_name,data_type,required,description,example
+contract_version,string,yes,Universal contract version,1.0.0
+platform_id,string,yes,Source platform identifier,mtg
+run_id,string,yes,Originating run identifier,53807130-a90a-4570-ba75-18b17e88ee5d
+universal_asset_id,string,yes,Universal asset identifier,mtg:secret-lair-example
+performance_status,string,yes,Historical-performance calculation status,eligible
+performance_eligible,boolean,yes,Whether historical performance is suitable for analytical use,true
+historical_start_date,date,no,Earliest date included in the historical period,2021-07-16
+historical_end_date,date,no,Latest date included in the historical period,2026-07-16
+historical_start_value,decimal,no,Asset value at the beginning of the historical period,100
+historical_end_value,decimal,no,Asset value at the end of the historical period,165
+elapsed_days,integer,no,Elapsed calendar days between start and end dates,1826
+observation_count,integer,no,Number of historical observations used,48
+distinct_date_count,integer,no,Number of distinct historical observation dates,48
+source_count,integer,no,Number of distinct historical data sources,2
+historical_sources,string,no,Delimited or serialized description of historical sources,tcgplayer|mtgjson
+total_return_pct,decimal,no,Total return over the historical period expressed as a decimal,0.65
+cagr_pct,decimal,no,Compound annual growth rate expressed as a decimal,0.1053
+annualized_return_pct,decimal,no,Annualized historical return expressed as a decimal,0.1053
+minimum_value,decimal,no,Minimum observed value during the historical period,92
+maximum_value,decimal,no,Maximum observed value during the historical period,175
+data_quality,string,yes,Historical-data quality classification,high
+suppression_reason,string,no,Reason historical performance is unavailable or suppressed,insufficient_history
+currency,string,yes,Currency used for historical values,USD
+source_system,string,yes,System that produced the historical-performance record,mtg-investment-terminal
+model_version,string,no,Historical-performance model or adapter version,mtg-import-adapter-1.1.0
+generated_at_utc,timestamp,yes,Generation timestamp,2026-07-16T18:06:30Z
+notes,string,no,Additional historical-performance notes,Certified source history
+metadata_json,string,no,Serialized supplemental metadata,{}

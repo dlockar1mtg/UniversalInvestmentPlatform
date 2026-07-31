@@ -1,0 +1,24 @@
+{
+  "approved_boundary": "UIP consumes certified MTG universal-contract packages; UIP does not execute standalone MTG production workflows.",
+  "canonical_candidate_count": 37,
+  "canonical_source_role": "mtg-investment-terminal",
+  "conflicting_priority_files": [
+    "scripts/run_daily_ebay_collection.py",
+    "scripts/run_mtg_marketplace_production.py"
+  ],
+  "disposition_counts": {
+    "ADAPT": 9,
+    "REPLACE": 4,
+    "RETAIN_STANDALONE": 5
+  },
+  "inventory_mode": "READ_ONLY_STATIC_INSPECTION",
+  "priority_candidate_count": 18,
+  "raw_apparent_entrypoint_count": 813,
+  "raw_candidate_count": 3225,
+  "secondary_source_role": "comparison-only",
+  "source_overlap_counts": {
+    "canonical_only": 12,
+    "different_in_secondary": 2,
+    "identical_in_secondary": 23
+  }
+}
