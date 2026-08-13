@@ -13,13 +13,13 @@ Recovery classification:
 RECOVERED_AND_READY_FOR_INTEGRATION
 
 Current execution state:
-MULTI_BRANCH_RECONCILIATION_REQUIRED_BEFORE_INTEGRATION
+CERTIFIED_DOMAIN_INTEGRATION_SEQUENCE_ACTIVE
 
 Current roadmap phase:
-Phase A — Project control and recovery stabilization
+Certified domain integration
 
 Current milestone:
-MTG historical-performance reconstruction
+UIP_MTG_A1_EXPORT_ACCEPTANCE_AND_SEMANTIC_PRESERVATION
 
 Current certification:
 BASELINE_TEST_SUITE_PASS
@@ -33,7 +33,7 @@ OLD_PHASE_10_12_IMPLEMENTATION_EXCLUDED
 PHASE_A_NOT_YET_CERTIFIED
 
 Next authorized action:
-RECONSTRUCT_MTG_HISTORICAL_PERFORMANCE
+UIP_MTG_A1_EXPORT_ACCEPTANCE_AND_SEMANTIC_PRESERVATION
 ```
 
 ## Repository authority

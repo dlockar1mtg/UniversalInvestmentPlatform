@@ -75,7 +75,7 @@ Recovery classification:
 
 Current execution state:
 
-`MULTI_BRANCH_RECONCILIATION_REQUIRED_BEFORE_INTEGRATION`
+`CERTIFIED_DOMAIN_INTEGRATION_SEQUENCE_ACTIVE`
 
 Current phase:
 
@@ -99,7 +99,7 @@ Recovered targeted-test evidence:
 
 Current next authorized action:
 
-`RECONSTRUCT_MTG_HISTORICAL_PERFORMANCE`
+`UIP_MTG_A1_EXPORT_ACCEPTANCE_AND_SEMANTIC_PRESERVATION`
 
 The controlled MTG reconciliation branch was created from `df8e796`, pushed to GitHub, and verified to exclude the defective Phase 10.12 recovery implementation. The next action is controlled reconstruction of MTG historical performance.
 
