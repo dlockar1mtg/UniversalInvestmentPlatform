@@ -54,17 +54,21 @@ Stable branch:
 
 `main`
 
-Stable baseline:
+Current governed main baseline:
+
+`5fd26f87e7e452321379d4e903c1ec19f804bad3`
+
+Historical recovery baseline:
 
 `7bd8d0e3cb0f8cfa61208a0950cb7c3f51c7b5e8`
 
-Stable-baseline evidence:
+Historical recovery baseline evidence:
 
 `1,201 passed, 1 warning`
 
 Active governance branch:
 
-`recovery/uip-project-control-center`
+`phase-uip-a0g-governance-sync`
 
 ## Recovered historical-performance work
 
@@ -290,15 +294,15 @@ Not authorized:
 
 ## Next integration sequence
 
-1. `UIP-MTG-A1` ? accept the certified MTG export and prove semantic preservation.
-2. `UIP-MTG-A2` ? certify MTG integration into UIP.
-3. `UIP-METALS-A0/A1` ? inspect and bind Metals under Metals-native governance.
-4. `UIP-CRYPTO-A0/A1` ? inspect and bind Crypto under Crypto-native governance.
-5. `UIP-D1` ? establish the minimal lossless common domain registry and lineage interface.
-6. `UIP-R1` ? establish governed refresh and orchestration contracts.
-7. `UIP-R2` ? perform refreshed-data rehearsals for MTG, Metals, and Crypto.
-8. `UIP-E1` ? establish the future Stocks/ETF extension boundary.
-9. `UIP-DASH-1` and `UIP-DASH-2` ? build the dashboard on certified multi-domain inputs.
+1. `UIP-MTG-A1` - accept the certified MTG export and prove semantic preservation.
+2. `UIP-MTG-A2` - certify MTG integration into UIP.
+3. `UIP-METALS-A0/A1` - inspect and bind Metals under Metals-native governance.
+4. `UIP-CRYPTO-A0/A1` - inspect and bind Crypto under Crypto-native governance.
+5. `UIP-D1` - establish the minimal lossless common domain registry and lineage interface.
+6. `UIP-R1` - establish governed refresh and orchestration contracts.
+7. `UIP-R2` - perform refreshed-data rehearsals for MTG, Metals, and Crypto.
+8. `UIP-E1` - establish the future Stocks/ETF extension boundary.
+9. `UIP-DASH-1` and `UIP-DASH-2` - build the dashboard on certified multi-domain inputs.
 10. Govern future cross-asset ranking, comparison, or allocation methodology separately.
 
 No universal cross-asset ranking is authorized by this sequence.
@@ -306,4 +310,4 @@ Automatic purchase execution remains disabled.
 
 ## State principle
 
-> UIP is recovered, the stable baseline passes, and all major candidate branches are preserved. Integration cannot proceed by wholesale merge. Future work must reconstruct or selectively port recovered capabilities against the certified baseline under ordered migrations, governed contracts, and complete certification.
+> UIP recovery history remains preserved, but current integration proceeds from certified repository and domain-package authority. Each domain retains its native semantics; UIP may accept certified outputs, preserve lineage, orchestrate governed refreshes, and present evidence without silently redefining native models, ranks, recommendations, or execution authority.
