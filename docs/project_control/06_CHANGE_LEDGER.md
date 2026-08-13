@@ -616,6 +616,120 @@ Reversal:
 
 `FULLY_REVERSIBLE`
 
+
+## UIP-CHG-2026-026 — Activate Certified Domain Integration Sequence
+
+Date: 2026-08-13
+Status: ACTIVE
+Type: ROADMAP, MTG_INTEGRATION, DATA_CONTRACT, CERTIFICATION, DOMAIN_GOVERNANCE
+Approval authority: Devon Lockard
+
+Decision:
+
+Prospectively supersede the recovery-era
+`RECONSTRUCT_MTG_HISTORICAL_PERFORMANCE` next-action requirement with:
+
+`UIP_MTG_A1_EXPORT_ACCEPTANCE_AND_SEMANTIC_PRESERVATION`
+
+Historical branch creation, recovery findings, failed-run evidence, migration
+controls, and all recovery evidence through `UIP-CHG-2026-025` remain
+preserved.
+
+Certified MTG upstream authority:
+
+- repository: `dlockar1mtg/mtg-investment-terminal`
+- Unified MTG V1 production commit:
+  `94c2bd3273eaba4d05ee8f7f5c3d6c4dcc283768`
+- MTG-to-UIP export certification commit:
+  `f7dea3e2611f27de4ff6541da3b1d6a60dc6d695`
+- certified payload SHA-256:
+  `006ba3951565437291284d8e86e93a40208d2c0e783f43d3652e9f8f510914e1`
+- Collector rows: 50
+- Pre-Collector rows: 131
+- Secret Lair V1.1 rows: 787
+- current total rows: 968
+- current total is a permanent universe constant: false
+- export transformations: 0
+- UIP acceptance testing authorized: true
+- UIP integration certified: false
+- UIP cross-asset ranking authorized: false
+- automatic purchase execution: false
+
+Semantic-preservation requirements:
+
+- preserve MTG lane identity;
+- preserve native rank together with native rank type;
+- native rank is not a global MTG rank;
+- native rank is not a cross-asset UIP rank;
+- preserve native purchase status and purchase semantic;
+- missing price remains missing;
+- missing forecast remains missing;
+- missing rank remains missing;
+- missing purchase status remains missing;
+- Secret Lair `BUY_CANDIDATE_NOW` means
+  `MODEL_QUALIFIED_ENTRY_CANDIDATE`;
+- Secret Lair BUY is not execution-ready purchase authority;
+- manual execution-price validation remains required where governed;
+- Secret Lair discovery remains dynamic;
+- automatic purchase execution remains false.
+
+Domain-boundary rule:
+
+MTG, Metals, Crypto, and future Stocks/ETFs retain their native data,
+modeling, forecast, risk, ranking, recommendation, refresh, and
+recertification semantics unless separately governed.
+
+UIP may consume certified outputs, preserve lineage, orchestrate governed
+refresh routes, and present native evidence.
+
+Thresholds, weights, ranking semantics, recommendation policies, or model
+assumptions may not transfer between domains without explicit governance.
+
+No universal cross-asset ranking is authorized by this change.
+
+Refresh rule:
+
+Current-price refresh, liquidity refresh, new-asset discovery, historical
+append, model rerun, model retraining, recommendation rerun, recertification,
+and full rebuild remain distinct governed operations.
+
+Active integration sequence:
+
+1. `UIP-MTG-A1`
+2. `UIP-MTG-A2`
+3. `UIP-METALS-A0/A1`
+4. `UIP-CRYPTO-A0/A1`
+5. `UIP-D1`
+6. `UIP-R1`
+7. `UIP-R2`
+8. `UIP-E1`
+9. `UIP-DASH-1`
+10. `UIP-DASH-2`
+
+Prior state:
+
+`RECONSTRUCT_MTG_HISTORICAL_PERFORMANCE`
+
+New state:
+
+`CERTIFIED_DOMAIN_INTEGRATION_SEQUENCE_ACTIVE`
+
+Superseded scope:
+
+Only the prospective next-action requirement of `UIP-CHG-2026-025` is
+superseded. Its historical implementation decision and evidence remain
+preserved.
+
+Reversal:
+
+`FULLY_REVERSIBLE`
+
+Next required action:
+
+`UIP_MTG_A1_EXPORT_ACCEPTANCE_AND_SEMANTIC_PRESERVATION`
+
+---
+
 # Future change procedure
 
 Before material work:

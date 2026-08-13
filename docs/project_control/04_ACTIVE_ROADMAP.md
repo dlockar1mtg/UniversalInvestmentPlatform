@@ -218,7 +218,7 @@ Completion gate:
 
 Active phase:
 
-`Phase A`
+`Certified domain integration`
 
 Completed milestones:
 
@@ -230,15 +230,15 @@ Completed milestones:
 
 Current milestone:
 
-`MTG historical-performance reconstruction`
+`UIP_MTG_A1_EXPORT_ACCEPTANCE_AND_SEMANTIC_PRESERVATION`
 
 Next authorized action:
 
-`RECONSTRUCT_MTG_HISTORICAL_PERFORMANCE`
+`IMPLEMENT_UIP_MTG_A1_ACCEPTANCE_BOUNDARY`
 
 Expected subsequent action:
 
-`RECONSTRUCT_MTG_HISTORICAL_PERFORMANCE_INTEGRATION`
+`UIP_MTG_A2_INTEGRATION_CERTIFICATION`
 
 ## Dependency principle
 

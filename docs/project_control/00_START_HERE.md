@@ -71,21 +71,25 @@ A ledger entry may change policy prospectively, but it cannot rewrite historical
 
 Recovery classification:
 
-`RECOVERED_AND_READY_FOR_INTEGRATION`
+`RECOVERED_AND_READY_FOR_GOVERNED_DOMAIN_INTEGRATION`
 
 Current execution state:
 
-`MULTI_BRANCH_RECONCILIATION_REQUIRED_BEFORE_INTEGRATION`
+`CERTIFIED_DOMAIN_INTEGRATION_SEQUENCE_ACTIVE`
 
 Current phase:
 
-`Phase A — Project control and recovery stabilization`
+`Certified domain integration`
 
-Current stable baseline:
+Current governed main baseline:
+
+`5fd26f87e7e452321379d4e903c1ec19f804bad3`
+
+Historical recovery baseline:
 
 `7bd8d0e3cb0f8cfa61208a0950cb7c3f51c7b5e8`
 
-Baseline evidence:
+Historical recovery baseline evidence:
 
 `1,201 tests passed`
 
@@ -99,9 +103,9 @@ Recovered targeted-test evidence:
 
 Current next authorized action:
 
-`RECONSTRUCT_MTG_HISTORICAL_PERFORMANCE`
+`UIP_MTG_A1_EXPORT_ACCEPTANCE_AND_SEMANTIC_PRESERVATION`
 
-The controlled MTG reconciliation branch was created from `df8e796`, pushed to GitHub, and verified to exclude the defective Phase 10.12 recovery implementation. The next action is controlled reconstruction of MTG historical performance.
+The controlled MTG reconciliation branch and its recovery evidence remain preserved. Under `UIP-CHG-2026-026`, the active next action is certified MTG export acceptance and semantic-preservation testing. The former historical-performance reconstruction path is no longer the active prerequisite, and certified MTG source-domain work must not be reopened without a verified governance defect.
 
 ## Session summary template
 
