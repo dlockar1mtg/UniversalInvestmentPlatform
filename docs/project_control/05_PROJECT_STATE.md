@@ -30,7 +30,7 @@ MIGRATION_CHAIN_RECONCILIATION_PASS
 MIGRATION_CHAIN_REPRODUCES_CURRENT_SCHEMA
 MTG_RECONCILIATION_BRANCH_CREATED
 OLD_PHASE_10_12_IMPLEMENTATION_EXCLUDED
-PHASE_A_NOT_YET_CERTIFIED
+UIP_A0G_GOVERNANCE_SYNCHRONIZATION_PENDING_MERGE
 
 Next authorized action:
 UIP_MTG_A1_EXPORT_ACCEPTANCE_AND_SEMANTIC_PRESERVATION
@@ -290,12 +290,19 @@ Not authorized:
 
 ## Next integration sequence
 
-1. Reconstruct MTG historical performance.
-2. Port compatible MTG orchestration.
-3. Reconcile cross-domain production automation.
-4. Certify MTG end to end.
-5. Evaluate Phase 11 automation.
-6. Re-certify Crypto and Metals within combined automation.
+1. `UIP-MTG-A1` ? accept the certified MTG export and prove semantic preservation.
+2. `UIP-MTG-A2` ? certify MTG integration into UIP.
+3. `UIP-METALS-A0/A1` ? inspect and bind Metals under Metals-native governance.
+4. `UIP-CRYPTO-A0/A1` ? inspect and bind Crypto under Crypto-native governance.
+5. `UIP-D1` ? establish the minimal lossless common domain registry and lineage interface.
+6. `UIP-R1` ? establish governed refresh and orchestration contracts.
+7. `UIP-R2` ? perform refreshed-data rehearsals for MTG, Metals, and Crypto.
+8. `UIP-E1` ? establish the future Stocks/ETF extension boundary.
+9. `UIP-DASH-1` and `UIP-DASH-2` ? build the dashboard on certified multi-domain inputs.
+10. Govern future cross-asset ranking, comparison, or allocation methodology separately.
+
+No universal cross-asset ranking is authorized by this sequence.
+Automatic purchase execution remains disabled.
 
 ## State principle
 

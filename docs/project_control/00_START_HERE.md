@@ -101,7 +101,7 @@ Current next authorized action:
 
 `UIP_MTG_A1_EXPORT_ACCEPTANCE_AND_SEMANTIC_PRESERVATION`
 
-The controlled MTG reconciliation branch was created from `df8e796`, pushed to GitHub, and verified to exclude the defective Phase 10.12 recovery implementation. The next action is controlled reconstruction of MTG historical performance.
+The controlled MTG reconciliation branch and its recovery evidence remain preserved. Under `UIP-CHG-2026-026`, the active next action is certified MTG export acceptance and semantic-preservation testing. The former historical-performance reconstruction path is no longer the active prerequisite, and certified MTG source-domain work must not be reopened without a verified governance defect.
 
 ## Session summary template
 

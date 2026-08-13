@@ -617,7 +617,7 @@ Reversal:
 `FULLY_REVERSIBLE`
 
 
-## UIP-CHG-2026-026 ? Activate Certified Domain Integration Sequence
+## UIP-CHG-2026-026 — Activate Certified Domain Integration Sequence
 
 Date: 2026-08-13
 Status: ACTIVE
