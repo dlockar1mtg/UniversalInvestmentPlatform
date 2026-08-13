@@ -71,7 +71,7 @@ A ledger entry may change policy prospectively, but it cannot rewrite historical
 
 Recovery classification:
 
-`RECOVERED_AND_READY_FOR_INTEGRATION`
+`RECOVERED_AND_READY_FOR_GOVERNED_DOMAIN_INTEGRATION`
 
 Current execution state:
 
@@ -79,13 +79,17 @@ Current execution state:
 
 Current phase:
 
-`Phase A — Project control and recovery stabilization`
+`Certified domain integration`
 
-Current stable baseline:
+Current governed main baseline:
+
+`5fd26f87e7e452321379d4e903c1ec19f804bad3`
+
+Historical recovery baseline:
 
 `7bd8d0e3cb0f8cfa61208a0950cb7c3f51c7b5e8`
 
-Baseline evidence:
+Historical recovery baseline evidence:
 
 `1,201 tests passed`
 
