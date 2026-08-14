@@ -83,7 +83,7 @@ Current phase:
 
 Current governed main baseline:
 
-`4dfc98df10dcd1cf59db075b41cce95c237956b2`
+`398f949dee1f6af76d7823f07f61c628fab1ca57`
 
 Historical recovery baseline:
 
@@ -103,9 +103,9 @@ Recovered targeted-test evidence:
 
 Current next authorized action:
 
-`UIP_CRYPTO_A0_A1_DOMAIN_BINDING`
+`UIP_D1_COMMON_DOMAIN_REGISTRY_AND_LINEAGE_INTERFACE`
 
-The controlled MTG reconciliation branch and its recovery evidence remain preserved. Under `UIP-CHG-2026-026`, `UIP-CHG-2026-027`, and `UIP-CHG-2026-028`, UIP-MTG-A2 is certified complete and the active next action is UIP-METALS-A0/A1 domain binding. The former historical-performance reconstruction path is no longer the active prerequisite, and certified MTG source-domain work must not be reopened without a verified governance defect.
+The controlled recovery evidence remains preserved. Under `UIP-CHG-2026-026` through `UIP-CHG-2026-030`, MTG, Metals, and Crypto certified-domain integration milestones are complete. The active next action is the common UIP domain registry and lineage interface. Certified native-domain work must not be reopened without a verified governance defect.
 
 ## Session summary template
 

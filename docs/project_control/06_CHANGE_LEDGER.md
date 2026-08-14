@@ -939,6 +939,77 @@ Next required action:
 
 ---
 
+## UIP-CHG-2026-030 - Certify UIP-CRYPTO-A0/A1 and Activate UIP-D1
+
+Date: 2026-08-14
+Status: ACTIVE
+Type: CRYPTO_INTEGRATION, CERTIFICATION, ROADMAP_STATE
+Approval authority: Devon Lockard
+
+Decision:
+
+Certify `UIP_CRYPTO_A0_A1_DOMAIN_BINDING` complete and activate
+`UIP_D1_COMMON_DOMAIN_REGISTRY_AND_LINEAGE_INTERFACE`.
+
+Crypto A0/A1 evidence:
+
+- source repository: `dlockar1mtg/CryptoIntelligencePlatform`;
+- source commit: `951ca1111ef844a651eb6e12299441252ef5f56b`;
+- contract version: `1.0.0`;
+- adapter version: `1.0.0`;
+- rehearsal package: `crypto-uip-a1-rehearsal-20260814`;
+- asset / forecast / status / position / recommendation / risk rows: 6 / 132 / 1 / 0 / 6 / 6;
+- total imported rows: 151;
+- package population treated as permanent: false;
+- package integrity and SHA-256 validation: pass;
+- canonical Crypto identities preserved: true;
+- native recommendation labels preserved: true;
+- native `WAIT` maps to universal `watch`;
+- native `AVOID` maps to universal `sell`;
+- missing holdings preserved as absent; holdings synthesized: false;
+- import lineage complete: true;
+- duplicate replay rejected: true;
+- Crypto source database remained read-only;
+- Crypto native model changed: false;
+- cross-asset ranking created: false;
+- automatic purchase execution created: false;
+- focused Crypto A1 tests: 4 passed;
+- full UIP suite: 1,246 passed, 1 existing warning.
+
+Permanent evidence:
+
+`docs/project_control/generated/crypto_a1_integration/crypto_a1_integration_certification.json`
+
+Regression protection:
+
+`tests/test_crypto_a1_certification_evidence.py`
+
+Governance effect:
+
+MTG, Metals, and Crypto certified-domain integration milestones are complete for the current sequence.
+UIP may proceed to D1 without reopening those native domains unless a verified governance defect is found.
+
+No universal cross-asset ranking or allocation policy is authorized by this transition.
+
+No automatic purchase or trade execution is authorized by this transition.
+
+Prior state:
+
+`UIP_CRYPTO_A0_A1_DOMAIN_BINDING`
+
+New state:
+
+`UIP_D1_COMMON_DOMAIN_REGISTRY_AND_LINEAGE_INTERFACE`
+
+Reversal:
+
+`FULLY_REVERSIBLE`
+
+Next required action:
+
+`IMPLEMENT_COMMON_DOMAIN_REGISTRY_AND_LINEAGE_INTERFACE`
+---
+
 # Future change procedure
 
 Before material work:

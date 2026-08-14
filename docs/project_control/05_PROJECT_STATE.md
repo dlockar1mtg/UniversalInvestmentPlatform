@@ -19,7 +19,7 @@ Current roadmap phase:
 Certified domain integration
 
 Current milestone:
-UIP_CRYPTO_A0_A1_DOMAIN_BINDING
+UIP_D1_COMMON_DOMAIN_REGISTRY_AND_LINEAGE_INTERFACE
 
 Current certification:
 BASELINE_TEST_SUITE_PASS
@@ -40,9 +40,10 @@ UIP_MTG_A2_POST_MERGE_CI_PASS
 UIP_MTG_A2_POST_MERGE_CONTAINER_PASS
 
 UIP_METALS_A1_INTEGRATION_CERTIFICATION_PASS
+UIP_CRYPTO_A1_INTEGRATION_CERTIFICATION_PASS
 
 Next authorized action:
-UIP_CRYPTO_A0_A1_DOMAIN_BINDING
+UIP_D1_COMMON_DOMAIN_REGISTRY_AND_LINEAGE_INTERFACE
 ```
 
 ## Repository authority
@@ -65,7 +66,7 @@ Stable branch:
 
 Current governed main baseline:
 
-`4dfc98df10dcd1cf59db075b41cce95c237956b2`
+`398f949dee1f6af76d7823f07f61c628fab1ca57`
 
 Historical recovery baseline:
 
@@ -77,7 +78,7 @@ Historical recovery baseline evidence:
 
 Active governance branch:
 
-`phase-uip-metals-a0-a1-domain-binding`
+`phase-uip-crypto-a0-a1-domain-binding`
 
 ## UIP-MTG-A1 certification transition
 
@@ -465,3 +466,58 @@ Automatic purchase execution remains disabled.
 ## State principle
 
 > UIP recovery history remains preserved, but current integration proceeds from certified repository and domain-package authority. Each domain retains its native semantics; UIP may accept certified outputs, preserve lineage, orchestrate governed refreshes, and present evidence without silently redefining native models, ranks, recommendations, or execution authority.
+
+## UIP-CRYPTO-A0/A1 certification closeout
+
+Crypto source authority:
+
+`951ca1111ef844a651eb6e12299441252ef5f56b`
+
+UIP integration base:
+
+`398f949dee1f6af76d7823f07f61c628fab1ca57`
+
+Certification evidence:
+
+- status: `UIP_CRYPTO_A1_INTEGRATION_CERTIFICATION_PASS`;
+- contract version: `1.0.0`;
+- adapter version: `1.0.0`;
+- observed current assets: 6;
+- forecasts: 132;
+- platform-status rows: 1;
+- portfolio-position rows: 0;
+- recommendations: 6;
+- risk metrics: 6;
+- total imported rows: 151;
+- package population treated as permanent: false;
+- package integrity and manifest SHA-256 validation: pass;
+- canonical Crypto identities preserved: true;
+- native recommendation labels preserved: true;
+- `WAIT` normalized to universal `watch`: true;
+- `AVOID` normalized to universal `sell`: true;
+- missing holdings preserved as absent: true;
+- holdings synthesized: false;
+- lineage complete: true;
+- duplicate replay rejected: true;
+- Crypto source database remained read-only: true;
+- Crypto native model changed: false;
+- cross-asset ranking created: false;
+- automatic purchase execution created: false;
+- focused Crypto A1 tests: 4 passed;
+- full UIP suite: 1,246 passed, 1 existing warning.
+
+Permanent evidence:
+
+`docs/project_control/generated/crypto_a1_integration/crypto_a1_integration_certification.json`
+
+Regression protection:
+
+`tests/test_crypto_a1_certification_evidence.py`
+
+Disposition:
+
+`UIP_CRYPTO_A0_A1_CERTIFIED_COMPLETE`
+
+Active next milestone:
+
+`UIP_D1_COMMON_DOMAIN_REGISTRY_AND_LINEAGE_INTERFACE`

@@ -1,0 +1,86 @@
+﻿{
+    "certification_status":  "UIP_CRYPTO_A1_INTEGRATION_CERTIFICATION_PASS",
+    "certification_date":  "2026-08-14",
+    "uip":  {
+                "repository":  "dlockar1mtg/UniversalInvestmentPlatform",
+                "branch":  "phase-uip-crypto-a0-a1-domain-binding",
+                "base_commit":  "398f949dee1f6af76d7823f07f61c628fab1ca57"
+            },
+    "crypto_source":  {
+                          "repository":  "dlockar1mtg/CryptoIntelligencePlatform",
+                          "commit":  "951ca1111ef844a651eb6e12299441252ef5f56b",
+                          "contract_version":  "1.0.0",
+                          "adapter_version":  "1.0.0",
+                          "package_run_id":  "crypto-uip-a1-rehearsal-20260814",
+                          "package_population_is_permanent":  false
+                      },
+    "observed_package_counts":  {
+                                    "asset_master":  6,
+                                    "forecasts":  132,
+                                    "platform_status":  1,
+                                    "portfolio_positions":  0,
+                                    "recommendations":  6,
+                                    "risk_metrics":  6,
+                                    "imported_total":  151
+                                },
+    "semantic_certification":  {
+                                   "current_package_integrity_pass":  true,
+                                   "manifest_sha256_validation_pass":  true,
+                                   "adapter_version_preserved":  true,
+                                   "contract_version_preserved":  true,
+                                   "canonical_crypto_asset_ids_preserved":  true,
+                                   "native_recommendation_labels_preserved":  true,
+                                   "wait_normalized_to_watch":  true,
+                                   "avoid_normalized_to_sell":  true,
+                                   "missing_holdings_preserved_as_absent":  true,
+                                   "holdings_synthesized":  false,
+                                   "lineage_complete":  true,
+                                   "duplicate_replay_rejected":  true,
+                                   "source_database_read_only":  true,
+                                   "crypto_model_changed":  false,
+                                   "cross_asset_ranking_created":  false,
+                                   "automatic_purchase_execution_created":  false
+                               },
+    "recommendation_evidence":  [
+                                    {
+                                        "asset":  "crypto:avalanche",
+                                        "native":  "WAIT",
+                                        "universal":  "watch"
+                                    },
+                                    {
+                                        "asset":  "crypto:bitcoin",
+                                        "native":  "WAIT",
+                                        "universal":  "watch"
+                                    },
+                                    {
+                                        "asset":  "crypto:chainlink",
+                                        "native":  "WAIT",
+                                        "universal":  "watch"
+                                    },
+                                    {
+                                        "asset":  "crypto:ethereum",
+                                        "native":  "WAIT",
+                                        "universal":  "watch"
+                                    },
+                                    {
+                                        "asset":  "crypto:solana",
+                                        "native":  "WAIT",
+                                        "universal":  "watch"
+                                    },
+                                    {
+                                        "asset":  "crypto:xrp",
+                                        "native":  "AVOID",
+                                        "universal":  "sell"
+                                    }
+                                ],
+    "rehearsal":  {
+                      "status":  "UIP_CRYPTO_A1_FINAL_REHEARSAL_PASS",
+                      "disposable_import":  true,
+                      "production_uip_database_modified":  false,
+                      "crypto_database_modified":  false,
+                      "repository_files_modified_during_rehearsal":  false,
+                      "data_collection_performed":  false,
+                      "model_execution_performed":  false
+                  },
+    "next_authorized_milestone":  "UIP_D1_COMMON_DOMAIN_REGISTRY_AND_LINEAGE_INTERFACE"
+}
