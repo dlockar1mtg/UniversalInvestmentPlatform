@@ -61,6 +61,7 @@ def test_discovers_all_canonical_migrations() -> None:
         "002_audit_registry_integration.sql",
         "003_health_status_latest_attempt.sql",
         "004_historical_performance.sql",
+        "005_mtg_native_authority.sql",
     ]
 
 
@@ -81,7 +82,15 @@ def test_fresh_database_contains_historical_objects(
         objects["historical_performance_current"]
         == "VIEW"
     )
-    assert len(objects) == 25
+    assert len(objects) == 27
+    assert (
+        objects["mtg_native_authority_history"]
+        == "BASE TABLE"
+    )
+    assert (
+        objects["mtg_native_authority_current"]
+        == "VIEW"
+    )
 
 
 def test_upgrade_from_first_three_migrations(
@@ -113,7 +122,15 @@ def test_upgrade_from_first_three_migrations(
 
     after = _objects(database_path)
 
-    assert len(after) == 25
+    assert len(after) == 27
+    assert (
+        after["mtg_native_authority_history"]
+        == "BASE TABLE"
+    )
+    assert (
+        after["mtg_native_authority_current"]
+        == "VIEW"
+    )
     assert (
         after["historical_performance_history"]
         == "BASE TABLE"
@@ -137,7 +154,15 @@ def test_full_chain_is_idempotent(
     second = _objects(database_path)
 
     assert first == second
-    assert len(second) == 25
+    assert len(second) == 27
+    assert (
+        second["mtg_native_authority_history"]
+        == "BASE TABLE"
+    )
+    assert (
+        second["mtg_native_authority_current"]
+        == "VIEW"
+    )
 
 
 def test_failed_migration_rolls_back_full_chain(

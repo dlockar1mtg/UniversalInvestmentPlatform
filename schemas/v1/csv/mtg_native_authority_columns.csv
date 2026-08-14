@@ -1,0 +1,24 @@
+column_name,data_type,required,description,example
+mtg_asset_id,string,yes,Governed stable MTG asset identifier,mtg:collector:example
+mtg_lane,string,yes,Native governed MTG lane,COLLECTOR_V1
+native_asset_id,string,yes,Native source-domain asset identifier,example-native-id
+product_name,string,yes,Native MTG product name,Example Product
+lane_authority_state,string,yes,Native lane authority state,CERTIFIED
+current_price_usd,decimal,no,Native governed current price in USD,120.00
+current_price_authority_available,boolean,yes,Whether native current-price authority exists,true
+forecast_authority_available,boolean,yes,Whether native forecast authority exists,true
+forecast_1y_price_usd,decimal,no,Native governed one-year forecast price,145.00
+forecast_1y_return,decimal,no,Native governed one-year forecast return,0.2083
+risk_authority_available,boolean,yes,Whether native risk authority exists,true
+native_rank,integer,no,Native rank preserved with native rank type,12
+native_rank_type,string,no,Native rank semantic type,COLLECTOR_NATIVE_RANK
+native_purchase_status,string,no,Native purchase status,BUY_CANDIDATE_NOW
+purchase_semantic,string,no,Meaning of native purchase status,MODEL_QUALIFIED_ENTRY_CANDIDATE
+evidence_state,string,yes,Native evidence state,CERTIFIED
+actionability_state,string,yes,Native actionability state,ACTIONABLE
+execution_ready_purchase_certified,boolean,yes,Whether execution-ready purchase authority exists,false
+manual_execution_price_check_required,boolean,yes,Whether manual execution-price validation is required,true
+native_authority_pointer,string,yes,Pointer to native certified authority,docs/example.csv
+native_authority_sha256,string,yes,SHA-256 of native authority,0123456789abcdef
+snapshot_population_is_permanent,boolean,yes,Whether this lane population is permanently fixed,false
+automatic_purchase_execution,boolean,yes,Whether automatic purchase execution is authorized,false

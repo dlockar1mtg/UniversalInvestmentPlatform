@@ -730,6 +730,63 @@ Next required action:
 
 ---
 
+## UIP-CHG-2026-027 — Certify UIP-MTG-A1 and Activate UIP-MTG-A2
+
+Date: 2026-08-14
+Status: ACTIVE
+Type: MTG_INTEGRATION, CERTIFICATION, ROADMAP_STATE, DATA_LINEAGE
+Approval authority: Devon Lockard
+
+Decision:
+
+Certify completion of `UIP_MTG_A1_EXPORT_ACCEPTANCE_AND_SEMANTIC_PRESERVATION` and activate `UIP_MTG_A2_INTEGRATION_CERTIFICATION`.
+
+This transition implements the sequence already approved by `UIP-CHG-2026-026`. It does not create cross-asset ranking authority, change MTG model semantics, or reopen certified MTG source-domain work.
+
+A1 evidence:
+
+- implementation commit: `7b02c11bf30096c37f08eeea02716d7e0cc9d176`;
+- pull request: `#35`;
+- governed merge commit: `8d414f599684dd9ead27008d821fd2b41d5fd9e7`;
+- certified MTG export authority: `62905717e7944591a83578abaef16ad0ca16e1f5`;
+- production authority: `94c2bd3273eaba4d05ee8f7f5c3d6c4dcc283768`;
+- canonical payload SHA-256: `aa363cd474ae6b846588bb4af2fd235a676e5cefd65441d497addf765a35eb71`;
+- current rows: 968, not a permanent universe constant;
+- Collector / Pre-Collector / Secret Lair rows: 50 / 131 / 787;
+- Secret Lair BUY candidates: 88;
+- duplicate governed asset IDs: 0;
+- transformations and missing-value imputations: 0;
+- execution-ready purchase authority: false;
+- cross-asset ranking authority: false;
+- automatic purchase execution: false;
+- full UIP suite: 1,227 passed, 1 existing warning;
+- post-merge UIP CI #487: success;
+- post-merge Container Delivery #64: success.
+
+A2 boundary:
+
+A2 must certify the binding between the accepted MTG V1 export and UIP canonical integration/storage while preserving native lane identity, native rank and rank type, native purchase semantics, missingness, dynamic Secret Lair discovery, and full lineage.
+
+The older `uip-mtg-delivery-v1` intake is implementation evidence only and must not be treated as semantic authority for the new MTG V1 export.
+
+Prior state:
+
+`UIP_MTG_A1_EXPORT_ACCEPTANCE_AND_SEMANTIC_PRESERVATION`
+
+New state:
+
+`UIP_MTG_A2_INTEGRATION_CERTIFICATION`
+
+Reversal:
+
+`FULLY_REVERSIBLE`
+
+Next required action:
+
+`CERTIFY_UIP_MTG_A2_INTEGRATION`
+
+---
+
 # Future change procedure
 
 Before material work:

@@ -83,7 +83,7 @@ Current phase:
 
 Current governed main baseline:
 
-`5fd26f87e7e452321379d4e903c1ec19f804bad3`
+`8d414f599684dd9ead27008d821fd2b41d5fd9e7`
 
 Historical recovery baseline:
 
@@ -103,9 +103,9 @@ Recovered targeted-test evidence:
 
 Current next authorized action:
 
-`UIP_MTG_A1_EXPORT_ACCEPTANCE_AND_SEMANTIC_PRESERVATION`
+`UIP_MTG_A2_INTEGRATION_CERTIFICATION`
 
-The controlled MTG reconciliation branch and its recovery evidence remain preserved. Under `UIP-CHG-2026-026`, the active next action is certified MTG export acceptance and semantic-preservation testing. The former historical-performance reconstruction path is no longer the active prerequisite, and certified MTG source-domain work must not be reopened without a verified governance defect.
+The controlled MTG reconciliation branch and its recovery evidence remain preserved. Under `UIP-CHG-2026-026` and `UIP-CHG-2026-027`, UIP-MTG-A1 is certified complete and the active next action is UIP-MTG-A2 integration certification. The former historical-performance reconstruction path is no longer the active prerequisite, and certified MTG source-domain work must not be reopened without a verified governance defect.
 
 ## Session summary template
 
