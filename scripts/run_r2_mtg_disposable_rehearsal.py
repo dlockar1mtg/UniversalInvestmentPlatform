@@ -9,9 +9,11 @@ import tempfile
 import zipfile
 from pathlib import Path
 
-from foundation.integrations.mtg.v1_integration_binding import import_mtg_v1_authority, result_to_dict
-
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
+from foundation.integrations.mtg.v1_integration_binding import import_mtg_v1_authority, result_to_dict
 
 EXPECTED_RUN_ID = "31843560745"
 EXPECTED_SOURCE_COMMIT = "c40b1dd1191f7f3c2a760fd307fe1041e02ea24c"
