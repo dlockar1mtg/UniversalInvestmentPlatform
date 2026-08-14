@@ -787,6 +787,158 @@ Next required action:
 
 ---
 
+## UIP-CHG-2026-028 — Certify UIP-MTG-A2 and Activate UIP-METALS-A0/A1
+
+Date: 2026-08-14
+Status: ACTIVE
+Type: MTG_INTEGRATION, METALS_INTEGRATION, CERTIFICATION, ROADMAP_STATE
+Approval authority: Devon Lockard
+
+Decision:
+
+Certify `UIP_MTG_A2_INTEGRATION_CERTIFICATION` complete and activate `UIP_METALS_A0_A1_DOMAIN_BINDING`.
+
+MTG A2 evidence:
+
+- implementation commit: `d5acd3725203a826f5899b5faed9708c6caecafa`;
+- pull request: `#36`;
+- governed merge commit: `4dfc98df10dcd1cf59db075b41cce95c237956b2`;
+- canonical MTG rows: 968;
+- 23 native fields preserved;
+- lineage-missing rows: 0;
+- generic recommendation, forecast, and risk reinterpretation: false;
+- cross-asset ranking created: false;
+- execution-ready purchase authority created: false;
+- automatic purchase execution: false;
+- full UIP suite: 1,232 passed, 1 existing warning;
+- post-merge UIP CI #491: success;
+- post-merge Container Delivery #66: success.
+
+Metals A0/A1 boundary:
+
+Metals is an existing UIP-native domain and must be inspected from current repository authority before any new implementation. Phase 8.8 certification and Phase 8.9.x runtime-independence evidence are implementation authorities to reconcile, not reasons to restart or replace Metals-native models.
+
+A0/A1 must determine current certified Metals ownership, provider and freshness state, canonical asset and vehicle coverage, forecast/recommendation/risk publication surfaces, runtime independence, package/import lineage, and the remaining binding gap into current UIP canonical architecture.
+
+No Metals-native methodology, forecast logic, recommendation semantics, risk semantics, provider authority, or asset-universe rule may be redefined during A0/A1 unless a verified governance defect is found.
+
+Prior state:
+
+`UIP_MTG_A2_INTEGRATION_CERTIFICATION`
+
+New state:
+
+`UIP_METALS_A0_A1_DOMAIN_BINDING`
+
+Reversal:
+
+`FULLY_REVERSIBLE`
+
+Next required action:
+
+`INSPECT_AND_BIND_UIP_METALS_NATIVE_DOMAIN`
+
+---
+
+## UIP-CHG-2026-029 — Certify UIP-METALS-A0/A1 and Activate UIP-CRYPTO-A0/A1
+
+Date: 2026-08-14
+Status: ACTIVE
+Type: METALS_INTEGRATION, CRYPTO_INTEGRATION, CERTIFICATION, ROADMAP_STATE, GOVERNANCE_CORRECTION
+Approval authority: Devon Lockard
+
+Decision:
+
+Certify `UIP_METALS_A0_A1_DOMAIN_BINDING` complete and activate
+`UIP_CRYPTO_A0_A1_DOMAIN_BINDING`.
+
+This entry also prospectively corrects a documentary omission in
+`UIP-CHG-2026-028`. Entry 028 correctly recorded the MTG A2 implementation,
+PR, governed merge, tests, and post-merge CI evidence, but omitted the
+separate A2 governance-transition commit:
+
+`1e9c1718f518c20b090a1e8ee7b6a53398de9d86`
+
+Entry 028 remains unchanged as historical ledger evidence. This correction
+does not alter MTG A2 implementation semantics, certification results, or
+merge authority.
+
+Metals A0/A1 evidence:
+
+- governed main baseline: `4dfc98df10dcd1cf59db075b41cce95c237956b2`;
+- governance activation: `13434495ac216e2a71569f92371e62d7c3d7369e`;
+- UTF-8 governance correction: `f1a60eeb6d179261b6df57fa461dfd9a6e0bf318`;
+- canonical identity binding: `21cf4a7c28c46761a6c57ab28f327fd3b3b9ea03`;
+- lossless contract-to-history translation: `a2f0e1939e60f909332b0443db8cb0be5396abf8`;
+- native package contract alignment: `ce1339425af63cd2087c66e09e5c7b84945d2b02`;
+- certified technical integration: `b9299c0aecbdc4bcb9aee1ea9582022dd36bb0c5`;
+- certification status: `UIP_METALS_A1_INTEGRATION_CERTIFICATION_PASS`;
+- canonical registry assets: 10;
+- governed commodity forecast assets: 9;
+- reserve/noncommodity assets: 1;
+- published asset / forecast / recommendation / platform-status rows: 9 / 9 / 9 / 1;
+- transactional datasets imported: 4;
+- imported rows: 28;
+- canonical identities preserved: true;
+- commodity benchmarks treated as direct investment vehicles: false;
+- unsupported liquidity, market/region, or history-start authority synthesized: false;
+- forecast semantics preserved: true;
+- missing forecast authority preserved as NULL: true;
+- native recommendation labels preserved: true;
+- universal recommendation vocabulary standardized: true;
+- otherwise-unmapped governed contract fields preserved in metadata: true;
+- import lineage complete: true;
+- duplicate replay rejected: true;
+- unknown native asset fails closed: true;
+- standalone-free readiness: pass;
+- native Metals model changed: false;
+- cross-domain allocation policy changed: false;
+- cross-asset ranking authority: false;
+- automatic purchase execution: false;
+- targeted A1 tests: 18 passed;
+- MTG A2 regression tests: 5 passed;
+- Metals-focused tests: 144 passed;
+- full UIP suite: 1,242 passed, 1 existing warning.
+
+Permanent certification evidence:
+
+`docs/project_control/generated/metals_a1_integration/metals_a1_integration_certification.json`
+
+Crypto boundary:
+
+Crypto A0/A1 must begin from current repository and certified source-domain
+truth. Existing Crypto branches already contained in UIP main are evidence,
+not authorization to rebuild or redefine Crypto-native logic.
+
+A0/A1 must inspect current Crypto ownership, package/export contract,
+canonical asset coverage, package-byte integrity, import lineage,
+forecast/recommendation/risk semantics, runtime independence, and any
+remaining UIP binding gap.
+
+No MTG or Metals work may be reopened during Crypto A0/A1 without a verified
+governance defect.
+
+No cross-asset ranking or automatic purchase execution is authorized by this
+transition.
+
+Prior state:
+
+`UIP_METALS_A0_A1_DOMAIN_BINDING`
+
+New state:
+
+`UIP_CRYPTO_A0_A1_DOMAIN_BINDING`
+
+Reversal:
+
+`FULLY_REVERSIBLE`
+
+Next required action:
+
+`INSPECT_AND_BIND_UIP_CRYPTO_DOMAIN`
+
+---
+
 # Future change procedure
 
 Before material work:

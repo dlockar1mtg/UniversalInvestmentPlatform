@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 import csv
+import json
 import uuid
 
 import duckdb
@@ -46,6 +47,126 @@ LINEAGE_COLUMNS = (
     "_manifest_sha256",
     "_imported_at_utc",
 )
+
+
+CONTRACT_TO_HISTORY_ALIASES = {
+    "asset_master": {
+        "is_active": "active",
+        "data_source": "source_system",
+        "first_available_date": "first_observed_date",
+    },
+    "forecasts": {
+        "forecast_value_base": "point_forecast",
+        "forecast_value_bear": "lower_bound",
+        "forecast_value_bull": "upper_bound",
+        "expected_total_return": "expected_return",
+        "probability_positive_return": "probability_positive",
+        "forecast_confidence": "confidence_score",
+        "scenario_name": "scenario",
+    },
+    "recommendations": {
+        "rationale_summary": "rationale",
+        "rationale": "rationale",
+        "primary_risk": "risk_summary",
+        "confidence": "confidence_score",
+        "recommendation_score": "normalized_score",
+    },
+    "platform_status": {
+        "status": "run_status",
+        "message": "status_message",
+        "last_successful_run_at_utc": "run_completed_at_utc",
+    },
+}
+
+
+def _parse_metadata_json(value: str) -> dict[str, object]:
+    raw = str(value or "").strip()
+    if not raw:
+        return {}
+
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError:
+        return {"source_metadata_raw": raw}
+
+    if isinstance(parsed, dict):
+        return dict(parsed)
+
+    return {"source_metadata_value": parsed}
+
+
+def _translate_contract_row(
+    dataset_name: str,
+    row: dict[str, str],
+    business_columns: list[str],
+) -> dict[str, object]:
+    """Translate a governed package row into the history-table shape losslessly."""
+
+    aliases = CONTRACT_TO_HISTORY_ALIASES.get(dataset_name, {})
+    business = set(business_columns)
+
+    translated: dict[str, object] = {}
+    consumed_source_fields: set[str] = set()
+
+    # Same-name fields are authoritative when the destination supports them.
+    for column in business_columns:
+        if column == "metadata_json":
+            continue
+        if column in row:
+            translated[column] = _coerce_blank(row.get(column, ""))
+            consumed_source_fields.add(column)
+
+    # Explicit contract -> history aliases fill only destination fields that
+    # were not already populated by an exact-name source field.
+    for source_column, destination_column in aliases.items():
+        if source_column not in row:
+            continue
+        if destination_column not in business:
+            continue
+
+        existing = translated.get(destination_column)
+        if existing is None:
+            translated[destination_column] = _coerce_blank(
+                row.get(source_column, "")
+            )
+
+        consumed_source_fields.add(source_column)
+
+    # Preserve every source field that has no dedicated history column.
+    metadata = _parse_metadata_json(row.get("metadata_json", ""))
+
+    unmapped = {}
+    for key, value in row.items():
+        if key == "metadata_json":
+            continue
+        if key in consumed_source_fields:
+            continue
+        if key in business:
+            continue
+        if key in aliases:
+            continue
+
+        normalized = _coerce_blank(value)
+        if normalized is not None:
+            unmapped[key] = normalized
+
+    if unmapped:
+        existing_unmapped = metadata.get("unmapped_contract_fields")
+        if isinstance(existing_unmapped, dict):
+            merged_unmapped = dict(existing_unmapped)
+            merged_unmapped.update(unmapped)
+            metadata["unmapped_contract_fields"] = merged_unmapped
+        else:
+            metadata["unmapped_contract_fields"] = unmapped
+
+    if "metadata_json" in business:
+        translated["metadata_json"] = (
+            json.dumps(metadata, sort_keys=True, separators=(",", ":"))
+            if metadata
+            else None
+        )
+
+    return translated
 
 
 @dataclass(frozen=True)
@@ -147,6 +268,7 @@ def _duplicate_exists(
 
 def _insert_rows(
     connection: duckdb.DuckDBPyConnection,
+    dataset_name: str,
     table_name: str,
     csv_path: Path,
     import_id: str,
@@ -182,7 +304,15 @@ def _insert_rows(
 
     payload = []
     for row_number, row in enumerate(rows, start=2):
-        values = [_coerce_blank(row.get(col, "")) for col in business_columns]
+        translated = _translate_contract_row(
+            dataset_name,
+            row,
+            business_columns,
+        )
+        values = [
+            translated.get(col)
+            for col in business_columns
+        ]
         values.extend(
             [
                 import_id,
@@ -284,6 +414,7 @@ def import_package(
             source_path = package.package_path / entry.filename
             row_count = _insert_rows(
                 connection=connection,
+                dataset_name=dataset_name,
                 table_name=table_name,
                 csv_path=source_path,
                 import_id=import_id,

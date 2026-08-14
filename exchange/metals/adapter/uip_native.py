@@ -9,9 +9,13 @@ from dataclasses import asdict, dataclass
 from datetime import date, datetime, timezone
 from pathlib import Path
 
+from foundation.production.metals_registry import load_metals_registry
+
 CONTRACT_VERSION = "1.0.0"
 ADAPTER_VERSION = "uip-native-metals-1.0.0"
 PLATFORM_ID = "metals"
+PLATFORM_NAME = "Metals Intelligence Platform"
+PLATFORM_VERSION = "1.0.0"
 
 
 @dataclass(frozen=True)
@@ -51,6 +55,28 @@ def _add_months(value: str, months: int) -> str:
     return date(year, month, day).isoformat()
 
 
+def _standard_recommendation(value: object) -> tuple[str, str]:
+    native = str(value or "").strip().upper()
+    mapping = {
+        "STRONG_BUY": "strong_buy",
+        "BUY": "buy",
+        "HOLD": "hold",
+        "REDUCE": "reduce",
+        "AVOID": "not_ready",
+    }
+    try:
+        return mapping[native], native
+    except KeyError as exc:
+        raise ValueError(
+            f"Unsupported native Metals recommendation: {native or '<blank>'}"
+        ) from exc
+
+
+def _normalized_recommendation_score(expected_return: object) -> float:
+    raw = float(expected_return) * 100.0
+    return round(min(100.0, max(0.0, raw)), 6)
+
+
 def publish_uip_native_metals_package(
     native_cycle_path: Path,
     output_root: Path,
@@ -69,29 +95,43 @@ def publish_uip_native_metals_package(
     package_root = output_root / package_id
     package_root.mkdir(parents=True, exist_ok=False)
 
+    registry = load_metals_registry()
+    assets_by_slug = registry.assets_by_slug
+
     assets: dict[str, dict[str, object]] = {}
     forecast_rows: list[dict[str, object]] = []
     recommendation_rows: list[dict[str, object]] = []
     for row in forecasts:
-        asset_id = str(row["asset_id"])
-        universal_id = f"metals:{asset_id.lower()}"
+        asset_id = str(row["asset_id"]).strip()
+        native_slug = asset_id.lower()
+        try:
+            canonical_asset = assets_by_slug[native_slug]
+        except KeyError as exc:
+            raise ValueError(
+                f"Native Metals asset is not present in the canonical registry: {asset_id}"
+            ) from exc
+        if canonical_asset.asset_class != "commodity":
+            raise ValueError(
+                f"Native Metals forecast asset is not a governed commodity: {asset_id}"
+            )
+        universal_id = canonical_asset.asset_id
         assets[asset_id] = {
             "contract_version": CONTRACT_VERSION,
             "platform_id": PLATFORM_ID,
             "run_id": run,
             "universal_asset_id": universal_id,
             "platform_asset_id": asset_id,
-            "asset_name": asset_id.title(),
-            "asset_symbol": asset_id,
+            "asset_name": canonical_asset.name,
+            "asset_symbol": canonical_asset.symbol,
             "asset_class": "metals",
             "asset_subclass": "commodity_benchmark",
             "currency": "USD",
-            "market_or_region": "global",
+            "market_or_region": "",
             "is_active": True,
-            "investable": True,
-            "liquidity_tier": "high",
+            "investable": False,
+            "liquidity_tier": "",
             "data_source": "UIP-native Metals store",
-            "first_available_date": row["as_of_date"],
+            "first_available_date": "",
             "last_updated_at_utc": generated,
         }
         forecast_rows.append({
@@ -115,17 +155,28 @@ def publish_uip_native_metals_package(
             "model_version": row["methodology_version"],
             "generated_at_utc": generated,
         })
+        universal_recommendation, native_recommendation = (
+            _standard_recommendation(row["recommendation"])
+        )
         recommendation_rows.append({
             "contract_version": CONTRACT_VERSION,
             "platform_id": PLATFORM_ID,
             "run_id": run,
             "universal_asset_id": universal_id,
-            "recommendation_date": row["as_of_date"],
-            "recommendation": row["recommendation"],
-            "recommendation_score": round(float(row["expected_return"]) * 100, 6),
-            "confidence": round(float(row["confidence"]) * 100, 2),
-            "time_horizon_months": row["horizon_months"],
-            "rationale": f"UIP-native {row['model_id']} forecast",
+            "as_of_date": row["as_of_date"],
+            "recommendation": universal_recommendation,
+            "normalized_score": _normalized_recommendation_score(
+                row["expected_return"]
+            ),
+            "confidence_score": round(float(row["confidence"]) * 100, 2),
+            "platform_native_score": "",
+            "platform_native_label": native_recommendation,
+            "time_horizon": f"{int(row['horizon_months'])}_month",
+            "target_weight": "",
+            "minimum_weight": "",
+            "maximum_weight": "",
+            "rationale_summary": f"UIP-native {row['model_id']} forecast",
+            "primary_risk": "",
             "model_version": row["methodology_version"],
             "generated_at_utc": generated,
         })
@@ -137,15 +188,34 @@ def publish_uip_native_metals_package(
         "platform_status": ([{
             "contract_version": CONTRACT_VERSION,
             "platform_id": PLATFORM_ID,
+            "platform_name": PLATFORM_NAME,
+            "platform_version": PLATFORM_VERSION,
             "run_id": run,
-            "status": "HEALTHY",
-            "status_date": generated[:10],
+            "run_started_at_utc": generated,
+            "run_completed_at_utc": generated,
+            "run_status": "success",
             "data_as_of_date": max(str(row["as_of_date"]) for row in forecasts),
-            "last_successful_run_at_utc": generated,
-            "adapter_version": ADAPTER_VERSION,
+            "records_published": len(forecast_rows),
+            "warning_count": 0,
+            "error_count": 0,
+            "source_machine": "",
             "message": "UIP-native Metals package generated without external runtime",
-            "generated_at_utc": generated,
-        }], ["contract_version", "platform_id", "run_id", "status", "status_date", "data_as_of_date", "last_successful_run_at_utc", "adapter_version", "message", "generated_at_utc"]),
+        }], [
+            "contract_version",
+            "platform_id",
+            "platform_name",
+            "platform_version",
+            "run_id",
+            "run_started_at_utc",
+            "run_completed_at_utc",
+            "run_status",
+            "data_as_of_date",
+            "records_published",
+            "warning_count",
+            "error_count",
+            "source_machine",
+            "message",
+        ]),
     }
 
     manifest_rows: list[dict[str, object]] = []
