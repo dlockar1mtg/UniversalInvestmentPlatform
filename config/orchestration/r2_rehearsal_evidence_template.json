@@ -1,0 +1,58 @@
+{
+  "schema_version": "1.0.0",
+  "milestone": "UIP_R2_REFRESHED_DATA_REHEARSAL",
+  "production_uip_activation_authorized": false,
+  "cross_asset_ranking_authorized": false,
+  "allocation_policy_authorized": false,
+  "automatic_execution_authorized": false,
+  "required_cycle_evidence_fields": [
+    "domain_id",
+    "source_repository_or_native_boundary",
+    "source_commit_or_version",
+    "refresh_started_at_utc",
+    "refresh_completed_at_utc",
+    "data_as_of",
+    "producer_run_id",
+    "package_id",
+    "package_manifest_sha256_or_equivalent",
+    "dataset_coverage",
+    "native_status",
+    "freshness_status",
+    "warnings",
+    "errors",
+    "data_collection_performed",
+    "model_execution_performed",
+    "uip_import_status",
+    "uip_import_id",
+    "lineage_status"
+  ],
+  "domains": {
+    "mtg": {
+      "status": "PENDING_REAL_REFRESH",
+      "compatibility_gate": "R2_COMPATIBILITY_PROOF_REQUIRED",
+      "evidence": {}
+    },
+    "metals": {
+      "status": "PENDING_REAL_REFRESH",
+      "compatibility_gate": "CERTIFIED_A1_COMPATIBLE_PENDING_FRESH_R2_REHEARSAL",
+      "evidence": {}
+    },
+    "crypto": {
+      "status": "PENDING_REAL_REFRESH",
+      "compatibility_gate": "CERTIFIED_A1_COMPATIBLE_PENDING_FRESH_R2_REHEARSAL",
+      "evidence": {}
+    }
+  },
+  "r2_pass_requirements": {
+    "all_three_real_refreshes_successful": true,
+    "all_required_evidence_fields_populated": true,
+    "disposable_uip_state_used": true,
+    "package_integrity_proven": true,
+    "semantic_compatibility_proven": true,
+    "lineage_complete": true,
+    "production_uip_database_modified": false,
+    "native_domain_semantics_changed": false,
+    "partial_activation_performed": false
+  },
+  "next_gate": "UIP_R3_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_REVIEW"
+}
