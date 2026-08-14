@@ -19,7 +19,7 @@ Current roadmap phase:
 Certified domain integration
 
 Current milestone:
-UIP_METALS_A0_A1_DOMAIN_BINDING
+UIP_CRYPTO_A0_A1_DOMAIN_BINDING
 
 Current certification:
 BASELINE_TEST_SUITE_PASS
@@ -39,8 +39,10 @@ UIP_MTG_A2_MERGED
 UIP_MTG_A2_POST_MERGE_CI_PASS
 UIP_MTG_A2_POST_MERGE_CONTAINER_PASS
 
+UIP_METALS_A1_INTEGRATION_CERTIFICATION_PASS
+
 Next authorized action:
-UIP_METALS_A0_A1_DOMAIN_BINDING
+UIP_CRYPTO_A0_A1_DOMAIN_BINDING
 ```
 
 ## Repository authority
@@ -120,6 +122,10 @@ Active next milestone:
 
 ## UIP-MTG-A2 certification closeout
 
+A2 governance transition commit:
+
+`1e9c1718f518c20b090a1e8ee7b6a53398de9d86`
+
 A2 implementation commit:
 
 `d5acd3725203a826f5899b5faed9708c6caecafa`
@@ -158,6 +164,65 @@ Disposition:
 Active next milestone:
 
 `UIP_METALS_A0_A1_DOMAIN_BINDING`
+
+## UIP-METALS-A0/A1 certification closeout
+
+Certified technical integration commit:
+
+`b9299c0aecbdc4bcb9aee1ea9582022dd36bb0c5`
+
+Supporting implementation commits:
+
+- governance activation: `13434495ac216e2a71569f92371e62d7c3d7369e`;
+- UTF-8 governance correction: `f1a60eeb6d179261b6df57fa461dfd9a6e0bf318`;
+- canonical identity binding: `21cf4a7c28c46761a6c57ab28f327fd3b3b9ea03`;
+- lossless universal-contract import translation: `a2f0e1939e60f909332b0443db8cb0be5396abf8`;
+- native package contract alignment: `ce1339425af63cd2087c66e09e5c7b84945d2b02`.
+
+Certification evidence:
+
+- status: `UIP_METALS_A1_INTEGRATION_CERTIFICATION_PASS`;
+- canonical Metals registry assets: 10;
+- governed commodity forecast assets: 9;
+- governed noncommodity reserve assets: 1;
+- published asset / forecast / recommendation / platform-status rows: 9 / 9 / 9 / 1;
+- transactional datasets imported: 4;
+- imported rows: 28;
+- canonical asset identities preserved: true;
+- commodity benchmarks marked investable: false;
+- unsupported liquidity authority synthesized: false;
+- unsupported market/region authority synthesized: false;
+- fabricated first-history date synthesized: false;
+- forecast semantics preserved: true;
+- missing forecast authority preserved as NULL: true;
+- native recommendation labels preserved: true;
+- universal recommendation vocabulary standardized: true;
+- otherwise-unmapped governed contract fields preserved in metadata: true;
+- platform status preserved: true;
+- lineage complete: true;
+- duplicate package replay rejected: true;
+- unknown native asset fails closed: true;
+- standalone-free readiness: pass;
+- Metals native model changed: false;
+- cross-domain allocation policy changed: false;
+- cross-asset ranking authority created: false;
+- automatic purchase execution created: false;
+- targeted A1 tests: 18 passed;
+- MTG A2 regression tests: 5 passed;
+- Metals-focused tests: 144 passed;
+- full UIP suite: 1,242 passed, 1 existing warning.
+
+Permanent evidence:
+
+`docs/project_control/generated/metals_a1_integration/metals_a1_integration_certification.json`
+
+Disposition:
+
+`UIP_METALS_A0_A1_CERTIFIED_COMPLETE`
+
+Active next milestone:
+
+`UIP_CRYPTO_A0_A1_DOMAIN_BINDING`
 
 ## Recovered historical-performance work
 
