@@ -83,7 +83,7 @@ Current phase:
 
 Current governed main baseline:
 
-`1babdacdc101e40f6f4550b56883ccc7b2d0f674`
+`55d5c72582bf70aff21a30b69edadab9ea9e8553`
 
 Historical recovery baseline:
 
@@ -103,9 +103,9 @@ Recovered targeted-test evidence:
 
 Current next authorized action:
 
-`UIP_R1_REFRESH_AND_ORCHESTRATION_CONTRACTS`
+`UIP_R2_REFRESHED_DATA_REHEARSAL`
 
-The controlled recovery evidence remains preserved. Under `UIP-CHG-2026-026` through `UIP-CHG-2026-031`, MTG, Metals, Crypto, and D1 are certified complete. The active next action is R1 governed refresh and orchestration contracts. Certified native-domain and D1 work must not be reopened without a verified governance defect.
+The controlled recovery evidence remains preserved. Under `UIP-CHG-2026-026` through `UIP-CHG-2026-032`, MTG, Metals, Crypto, D1, and R1 are certified complete. The active next action is R2 real refreshed-data rehearsal, followed by the governed R3 output-rationality/domain-health gate before E1 or dashboard decision logic. Certified native-domain, D1, and R1 work must not be reopened without a verified governance defect.
 
 ## Session summary template
 
