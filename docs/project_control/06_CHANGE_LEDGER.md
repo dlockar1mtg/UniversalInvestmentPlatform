@@ -787,6 +787,59 @@ Next required action:
 
 ---
 
+## UIP-CHG-2026-028 — Certify UIP-MTG-A2 and Activate UIP-METALS-A0/A1
+
+Date: 2026-08-14
+Status: ACTIVE
+Type: MTG_INTEGRATION, METALS_INTEGRATION, CERTIFICATION, ROADMAP_STATE
+Approval authority: Devon Lockard
+
+Decision:
+
+Certify `UIP_MTG_A2_INTEGRATION_CERTIFICATION` complete and activate `UIP_METALS_A0_A1_DOMAIN_BINDING`.
+
+MTG A2 evidence:
+
+- implementation commit: `d5acd3725203a826f5899b5faed9708c6caecafa`;
+- pull request: `#36`;
+- governed merge commit: `4dfc98df10dcd1cf59db075b41cce95c237956b2`;
+- canonical MTG rows: 968;
+- 23 native fields preserved;
+- lineage-missing rows: 0;
+- generic recommendation, forecast, and risk reinterpretation: false;
+- cross-asset ranking created: false;
+- execution-ready purchase authority created: false;
+- automatic purchase execution: false;
+- full UIP suite: 1,232 passed, 1 existing warning;
+- post-merge UIP CI #491: success;
+- post-merge Container Delivery #66: success.
+
+Metals A0/A1 boundary:
+
+Metals is an existing UIP-native domain and must be inspected from current repository authority before any new implementation. Phase 8.8 certification and Phase 8.9.x runtime-independence evidence are implementation authorities to reconcile, not reasons to restart or replace Metals-native models.
+
+A0/A1 must determine current certified Metals ownership, provider and freshness state, canonical asset and vehicle coverage, forecast/recommendation/risk publication surfaces, runtime independence, package/import lineage, and the remaining binding gap into current UIP canonical architecture.
+
+No Metals-native methodology, forecast logic, recommendation semantics, risk semantics, provider authority, or asset-universe rule may be redefined during A0/A1 unless a verified governance defect is found.
+
+Prior state:
+
+`UIP_MTG_A2_INTEGRATION_CERTIFICATION`
+
+New state:
+
+`UIP_METALS_A0_A1_DOMAIN_BINDING`
+
+Reversal:
+
+`FULLY_REVERSIBLE`
+
+Next required action:
+
+`INSPECT_AND_BIND_UIP_METALS_NATIVE_DOMAIN`
+
+---
+
 # Future change procedure
 
 Before material work:

@@ -1,4 +1,4 @@
-# Universal Investment Platform — Active Roadmap
+# Universal Investment Platform â€” Active Roadmap
 
 ## Priority sequence
 
@@ -9,7 +9,7 @@
 5. Build final remote production infrastructure.
 6. Certify laptop-independent production.
 
-## Phase A — Project control and recovery stabilization
+## Phase A â€” Project control and recovery stabilization
 
 Objectives:
 
@@ -34,7 +34,7 @@ Completion gate:
 
 `PHASE_A_CERTIFIED`
 
-## Phase B — Universal core stabilization
+## Phase B â€” Universal core stabilization
 
 Objectives:
 
@@ -49,7 +49,7 @@ Completion gate:
 
 `UNIVERSAL_CORE_CERTIFIED`
 
-## Phase C — Metals native-domain completion
+## Phase C â€” Metals native-domain completion
 
 Objectives:
 
@@ -64,7 +64,7 @@ Completion gate:
 
 `METALS_NATIVE_DOMAIN_CERTIFIED`
 
-## Phase D — MTG integration completion
+## Phase D â€” MTG integration completion
 
 Interpretation:
 
@@ -83,7 +83,7 @@ Completion gate:
 
 `MTG_INTEGRATION_CERTIFIED`
 
-## Phase E — Crypto integration completion
+## Phase E â€” Crypto integration completion
 
 Interpretation:
 
@@ -101,7 +101,7 @@ Completion gate:
 
 `CRYPTO_INTEGRATION_CERTIFIED`
 
-## Phase F — Remaining asset-domain integrations
+## Phase F â€” Remaining asset-domain integrations
 
 Domains may include:
 
@@ -126,7 +126,7 @@ Completion gate:
 
 `ALL_PRIORITY_DOMAINS_CERTIFIED`
 
-## Phase G — Automated certification framework
+## Phase G â€” Automated certification framework
 
 Build and certify the non-dashboard certification framework:
 
@@ -147,7 +147,7 @@ Completion gate:
 
 `AUTOMATED_CERTIFICATION_FRAMEWORK_CERTIFIED`
 
-## Phase H — Complete dashboard and user-facing services
+## Phase H â€” Complete dashboard and user-facing services
 
 Current provisional platform:
 
@@ -170,7 +170,7 @@ Completion gate:
 
 `FULL_DASHBOARD_CERTIFIED`
 
-## Phase I — Remote infrastructure implementation
+## Phase I â€” Remote infrastructure implementation
 
 Objectives:
 
@@ -190,7 +190,7 @@ Completion gate:
 
 `REMOTE_INFRASTRUCTURE_OPERATIONAL`
 
-## Phase J — Full remote production certification
+## Phase J â€” Full remote production certification
 
 Run one combined end-to-end certification proving:
 
@@ -228,18 +228,19 @@ Completed milestones:
 - `MIGRATION_CHAIN_RECONCILIATION_PASS`
 - `MTG_RECONCILIATION_BRANCH_CREATED`
 - `UIP_MTG_A1_EXPORT_ACCEPTANCE_AND_SEMANTIC_PRESERVATION`
+- `UIP_MTG_A2_INTEGRATION_CERTIFICATION`
 
 Current milestone:
 
-`UIP_MTG_A2_INTEGRATION_CERTIFICATION`
+`UIP_METALS_A0_A1_DOMAIN_BINDING`
 
 Next authorized action:
 
-`CERTIFY_UIP_MTG_A2_INTEGRATION`
+`INSPECT_AND_BIND_UIP_METALS_NATIVE_DOMAIN`
 
 Expected subsequent action:
 
-`UIP_METALS_A0_A1_DOMAIN_BINDING`
+`UIP_CRYPTO_A0_A1_DOMAIN_BINDING`
 
 ## Dependency principle
 

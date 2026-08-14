@@ -1,4 +1,4 @@
-# Universal Investment Platform — Project State
+# Universal Investment Platform â€” Project State
 
 ## Current status
 
@@ -19,7 +19,7 @@ Current roadmap phase:
 Certified domain integration
 
 Current milestone:
-UIP_MTG_A2_INTEGRATION_CERTIFICATION
+UIP_METALS_A0_A1_DOMAIN_BINDING
 
 Current certification:
 BASELINE_TEST_SUITE_PASS
@@ -34,9 +34,13 @@ UIP_A0G_GOVERNANCE_SYNCHRONIZATION_MERGED
 UIP_MTG_A1_EXPORT_ACCEPTANCE_PASS
 UIP_MTG_A1_MERGED
 UIP_MTG_A1_POST_MERGE_CI_PASS
+UIP_MTG_A2_INTEGRATION_CERTIFICATION_PASS
+UIP_MTG_A2_MERGED
+UIP_MTG_A2_POST_MERGE_CI_PASS
+UIP_MTG_A2_POST_MERGE_CONTAINER_PASS
 
 Next authorized action:
-UIP_MTG_A2_INTEGRATION_CERTIFICATION
+UIP_METALS_A0_A1_DOMAIN_BINDING
 ```
 
 ## Repository authority
@@ -59,7 +63,7 @@ Stable branch:
 
 Current governed main baseline:
 
-`8d414f599684dd9ead27008d821fd2b41d5fd9e7`
+`4dfc98df10dcd1cf59db075b41cce95c237956b2`
 
 Historical recovery baseline:
 
@@ -71,7 +75,7 @@ Historical recovery baseline evidence:
 
 Active governance branch:
 
-`phase-uip-mtg-a2-integration-certification`
+`phase-uip-metals-a0-a1-domain-binding`
 
 ## UIP-MTG-A1 certification transition
 
@@ -113,6 +117,47 @@ Disposition:
 Active next milestone:
 
 `UIP_MTG_A2_INTEGRATION_CERTIFICATION`
+
+## UIP-MTG-A2 certification closeout
+
+A2 implementation commit:
+
+`d5acd3725203a826f5899b5faed9708c6caecafa`
+
+Merged governed main commit:
+
+`4dfc98df10dcd1cf59db075b41cce95c237956b2`
+
+Pull request:
+
+`#36`
+
+Certification evidence:
+
+- status: `UIP_MTG_A2_INTEGRATION_CERTIFICATION_PASS`;
+- canonical MTG rows: 968;
+- Collector / Pre-Collector / Secret Lair rows: 50 / 131 / 787;
+- Secret Lair BUY candidates: 88;
+- all 23 native MTG fields preserved;
+- missing values preserved as NULL;
+- lineage-missing rows: 0;
+- generic UIP recommendations created: false;
+- generic UIP forecasts created: false;
+- generic UIP risk records created: false;
+- cross-asset rank created: false;
+- execution-ready purchase authority created: false;
+- automatic purchase execution: false;
+- full UIP suite: 1,232 passed, 1 existing warning;
+- post-merge UIP CI #491: success;
+- post-merge Container Delivery #66: success.
+
+Disposition:
+
+`UIP_MTG_A2_CERTIFIED_COMPLETE`
+
+Active next milestone:
+
+`UIP_METALS_A0_A1_DOMAIN_BINDING`
 
 ## Recovered historical-performance work
 
@@ -223,7 +268,7 @@ SHA-256:
 
 Classification:
 
-`RECOVERY_PROTECTED — INTEGRITY_VERIFIED`
+`RECOVERY_PROTECTED â€” INTEGRITY_VERIFIED`
 
 The archive must not be deleted or modified until Phase A is certified and all required evidence is stored remotely.
 
@@ -241,19 +286,19 @@ Classifications:
 
 ### Export script
 
-`RECOVERY_UTILITY — CODE_REVIEW_REQUIRED_BEFORE_COMMIT`
+`RECOVERY_UTILITY â€” CODE_REVIEW_REQUIRED_BEFORE_COMMIT`
 
 ### Interpretation input
 
-`SENSITIVE_RECOVERY_SNAPSHOT — DO_NOT_COMMIT`
+`SENSITIVE_RECOVERY_SNAPSHOT â€” DO_NOT_COMMIT`
 
 ### Interpretation export
 
-`SENSITIVE_GENERATED_RECOVERY_EVIDENCE — DO_NOT_COMMIT`
+`SENSITIVE_GENERATED_RECOVERY_EVIDENCE â€” DO_NOT_COMMIT`
 
 ### Inspection output
 
-`RECOVERY_INSPECTION_EVIDENCE — DO_NOT_COMMIT UNTIL SANITIZED`
+`RECOVERY_INSPECTION_EVIDENCE â€” DO_NOT_COMMIT UNTIL SANITIZED`
 
 ## Database state
 
@@ -287,7 +332,7 @@ Historical-performance objects:
 
 Current classification:
 
-`LIKELY_CURRENT_LOCAL_UIP_DATABASE — AUTHORITY_NOT_YET_PRODUCTION_CERTIFIED`
+`LIKELY_CURRENT_LOCAL_UIP_DATABASE â€” AUTHORITY_NOT_YET_PRODUCTION_CERTIFIED`
 
 Other discovered databases require ownership and lifecycle classification.
 
