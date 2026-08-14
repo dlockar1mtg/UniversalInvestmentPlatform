@@ -19,7 +19,7 @@ Current roadmap phase:
 Certified domain integration
 
 Current milestone:
-UIP_MTG_A1_EXPORT_ACCEPTANCE_AND_SEMANTIC_PRESERVATION
+UIP_MTG_A2_INTEGRATION_CERTIFICATION
 
 Current certification:
 BASELINE_TEST_SUITE_PASS
@@ -30,10 +30,13 @@ MIGRATION_CHAIN_RECONCILIATION_PASS
 MIGRATION_CHAIN_REPRODUCES_CURRENT_SCHEMA
 MTG_RECONCILIATION_BRANCH_CREATED
 OLD_PHASE_10_12_IMPLEMENTATION_EXCLUDED
-UIP_A0G_GOVERNANCE_SYNCHRONIZATION_PENDING_MERGE
+UIP_A0G_GOVERNANCE_SYNCHRONIZATION_MERGED
+UIP_MTG_A1_EXPORT_ACCEPTANCE_PASS
+UIP_MTG_A1_MERGED
+UIP_MTG_A1_POST_MERGE_CI_PASS
 
 Next authorized action:
-UIP_MTG_A1_EXPORT_ACCEPTANCE_AND_SEMANTIC_PRESERVATION
+UIP_MTG_A2_INTEGRATION_CERTIFICATION
 ```
 
 ## Repository authority
@@ -56,7 +59,7 @@ Stable branch:
 
 Current governed main baseline:
 
-`5fd26f87e7e452321379d4e903c1ec19f804bad3`
+`8d414f599684dd9ead27008d821fd2b41d5fd9e7`
 
 Historical recovery baseline:
 
@@ -68,7 +71,48 @@ Historical recovery baseline evidence:
 
 Active governance branch:
 
-`phase-uip-a0g-governance-sync`
+`phase-uip-mtg-a2-integration-certification`
+
+## UIP-MTG-A1 certification transition
+
+Certified A1 implementation commit:
+
+`7b02c11bf30096c37f08eeea02716d7e0cc9d176`
+
+Merged governed main commit:
+
+`8d414f599684dd9ead27008d821fd2b41d5fd9e7`
+
+Pull request:
+
+`#35`
+
+Certification evidence:
+
+- A1 acceptance status: `UIP_MTG_A1_EXPORT_ACCEPTANCE_PASS`;
+- current MTG rows: 968;
+- Collector rows: 50;
+- Pre-Collector rows: 131;
+- Secret Lair V1.1 rows: 787;
+- Secret Lair BUY candidates: 88;
+- duplicate governed MTG asset IDs: 0;
+- transformations: 0;
+- missing-value imputations: 0;
+- current snapshot permanent: false;
+- execution-ready purchase authority: false;
+- cross-asset ranking authority: false;
+- automatic purchase execution: false;
+- full UIP suite: 1,227 passed, 1 existing warning;
+- post-merge UIP CI #487: success;
+- post-merge Container Delivery #64: success.
+
+Disposition:
+
+`UIP_MTG_A1_CERTIFIED_COMPLETE`
+
+Active next milestone:
+
+`UIP_MTG_A2_INTEGRATION_CERTIFICATION`
 
 ## Recovered historical-performance work
 
