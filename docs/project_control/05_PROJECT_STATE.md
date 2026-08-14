@@ -1,4 +1,4 @@
-# Universal Investment Platform â€” Project State
+# Universal Investment Platform — Project State
 
 ## Current status
 
@@ -268,7 +268,7 @@ SHA-256:
 
 Classification:
 
-`RECOVERY_PROTECTED â€” INTEGRITY_VERIFIED`
+`RECOVERY_PROTECTED — INTEGRITY_VERIFIED`
 
 The archive must not be deleted or modified until Phase A is certified and all required evidence is stored remotely.
 
@@ -286,19 +286,19 @@ Classifications:
 
 ### Export script
 
-`RECOVERY_UTILITY â€” CODE_REVIEW_REQUIRED_BEFORE_COMMIT`
+`RECOVERY_UTILITY — CODE_REVIEW_REQUIRED_BEFORE_COMMIT`
 
 ### Interpretation input
 
-`SENSITIVE_RECOVERY_SNAPSHOT â€” DO_NOT_COMMIT`
+`SENSITIVE_RECOVERY_SNAPSHOT — DO_NOT_COMMIT`
 
 ### Interpretation export
 
-`SENSITIVE_GENERATED_RECOVERY_EVIDENCE â€” DO_NOT_COMMIT`
+`SENSITIVE_GENERATED_RECOVERY_EVIDENCE — DO_NOT_COMMIT`
 
 ### Inspection output
 
-`RECOVERY_INSPECTION_EVIDENCE â€” DO_NOT_COMMIT UNTIL SANITIZED`
+`RECOVERY_INSPECTION_EVIDENCE — DO_NOT_COMMIT UNTIL SANITIZED`
 
 ## Database state
 
@@ -332,7 +332,7 @@ Historical-performance objects:
 
 Current classification:
 
-`LIKELY_CURRENT_LOCAL_UIP_DATABASE â€” AUTHORITY_NOT_YET_PRODUCTION_CERTIFIED`
+`LIKELY_CURRENT_LOCAL_UIP_DATABASE — AUTHORITY_NOT_YET_PRODUCTION_CERTIFIED`
 
 Other discovered databases require ownership and lifecycle classification.
 
