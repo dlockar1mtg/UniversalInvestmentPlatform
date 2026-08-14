@@ -1,0 +1,151 @@
+{
+  "contract_version": "1.0.0",
+  "milestone": "UIP_R1_REFRESH_AND_ORCHESTRATION_CONTRACTS",
+  "purpose": "Govern how UIP requests, receives, validates, and activates refreshed certified domain intelligence without redefining native domain semantics.",
+  "global_controls": {
+    "uip_may_trigger_source_owned_workflows": true,
+    "uip_may_invoke_external_collectors_directly": false,
+    "source_domain_owns_native_model_execution": true,
+    "failed_cycle_preserves_previous_certified_state": true,
+    "partial_activation_authorized": false,
+    "missing_authority_may_be_synthesized": false,
+    "permanent_asset_population_counts_allowed": false,
+    "cross_asset_ranking_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false,
+    "required_cycle_evidence": [
+      "domain_id",
+      "source_repository_or_native_boundary",
+      "source_commit_or_version",
+      "refresh_started_at_utc",
+      "refresh_completed_at_utc",
+      "data_as_of",
+      "producer_run_id",
+      "package_id",
+      "package_manifest_sha256_or_equivalent",
+      "dataset_coverage",
+      "native_status",
+      "freshness_status",
+      "warnings",
+      "errors",
+      "data_collection_performed",
+      "model_execution_performed",
+      "uip_import_status",
+      "uip_import_id",
+      "lineage_status"
+    ]
+  },
+  "domains": {
+    "mtg": {
+      "ownership_type": "external_source_repository",
+      "producer_repository": "dlockar1mtg/mtg-investment-terminal",
+      "producer_ref": "main",
+      "producer_trigger": {
+        "type": "github_workflow_dispatch",
+        "workflow": ".github/workflows/mtg-marketplace-production.yml",
+        "inputs": {
+          "live_execution": true
+        }
+      },
+      "producer_execution_owner": "mtg_source_domain",
+      "direct_uip_collector_invocation_authorized": false,
+      "declared_delivery": {
+        "producer_path": "data/operations/mtg_uip_delivery/latest",
+        "artifact_name_pattern": "mtg-marketplace-production-<github_run_id>",
+        "handoff_metadata": "data/operations/mtg_marketplace/uip_source_refresh_handoff.json"
+      },
+      "uip_consumer_boundary": "certified_package_validation_then_transactional_import",
+      "consumer_binding_state": "R2_COMPATIBILITY_PROOF_REQUIRED",
+      "consumer_binding_note": "The live hosted MTG delivery is source-owned production output. R2 must prove that the refreshed package can be losslessly bound to the certified MTG native-authority interface before activation; UIP must not reinterpret or flatten native lane/rank/purchase semantics.",
+      "native_semantics_authoritative": true,
+      "known_governed_requirements": [
+        "collector_precollector_secret_lair_lane_semantics_preserved",
+        "secret_lair_dynamic_universe_preserved",
+        "missing_price_forecast_rank_authority_preserved",
+        "buy_candidate_not_execution_ready",
+        "manual_execution_price_check_preserved_where_required"
+      ]
+    },
+    "metals": {
+      "ownership_type": "uip_native_domain",
+      "producer_repository": "dlockar1mtg/UniversalInvestmentPlatform",
+      "producer_ref": "main",
+      "producer_trigger": {
+        "type": "uip_native_entrypoint",
+        "entrypoint": "scripts/run_metals_production_cycle.py"
+      },
+      "producer_execution_owner": "metals_native_domain",
+      "declared_delivery": {
+        "producer_path": "data/integration/metals/latest",
+        "cycle_history": "data/operations/metals/cycle_history",
+        "operations_status": "data/operations/metals/metals_operations_status.json"
+      },
+      "uip_consumer_boundary": "native_certified_publication_then_transactional_import",
+      "consumer_binding_state": "CERTIFIED_A1_COMPATIBLE_PENDING_FRESH_R2_REHEARSAL",
+      "native_semantics_authoritative": true,
+      "known_governed_requirements": [
+        "commodity_benchmarks_not_direct_investment_vehicles",
+        "unsupported_liquidity_market_region_history_authority_not_synthesized",
+        "missing_forecast_authority_preserved_as_null",
+        "native_recommendation_semantics_preserved"
+      ]
+    },
+    "crypto": {
+      "ownership_type": "external_source_repository",
+      "producer_repository": "dlockar1mtg/CryptoIntelligencePlatform",
+      "producer_ref": "main",
+      "producer_trigger": {
+        "type": "github_workflow_dispatch",
+        "workflow": ".github/workflows/crypto-production-cycle.yml",
+        "inputs": {
+          "full_refresh": true
+        }
+      },
+      "producer_execution_owner": "crypto_source_domain",
+      "direct_uip_collector_invocation_authorized": false,
+      "declared_delivery": {
+        "producer_path": "data/operations/crypto/uip_delivery",
+        "artifact_name_pattern": "crypto-production-<github_run_id>-<github_run_attempt>"
+      },
+      "uip_consumer_boundary": "certified_universal_package_then_transactional_import",
+      "consumer_entrypoint": "scripts/import_certified_crypto_package.py",
+      "consumer_binding_state": "CERTIFIED_A1_COMPATIBLE_PENDING_FRESH_R2_REHEARSAL",
+      "native_semantics_authoritative": true,
+      "known_governed_requirements": [
+        "wait_maps_to_watch",
+        "avoid_maps_to_sell",
+        "unknown_recommendation_labels_fail_closed",
+        "missing_holdings_remain_absent",
+        "source_database_not_mutated_by_uip"
+      ]
+    }
+  },
+  "r2_gate": {
+    "milestone": "UIP_R2_REFRESHED_DATA_REHEARSAL",
+    "requires_all_domain_refresh_contracts_valid": true,
+    "requires_real_fresh_output": true,
+    "requires_disposable_uip_import_rehearsal_before_production_activation": true
+  },
+  "r3_gate": {
+    "milestone": "UIP_R3_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_REVIEW",
+    "purpose": "Determine whether fresh MTG, Metals, and Crypto outputs are current, internally coherent, plausible, semantically preserved in UIP, and suitable as inputs to later UIP decision logic.",
+    "allowed_findings": [
+      "PASS",
+      "PASS_WITH_GOVERNED_GAPS",
+      "REVIEW",
+      "DOMAIN_INVESTIGATION_REQUIRED"
+    ],
+    "required_review_dimensions": [
+      "freshness_and_completeness",
+      "native_self_consistency",
+      "distribution_and_outliers",
+      "change_from_prior_plausibility",
+      "uip_semantic_preservation",
+      "decision_readiness",
+      "investigation_routing"
+    ],
+    "cross_asset_ranking_authorized": false,
+    "allocation_policy_authorized": false,
+    "hard_gate_before_e1_or_dashboard_decision_logic": true
+  }
+}

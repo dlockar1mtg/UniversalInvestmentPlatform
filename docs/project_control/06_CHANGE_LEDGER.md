@@ -1079,6 +1079,79 @@ Next required action:
 `IMPLEMENT_REFRESH_AND_ORCHESTRATION_CONTRACTS`
 ---
 
+## UIP-CHG-2026-032 - Certify UIP-R1, Activate UIP-R2, and Establish UIP-R3 Health Gate
+
+Date: 2026-08-14
+Status: ACTIVE
+Type: REFRESH_ORCHESTRATION, CERTIFICATION, ROADMAP_STATE, DOMAIN_HEALTH_GATE
+Approval authority: Devon Lockard
+
+Decision:
+
+Certify `UIP_R1_REFRESH_AND_ORCHESTRATION_CONTRACTS` complete, activate `UIP_R2_REFRESHED_DATA_REHEARSAL`, and establish `UIP_R3_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_REVIEW` as the required following gate before E1 or dashboard decision logic.
+
+R1 evidence:
+
+- governed main base: `55d5c72582bf70aff21a30b69edadab9ea9e8553`;
+- technical contract head before certification evidence: `026169f85f411c4b76061a5c9e4b42de944efba4`;
+- machine-readable contract: `config/orchestration/r1_domain_refresh_contracts.json`;
+- typed interface: `foundation/orchestration/refresh_contracts.py`;
+- human-readable contract: `docs/project_control/R1_REFRESH_ORCHESTRATION_CONTRACT.md`;
+- domains governed: MTG, Metals, Crypto;
+- required cycle evidence fields: 19;
+- external-domain collection/model execution remains source-owned;
+- direct UIP invocation of MTG/Crypto collectors remains prohibited;
+- Metals remains UIP-native;
+- failure preserves prior certified state and failed evidence;
+- partial activation is prohibited;
+- missing authority is not synthesized;
+- permanent asset-population counts are prohibited;
+- MTG refreshed hosted-delivery compatibility is not assumed and must be proven in R2;
+- R1 focused tests: 5 passed;
+- certified-domain regression tests: 18 passed;
+- pre-certification full UIP suite: 1,260 passed, 1 existing warning;
+- validation worktree remained clean.
+
+R2 requirement:
+
+R2 must execute real refreshed MTG, Metals, and Crypto cycles, capture the governed 19-field cycle evidence, use disposable UIP import state before any production activation, and prove current producer-output compatibility with the certified UIP domain bindings.
+
+R3 requirement:
+
+R3 must review each fresh domain across seven dimensions: freshness/completeness, native self-consistency, distribution/outliers, change-from-prior plausibility, UIP semantic preservation, decision readiness, and investigation routing.
+
+Allowed R3 findings are `PASS`, `PASS_WITH_GOVERNED_GAPS`, `REVIEW`, and `DOMAIN_INVESTIGATION_REQUIRED`. A suspicious domain may be excluded from later UIP decision logic until its native authority is investigated and recertified. R3 does not create a universal rank, allocation methodology, or execution authority.
+
+Permanent evidence:
+
+`docs/project_control/generated/r1_refresh_orchestration/r1_refresh_orchestration_certification.json`
+
+Regression protection:
+
+`tests/test_r1_certification_evidence.py`
+
+Prior state:
+
+`UIP_R1_REFRESH_AND_ORCHESTRATION_CONTRACTS`
+
+New state:
+
+`UIP_R2_REFRESHED_DATA_REHEARSAL`
+
+Expected following state:
+
+`UIP_R3_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_REVIEW`
+
+Reversal:
+
+`FULLY_REVERSIBLE`
+
+Next required action:
+
+`EXECUTE_REAL_REFRESHED_DATA_REHEARSAL`
+
+---
+
 # Future change procedure
 
 Before material work:

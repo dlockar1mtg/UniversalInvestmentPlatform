@@ -19,7 +19,7 @@ Current roadmap phase:
 Certified domain integration
 
 Current milestone:
-UIP_R1_REFRESH_AND_ORCHESTRATION_CONTRACTS
+UIP_R2_REFRESHED_DATA_REHEARSAL
 
 Current certification:
 BASELINE_TEST_SUITE_PASS
@@ -43,7 +43,7 @@ UIP_METALS_A1_INTEGRATION_CERTIFICATION_PASS
 UIP_CRYPTO_A1_INTEGRATION_CERTIFICATION_PASS
 
 Next authorized action:
-UIP_R1_REFRESH_AND_ORCHESTRATION_CONTRACTS
+UIP_R2_REFRESHED_DATA_REHEARSAL
 ```
 
 ## Repository authority
@@ -66,7 +66,7 @@ Stable branch:
 
 Current governed main baseline:
 
-`1babdacdc101e40f6f4550b56883ccc7b2d0f674`
+`55d5c72582bf70aff21a30b69edadab9ea9e8553`
 
 Historical recovery baseline:
 
@@ -78,7 +78,7 @@ Historical recovery baseline evidence:
 
 Active governance branch:
 
-`phase-uip-d1-common-domain-registry`
+`phase-uip-r1-refresh-orchestration`
 
 ## UIP-MTG-A1 certification transition
 
@@ -455,10 +455,11 @@ Not authorized:
 4. `UIP-CRYPTO-A0/A1` - inspect and bind Crypto under Crypto-native governance.
 5. `UIP-D1` - establish the minimal lossless common domain registry and lineage interface.
 6. `UIP-R1` - establish governed refresh and orchestration contracts.
-7. `UIP-R2` - perform refreshed-data rehearsals for MTG, Metals, and Crypto.
-8. `UIP-E1` - establish the future Stocks/ETF extension boundary.
-9. `UIP-DASH-1` and `UIP-DASH-2` - build the dashboard on certified multi-domain inputs.
-10. Govern future cross-asset ranking, comparison, or allocation methodology separately.
+7. `UIP-R2` - perform real refreshed-data rehearsals for MTG, Metals, and Crypto.
+8. `UIP-R3` - certify output rationality, domain health, anomaly routing, and decision readiness without creating cross-asset ranking or allocation policy.
+9. `UIP-E1` - establish the future Stocks/ETF extension boundary.
+10. `UIP-DASH-1` and `UIP-DASH-2` - build the dashboard on certified multi-domain inputs.
+11. Govern future cross-asset ranking, comparison, or allocation methodology separately.
 
 No universal cross-asset ranking is authorized by this sequence.
 Automatic purchase execution remains disabled.
@@ -570,3 +571,66 @@ Disposition:
 Active next milestone:
 
 `UIP_R1_REFRESH_AND_ORCHESTRATION_CONTRACTS`
+
+## UIP-R1 certification closeout
+
+R1 status:
+
+`UIP_R1_REFRESH_AND_ORCHESTRATION_CONTRACT_CERTIFICATION_PASS`
+
+Governed main base:
+
+`55d5c72582bf70aff21a30b69edadab9ea9e8553`
+
+Technical contract head before certification evidence:
+
+`026169f85f411c4b76061a5c9e4b42de944efba4`
+
+Certified authority and controls:
+
+- machine-readable contract: `config/orchestration/r1_domain_refresh_contracts.json`;
+- typed fail-closed interface: `foundation/orchestration/refresh_contracts.py`;
+- human-readable contract: `docs/project_control/R1_REFRESH_ORCHESTRATION_CONTRACT.md`;
+- certified domains: MTG, Metals, Crypto;
+- required cycle evidence fields: 19;
+- external domains use source-owned GitHub workflow dispatch;
+- UIP direct invocation of external collectors remains prohibited;
+- Metals remains UIP-native and uses its canonical production entrypoint;
+- failed refresh cycles preserve the latest certified UIP state;
+- partial activation is prohibited;
+- missing authority may not be synthesized;
+- current asset populations are not permanent constants;
+- MTG refreshed-delivery compatibility remains an explicit R2 proof requirement;
+- R1 focused tests: 5 passed;
+- certified-domain regression tests: 18 passed;
+- pre-certification full UIP suite: 1,260 passed, 1 existing warning;
+- validation left the R1 worktree clean;
+- fresh domain outputs certified by R1: false;
+- real refreshed-data rehearsal performed by R1: false;
+- production UIP database activation performed by R1: false;
+- native domain models changed: false;
+- cross-asset ranking authorized: false;
+- allocation policy authorized: false;
+- automatic execution authorized: false.
+
+Permanent evidence:
+
+`docs/project_control/generated/r1_refresh_orchestration/r1_refresh_orchestration_certification.json`
+
+Regression protection:
+
+`tests/test_r1_certification_evidence.py`
+
+Disposition:
+
+`UIP_R1_CERTIFIED_COMPLETE`
+
+Active next milestone:
+
+`UIP_R2_REFRESHED_DATA_REHEARSAL`
+
+Expected following milestone:
+
+`UIP_R3_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_REVIEW`
+
+R3 is a hard gate before E1 or dashboard decision logic. It evaluates fresh-output freshness/completeness, native self-consistency, distributions/outliers, change-from-prior plausibility, UIP semantic preservation, decision readiness, and investigation routing. R3 does not authorize cross-asset ranking or allocation.
