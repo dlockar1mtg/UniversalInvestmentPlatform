@@ -1010,6 +1010,75 @@ Next required action:
 `IMPLEMENT_COMMON_DOMAIN_REGISTRY_AND_LINEAGE_INTERFACE`
 ---
 
+## UIP-CHG-2026-031 - Certify UIP-D1 and Activate UIP-R1
+
+Date: 2026-08-14
+Status: ACTIVE
+Type: COMMON_DOMAIN_REGISTRY, LINEAGE, CERTIFICATION, ROADMAP_STATE
+Approval authority: Devon Lockard
+
+Decision:
+
+Certify `UIP_D1_COMMON_DOMAIN_REGISTRY_AND_LINEAGE_INTERFACE` complete and activate
+`UIP_R1_REFRESH_AND_ORCHESTRATION_CONTRACTS`.
+
+D1 evidence:
+
+- certified implementation commit: `9a1f011cb92069069f54967442bbf3d6d0ea281c`;
+- canonical registry authority: `foundation/import_engine/sql/006_common_domain_registry_lineage.sql`;
+- certified domains: MTG, Metals, Crypto;
+- canonical certified-domain count: 3;
+- fresh canonical databases initialize the registry automatically;
+- Python registry access is read-only and unknown domains fail closed;
+- native domain semantics remain authoritative;
+- permanent asset-population counts are not embedded;
+- common row lineage spans certified universal histories plus MTG native authority;
+- canonical migration chain: 001 through 006;
+- canonical schema object count: 31;
+- D1 schema object count: 4;
+- schema-control generation and validate-only validation: pass;
+- focused D1 tests: 5 passed;
+- migration tests: 5 passed;
+- combined D1/schema tests: 10 passed;
+- full UIP suite: 1,251 passed, 1 existing warning;
+- production UIP database modified: false;
+- native domain databases modified: false;
+- cross-asset ranking created: false;
+- allocation policy created: false;
+- automatic purchase execution created: false.
+
+Permanent evidence:
+
+`docs/project_control/generated/d1_common_domain_registry/d1_common_domain_registry_certification.json`
+
+Regression protection:
+
+`tests/test_d1_certification_evidence.py`
+
+Governance effect:
+
+UIP now has one governed common domain registry and one common lineage interface for the three certified domains.
+R1 may define refresh and orchestration contracts against this interface without reopening native domain semantics.
+
+No universal cross-asset ranking, comparison methodology, allocation policy, or automatic trade execution is authorized.
+
+Prior state:
+
+`UIP_D1_COMMON_DOMAIN_REGISTRY_AND_LINEAGE_INTERFACE`
+
+New state:
+
+`UIP_R1_REFRESH_AND_ORCHESTRATION_CONTRACTS`
+
+Reversal:
+
+`FULLY_REVERSIBLE`
+
+Next required action:
+
+`IMPLEMENT_REFRESH_AND_ORCHESTRATION_CONTRACTS`
+---
+
 # Future change procedure
 
 Before material work:

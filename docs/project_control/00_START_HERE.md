@@ -83,7 +83,7 @@ Current phase:
 
 Current governed main baseline:
 
-`398f949dee1f6af76d7823f07f61c628fab1ca57`
+`1babdacdc101e40f6f4550b56883ccc7b2d0f674`
 
 Historical recovery baseline:
 
@@ -103,9 +103,9 @@ Recovered targeted-test evidence:
 
 Current next authorized action:
 
-`UIP_D1_COMMON_DOMAIN_REGISTRY_AND_LINEAGE_INTERFACE`
+`UIP_R1_REFRESH_AND_ORCHESTRATION_CONTRACTS`
 
-The controlled recovery evidence remains preserved. Under `UIP-CHG-2026-026` through `UIP-CHG-2026-030`, MTG, Metals, and Crypto certified-domain integration milestones are complete. The active next action is the common UIP domain registry and lineage interface. Certified native-domain work must not be reopened without a verified governance defect.
+The controlled recovery evidence remains preserved. Under `UIP-CHG-2026-026` through `UIP-CHG-2026-031`, MTG, Metals, Crypto, and D1 are certified complete. The active next action is R1 governed refresh and orchestration contracts. Certified native-domain and D1 work must not be reopened without a verified governance defect.
 
 ## Session summary template
 

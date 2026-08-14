@@ -19,7 +19,7 @@ Current roadmap phase:
 Certified domain integration
 
 Current milestone:
-UIP_D1_COMMON_DOMAIN_REGISTRY_AND_LINEAGE_INTERFACE
+UIP_R1_REFRESH_AND_ORCHESTRATION_CONTRACTS
 
 Current certification:
 BASELINE_TEST_SUITE_PASS
@@ -43,7 +43,7 @@ UIP_METALS_A1_INTEGRATION_CERTIFICATION_PASS
 UIP_CRYPTO_A1_INTEGRATION_CERTIFICATION_PASS
 
 Next authorized action:
-UIP_D1_COMMON_DOMAIN_REGISTRY_AND_LINEAGE_INTERFACE
+UIP_R1_REFRESH_AND_ORCHESTRATION_CONTRACTS
 ```
 
 ## Repository authority
@@ -66,7 +66,7 @@ Stable branch:
 
 Current governed main baseline:
 
-`398f949dee1f6af76d7823f07f61c628fab1ca57`
+`1babdacdc101e40f6f4550b56883ccc7b2d0f674`
 
 Historical recovery baseline:
 
@@ -78,7 +78,7 @@ Historical recovery baseline evidence:
 
 Active governance branch:
 
-`phase-uip-crypto-a0-a1-domain-binding`
+`phase-uip-d1-common-domain-registry`
 
 ## UIP-MTG-A1 certification transition
 
@@ -520,4 +520,53 @@ Disposition:
 
 Active next milestone:
 
-`UIP_D1_COMMON_DOMAIN_REGISTRY_AND_LINEAGE_INTERFACE`
+`UIP_R1_REFRESH_AND_ORCHESTRATION_CONTRACTS`
+
+## UIP-D1 certification closeout
+
+D1 status:
+
+`UIP_D1_COMMON_DOMAIN_REGISTRY_AND_LINEAGE_CERTIFICATION_PASS`
+
+Certified implementation commit:
+
+`9a1f011cb92069069f54967442bbf3d6d0ea281c`
+
+Certified authority and controls:
+
+- canonical registry authority: `foundation/import_engine/sql/006_common_domain_registry_lineage.sql`;
+- certified domains: MTG, Metals, Crypto;
+- fresh canonical databases initialize the registry automatically;
+- Python domain-registry access is read-only and unknown domains fail closed;
+- native domain semantics remain authoritative;
+- permanent asset-population counts are not stored;
+- common lineage preserves import, package, source-file, source-row, manifest, and import-time evidence;
+- MTG native authority is included without flattening native ranking or purchase semantics;
+- canonical migrations: 001 through 006;
+- canonical database objects: 31;
+- D1 schema objects: 4;
+- focused D1 tests: 5 passed;
+- migration tests: 5 passed;
+- combined D1/schema tests: 10 passed;
+- full UIP suite: 1,251 passed, 1 existing warning;
+- production UIP database modified: false;
+- native domain databases modified: false;
+- cross-asset ranking created: false;
+- allocation policy created: false;
+- automatic purchase execution created: false.
+
+Permanent evidence:
+
+`docs/project_control/generated/d1_common_domain_registry/d1_common_domain_registry_certification.json`
+
+Regression protection:
+
+`tests/test_d1_certification_evidence.py`
+
+Disposition:
+
+`UIP_D1_CERTIFIED_COMPLETE`
+
+Active next milestone:
+
+`UIP_R1_REFRESH_AND_ORCHESTRATION_CONTRACTS`

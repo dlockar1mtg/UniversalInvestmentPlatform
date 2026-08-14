@@ -1,0 +1,97 @@
+{
+  "certification_status": "UIP_D1_COMMON_DOMAIN_REGISTRY_AND_LINEAGE_CERTIFICATION_PASS",
+  "certification_date": "2026-08-14",
+  "uip": {
+    "repository": "dlockar1mtg/UniversalInvestmentPlatform",
+    "branch": "phase-uip-d1-common-domain-registry",
+    "implementation_commit": "9a1f011cb92069069f54967442bbf3d6d0ea281c",
+    "base_commit": "1babdacdc101e40f6f4550b56883ccc7b2d0f674"
+  },
+  "domain_registry": {
+    "registry_version": "1.0.0",
+    "canonical_authority": "foundation/import_engine/sql/006_common_domain_registry_lineage.sql",
+    "certified_domains": [
+      "crypto",
+      "metals",
+      "mtg"
+    ],
+    "certified_domain_count": 3,
+    "fresh_database_initializes_registry": true,
+    "python_interface_read_only": true,
+    "unknown_domain_fails_closed": true,
+    "permanent_asset_population_counts_stored": false
+  },
+  "domain_boundaries": {
+    "crypto": {
+      "ownership_type": "external_source_repository",
+      "source_repository": "dlockar1mtg/CryptoIntelligencePlatform",
+      "native_semantics_authoritative": true
+    },
+    "metals": {
+      "ownership_type": "uip_native_domain",
+      "source_repository": null,
+      "native_semantics_authoritative": true
+    },
+    "mtg": {
+      "ownership_type": "external_source_repository",
+      "source_repository": "dlockar1mtg/mtg-investment-terminal",
+      "native_semantics_authoritative": true
+    }
+  },
+  "lineage_interface": {
+    "common_view": "main.universal_row_lineage",
+    "domain_enriched_view": "main.universal_lineage_with_domain",
+    "operational_status_view": "main.universal_domain_operational_status",
+    "common_lineage_fields": [
+      "_import_id",
+      "_package_id",
+      "_source_platform",
+      "_source_filename",
+      "_source_row_number",
+      "_manifest_sha256",
+      "_imported_at_utc"
+    ],
+    "mtg_native_authority_included": true,
+    "mtg_native_semantics_flattened": false,
+    "native_domain_semantics_preserved": true
+  },
+  "schema_control": {
+    "canonical_migration_count": 6,
+    "canonical_database_object_count": 31,
+    "d1_schema_object_count": 4,
+    "d1_schema_objects": [
+      "main.universal_domain_registry",
+      "main.universal_domain_operational_status",
+      "main.universal_row_lineage",
+      "main.universal_lineage_with_domain"
+    ],
+    "schema_control_generation_pass": true,
+    "schema_control_validate_only_pass": true
+  },
+  "semantic_certification": {
+    "single_static_domain_authority": true,
+    "native_models_changed": false,
+    "native_ranking_semantics_redefined": false,
+    "native_recommendation_semantics_redefined": false,
+    "missing_values_synthesized": false,
+    "cross_asset_ranking_created": false,
+    "allocation_policy_created": false,
+    "automatic_purchase_execution_created": false
+  },
+  "validation": {
+    "focused_d1_tests_passed": 5,
+    "migration_tests_passed": 5,
+    "combined_d1_schema_tests_passed": 10,
+    "full_uip_tests_passed": 1251,
+    "full_uip_warnings": 1,
+    "git_diff_check_pass": true
+  },
+  "runtime_boundary": {
+    "schema_rehearsal_disposable": true,
+    "production_uip_database_modified": false,
+    "native_domain_databases_modified": false,
+    "native_model_execution_performed": false,
+    "native_data_collection_performed": false
+  },
+  "next_authorized_milestone": "UIP_R1_REFRESH_AND_ORCHESTRATION_CONTRACTS"
+}
