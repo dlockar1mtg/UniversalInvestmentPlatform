@@ -1,0 +1,93 @@
+{
+  "certification_status": "UIP_R1_REFRESH_AND_ORCHESTRATION_CONTRACT_CERTIFICATION_PASS",
+  "certification_date": "2026-08-14",
+  "uip": {
+    "repository": "dlockar1mtg/UniversalInvestmentPlatform",
+    "branch": "phase-uip-r1-refresh-orchestration",
+    "governed_main_base": "55d5c72582bf70aff21a30b69edadab9ea9e8553",
+    "technical_contract_head": "026169f85f411c4b76061a5c9e4b42de944efba4"
+  },
+  "contract": {
+    "version": "1.0.0",
+    "machine_readable_authority": "config/orchestration/r1_domain_refresh_contracts.json",
+    "typed_interface": "foundation/orchestration/refresh_contracts.py",
+    "human_readable_authority": "docs/project_control/R1_REFRESH_ORCHESTRATION_CONTRACT.md",
+    "certified_domains": ["crypto", "metals", "mtg"],
+    "certified_domain_count": 3,
+    "required_cycle_evidence_field_count": 19
+  },
+  "global_controls": {
+    "uip_may_trigger_source_owned_workflows": true,
+    "uip_may_invoke_external_collectors_directly": false,
+    "source_domain_owns_native_model_execution": true,
+    "failed_cycle_preserves_previous_certified_state": true,
+    "partial_activation_authorized": false,
+    "missing_authority_may_be_synthesized": false,
+    "permanent_asset_population_counts_allowed": false,
+    "cross_asset_ranking_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "domain_boundaries": {
+    "mtg": {
+      "producer_repository": "dlockar1mtg/mtg-investment-terminal",
+      "producer_trigger": "github_workflow_dispatch",
+      "workflow": ".github/workflows/mtg-marketplace-production.yml",
+      "live_input": "live_execution=true",
+      "direct_uip_collector_invocation_authorized": false,
+      "consumer_binding_state": "R2_COMPATIBILITY_PROOF_REQUIRED",
+      "native_semantics_authoritative": true
+    },
+    "metals": {
+      "producer_repository": "dlockar1mtg/UniversalInvestmentPlatform",
+      "producer_trigger": "uip_native_entrypoint",
+      "entrypoint": "scripts/run_metals_production_cycle.py",
+      "consumer_binding_state": "CERTIFIED_A1_COMPATIBLE_PENDING_FRESH_R2_REHEARSAL",
+      "native_semantics_authoritative": true
+    },
+    "crypto": {
+      "producer_repository": "dlockar1mtg/CryptoIntelligencePlatform",
+      "producer_trigger": "github_workflow_dispatch",
+      "workflow": ".github/workflows/crypto-production-cycle.yml",
+      "live_input": "full_refresh=true",
+      "direct_uip_collector_invocation_authorized": false,
+      "consumer_binding_state": "CERTIFIED_A1_COMPATIBLE_PENDING_FRESH_R2_REHEARSAL",
+      "native_semantics_authoritative": true
+    }
+  },
+  "sequence": {
+    "next_milestone": "UIP_R2_REFRESHED_DATA_REHEARSAL",
+    "following_milestone": "UIP_R3_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_REVIEW",
+    "r3_hard_gate_before_e1_or_dashboard_decision_logic": true,
+    "r3_allowed_findings": [
+      "PASS",
+      "PASS_WITH_GOVERNED_GAPS",
+      "REVIEW",
+      "DOMAIN_INVESTIGATION_REQUIRED"
+    ],
+    "r3_required_review_dimensions": [
+      "freshness_and_completeness",
+      "native_self_consistency",
+      "distribution_and_outliers",
+      "change_from_prior_plausibility",
+      "uip_semantic_preservation",
+      "decision_readiness",
+      "investigation_routing"
+    ]
+  },
+  "validation": {
+    "machine_readable_contract_validation": "PASS",
+    "r1_focused_tests_passed": 5,
+    "certified_domain_regression_tests_passed": 18,
+    "pre_certification_full_uip_tests_passed": 1260,
+    "pre_certification_full_uip_warnings": 1,
+    "validation_modified_worktree": false
+  },
+  "scope_boundary": {
+    "fresh_domain_outputs_certified_by_r1": false,
+    "real_refresh_performed_by_r1": false,
+    "production_database_activation_performed_by_r1": false,
+    "native_domain_models_changed": false,
+    "cross_asset_decision_model_created": false
+  }
+}
