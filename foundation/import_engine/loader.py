@@ -34,6 +34,7 @@ SUPPORTED_DATASETS = {
     "platform_status": "platform_status_history",
     "macro_signals": "macro_signals_history",
     "historical_performance": "historical_performance_history",
+    "mtg_native_authority": "mtg_native_authority_history",
 }
 
 LINEAGE_COLUMNS = (
