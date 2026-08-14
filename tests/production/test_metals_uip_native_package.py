@@ -67,6 +67,93 @@ def test_forecast_contract_columns_are_published(tmp_path: Path):
     assert row["forecast_horizon_months"] == "12"
     assert row["forecast_method"] == "native-v1"
 
+def _governed_contract_columns(name: str) -> list[str]:
+    root = Path(__file__).resolve().parents[2]
+    path = root / "schemas" / "v1" / "csv" / f"{name}_columns.csv"
+    with path.open(newline="", encoding="utf-8-sig") as handle:
+        return [
+            row["column_name"]
+            for row in csv.DictReader(handle)
+        ]
+
+
+def test_recommendation_and_status_headers_match_governed_contracts(
+    tmp_path: Path,
+):
+    result = publish_uip_native_metals_package(
+        _cycle(tmp_path / "cycle.json"),
+        tmp_path / "packages",
+        run_id="run-contract",
+        generated_at_utc="2026-07-25T12:00:00Z",
+    )
+    root = Path(result.package_root)
+
+    with (root / "recommendations.csv").open(
+        newline="",
+        encoding="utf-8",
+    ) as handle:
+        reader = csv.DictReader(handle)
+        recommendation_columns = list(reader.fieldnames or [])
+        recommendation = next(reader)
+
+    with (root / "platform_status.csv").open(
+        newline="",
+        encoding="utf-8",
+    ) as handle:
+        reader = csv.DictReader(handle)
+        status_columns = list(reader.fieldnames or [])
+        status = next(reader)
+
+    assert recommendation_columns == _governed_contract_columns(
+        "recommendations"
+    )
+    assert status_columns == _governed_contract_columns(
+        "platform_status"
+    )
+
+    assert recommendation["recommendation"] == "buy"
+    assert recommendation["normalized_score"] == "5.0"
+    assert recommendation["confidence_score"] == "70.0"
+    assert recommendation["platform_native_label"] == "BUY"
+    assert recommendation["time_horizon"] == "12_month"
+    assert recommendation["as_of_date"] == "2026-07-25"
+
+    assert status["platform_id"] == "metals"
+    assert status["platform_name"] == "Metals Intelligence Platform"
+    assert status["platform_version"] == "1.0.0"
+    assert status["run_status"] == "success"
+    assert status["records_published"] == "1"
+    assert status["warning_count"] == "0"
+    assert status["error_count"] == "0"
+
+
+def test_native_avoid_is_preserved_while_universal_action_is_not_ready(
+    tmp_path: Path,
+):
+    cycle_path = tmp_path / "cycle.json"
+    document = json.loads(_cycle(cycle_path).read_text(encoding="utf-8"))
+    document["forecasts"][0]["recommendation"] = "AVOID"
+    document["forecasts"][0]["expected_return"] = -0.20
+    cycle_path.write_text(json.dumps(document), encoding="utf-8")
+
+    result = publish_uip_native_metals_package(
+        cycle_path,
+        tmp_path / "packages",
+        run_id="run-avoid",
+        generated_at_utc="2026-07-25T12:00:00Z",
+    )
+
+    with (
+        Path(result.package_root) / "recommendations.csv"
+    ).open(newline="", encoding="utf-8") as handle:
+        row = next(csv.DictReader(handle))
+
+    assert row["recommendation"] == "not_ready"
+    assert row["platform_native_label"] == "AVOID"
+    assert row["normalized_score"] == "0.0"
+    assert row["confidence_score"] == "70.0"
+
+
 def test_unknown_native_asset_fails_closed(tmp_path: Path):
     path = tmp_path / "cycle.json"
     document = json.loads(_cycle(path).read_text(encoding="utf-8"))
