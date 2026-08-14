@@ -104,7 +104,24 @@ CORE_DATASET_DESCRIPTIONS = {
         "Registry of received and validated universal delivery packages."
     ),
     "universal_platform_registry": (
-        "Canonical registry of integrated source platforms."
+        "Operational import-state registry for integrated source platforms."
+    ),
+    "universal_domain_registry": (
+        "Governed D1 registry of currently certified UIP investment domains, "
+        "their ownership boundaries, publication boundaries, semantic "
+        "authority, and explicit execution restrictions."
+    ),
+    "universal_domain_operational_status": (
+        "Read-only join of governed domain authority with current universal "
+        "platform import and package operational state."
+    ),
+    "universal_row_lineage": (
+        "Lossless common row-lineage interface across certified universal "
+        "history datasets and MTG native-authority history."
+    ),
+    "universal_lineage_with_domain": (
+        "Common row lineage enriched with governed domain identity and "
+        "native-semantic ownership without redefining source-domain results."
     ),
 }
 

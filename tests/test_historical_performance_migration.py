@@ -62,6 +62,7 @@ def test_discovers_all_canonical_migrations() -> None:
         "003_health_status_latest_attempt.sql",
         "004_historical_performance.sql",
         "005_mtg_native_authority.sql",
+        "006_common_domain_registry_lineage.sql",
     ]
 
 
@@ -82,7 +83,7 @@ def test_fresh_database_contains_historical_objects(
         objects["historical_performance_current"]
         == "VIEW"
     )
-    assert len(objects) == 27
+    assert len(objects) == 31
     assert (
         objects["mtg_native_authority_history"]
         == "BASE TABLE"
@@ -122,7 +123,7 @@ def test_upgrade_from_first_three_migrations(
 
     after = _objects(database_path)
 
-    assert len(after) == 27
+    assert len(after) == 31
     assert (
         after["mtg_native_authority_history"]
         == "BASE TABLE"
@@ -154,7 +155,7 @@ def test_full_chain_is_idempotent(
     second = _objects(database_path)
 
     assert first == second
-    assert len(second) == 27
+    assert len(second) == 31
     assert (
         second["mtg_native_authority_history"]
         == "BASE TABLE"

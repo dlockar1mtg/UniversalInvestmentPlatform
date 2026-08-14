@@ -1,17 +1,17 @@
 {
-  "database_path": "C:\\Users\\DevonLockard\\AppData\\Local\\Temp\\uip-historical-performance-schema-control\\universal_investment_upgraded.duckdb",
-  "database_size_bytes": 11546624,
-  "database_sha256": "2723537263957f71d41fe2fe048b4650a9d90ca145cc4244896811145673a9e3",
-  "inspected_at_utc": "2026-07-30T21:16:52.135630+00:00",
+  "database_path": "C:\\Users\\DevonLockard\\AppData\\Local\\Temp\\uip-d1-schema-control-f081e70765d848d2865501f0dda5385c\\d1_schema_control.duckdb",
+  "database_size_bytes": 1585152,
+  "database_sha256": "414d80d097a98f6e620f4a7cb011c46bde6392b85cc5f2608814d8698b1b99f4",
+  "inspected_at_utc": "2026-08-14T18:54:08.822414+00:00",
   "read_only": true,
-  "object_count": 25,
+  "object_count": 31,
   "objects": [
     {
       "schema": "main",
       "name": "asset_master_current",
       "qualified_name": "main.asset_master_current",
       "type": "VIEW",
-      "row_count": 1174,
+      "row_count": 0,
       "description": "Current canonical asset view derived from asset_master_history.",
       "columns": [
         {
@@ -199,7 +199,7 @@
       "name": "asset_master_history",
       "qualified_name": "main.asset_master_history",
       "type": "BASE TABLE",
-      "row_count": 8199,
+      "row_count": 0,
       "description": "Append-only canonical history of assets published by source domains. Each row represents an observed asset record for a platform run.",
       "columns": [
         {
@@ -418,7 +418,7 @@
       "name": "forecasts_current",
       "qualified_name": "main.forecasts_current",
       "type": "VIEW",
-      "row_count": 1499,
+      "row_count": 0,
       "description": "Current forecast view derived from forecasts_history.",
       "columns": [
         {
@@ -606,7 +606,7 @@
       "name": "forecasts_history",
       "qualified_name": "main.forecasts_history",
       "type": "BASE TABLE",
-      "row_count": 5254,
+      "row_count": 0,
       "description": "Append-only history of source and UIP forecast observations.",
       "columns": [
         {
@@ -1798,10 +1798,567 @@
     },
     {
       "schema": "main",
+      "name": "mtg_native_authority_current",
+      "qualified_name": "main.mtg_native_authority_current",
+      "type": "VIEW",
+      "row_count": 0,
+      "description": "Database object discovered through read-only DuckDB introspection.",
+      "columns": [
+        {
+          "position": 1,
+          "name": "mtg_asset_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 2,
+          "name": "mtg_lane",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 3,
+          "name": "native_asset_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 4,
+          "name": "product_name",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 5,
+          "name": "lane_authority_state",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 6,
+          "name": "current_price_usd",
+          "data_type": "DOUBLE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 7,
+          "name": "current_price_authority_available",
+          "data_type": "BOOLEAN",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 8,
+          "name": "forecast_authority_available",
+          "data_type": "BOOLEAN",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 9,
+          "name": "forecast_1y_price_usd",
+          "data_type": "DOUBLE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 10,
+          "name": "forecast_1y_return",
+          "data_type": "DOUBLE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 11,
+          "name": "risk_authority_available",
+          "data_type": "BOOLEAN",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 12,
+          "name": "native_rank",
+          "data_type": "BIGINT",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 13,
+          "name": "native_rank_type",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 14,
+          "name": "native_purchase_status",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 15,
+          "name": "purchase_semantic",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 16,
+          "name": "evidence_state",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 17,
+          "name": "actionability_state",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 18,
+          "name": "execution_ready_purchase_certified",
+          "data_type": "BOOLEAN",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 19,
+          "name": "manual_execution_price_check_required",
+          "data_type": "BOOLEAN",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 20,
+          "name": "native_authority_pointer",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 21,
+          "name": "native_authority_sha256",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 22,
+          "name": "snapshot_population_is_permanent",
+          "data_type": "BOOLEAN",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 23,
+          "name": "automatic_purchase_execution",
+          "data_type": "BOOLEAN",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 24,
+          "name": "_import_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 25,
+          "name": "_package_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 26,
+          "name": "_source_platform",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 27,
+          "name": "_source_filename",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 28,
+          "name": "_source_row_number",
+          "data_type": "BIGINT",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 29,
+          "name": "_manifest_sha256",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 30,
+          "name": "_imported_at_utc",
+          "data_type": "TIMESTAMP",
+          "nullable": true,
+          "default": null
+        }
+      ],
+      "constraints": [],
+      "indexes": [],
+      "view_definition": "CREATE VIEW mtg_native_authority_current AS SELECT * EXCLUDE (_row_rank) FROM (SELECT *, row_number() OVER (PARTITION BY mtg_asset_id ORDER BY _imported_at_utc DESC, _source_row_number DESC) AS _row_rank FROM mtg_native_authority_history) WHERE (_row_rank = 1);"
+    },
+    {
+      "schema": "main",
+      "name": "mtg_native_authority_history",
+      "qualified_name": "main.mtg_native_authority_history",
+      "type": "BASE TABLE",
+      "row_count": 0,
+      "description": "Database object discovered through read-only DuckDB introspection.",
+      "columns": [
+        {
+          "position": 1,
+          "name": "mtg_asset_id",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 2,
+          "name": "mtg_lane",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 3,
+          "name": "native_asset_id",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 4,
+          "name": "product_name",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 5,
+          "name": "lane_authority_state",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 6,
+          "name": "current_price_usd",
+          "data_type": "DOUBLE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 7,
+          "name": "current_price_authority_available",
+          "data_type": "BOOLEAN",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 8,
+          "name": "forecast_authority_available",
+          "data_type": "BOOLEAN",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 9,
+          "name": "forecast_1y_price_usd",
+          "data_type": "DOUBLE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 10,
+          "name": "forecast_1y_return",
+          "data_type": "DOUBLE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 11,
+          "name": "risk_authority_available",
+          "data_type": "BOOLEAN",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 12,
+          "name": "native_rank",
+          "data_type": "BIGINT",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 13,
+          "name": "native_rank_type",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 14,
+          "name": "native_purchase_status",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 15,
+          "name": "purchase_semantic",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 16,
+          "name": "evidence_state",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 17,
+          "name": "actionability_state",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 18,
+          "name": "execution_ready_purchase_certified",
+          "data_type": "BOOLEAN",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 19,
+          "name": "manual_execution_price_check_required",
+          "data_type": "BOOLEAN",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 20,
+          "name": "native_authority_pointer",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 21,
+          "name": "native_authority_sha256",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 22,
+          "name": "snapshot_population_is_permanent",
+          "data_type": "BOOLEAN",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 23,
+          "name": "automatic_purchase_execution",
+          "data_type": "BOOLEAN",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 24,
+          "name": "_import_id",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 25,
+          "name": "_package_id",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 26,
+          "name": "_source_platform",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 27,
+          "name": "_source_filename",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 28,
+          "name": "_source_row_number",
+          "data_type": "BIGINT",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 29,
+          "name": "_manifest_sha256",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 30,
+          "name": "_imported_at_utc",
+          "data_type": "TIMESTAMP",
+          "nullable": false,
+          "default": null
+        }
+      ],
+      "constraints": [
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        }
+      ],
+      "indexes": [],
+      "view_definition": null
+    },
+    {
+      "schema": "main",
       "name": "platform_status_current",
       "qualified_name": "main.platform_status_current",
       "type": "VIEW",
-      "row_count": 3,
+      "row_count": 0,
       "description": "Current platform-status view.",
       "columns": [
         {
@@ -1968,7 +2525,7 @@
       "name": "platform_status_history",
       "qualified_name": "main.platform_status_history",
       "type": "BASE TABLE",
-      "row_count": 24,
+      "row_count": 0,
       "description": "Append-only history of source-platform publication and run status.",
       "columns": [
         {
@@ -2166,7 +2723,7 @@
       "name": "portfolio_positions_current",
       "qualified_name": "main.portfolio_positions_current",
       "type": "VIEW",
-      "row_count": 12,
+      "row_count": 0,
       "description": "Current canonical portfolio-position view.",
       "columns": [
         {
@@ -2347,7 +2904,7 @@
       "name": "portfolio_positions_history",
       "qualified_name": "main.portfolio_positions_history",
       "type": "BASE TABLE",
-      "row_count": 66,
+      "row_count": 0,
       "description": "Append-only history of canonical portfolio positions imported or derived for a platform run.",
       "columns": [
         {
@@ -2559,7 +3116,7 @@
       "name": "recommendations_current",
       "qualified_name": "main.recommendations_current",
       "type": "VIEW",
-      "row_count": 1169,
+      "row_count": 0,
       "description": "Current recommendation view derived from recommendations_history.",
       "columns": [
         {
@@ -2733,7 +3290,7 @@
       "name": "recommendations_history",
       "qualified_name": "main.recommendations_history",
       "type": "BASE TABLE",
-      "row_count": 5285,
+      "row_count": 0,
       "description": "Append-only history of recommendations and recommendation evidence.",
       "columns": [
         {
@@ -2938,7 +3495,7 @@
       "name": "risk_metrics_current",
       "qualified_name": "main.risk_metrics_current",
       "type": "VIEW",
-      "row_count": 1168,
+      "row_count": 0,
       "description": "Current risk-metric view derived from risk_metrics_history.",
       "columns": [
         {
@@ -3126,7 +3683,7 @@
       "name": "risk_metrics_history",
       "qualified_name": "main.risk_metrics_history",
       "type": "BASE TABLE",
-      "row_count": 2439,
+      "row_count": 0,
       "description": "Append-only history of asset-level risk measurements.",
       "columns": [
         {
@@ -3342,10 +3899,370 @@
     },
     {
       "schema": "main",
+      "name": "universal_domain_operational_status",
+      "qualified_name": "main.universal_domain_operational_status",
+      "type": "VIEW",
+      "row_count": 3,
+      "description": "Read-only join of governed domain authority with current universal platform import and package operational state.",
+      "columns": [
+        {
+          "position": 1,
+          "name": "domain_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 2,
+          "name": "domain_name",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 3,
+          "name": "platform_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 4,
+          "name": "ownership_type",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 5,
+          "name": "source_repository",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 6,
+          "name": "publication_boundary",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 7,
+          "name": "certification_state",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 8,
+          "name": "dynamic_asset_universe",
+          "data_type": "BOOLEAN",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 9,
+          "name": "native_semantics_authoritative",
+          "data_type": "BOOLEAN",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 10,
+          "name": "cross_asset_ranking_authorized",
+          "data_type": "BOOLEAN",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 11,
+          "name": "automatic_execution_authorized",
+          "data_type": "BOOLEAN",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 12,
+          "name": "registry_version",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 13,
+          "name": "platform_name",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 14,
+          "name": "platform_version",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 15,
+          "name": "adapter_version",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 16,
+          "name": "contract_version",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 17,
+          "name": "import_registry_status",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 18,
+          "name": "last_package_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 19,
+          "name": "last_run_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 20,
+          "name": "last_import_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 21,
+          "name": "last_import_status",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 22,
+          "name": "last_imported_at_utc",
+          "data_type": "TIMESTAMP",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 23,
+          "name": "last_data_as_of_date",
+          "data_type": "DATE",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 24,
+          "name": "warning_count",
+          "data_type": "BIGINT",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 25,
+          "name": "error_count",
+          "data_type": "BIGINT",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 26,
+          "name": "status_message",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        }
+      ],
+      "constraints": [],
+      "indexes": [],
+      "view_definition": "CREATE VIEW universal_domain_operational_status AS SELECT d.domain_id, d.domain_name, d.platform_id, d.ownership_type, d.source_repository, d.publication_boundary, d.certification_state, d.dynamic_asset_universe, d.native_semantics_authoritative, d.cross_asset_ranking_authorized, d.automatic_execution_authorized, d.registry_version, p.platform_name, p.platform_version, p.adapter_version, p.contract_version, p.registry_status AS import_registry_status, p.last_package_id, p.last_run_id, p.last_import_id, p.last_import_status, p.last_imported_at_utc, p.last_data_as_of_date, p.warning_count, p.error_count, p.status_message FROM universal_domain_registry AS d LEFT JOIN universal_platform_registry AS p ON ((p.platform_id = d.platform_id));"
+    },
+    {
+      "schema": "main",
+      "name": "universal_domain_registry",
+      "qualified_name": "main.universal_domain_registry",
+      "type": "BASE TABLE",
+      "row_count": 3,
+      "description": "Governed D1 registry of currently certified UIP investment domains, their ownership boundaries, publication boundaries, semantic authority, and explicit execution restrictions.",
+      "columns": [
+        {
+          "position": 1,
+          "name": "domain_id",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 2,
+          "name": "domain_name",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 3,
+          "name": "platform_id",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 4,
+          "name": "ownership_type",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 5,
+          "name": "source_repository",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 6,
+          "name": "publication_boundary",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 7,
+          "name": "certification_state",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 8,
+          "name": "dynamic_asset_universe",
+          "data_type": "BOOLEAN",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 9,
+          "name": "native_semantics_authoritative",
+          "data_type": "BOOLEAN",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 10,
+          "name": "cross_asset_ranking_authorized",
+          "data_type": "BOOLEAN",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 11,
+          "name": "automatic_execution_authorized",
+          "data_type": "BOOLEAN",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 12,
+          "name": "registry_version",
+          "data_type": "VARCHAR",
+          "nullable": false,
+          "default": null
+        },
+        {
+          "position": 13,
+          "name": "notes",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        }
+      ],
+      "constraints": [
+        {
+          "type": "PRIMARY KEY",
+          "text": "PRIMARY KEY(domain_id)",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        },
+        {
+          "type": "NOT NULL",
+          "text": "NOT NULL",
+          "expression": null
+        }
+      ],
+      "indexes": [],
+      "view_definition": null
+    },
+    {
+      "schema": "main",
       "name": "universal_import_datasets",
       "qualified_name": "main.universal_import_datasets",
       "type": "BASE TABLE",
-      "row_count": 132,
+      "row_count": 0,
       "description": "Dataset-level evidence for universal import attempts.",
       "columns": [
         {
@@ -3489,7 +4406,7 @@
       "name": "universal_import_error_summary",
       "qualified_name": "main.universal_import_error_summary",
       "type": "VIEW",
-      "row_count": 1,
+      "row_count": 0,
       "description": "Aggregated current import-error summary.",
       "columns": [
         {
@@ -3544,7 +4461,7 @@
       "name": "universal_import_errors",
       "qualified_name": "main.universal_import_errors",
       "type": "BASE TABLE",
-      "row_count": 1,
+      "row_count": 0,
       "description": "Detailed import-validation and activation errors.",
       "columns": [
         {
@@ -3651,7 +4568,7 @@
       "name": "universal_import_health",
       "qualified_name": "main.universal_import_health",
       "type": "VIEW",
-      "row_count": 3,
+      "row_count": 0,
       "description": "Current import-health view by source platform.",
       "columns": [
         {
@@ -3797,7 +4714,7 @@
       "name": "universal_imports",
       "qualified_name": "main.universal_imports",
       "type": "BASE TABLE",
-      "row_count": 25,
+      "row_count": 0,
       "description": "Import-attempt registry containing package, platform, timing, and outcome evidence.",
       "columns": [
         {
@@ -3979,7 +4896,7 @@
       "name": "universal_latest_import_attempt",
       "qualified_name": "main.universal_latest_import_attempt",
       "type": "VIEW",
-      "row_count": 3,
+      "row_count": 0,
       "description": "Latest import attempt per platform.",
       "columns": [
         {
@@ -4125,7 +5042,7 @@
       "name": "universal_latest_successful_import",
       "qualified_name": "main.universal_latest_successful_import",
       "type": "VIEW",
-      "row_count": 3,
+      "row_count": 0,
       "description": "Latest successfully activated import per platform.",
       "columns": [
         {
@@ -4268,10 +5185,128 @@
     },
     {
       "schema": "main",
+      "name": "universal_lineage_with_domain",
+      "qualified_name": "main.universal_lineage_with_domain",
+      "type": "VIEW",
+      "row_count": 0,
+      "description": "Common row lineage enriched with governed domain identity and native-semantic ownership without redefining source-domain results.",
+      "columns": [
+        {
+          "position": 1,
+          "name": "domain_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 2,
+          "name": "domain_name",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 3,
+          "name": "ownership_type",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 4,
+          "name": "native_semantics_authoritative",
+          "data_type": "BOOLEAN",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 5,
+          "name": "dataset_name",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 6,
+          "name": "platform_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 7,
+          "name": "universal_asset_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 8,
+          "name": "run_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 9,
+          "name": "_import_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 10,
+          "name": "_package_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 11,
+          "name": "_source_platform",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 12,
+          "name": "_source_filename",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 13,
+          "name": "_source_row_number",
+          "data_type": "BIGINT",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 14,
+          "name": "_manifest_sha256",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 15,
+          "name": "_imported_at_utc",
+          "data_type": "TIMESTAMP",
+          "nullable": true,
+          "default": null
+        }
+      ],
+      "constraints": [],
+      "indexes": [],
+      "view_definition": "CREATE VIEW universal_lineage_with_domain AS SELECT d.domain_id, d.domain_name, d.ownership_type, d.native_semantics_authoritative, l.dataset_name, l.platform_id, l.universal_asset_id, l.run_id, l._import_id, l._package_id, l._source_platform, l._source_filename, l._source_row_number, l._manifest_sha256, l._imported_at_utc FROM universal_row_lineage AS l LEFT JOIN universal_domain_registry AS d ON ((d.platform_id = l.platform_id));"
+    },
+    {
+      "schema": "main",
       "name": "universal_packages",
       "qualified_name": "main.universal_packages",
       "type": "BASE TABLE",
-      "row_count": 24,
+      "row_count": 0,
       "description": "Registry of received and validated universal delivery packages.",
       "columns": [
         {
@@ -4404,8 +5439,8 @@
       "name": "universal_platform_registry",
       "qualified_name": "main.universal_platform_registry",
       "type": "BASE TABLE",
-      "row_count": 3,
-      "description": "Canonical registry of integrated source platforms.",
+      "row_count": 0,
+      "description": "Operational import-state registry for integrated source platforms.",
       "columns": [
         {
           "position": 1,
@@ -4577,6 +5612,96 @@
       ],
       "indexes": [],
       "view_definition": null
+    },
+    {
+      "schema": "main",
+      "name": "universal_row_lineage",
+      "qualified_name": "main.universal_row_lineage",
+      "type": "VIEW",
+      "row_count": 0,
+      "description": "Lossless common row-lineage interface across certified universal history datasets and MTG native-authority history.",
+      "columns": [
+        {
+          "position": 1,
+          "name": "dataset_name",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 2,
+          "name": "platform_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 3,
+          "name": "universal_asset_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 4,
+          "name": "run_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 5,
+          "name": "_import_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 6,
+          "name": "_package_id",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 7,
+          "name": "_source_platform",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 8,
+          "name": "_source_filename",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 9,
+          "name": "_source_row_number",
+          "data_type": "BIGINT",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 10,
+          "name": "_manifest_sha256",
+          "data_type": "VARCHAR",
+          "nullable": true,
+          "default": null
+        },
+        {
+          "position": 11,
+          "name": "_imported_at_utc",
+          "data_type": "TIMESTAMP",
+          "nullable": true,
+          "default": null
+        }
+      ],
+      "constraints": [],
+      "indexes": [],
+      "view_definition": "CREATE VIEW universal_row_lineage AS (SELECT 'asset_master' AS dataset_name, platform_id, universal_asset_id, run_id, _import_id, _package_id, _source_platform, _source_filename, _source_row_number, _manifest_sha256, _imported_at_utc FROM asset_master_history) UNION ALL ((((SELECT 'forecasts' AS dataset_name, platform_id, universal_asset_id, run_id, _import_id, _package_id, _source_platform, _source_filename, _source_row_number, _manifest_sha256, _imported_at_utc FROM forecasts_history) UNION ALL (SELECT 'recommendations' AS dataset_name, platform_id, universal_asset_id, run_id, _import_id, _package_id, _source_platform, _source_filename, _source_row_number, _manifest_sha256, _imported_at_utc FROM recommendations_history)) UNION ALL ((SELECT 'risk_metrics' AS dataset_name, platform_id, universal_asset_id, run_id, _import_id, _package_id, _source_platform, _source_filename, _source_row_number, _manifest_sha256, _imported_at_utc FROM risk_metrics_history) UNION ALL (SELECT 'portfolio_positions' AS dataset_name, platform_id, universal_asset_id, run_id, _import_id, _package_id, _source_platform, _source_filename, _source_row_number, _manifest_sha256, _imported_at_utc FROM portfolio_positions_history))) UNION ALL (((SELECT 'platform_status' AS dataset_name, platform_id, CAST(NULL AS VARCHAR) AS universal_asset_id, run_id, _import_id, _package_id, _source_platform, _source_filename, _source_row_number, _manifest_sha256, _imported_at_utc FROM platform_status_history) UNION ALL (SELECT 'historical_performance' AS dataset_name, platform_id, universal_asset_id, run_id, _import_id, _package_id, _source_platform, _source_filename, _source_row_number, _manifest_sha256, _imported_at_utc FROM historical_performance_history)) UNION ALL (SELECT 'mtg_native_authority' AS dataset_name, 'mtg' AS platform_id, mtg_asset_id AS universal_asset_id, CAST(NULL AS VARCHAR) AS run_id, _import_id, _package_id, _source_platform, _source_filename, _source_row_number, _manifest_sha256, _imported_at_utc FROM mtg_native_authority_history)));"
     }
   ]
 }

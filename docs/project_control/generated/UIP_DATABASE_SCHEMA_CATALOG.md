@@ -2,13 +2,13 @@
 
 ## Generation evidence
 
-- Database: `C:\Users\DevonLockard\AppData\Local\Temp\uip-historical-performance-schema-control\universal_investment_upgraded.duckdb`
-- Database SHA-256: `2723537263957f71d41fe2fe048b4650a9d90ca145cc4244896811145673a9e3`
-- Database size: `11546624` bytes
-- Inspected at: `2026-07-30T21:16:52.135630+00:00`
+- Database: `C:\Users\DevonLockard\AppData\Local\Temp\uip-d1-schema-control-f081e70765d848d2865501f0dda5385c\d1_schema_control.duckdb`
+- Database SHA-256: `414d80d097a98f6e620f4a7cb011c46bde6392b85cc5f2608814d8698b1b99f4`
+- Database size: `1585152` bytes
+- Inspected at: `2026-08-14T18:54:08.822414+00:00`
 - Inspection mode: `READ_ONLY`
-- Database objects: `25`
-- Ordered SQL files: `4`
+- Database objects: `31`
+- Ordered SQL files: `6`
 
 This catalog is generated from read-only DuckDB introspection. It records observed implementation evidence; it does not by itself authorize a schema change.
 
@@ -20,13 +20,15 @@ This catalog is generated from read-only DuckDB introspection. It records observ
 | 2 | `foundation/import_engine/sql/002_audit_registry_integration.sql` | `9563d6ca0a0b120d4de15a6fd78d47fd4d3f4c5afa530886a8289c8011b1cc5d` | create or extend canonical tables; import audit and platform registry |
 | 3 | `foundation/import_engine/sql/003_health_status_latest_attempt.sql` | `130f47a6e95bbc8e2479466e2ea6f42d05e726f7fc22f94fd4a2f96fdbef7624` | import audit and platform registry |
 | 4 | `foundation/import_engine/sql/004_historical_performance.sql` | `ae86fefd6113eb98d2a87f293797e34d4216001d7d55ba21276185d202c40041` | create or extend canonical tables |
+| 5 | `foundation/import_engine/sql/005_mtg_native_authority.sql` | `33f44c15b9d0edcbf813162477077a18acf07833cd7f13e1fc4cbec60a0a37d4` | create or extend canonical tables |
+| 6 | `foundation/import_engine/sql/006_common_domain_registry_lineage.sql` | `b155e0ab7e80dd5c23559a5cd2ade63b0ed967dad8e56b6fa41c3958a721b236` | create or extend canonical tables; import audit and platform registry |
 
 ## Database objects
 
 ### `main.asset_master_current`
 
 - Type: `VIEW`
-- Observed rows: `1174`
+- Observed rows: `0`
 - Description: Current canonical asset view derived from asset_master_history.
 
 | Position | Column | Type | Nullable | Default |
@@ -69,7 +71,7 @@ CREATE VIEW asset_master_current AS SELECT * EXCLUDE (_row_rank) FROM (SELECT *,
 ### `main.asset_master_history`
 
 - Type: `BASE TABLE`
-- Observed rows: `8199`
+- Observed rows: `0`
 - Description: Append-only canonical history of assets published by source domains. Each row represents an observed asset record for a platform run.
 
 | Position | Column | Type | Nullable | Default |
@@ -112,7 +114,7 @@ CREATE VIEW asset_master_current AS SELECT * EXCLUDE (_row_rank) FROM (SELECT *,
 ### `main.forecasts_current`
 
 - Type: `VIEW`
-- Observed rows: `1499`
+- Observed rows: `0`
 - Description: Current forecast view derived from forecasts_history.
 
 | Position | Column | Type | Nullable | Default |
@@ -155,7 +157,7 @@ CREATE VIEW forecasts_current AS SELECT * EXCLUDE (_row_rank) FROM (SELECT *, ro
 ### `main.forecasts_history`
 
 - Type: `BASE TABLE`
-- Observed rows: `5254`
+- Observed rows: `0`
 - Description: Append-only history of source and UIP forecast observations.
 
 | Position | Column | Type | Nullable | Default |
@@ -393,10 +395,122 @@ CREATE VIEW macro_signals_current AS SELECT * EXCLUDE (_row_rank) FROM (SELECT *
 - `NOT NULL`: `NOT NULL`
 - `NOT NULL`: `NOT NULL`
 
+### `main.mtg_native_authority_current`
+
+- Type: `VIEW`
+- Observed rows: `0`
+- Description: Database object discovered through read-only DuckDB introspection.
+
+| Position | Column | Type | Nullable | Default |
+|---:|---|---|---|---|
+| 1 | `mtg_asset_id` | `VARCHAR` | `YES` | `` |
+| 2 | `mtg_lane` | `VARCHAR` | `YES` | `` |
+| 3 | `native_asset_id` | `VARCHAR` | `YES` | `` |
+| 4 | `product_name` | `VARCHAR` | `YES` | `` |
+| 5 | `lane_authority_state` | `VARCHAR` | `YES` | `` |
+| 6 | `current_price_usd` | `DOUBLE` | `YES` | `` |
+| 7 | `current_price_authority_available` | `BOOLEAN` | `YES` | `` |
+| 8 | `forecast_authority_available` | `BOOLEAN` | `YES` | `` |
+| 9 | `forecast_1y_price_usd` | `DOUBLE` | `YES` | `` |
+| 10 | `forecast_1y_return` | `DOUBLE` | `YES` | `` |
+| 11 | `risk_authority_available` | `BOOLEAN` | `YES` | `` |
+| 12 | `native_rank` | `BIGINT` | `YES` | `` |
+| 13 | `native_rank_type` | `VARCHAR` | `YES` | `` |
+| 14 | `native_purchase_status` | `VARCHAR` | `YES` | `` |
+| 15 | `purchase_semantic` | `VARCHAR` | `YES` | `` |
+| 16 | `evidence_state` | `VARCHAR` | `YES` | `` |
+| 17 | `actionability_state` | `VARCHAR` | `YES` | `` |
+| 18 | `execution_ready_purchase_certified` | `BOOLEAN` | `YES` | `` |
+| 19 | `manual_execution_price_check_required` | `BOOLEAN` | `YES` | `` |
+| 20 | `native_authority_pointer` | `VARCHAR` | `YES` | `` |
+| 21 | `native_authority_sha256` | `VARCHAR` | `YES` | `` |
+| 22 | `snapshot_population_is_permanent` | `BOOLEAN` | `YES` | `` |
+| 23 | `automatic_purchase_execution` | `BOOLEAN` | `YES` | `` |
+| 24 | `_import_id` | `VARCHAR` | `YES` | `` |
+| 25 | `_package_id` | `VARCHAR` | `YES` | `` |
+| 26 | `_source_platform` | `VARCHAR` | `YES` | `` |
+| 27 | `_source_filename` | `VARCHAR` | `YES` | `` |
+| 28 | `_source_row_number` | `BIGINT` | `YES` | `` |
+| 29 | `_manifest_sha256` | `VARCHAR` | `YES` | `` |
+| 30 | `_imported_at_utc` | `TIMESTAMP` | `YES` | `` |
+
+<details>
+<summary>View definition</summary>
+
+```sql
+CREATE VIEW mtg_native_authority_current AS SELECT * EXCLUDE (_row_rank) FROM (SELECT *, row_number() OVER (PARTITION BY mtg_asset_id ORDER BY _imported_at_utc DESC, _source_row_number DESC) AS _row_rank FROM mtg_native_authority_history) WHERE (_row_rank = 1);
+```
+
+</details>
+
+### `main.mtg_native_authority_history`
+
+- Type: `BASE TABLE`
+- Observed rows: `0`
+- Description: Database object discovered through read-only DuckDB introspection.
+
+| Position | Column | Type | Nullable | Default |
+|---:|---|---|---|---|
+| 1 | `mtg_asset_id` | `VARCHAR` | `NO` | `` |
+| 2 | `mtg_lane` | `VARCHAR` | `NO` | `` |
+| 3 | `native_asset_id` | `VARCHAR` | `NO` | `` |
+| 4 | `product_name` | `VARCHAR` | `NO` | `` |
+| 5 | `lane_authority_state` | `VARCHAR` | `NO` | `` |
+| 6 | `current_price_usd` | `DOUBLE` | `YES` | `` |
+| 7 | `current_price_authority_available` | `BOOLEAN` | `NO` | `` |
+| 8 | `forecast_authority_available` | `BOOLEAN` | `NO` | `` |
+| 9 | `forecast_1y_price_usd` | `DOUBLE` | `YES` | `` |
+| 10 | `forecast_1y_return` | `DOUBLE` | `YES` | `` |
+| 11 | `risk_authority_available` | `BOOLEAN` | `NO` | `` |
+| 12 | `native_rank` | `BIGINT` | `YES` | `` |
+| 13 | `native_rank_type` | `VARCHAR` | `YES` | `` |
+| 14 | `native_purchase_status` | `VARCHAR` | `YES` | `` |
+| 15 | `purchase_semantic` | `VARCHAR` | `YES` | `` |
+| 16 | `evidence_state` | `VARCHAR` | `NO` | `` |
+| 17 | `actionability_state` | `VARCHAR` | `NO` | `` |
+| 18 | `execution_ready_purchase_certified` | `BOOLEAN` | `NO` | `` |
+| 19 | `manual_execution_price_check_required` | `BOOLEAN` | `NO` | `` |
+| 20 | `native_authority_pointer` | `VARCHAR` | `NO` | `` |
+| 21 | `native_authority_sha256` | `VARCHAR` | `NO` | `` |
+| 22 | `snapshot_population_is_permanent` | `BOOLEAN` | `NO` | `` |
+| 23 | `automatic_purchase_execution` | `BOOLEAN` | `NO` | `` |
+| 24 | `_import_id` | `VARCHAR` | `NO` | `` |
+| 25 | `_package_id` | `VARCHAR` | `NO` | `` |
+| 26 | `_source_platform` | `VARCHAR` | `NO` | `` |
+| 27 | `_source_filename` | `VARCHAR` | `NO` | `` |
+| 28 | `_source_row_number` | `BIGINT` | `NO` | `` |
+| 29 | `_manifest_sha256` | `VARCHAR` | `YES` | `` |
+| 30 | `_imported_at_utc` | `TIMESTAMP` | `NO` | `` |
+
+**Constraints**
+
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+
 ### `main.platform_status_current`
 
 - Type: `VIEW`
-- Observed rows: `3`
+- Observed rows: `0`
 - Description: Current platform-status view.
 
 | Position | Column | Type | Nullable | Default |
@@ -436,7 +550,7 @@ CREATE VIEW platform_status_current AS SELECT * EXCLUDE (_row_rank) FROM (SELECT
 ### `main.platform_status_history`
 
 - Type: `BASE TABLE`
-- Observed rows: `24`
+- Observed rows: `0`
 - Description: Append-only history of source-platform publication and run status.
 
 | Position | Column | Type | Nullable | Default |
@@ -476,7 +590,7 @@ CREATE VIEW platform_status_current AS SELECT * EXCLUDE (_row_rank) FROM (SELECT
 ### `main.portfolio_positions_current`
 
 - Type: `VIEW`
-- Observed rows: `12`
+- Observed rows: `0`
 - Description: Current canonical portfolio-position view.
 
 | Position | Column | Type | Nullable | Default |
@@ -518,7 +632,7 @@ CREATE VIEW portfolio_positions_current AS SELECT * EXCLUDE (_row_rank) FROM (SE
 ### `main.portfolio_positions_history`
 
 - Type: `BASE TABLE`
-- Observed rows: `66`
+- Observed rows: `0`
 - Description: Append-only history of canonical portfolio positions imported or derived for a platform run.
 
 | Position | Column | Type | Nullable | Default |
@@ -560,7 +674,7 @@ CREATE VIEW portfolio_positions_current AS SELECT * EXCLUDE (_row_rank) FROM (SE
 ### `main.recommendations_current`
 
 - Type: `VIEW`
-- Observed rows: `1169`
+- Observed rows: `0`
 - Description: Current recommendation view derived from recommendations_history.
 
 | Position | Column | Type | Nullable | Default |
@@ -601,7 +715,7 @@ CREATE VIEW recommendations_current AS SELECT * EXCLUDE (_row_rank) FROM (SELECT
 ### `main.recommendations_history`
 
 - Type: `BASE TABLE`
-- Observed rows: `5285`
+- Observed rows: `0`
 - Description: Append-only history of recommendations and recommendation evidence.
 
 | Position | Column | Type | Nullable | Default |
@@ -642,7 +756,7 @@ CREATE VIEW recommendations_current AS SELECT * EXCLUDE (_row_rank) FROM (SELECT
 ### `main.risk_metrics_current`
 
 - Type: `VIEW`
-- Observed rows: `1168`
+- Observed rows: `0`
 - Description: Current risk-metric view derived from risk_metrics_history.
 
 | Position | Column | Type | Nullable | Default |
@@ -685,7 +799,7 @@ CREATE VIEW risk_metrics_current AS SELECT * EXCLUDE (_row_rank) FROM (SELECT *,
 ### `main.risk_metrics_history`
 
 - Type: `BASE TABLE`
-- Observed rows: `2439`
+- Observed rows: `0`
 - Description: Append-only history of asset-level risk measurements.
 
 | Position | Column | Type | Nullable | Default |
@@ -725,10 +839,91 @@ CREATE VIEW risk_metrics_current AS SELECT * EXCLUDE (_row_rank) FROM (SELECT *,
 - `NOT NULL`: `NOT NULL`
 - `NOT NULL`: `NOT NULL`
 
+### `main.universal_domain_operational_status`
+
+- Type: `VIEW`
+- Observed rows: `3`
+- Description: Read-only join of governed domain authority with current universal platform import and package operational state.
+
+| Position | Column | Type | Nullable | Default |
+|---:|---|---|---|---|
+| 1 | `domain_id` | `VARCHAR` | `YES` | `` |
+| 2 | `domain_name` | `VARCHAR` | `YES` | `` |
+| 3 | `platform_id` | `VARCHAR` | `YES` | `` |
+| 4 | `ownership_type` | `VARCHAR` | `YES` | `` |
+| 5 | `source_repository` | `VARCHAR` | `YES` | `` |
+| 6 | `publication_boundary` | `VARCHAR` | `YES` | `` |
+| 7 | `certification_state` | `VARCHAR` | `YES` | `` |
+| 8 | `dynamic_asset_universe` | `BOOLEAN` | `YES` | `` |
+| 9 | `native_semantics_authoritative` | `BOOLEAN` | `YES` | `` |
+| 10 | `cross_asset_ranking_authorized` | `BOOLEAN` | `YES` | `` |
+| 11 | `automatic_execution_authorized` | `BOOLEAN` | `YES` | `` |
+| 12 | `registry_version` | `VARCHAR` | `YES` | `` |
+| 13 | `platform_name` | `VARCHAR` | `YES` | `` |
+| 14 | `platform_version` | `VARCHAR` | `YES` | `` |
+| 15 | `adapter_version` | `VARCHAR` | `YES` | `` |
+| 16 | `contract_version` | `VARCHAR` | `YES` | `` |
+| 17 | `import_registry_status` | `VARCHAR` | `YES` | `` |
+| 18 | `last_package_id` | `VARCHAR` | `YES` | `` |
+| 19 | `last_run_id` | `VARCHAR` | `YES` | `` |
+| 20 | `last_import_id` | `VARCHAR` | `YES` | `` |
+| 21 | `last_import_status` | `VARCHAR` | `YES` | `` |
+| 22 | `last_imported_at_utc` | `TIMESTAMP` | `YES` | `` |
+| 23 | `last_data_as_of_date` | `DATE` | `YES` | `` |
+| 24 | `warning_count` | `BIGINT` | `YES` | `` |
+| 25 | `error_count` | `BIGINT` | `YES` | `` |
+| 26 | `status_message` | `VARCHAR` | `YES` | `` |
+
+<details>
+<summary>View definition</summary>
+
+```sql
+CREATE VIEW universal_domain_operational_status AS SELECT d.domain_id, d.domain_name, d.platform_id, d.ownership_type, d.source_repository, d.publication_boundary, d.certification_state, d.dynamic_asset_universe, d.native_semantics_authoritative, d.cross_asset_ranking_authorized, d.automatic_execution_authorized, d.registry_version, p.platform_name, p.platform_version, p.adapter_version, p.contract_version, p.registry_status AS import_registry_status, p.last_package_id, p.last_run_id, p.last_import_id, p.last_import_status, p.last_imported_at_utc, p.last_data_as_of_date, p.warning_count, p.error_count, p.status_message FROM universal_domain_registry AS d LEFT JOIN universal_platform_registry AS p ON ((p.platform_id = d.platform_id));
+```
+
+</details>
+
+### `main.universal_domain_registry`
+
+- Type: `BASE TABLE`
+- Observed rows: `3`
+- Description: Governed D1 registry of currently certified UIP investment domains, their ownership boundaries, publication boundaries, semantic authority, and explicit execution restrictions.
+
+| Position | Column | Type | Nullable | Default |
+|---:|---|---|---|---|
+| 1 | `domain_id` | `VARCHAR` | `NO` | `` |
+| 2 | `domain_name` | `VARCHAR` | `NO` | `` |
+| 3 | `platform_id` | `VARCHAR` | `NO` | `` |
+| 4 | `ownership_type` | `VARCHAR` | `NO` | `` |
+| 5 | `source_repository` | `VARCHAR` | `YES` | `` |
+| 6 | `publication_boundary` | `VARCHAR` | `NO` | `` |
+| 7 | `certification_state` | `VARCHAR` | `NO` | `` |
+| 8 | `dynamic_asset_universe` | `BOOLEAN` | `NO` | `` |
+| 9 | `native_semantics_authoritative` | `BOOLEAN` | `NO` | `` |
+| 10 | `cross_asset_ranking_authorized` | `BOOLEAN` | `NO` | `` |
+| 11 | `automatic_execution_authorized` | `BOOLEAN` | `NO` | `` |
+| 12 | `registry_version` | `VARCHAR` | `NO` | `` |
+| 13 | `notes` | `VARCHAR` | `YES` | `` |
+
+**Constraints**
+
+- `PRIMARY KEY`: `PRIMARY KEY(domain_id)`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+- `NOT NULL`: `NOT NULL`
+
 ### `main.universal_import_datasets`
 
 - Type: `BASE TABLE`
-- Observed rows: `132`
+- Observed rows: `0`
 - Description: Dataset-level evidence for universal import attempts.
 
 | Position | Column | Type | Nullable | Default |
@@ -760,7 +955,7 @@ CREATE VIEW risk_metrics_current AS SELECT * EXCLUDE (_row_rank) FROM (SELECT *,
 ### `main.universal_import_error_summary`
 
 - Type: `VIEW`
-- Observed rows: `1`
+- Observed rows: `0`
 - Description: Aggregated current import-error summary.
 
 | Position | Column | Type | Nullable | Default |
@@ -784,7 +979,7 @@ CREATE VIEW universal_import_error_summary AS SELECT import_id, severity, error_
 ### `main.universal_import_errors`
 
 - Type: `BASE TABLE`
-- Observed rows: `1`
+- Observed rows: `0`
 - Description: Detailed import-validation and activation errors.
 
 | Position | Column | Type | Nullable | Default |
@@ -811,7 +1006,7 @@ CREATE VIEW universal_import_error_summary AS SELECT import_id, severity, error_
 ### `main.universal_import_health`
 
 - Type: `VIEW`
-- Observed rows: `3`
+- Observed rows: `0`
 - Description: Current import-health view by source platform.
 
 | Position | Column | Type | Nullable | Default |
@@ -848,7 +1043,7 @@ CREATE VIEW universal_import_health AS SELECT r.platform_id, r.platform_name, r.
 ### `main.universal_imports`
 
 - Type: `BASE TABLE`
-- Observed rows: `25`
+- Observed rows: `0`
 - Description: Import-attempt registry containing package, platform, timing, and outcome evidence.
 
 | Position | Column | Type | Nullable | Default |
@@ -886,7 +1081,7 @@ CREATE VIEW universal_import_health AS SELECT r.platform_id, r.platform_name, r.
 ### `main.universal_latest_import_attempt`
 
 - Type: `VIEW`
-- Observed rows: `3`
+- Observed rows: `0`
 - Description: Latest import attempt per platform.
 
 | Position | Column | Type | Nullable | Default |
@@ -923,7 +1118,7 @@ CREATE VIEW universal_latest_import_attempt AS SELECT * EXCLUDE (_row_rank) FROM
 ### `main.universal_latest_successful_import`
 
 - Type: `VIEW`
-- Observed rows: `3`
+- Observed rows: `0`
 - Description: Latest successfully activated import per platform.
 
 | Position | Column | Type | Nullable | Default |
@@ -957,10 +1152,43 @@ CREATE VIEW universal_latest_successful_import AS SELECT * EXCLUDE (_row_rank) F
 
 </details>
 
+### `main.universal_lineage_with_domain`
+
+- Type: `VIEW`
+- Observed rows: `0`
+- Description: Common row lineage enriched with governed domain identity and native-semantic ownership without redefining source-domain results.
+
+| Position | Column | Type | Nullable | Default |
+|---:|---|---|---|---|
+| 1 | `domain_id` | `VARCHAR` | `YES` | `` |
+| 2 | `domain_name` | `VARCHAR` | `YES` | `` |
+| 3 | `ownership_type` | `VARCHAR` | `YES` | `` |
+| 4 | `native_semantics_authoritative` | `BOOLEAN` | `YES` | `` |
+| 5 | `dataset_name` | `VARCHAR` | `YES` | `` |
+| 6 | `platform_id` | `VARCHAR` | `YES` | `` |
+| 7 | `universal_asset_id` | `VARCHAR` | `YES` | `` |
+| 8 | `run_id` | `VARCHAR` | `YES` | `` |
+| 9 | `_import_id` | `VARCHAR` | `YES` | `` |
+| 10 | `_package_id` | `VARCHAR` | `YES` | `` |
+| 11 | `_source_platform` | `VARCHAR` | `YES` | `` |
+| 12 | `_source_filename` | `VARCHAR` | `YES` | `` |
+| 13 | `_source_row_number` | `BIGINT` | `YES` | `` |
+| 14 | `_manifest_sha256` | `VARCHAR` | `YES` | `` |
+| 15 | `_imported_at_utc` | `TIMESTAMP` | `YES` | `` |
+
+<details>
+<summary>View definition</summary>
+
+```sql
+CREATE VIEW universal_lineage_with_domain AS SELECT d.domain_id, d.domain_name, d.ownership_type, d.native_semantics_authoritative, l.dataset_name, l.platform_id, l.universal_asset_id, l.run_id, l._import_id, l._package_id, l._source_platform, l._source_filename, l._source_row_number, l._manifest_sha256, l._imported_at_utc FROM universal_row_lineage AS l LEFT JOIN universal_domain_registry AS d ON ((d.platform_id = l.platform_id));
+```
+
+</details>
+
 ### `main.universal_packages`
 
 - Type: `BASE TABLE`
-- Observed rows: `24`
+- Observed rows: `0`
 - Description: Registry of received and validated universal delivery packages.
 
 | Position | Column | Type | Nullable | Default |
@@ -991,8 +1219,8 @@ CREATE VIEW universal_latest_successful_import AS SELECT * EXCLUDE (_row_rank) F
 ### `main.universal_platform_registry`
 
 - Type: `BASE TABLE`
-- Observed rows: `3`
-- Description: Canonical registry of integrated source platforms.
+- Observed rows: `0`
+- Description: Operational import-state registry for integrated source platforms.
 
 | Position | Column | Type | Nullable | Default |
 |---:|---|---|---|---|
@@ -1024,6 +1252,35 @@ CREATE VIEW universal_latest_successful_import AS SELECT * EXCLUDE (_row_rank) F
 - `NOT NULL`: `NOT NULL`
 - `NOT NULL`: `NOT NULL`
 - `NOT NULL`: `NOT NULL`
+
+### `main.universal_row_lineage`
+
+- Type: `VIEW`
+- Observed rows: `0`
+- Description: Lossless common row-lineage interface across certified universal history datasets and MTG native-authority history.
+
+| Position | Column | Type | Nullable | Default |
+|---:|---|---|---|---|
+| 1 | `dataset_name` | `VARCHAR` | `YES` | `` |
+| 2 | `platform_id` | `VARCHAR` | `YES` | `` |
+| 3 | `universal_asset_id` | `VARCHAR` | `YES` | `` |
+| 4 | `run_id` | `VARCHAR` | `YES` | `` |
+| 5 | `_import_id` | `VARCHAR` | `YES` | `` |
+| 6 | `_package_id` | `VARCHAR` | `YES` | `` |
+| 7 | `_source_platform` | `VARCHAR` | `YES` | `` |
+| 8 | `_source_filename` | `VARCHAR` | `YES` | `` |
+| 9 | `_source_row_number` | `BIGINT` | `YES` | `` |
+| 10 | `_manifest_sha256` | `VARCHAR` | `YES` | `` |
+| 11 | `_imported_at_utc` | `TIMESTAMP` | `YES` | `` |
+
+<details>
+<summary>View definition</summary>
+
+```sql
+CREATE VIEW universal_row_lineage AS (SELECT 'asset_master' AS dataset_name, platform_id, universal_asset_id, run_id, _import_id, _package_id, _source_platform, _source_filename, _source_row_number, _manifest_sha256, _imported_at_utc FROM asset_master_history) UNION ALL ((((SELECT 'forecasts' AS dataset_name, platform_id, universal_asset_id, run_id, _import_id, _package_id, _source_platform, _source_filename, _source_row_number, _manifest_sha256, _imported_at_utc FROM forecasts_history) UNION ALL (SELECT 'recommendations' AS dataset_name, platform_id, universal_asset_id, run_id, _import_id, _package_id, _source_platform, _source_filename, _source_row_number, _manifest_sha256, _imported_at_utc FROM recommendations_history)) UNION ALL ((SELECT 'risk_metrics' AS dataset_name, platform_id, universal_asset_id, run_id, _import_id, _package_id, _source_platform, _source_filename, _source_row_number, _manifest_sha256, _imported_at_utc FROM risk_metrics_history) UNION ALL (SELECT 'portfolio_positions' AS dataset_name, platform_id, universal_asset_id, run_id, _import_id, _package_id, _source_platform, _source_filename, _source_row_number, _manifest_sha256, _imported_at_utc FROM portfolio_positions_history))) UNION ALL (((SELECT 'platform_status' AS dataset_name, platform_id, CAST(NULL AS VARCHAR) AS universal_asset_id, run_id, _import_id, _package_id, _source_platform, _source_filename, _source_row_number, _manifest_sha256, _imported_at_utc FROM platform_status_history) UNION ALL (SELECT 'historical_performance' AS dataset_name, platform_id, universal_asset_id, run_id, _import_id, _package_id, _source_platform, _source_filename, _source_row_number, _manifest_sha256, _imported_at_utc FROM historical_performance_history)) UNION ALL (SELECT 'mtg_native_authority' AS dataset_name, 'mtg' AS platform_id, mtg_asset_id AS universal_asset_id, CAST(NULL AS VARCHAR) AS run_id, _import_id, _package_id, _source_platform, _source_filename, _source_row_number, _manifest_sha256, _imported_at_utc FROM mtg_native_authority_history)));
+```
+
+</details>
 
 ## Interpretation rule
 

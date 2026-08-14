@@ -8,9 +8,9 @@ authority:
   generated_catalog_markdown: docs/project_control/generated/UIP_DATABASE_SCHEMA_CATALOG.md
   semantic_dictionary: docs/project_control/UIP_DATA_DICTIONARY.md
 generation:
-  generated_at_utc: '2026-07-30T21:16:52.141195+00:00'
-  source_database: C:\Users\DevonLockard\AppData\Local\Temp\uip-historical-performance-schema-control\universal_investment_upgraded.duckdb
-  source_database_sha256: 2723537263957f71d41fe2fe048b4650a9d90ca145cc4244896811145673a9e3
+  generated_at_utc: '2026-08-14T18:54:08.827337+00:00'
+  source_database: C:\Users\DevonLockard\AppData\Local\Temp\uip-d1-schema-control-f081e70765d848d2865501f0dda5385c\d1_schema_control.duckdb
+  source_database_sha256: 414d80d097a98f6e620f4a7cb011c46bde6392b85cc5f2608814d8698b1b99f4
   read_only_introspection: true
 migration_policy:
   ordered_by_numeric_filename_prefix: true
@@ -42,7 +42,19 @@ migrations:
   sha256: ae86fefd6113eb98d2a87f293797e34d4216001d7d55ba21276185d202c40041
   size_bytes: 1728
   purpose: create or extend canonical tables
+- order: 5
+  filename: 005_mtg_native_authority.sql
+  path: foundation/import_engine/sql/005_mtg_native_authority.sql
+  sha256: 33f44c15b9d0edcbf813162477077a18acf07833cd7f13e1fc4cbec60a0a37d4
+  size_bytes: 1672
+  purpose: create or extend canonical tables
+- order: 6
+  filename: 006_common_domain_registry_lineage.sql
+  path: foundation/import_engine/sql/006_common_domain_registry_lineage.sql
+  sha256: b155e0ab7e80dd5c23559a5cd2ade63b0ed967dad8e56b6fa41c3958a721b236
+  size_bytes: 6758
+  purpose: create or extend canonical tables; import audit and platform registry
 observed_database:
-  object_count: 25
-  tables: 13
-  views: 12
+  object_count: 31
+  tables: 15
+  views: 16

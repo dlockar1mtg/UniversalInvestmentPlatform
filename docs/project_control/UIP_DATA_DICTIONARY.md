@@ -33,7 +33,7 @@ This dictionary defines the semantic meaning of canonical UIP database objects. 
 Current canonical asset view derived from asset_master_history.
 
 - Physical type: `VIEW`
-- Observed rows during generation: `1174`
+- Observed rows during generation: `0`
 - Column definitions: see the generated schema catalog.
 
 ### `main.asset_master_history`
@@ -41,7 +41,7 @@ Current canonical asset view derived from asset_master_history.
 Append-only canonical history of assets published by source domains. Each row represents an observed asset record for a platform run.
 
 - Physical type: `BASE TABLE`
-- Observed rows during generation: `8199`
+- Observed rows during generation: `0`
 - Column definitions: see the generated schema catalog.
 
 ### `main.forecasts_current`
@@ -49,7 +49,7 @@ Append-only canonical history of assets published by source domains. Each row re
 Current forecast view derived from forecasts_history.
 
 - Physical type: `VIEW`
-- Observed rows during generation: `1499`
+- Observed rows during generation: `0`
 - Column definitions: see the generated schema catalog.
 
 ### `main.forecasts_history`
@@ -57,7 +57,7 @@ Current forecast view derived from forecasts_history.
 Append-only history of source and UIP forecast observations.
 
 - Physical type: `BASE TABLE`
-- Observed rows during generation: `5254`
+- Observed rows during generation: `0`
 - Column definitions: see the generated schema catalog.
 
 ### `main.historical_performance_current`
@@ -92,12 +92,28 @@ Append-only history of canonical macroeconomic or market signals.
 - Observed rows during generation: `0`
 - Column definitions: see the generated schema catalog.
 
+### `main.mtg_native_authority_current`
+
+Database object discovered through read-only DuckDB introspection.
+
+- Physical type: `VIEW`
+- Observed rows during generation: `0`
+- Column definitions: see the generated schema catalog.
+
+### `main.mtg_native_authority_history`
+
+Database object discovered through read-only DuckDB introspection.
+
+- Physical type: `BASE TABLE`
+- Observed rows during generation: `0`
+- Column definitions: see the generated schema catalog.
+
 ### `main.platform_status_current`
 
 Current platform-status view.
 
 - Physical type: `VIEW`
-- Observed rows during generation: `3`
+- Observed rows during generation: `0`
 - Column definitions: see the generated schema catalog.
 
 ### `main.platform_status_history`
@@ -105,7 +121,7 @@ Current platform-status view.
 Append-only history of source-platform publication and run status.
 
 - Physical type: `BASE TABLE`
-- Observed rows during generation: `24`
+- Observed rows during generation: `0`
 - Column definitions: see the generated schema catalog.
 
 ### `main.portfolio_positions_current`
@@ -113,7 +129,7 @@ Append-only history of source-platform publication and run status.
 Current canonical portfolio-position view.
 
 - Physical type: `VIEW`
-- Observed rows during generation: `12`
+- Observed rows during generation: `0`
 - Column definitions: see the generated schema catalog.
 
 ### `main.portfolio_positions_history`
@@ -121,7 +137,7 @@ Current canonical portfolio-position view.
 Append-only history of canonical portfolio positions imported or derived for a platform run.
 
 - Physical type: `BASE TABLE`
-- Observed rows during generation: `66`
+- Observed rows during generation: `0`
 - Column definitions: see the generated schema catalog.
 
 ### `main.recommendations_current`
@@ -129,7 +145,7 @@ Append-only history of canonical portfolio positions imported or derived for a p
 Current recommendation view derived from recommendations_history.
 
 - Physical type: `VIEW`
-- Observed rows during generation: `1169`
+- Observed rows during generation: `0`
 - Column definitions: see the generated schema catalog.
 
 ### `main.recommendations_history`
@@ -137,7 +153,7 @@ Current recommendation view derived from recommendations_history.
 Append-only history of recommendations and recommendation evidence.
 
 - Physical type: `BASE TABLE`
-- Observed rows during generation: `5285`
+- Observed rows during generation: `0`
 - Column definitions: see the generated schema catalog.
 
 ### `main.risk_metrics_current`
@@ -145,7 +161,7 @@ Append-only history of recommendations and recommendation evidence.
 Current risk-metric view derived from risk_metrics_history.
 
 - Physical type: `VIEW`
-- Observed rows during generation: `1168`
+- Observed rows during generation: `0`
 - Column definitions: see the generated schema catalog.
 
 ### `main.risk_metrics_history`
@@ -153,7 +169,23 @@ Current risk-metric view derived from risk_metrics_history.
 Append-only history of asset-level risk measurements.
 
 - Physical type: `BASE TABLE`
-- Observed rows during generation: `2439`
+- Observed rows during generation: `0`
+- Column definitions: see the generated schema catalog.
+
+### `main.universal_domain_operational_status`
+
+Read-only join of governed domain authority with current universal platform import and package operational state.
+
+- Physical type: `VIEW`
+- Observed rows during generation: `3`
+- Column definitions: see the generated schema catalog.
+
+### `main.universal_domain_registry`
+
+Governed D1 registry of currently certified UIP investment domains, their ownership boundaries, publication boundaries, semantic authority, and explicit execution restrictions.
+
+- Physical type: `BASE TABLE`
+- Observed rows during generation: `3`
 - Column definitions: see the generated schema catalog.
 
 ### `main.universal_import_datasets`
@@ -161,7 +193,7 @@ Append-only history of asset-level risk measurements.
 Dataset-level evidence for universal import attempts.
 
 - Physical type: `BASE TABLE`
-- Observed rows during generation: `132`
+- Observed rows during generation: `0`
 - Column definitions: see the generated schema catalog.
 
 ### `main.universal_import_error_summary`
@@ -169,7 +201,7 @@ Dataset-level evidence for universal import attempts.
 Aggregated current import-error summary.
 
 - Physical type: `VIEW`
-- Observed rows during generation: `1`
+- Observed rows during generation: `0`
 - Column definitions: see the generated schema catalog.
 
 ### `main.universal_import_errors`
@@ -177,7 +209,7 @@ Aggregated current import-error summary.
 Detailed import-validation and activation errors.
 
 - Physical type: `BASE TABLE`
-- Observed rows during generation: `1`
+- Observed rows during generation: `0`
 - Column definitions: see the generated schema catalog.
 
 ### `main.universal_import_health`
@@ -185,7 +217,7 @@ Detailed import-validation and activation errors.
 Current import-health view by source platform.
 
 - Physical type: `VIEW`
-- Observed rows during generation: `3`
+- Observed rows during generation: `0`
 - Column definitions: see the generated schema catalog.
 
 ### `main.universal_imports`
@@ -193,7 +225,7 @@ Current import-health view by source platform.
 Import-attempt registry containing package, platform, timing, and outcome evidence.
 
 - Physical type: `BASE TABLE`
-- Observed rows during generation: `25`
+- Observed rows during generation: `0`
 - Column definitions: see the generated schema catalog.
 
 ### `main.universal_latest_import_attempt`
@@ -201,7 +233,7 @@ Import-attempt registry containing package, platform, timing, and outcome eviden
 Latest import attempt per platform.
 
 - Physical type: `VIEW`
-- Observed rows during generation: `3`
+- Observed rows during generation: `0`
 - Column definitions: see the generated schema catalog.
 
 ### `main.universal_latest_successful_import`
@@ -209,7 +241,15 @@ Latest import attempt per platform.
 Latest successfully activated import per platform.
 
 - Physical type: `VIEW`
-- Observed rows during generation: `3`
+- Observed rows during generation: `0`
+- Column definitions: see the generated schema catalog.
+
+### `main.universal_lineage_with_domain`
+
+Common row lineage enriched with governed domain identity and native-semantic ownership without redefining source-domain results.
+
+- Physical type: `VIEW`
+- Observed rows during generation: `0`
 - Column definitions: see the generated schema catalog.
 
 ### `main.universal_packages`
@@ -217,15 +257,23 @@ Latest successfully activated import per platform.
 Registry of received and validated universal delivery packages.
 
 - Physical type: `BASE TABLE`
-- Observed rows during generation: `24`
+- Observed rows during generation: `0`
 - Column definitions: see the generated schema catalog.
 
 ### `main.universal_platform_registry`
 
-Canonical registry of integrated source platforms.
+Operational import-state registry for integrated source platforms.
 
 - Physical type: `BASE TABLE`
-- Observed rows during generation: `3`
+- Observed rows during generation: `0`
+- Column definitions: see the generated schema catalog.
+
+### `main.universal_row_lineage`
+
+Lossless common row-lineage interface across certified universal history datasets and MTG native-authority history.
+
+- Physical type: `VIEW`
+- Observed rows during generation: `0`
 - Column definitions: see the generated schema catalog.
 
 ## Null, status, and coverage rules
