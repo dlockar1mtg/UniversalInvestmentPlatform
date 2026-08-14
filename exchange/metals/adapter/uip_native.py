@@ -9,6 +9,8 @@ from dataclasses import asdict, dataclass
 from datetime import date, datetime, timezone
 from pathlib import Path
 
+from foundation.production.metals_registry import load_metals_registry
+
 CONTRACT_VERSION = "1.0.0"
 ADAPTER_VERSION = "uip-native-metals-1.0.0"
 PLATFORM_ID = "metals"
@@ -69,20 +71,34 @@ def publish_uip_native_metals_package(
     package_root = output_root / package_id
     package_root.mkdir(parents=True, exist_ok=False)
 
+    registry = load_metals_registry()
+    assets_by_slug = registry.assets_by_slug
+
     assets: dict[str, dict[str, object]] = {}
     forecast_rows: list[dict[str, object]] = []
     recommendation_rows: list[dict[str, object]] = []
     for row in forecasts:
-        asset_id = str(row["asset_id"])
-        universal_id = f"metals:{asset_id.lower()}"
+        asset_id = str(row["asset_id"]).strip()
+        native_slug = asset_id.lower()
+        try:
+            canonical_asset = assets_by_slug[native_slug]
+        except KeyError as exc:
+            raise ValueError(
+                f"Native Metals asset is not present in the canonical registry: {asset_id}"
+            ) from exc
+        if canonical_asset.asset_class != "commodity":
+            raise ValueError(
+                f"Native Metals forecast asset is not a governed commodity: {asset_id}"
+            )
+        universal_id = canonical_asset.asset_id
         assets[asset_id] = {
             "contract_version": CONTRACT_VERSION,
             "platform_id": PLATFORM_ID,
             "run_id": run,
             "universal_asset_id": universal_id,
             "platform_asset_id": asset_id,
-            "asset_name": asset_id.title(),
-            "asset_symbol": asset_id,
+            "asset_name": canonical_asset.name,
+            "asset_symbol": canonical_asset.symbol,
             "asset_class": "metals",
             "asset_subclass": "commodity_benchmark",
             "currency": "USD",

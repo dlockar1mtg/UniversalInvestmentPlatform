@@ -7,6 +7,8 @@ import json
 from dataclasses import asdict, dataclass
 from pathlib import Path
 
+from foundation.production.metals_registry import load_metals_registry
+
 
 @dataclass(frozen=True)
 class NativeReadinessReport:
@@ -60,10 +62,51 @@ def evaluate_native_readiness(package_root: Path) -> NativeReadinessReport:
             reasons.append("ROW_COUNT_MISMATCH")
         if _looks_external(path.read_text(encoding="utf-8-sig", errors="ignore")):
             external += 1
-    required = {"export_manifest.csv", "platform_status.csv", "package_summary.json"}
+    required = {
+        "asset_master.csv",
+        "forecasts.csv",
+        "recommendations.csv",
+        "export_manifest.csv",
+        "platform_status.csv",
+        "package_summary.json",
+    }
     present = {item.name for item in package_root.iterdir()}
     if not required.issubset(present):
         reasons.append("REQUIRED_PACKAGE_FILES_MISSING")
+
+    registry = load_metals_registry()
+    canonical_asset_ids = {asset.asset_id for asset in registry.assets}
+
+    asset_master_path = package_root / "asset_master.csv"
+    published_asset_ids: set[str] = set()
+    if asset_master_path.exists():
+        with asset_master_path.open(newline="", encoding="utf-8-sig") as handle:
+            asset_rows = list(csv.DictReader(handle))
+        published_asset_ids = {
+            str(row.get("universal_asset_id") or "").strip()
+            for row in asset_rows
+            if str(row.get("universal_asset_id") or "").strip()
+        }
+        if not published_asset_ids:
+            reasons.append("ASSET_MASTER_EMPTY")
+        if any(asset_id not in canonical_asset_ids for asset_id in published_asset_ids):
+            reasons.append("NONCANONICAL_METALS_ASSET_ID")
+
+    for dataset_name in ("forecasts.csv", "recommendations.csv"):
+        dataset_path = package_root / dataset_name
+        if not dataset_path.exists():
+            continue
+        with dataset_path.open(newline="", encoding="utf-8-sig") as handle:
+            dataset_rows = list(csv.DictReader(handle))
+        dataset_asset_ids = {
+            str(row.get("universal_asset_id") or "").strip()
+            for row in dataset_rows
+            if str(row.get("universal_asset_id") or "").strip()
+        }
+        if any(asset_id not in canonical_asset_ids for asset_id in dataset_asset_ids):
+            reasons.append("NONCANONICAL_METALS_ASSET_ID")
+        if any(asset_id not in published_asset_ids for asset_id in dataset_asset_ids):
+            reasons.append("METALS_DATASET_ASSET_NOT_IN_ASSET_MASTER")
     if summary.get("validation_status") != "PASS":
         reasons.append("PACKAGE_NOT_VALIDATED")
     if external:
