@@ -77,6 +77,35 @@ def _governed_contract_columns(name: str) -> list[str]:
         ]
 
 
+def test_benchmark_asset_master_does_not_invent_execution_authority(
+    tmp_path: Path,
+):
+    result = publish_uip_native_metals_package(
+        _cycle(tmp_path / "cycle.json"),
+        tmp_path / "packages",
+        run_id="run-asset-semantics",
+        generated_at_utc="2026-07-25T12:00:00Z",
+    )
+
+    with (
+        Path(result.package_root) / "asset_master.csv"
+    ).open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        columns = list(reader.fieldnames or [])
+        row = next(reader)
+
+    assert columns == _governed_contract_columns("asset_master")
+    assert row["universal_asset_id"] == "metals:commodity:gold"
+    assert row["asset_subclass"] == "commodity_benchmark"
+    assert row["is_active"] == "True"
+    assert row["investable"] == "False"
+
+    # The canonical benchmark registry does not establish these authorities.
+    assert row["market_or_region"] == ""
+    assert row["liquidity_tier"] == ""
+    assert row["first_available_date"] == ""
+
+
 def test_recommendation_and_status_headers_match_governed_contracts(
     tmp_path: Path,
 ):

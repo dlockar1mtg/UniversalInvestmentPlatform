@@ -126,12 +126,12 @@ def publish_uip_native_metals_package(
             "asset_class": "metals",
             "asset_subclass": "commodity_benchmark",
             "currency": "USD",
-            "market_or_region": "global",
+            "market_or_region": "",
             "is_active": True,
-            "investable": True,
-            "liquidity_tier": "high",
+            "investable": False,
+            "liquidity_tier": "",
             "data_source": "UIP-native Metals store",
-            "first_available_date": row["as_of_date"],
+            "first_available_date": "",
             "last_updated_at_utc": generated,
         }
         forecast_rows.append({
