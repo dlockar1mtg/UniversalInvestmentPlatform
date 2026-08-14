@@ -3,7 +3,8 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
-import shutil
+import subprocess
+import sys
 import tempfile
 import zipfile
 from pathlib import Path
@@ -29,13 +30,6 @@ def sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest().lower()
 
 
-def find_one(root: Path, filename: str) -> Path:
-    matches = list(root.rglob(filename))
-    if len(matches) != 1:
-        raise RuntimeError(f"Expected exactly one {filename}; found {len(matches)}")
-    return matches[0]
-
-
 def load_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8"))
 
@@ -59,6 +53,10 @@ def main() -> int:
     if not mtg_repo.is_dir():
         raise RuntimeError(f"MTG repository not found: {mtg_repo}")
 
+    overlay_script = mtg_repo / "scripts" / "apply_mtg_live_uip_overlay.py"
+    if not overlay_script.is_file():
+        raise RuntimeError(f"Repaired MTG overlay script not found: {overlay_script}")
+
     artifact_hash = sha256(artifact)
     if artifact_hash != EXPECTED_ARTIFACT_SHA256:
         raise RuntimeError(
@@ -72,8 +70,30 @@ def main() -> int:
         with zipfile.ZipFile(artifact) as archive:
             archive.extractall(extract_root)
 
-        native_authority = find_one(extract_root, "mtg_native_authority.csv")
-        package_summary_path = find_one(extract_root, "package_summary.json")
+        package_root = extract_root / "operations" / "mtg_uip_delivery" / "latest"
+        market_root = extract_root / "operations" / "mtg_marketplace"
+        native_authority = package_root / "mtg_native_authority.csv"
+        package_summary_path = package_root / "package_summary.json"
+
+        for required in (native_authority, package_summary_path, market_root / "consolidated_marketplace_prices.csv", market_root / "certified_marketplace_decisions.csv"):
+            if not required.is_file():
+                raise RuntimeError(f"Required run #401 artifact file missing: {required}")
+
+        replay = subprocess.run(
+            [
+                sys.executable,
+                str(overlay_script),
+                "--package",
+                str(package_root),
+                "--market-root",
+                str(market_root),
+            ],
+            check=False,
+            text=True,
+        )
+        if replay.returncode != 0:
+            raise RuntimeError(f"Corrected MTG live-overlay replay failed with exit code {replay.returncode}")
+
         package_summary = load_json(package_summary_path)
         live_overlay = package_summary.get("live_overlay") or {}
 
