@@ -7,7 +7,7 @@ services:
     branch: main
     dockerfilePath: ./deployment/Dockerfile
     dockerContext: .
-    healthCheckPath: /health/ready
+    healthCheckPath: /health/live
     autoDeployTrigger: checksPass
     envVars:
       - key: UIIP_ENVIRONMENT
