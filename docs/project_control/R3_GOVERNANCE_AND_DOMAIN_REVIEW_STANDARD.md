@@ -420,3 +420,27 @@ No R3 evaluation harness may be certified until it demonstrates that:
 ## R3 principle
 
 > R3 exists to determine whether certified domain intelligence is trustworthy enough, within its native meaning and known uncertainty, to enter later UIP portfolio decision methodology. It must preserve domain authority, expose gaps and anomalies, maintain lineage, and refuse to manufacture comparability, accuracy, or execution authority that has not been separately governed and empirically validated.
+
+## Exact-output evidence availability correction
+
+R3 remains anchored to the R2-certified cycle, but the exact row-level R2 output must not be fabricated when R2 execution did not durably persist that output.
+
+The governed evidence modes are:
+
+- MTG: review the exact R2 source artifact identified by workflow run `31843560745` and artifact digest `sha256:1885fd950f4b01d00d71719c5ba34261a5b9a442ec61b17e19587decd4b265bc`.
+- Metals: review the exact locally retained R2 runtime package, cycle evidence, and daily-market overlay associated with package `metals-20260814T232106Z-f3577228`.
+- Crypto: the exact row-level package from R2 run `crypto-prod-20260815T122413Z-e7429e07` was created inside disposable temporary storage and was not durably persisted. R3 may not reconstruct, synthesize, or label a later run as that exact R2 package.
+
+For Crypto only, R3 is authorized to perform one controlled persisted recapture using the same certified source commit/version and the already-governed populated-database incremental refresh path on a disposable database copy. The recapture must:
+
+- preserve the source production database unchanged;
+- use the certified source commit/version recorded in R2;
+- use the supported native incremental refresh path already governed in R2;
+- persist the complete review package and file hashes before temporary state is removed;
+- be labeled `R3_PERSISTED_RECAPTURE`, never `EXACT_R2_OUTPUT`;
+- retain the R2 run/package summary as prior-cycle authority;
+- treat unavailable exact row-to-row R2 comparison as a governed evidence gap rather than inventing a comparison.
+
+This correction does not reopen, replace, or retroactively modify the R2 certification. It narrows how R3 obtains reviewable row-level evidence after the availability audit proved that the Crypto R2 row package was not retained.
+
+A Crypto R3 finding cannot claim an exact row-to-row change-from-prior review against R2 unless the original R2 package is later recovered. That limitation must remain explicit in `governed_gaps` and may require `PASS_WITH_GOVERNED_GAPS` even if all currently reviewable evidence is otherwise decision-ready.

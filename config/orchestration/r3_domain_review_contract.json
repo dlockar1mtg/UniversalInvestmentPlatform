@@ -83,7 +83,9 @@
         "universal_risk_score",
         "cross_asset_rank",
         "portfolio_weight_from_native_recommendation"
-      ]
+      ],
+      "review_authority_mode": "R3_PERSISTED_RECAPTURE_REQUIRED",
+      "exact_r2_output_persisted": false
     },
     "metals": {
       "r2_evidence": "docs/project_control/generated/r2_refreshed_data_rehearsal/metals_r2_rehearsal_evidence.json",
@@ -98,7 +100,8 @@
       "prohibited_inferences": [
         "cross_domain_weight_from_metals_output",
         "benchmark_outlook_equals_vehicle_purchase_decision"
-      ]
+      ],
+      "review_authority_mode": "EXACT_R2_RUNTIME_EVIDENCE"
     },
     "mtg": {
       "r2_evidence": "docs/project_control/generated/r2_refreshed_data_rehearsal/mtg_r2_rehearsal_evidence.json",
@@ -117,7 +120,8 @@
         "missing_rank_to_worst_rank",
         "missing_purchase_status_to_WAIT",
         "native_rank_to_cross_asset_rank"
-      ]
+      ],
+      "review_authority_mode": "EXACT_R2_REMOTE_ARTIFACT"
     }
   },
   "r3_closeout_requirements": {
@@ -131,5 +135,16 @@
     "cross_asset_ranking_created": false,
     "allocation_policy_created": false,
     "automatic_execution_created": false
+  },
+  "exact_output_policy": {
+    "exact_r2_output_required_where_available": true,
+    "missing_exact_r2_output_may_be_synthesized": false,
+    "r3_persisted_recapture_allowed_when_exact_r2_not_retained": true,
+    "recapture_must_use_certified_source_commit_or_version": true,
+    "recapture_must_use_supported_native_refresh_path": true,
+    "recapture_must_use_disposable_source_state": true,
+    "recapture_must_be_durably_persisted_with_hashes": true,
+    "recapture_may_be_labeled_exact_r2_output": false,
+    "unavailable_exact_prior_row_comparison_is_governed_gap": true
   }
 }

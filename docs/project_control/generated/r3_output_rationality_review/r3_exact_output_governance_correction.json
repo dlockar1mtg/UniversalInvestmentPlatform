@@ -1,0 +1,15 @@
+{
+  "change_id": "UIP-CHG-2026-034",
+  "crypto_exact_prior_row_comparison_gap_preserved": true,
+  "crypto_recapture_may_be_labeled_exact_r2_output": false,
+  "crypto_review_authority_mode": "R3_PERSISTED_RECAPTURE_REQUIRED",
+  "exact_r2_output_required_where_available": true,
+  "ledger_updated": true,
+  "metals_review_authority_mode": "EXACT_R2_RUNTIME_EVIDENCE",
+  "missing_exact_r2_output_may_be_synthesized": false,
+  "mtg_review_authority_mode": "EXACT_R2_REMOTE_ARTIFACT",
+  "next_gate": "PERSIST_R3_CRYPTO_RECAPTURE_AND_RETRIEVE_EXACT_MTG_R2_ARTIFACT",
+  "r2_certification_changed": false,
+  "standard_updated": true,
+  "status": "UIP_R3_EXACT_OUTPUT_GOVERNANCE_CORRECTION_APPLIED"
+}

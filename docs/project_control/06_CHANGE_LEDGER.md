@@ -1231,3 +1231,59 @@ Corrections require a new dated entry.
 ## Ledger principle
 
 > Architecture and roadmap decisions must never depend on memory or informal conversation alone. Every material change must identify the prior state, approved new state, reason, impact, evidence, and reversal path.
+
+## UIP-CHG-2026-034 - Bound R3 Exact-Output Review to Available Certified Evidence
+
+Date: 2026-08-15
+Status: ACTIVE
+Type: DATA_GOVERNANCE, CERTIFICATION, R3_EVIDENCE_POLICY
+Approval authority: Devon Lockard
+
+Decision:
+
+Preserve the R3 requirement to review exact R2-certified row-level output wherever that output still exists, while prohibiting reconstruction or synthesis when it does not.
+
+Evidence availability audit:
+
+- MTG: exact R2 GitHub artifact retrieval identity is available for workflow run `31843560745`, digest `sha256:1885fd950f4b01d00d71719c5ba34261a5b9a442ec61b17e19587decd4b265bc`.
+- Metals: exact R2 runtime package, cycle history, and daily-market overlay remain locally available.
+- Crypto: exact R2 row-level package for `crypto-prod-20260815T122413Z-e7429e07` was not persisted because the disposable rehearsal removed its temporary directory after successful validation.
+
+New governed rule:
+
+- exact R2 output remains mandatory where available;
+- missing exact R2 output may not be synthesized or silently replaced;
+- for Crypto only, one controlled `R3_PERSISTED_RECAPTURE` is authorized using the same certified source commit/version and supported populated-database incremental refresh path on a disposable database copy;
+- the recapture must be durably persisted with hashes before review;
+- the recapture is not the exact R2 package and may not be labeled as such;
+- unavailable exact row-to-row R2 comparison remains an explicit governed gap in R3.
+
+Prior state:
+
+`R3_REQUIRES_EXACT_R2_ROW_OUTPUT_FOR_ALL_DOMAIN_REVIEW_DIMENSIONS`
+
+New state:
+
+`R3_USES_EXACT_R2_OUTPUT_WHERE_AVAILABLE_AND_FAIL_CLOSED_PERSISTED_RECAPTURE_WHERE_NOT_RETAINED`
+
+Architecture impact:
+
+None. Native domain ownership, UIP integration boundaries, and production activation rules are unchanged.
+
+Certification impact:
+
+R2 remains certified and unchanged. R3 must disclose the Crypto exact-prior-row evidence gap and may not claim a comparison that cannot be proven.
+
+Risk/cost impact:
+
+No paid provider is introduced. Crypto recapture uses the already-certified no-paid-CoinGecko incremental path and disposable state.
+
+Reversal:
+
+`FULLY_REVERSIBLE`
+
+Next required action:
+
+`PERSIST_R3_CRYPTO_RECAPTURE_AND_RETRIEVE_EXACT_MTG_R2_ARTIFACT`
+
+---
