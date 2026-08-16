@@ -1,0 +1,49 @@
+{
+  "automatic_purchase_execution_created": false,
+  "coingecko_api_key_available": false,
+  "coingecko_pro_api_key_available": false,
+  "cross_asset_rank_created": false,
+  "crypto_recovery_branch": "phase-r2-crypto-recovery",
+  "failed_modules": [],
+  "fred_api_key_available": true,
+  "fresh_run_id": "crypto-prod-20260815T122413Z-e7429e07",
+  "full_refresh": false,
+  "history_counts": {
+    "asset_master": 6,
+    "forecasts": 132,
+    "platform_status": 1,
+    "portfolio_positions": 0,
+    "recommendations": 6,
+    "risk_metrics": 6
+  },
+  "module_count": 43,
+  "native_semantics_reinterpreted": false,
+  "next_gate": "R2_CLOSEOUT_AND_R3_OUTPUT_RATIONALITY_REVIEW",
+  "package_id": "crypto-prod-20260815T122413Z-e7429e07",
+  "production_uip_database_modified": false,
+  "source_commit_or_version": "951ca1111ef844a651eb6e12299441252ef5f56b",
+  "source_database_sha256": "49c045871fb31257fdf6921bd76b53ce101e8c9477238c656fe12dcf323834c8",
+  "source_database_unchanged": true,
+  "source_domain": "crypto",
+  "source_env_present": true,
+  "source_repository": "dlockar1mtg/CryptoIntelligencePlatform",
+  "status": "UIP_R2_CRYPTO_DISPOSABLE_IMPORT_REHEARSAL_PASS",
+  "uip_delivery_contract": "uip-crypto-delivery-v1",
+  "uip_delivery_status": "PASS",
+  "uip_import_id": "0aba785e-0442-411d-9c58-181abcbfc7f5",
+  "uip_import_status": "IMPORTED",
+  "uip_imported_rows": 151,
+  "universal_export": {
+    "dataset_counts": {
+      "asset_master": 6,
+      "forecasts": 132,
+      "platform_status": 1,
+      "portfolio_positions": 0,
+      "recommendations": 6,
+      "risk_metrics": 6
+    },
+    "manifest_count": 6,
+    "output_directory": "C:\\Users\\DevonLockard\\AppData\\Local\\Temp\\uip-r2-crypto-69ybfici\\production_runs\\crypto-prod-20260815T122413Z-e7429e07\\universal_package",
+    "status": "PASS"
+  }
+}

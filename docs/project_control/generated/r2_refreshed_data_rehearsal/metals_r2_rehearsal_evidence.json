@@ -1,0 +1,61 @@
+{
+  "automatic_purchase_execution_created": false,
+  "cross_asset_rank_created": false,
+  "cycle_completed_at_utc": "2026-08-14T23:21:20.729688+00:00",
+  "cycle_id": "metals-20260814T232103Z-6f1943b6",
+  "cycle_runtime_seconds": 17.47,
+  "cycle_started_at_utc": "2026-08-14T23:21:03.260129+00:00",
+  "daily_market_collection_executed": true,
+  "daily_market_overlay": {
+    "alert_count": 0,
+    "critical_alert_count": 0,
+    "current_vehicle_count": 11,
+    "generated_at_utc": "2026-08-14T23:21:38.759073+00:00",
+    "highest_alert_severity": "INFO",
+    "status": "PASS",
+    "vehicle_count": 11
+  },
+  "data_as_of": "2026-08-14T23:21:06.588145+00:00",
+  "import_id": "76b3106a-de26-42d9-a802-434612a2fb02",
+  "live_official_providers_executed": true,
+  "native_semantics_reinterpreted": false,
+  "next_gate": "R2_CRYPTO_RECOVERY_AND_FRESH_REHEARSAL",
+  "operations_status_present": true,
+  "package_id": "metals-20260814T232106Z-f3577228",
+  "production_readiness": {
+    "component_count": 6,
+    "failed_components": [],
+    "model_parity_checks": 9,
+    "official_provider_counts": {
+      "eia": 1,
+      "world_bank": 8
+    },
+    "official_provider_records": 9,
+    "ready": true,
+    "registry_assets": 10,
+    "registry_vehicles": 11,
+    "status": "PASS",
+    "vehicle_constraint_scenarios": 6
+  },
+  "required_stages": {
+    "production_readiness": {
+      "return_code": 0,
+      "runtime_seconds": 8.777,
+      "status": "PASS"
+    },
+    "transactional_import": {
+      "return_code": 0,
+      "runtime_seconds": 4.477,
+      "status": "PASS"
+    },
+    "universal_export": {
+      "return_code": 0,
+      "runtime_seconds": 4.145,
+      "status": "PASS"
+    }
+  },
+  "rows_imported": 62,
+  "source_boundary": "UIP_NATIVE_METALS_RUNTIME",
+  "source_domain": "metals",
+  "status": "UIP_R2_METALS_FRESH_REHEARSAL_PASS"
+}
