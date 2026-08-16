@@ -1,0 +1,80 @@
+{
+  "authority_mode": "R3_PERSISTED_RECAPTURE",
+  "coingecko_api_key_available": false,
+  "coingecko_pro_api_key_available": false,
+  "dataset_counts": {
+    "asset_master": 6,
+    "forecasts": 132,
+    "platform_status": 1,
+    "portfolio_positions": 0,
+    "recommendations": 6,
+    "risk_metrics": 6
+  },
+  "failed_modules": [],
+  "files": [
+    {
+      "name": "asset_master.csv",
+      "sha256": "bbdfa0f36264da7aa4156d2e12e68ec418e674215fd95624adc003fdde2061de",
+      "size_bytes": 1393
+    },
+    {
+      "name": "export_manifest.csv",
+      "sha256": "e07319e60beba2335eb5cf7378385c00dda6d00c8a1a6a6762e78276dc79dc00",
+      "size_bytes": 1318
+    },
+    {
+      "name": "forecasts.csv",
+      "sha256": "3bae79e02a262ac5d6336f582ede136c52ee276d6783b74238272d279a192cea",
+      "size_bytes": 37122
+    },
+    {
+      "name": "package_summary.json",
+      "sha256": "909474be0353df1c3b136dbe7ded0fe6ebd539b55355a8a34346de07b63208da",
+      "size_bytes": 1696
+    },
+    {
+      "name": "platform_status.csv",
+      "sha256": "6ae01932d0be7042d13d923ab79fa010a4e62c2bb7dfae0bd73cde409e5ec96a",
+      "size_bytes": 673
+    },
+    {
+      "name": "portfolio_positions.csv",
+      "sha256": "f69329d78800bbe344d34e943fdf47106227432bfe8cc5de3b16a1c5e33c47cd",
+      "size_bytes": 248
+    },
+    {
+      "name": "recommendations.csv",
+      "sha256": "eb59cb366ac65495c30bb82ffb045f21b4eb80b90188334cf76c369fcf520c21",
+      "size_bytes": 2366
+    },
+    {
+      "name": "risk_metrics.csv",
+      "sha256": "2d8fe177ac0a65b18ee89524dd613eefc532589d49f76a07a6357f7755c6e434",
+      "size_bytes": 2120
+    },
+    {
+      "name": "validation_report.json",
+      "sha256": "19f6de7abdadb0cd1d08e78c78fb494c6067ec0a719b2b972e3532bdbdf02653",
+      "size_bytes": 594
+    },
+    {
+      "name": "run_summary.json",
+      "sha256": "9f2e4bc38a636bdd45bfc3a4719f6fbc7d436eb12c8ec99eb1e31f126d6b5240",
+      "size_bytes": 20815
+    }
+  ],
+  "fred_api_key_available": true,
+  "full_refresh": false,
+  "governed_gap": "Exact row-level R2 Crypto package was not retained; exact row-to-row comparison against R2 is unavailable unless the original package is later recovered.",
+  "is_exact_r2_output": false,
+  "module_count": 43,
+  "next_gate": "R3_CRYPTO_OUTPUT_RATIONALITY_REVIEW",
+  "r2_prior_run_id": "crypto-prod-20260815T122413Z-e7429e07",
+  "run_id": "crypto-prod-20260816T020351Z-df80b5bc",
+  "source_commit_or_version": "951ca1111ef844a651eb6e12299441252ef5f56b",
+  "source_database_sha256": "49c045871fb31257fdf6921bd76b53ce101e8c9477238c656fe12dcf323834c8",
+  "source_database_unchanged": true,
+  "source_env_present": true,
+  "source_repository": "dlockar1mtg/CryptoIntelligencePlatform",
+  "status": "UIP_R3_CRYPTO_PERSISTED_RECAPTURE_PASS"
+}

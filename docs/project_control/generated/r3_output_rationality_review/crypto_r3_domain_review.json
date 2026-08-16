@@ -1,0 +1,459 @@
+{
+  "allocation_policy_created": false,
+  "automatic_execution_created": false,
+  "checks_performed": [
+    "All Crypto asset-master rows have universal_asset_id",
+    "Crypto asset-master universal_asset_id values are unique",
+    "All forecasts rows have universal_asset_id",
+    "All forecasts asset IDs resolve to current asset master",
+    "All recommendations rows have universal_asset_id",
+    "All recommendations asset IDs resolve to current asset master",
+    "All risk_metrics rows have universal_asset_id",
+    "All risk_metrics asset IDs resolve to current asset master",
+    "Current Crypto recommendation rows are unique per represented asset",
+    "Current Crypto recommendations cover the current source-defined asset universe",
+    "Certified Crypto native recommendation vocabulary and deterministic universal normalization are preserved",
+    "Current Crypto risk rows are unique per represented asset",
+    "Current Crypto risk metrics cover the current source-defined asset universe",
+    "Absent Crypto holdings remain absent; no positions were synthesized",
+    "Crypto platform status contains exactly one row for the recapture run",
+    "Crypto platform_status run_status is native success",
+    "Crypto platform_status run_id matches capture manifest",
+    "Crypto platform_status data_as_of_date is populated",
+    "Crypto platform_status reports zero producer errors",
+    "Crypto forecast numeric fields are finite; probability_positive_return remains within 0-to-1 bounds and forecast_confidence remains within certified 0-to-100 score bounds when populated",
+    "Crypto native universal-export validation report is PASS"
+  ],
+  "cross_asset_ranking_created": false,
+  "data_as_of": "2026-08-15",
+  "decision_readiness_scope": "Decision-ready as bounded Crypto native evidence for later governed UIP portfolio methodology. R3 preserves the missing exact R2 row-to-row comparison as a governed gap and does not certify forecast predictive accuracy.",
+  "dimension_results": {
+    "change_from_prior_plausibility": {
+      "evidence": {
+        "exact_row_to_row_r2_comparison_available": false,
+        "note": "Exact row-level R2 Crypto package was not retained; only governed prior-cycle summary evidence may be compared.",
+        "population_count_comparison": {
+          "asset_master": {
+            "r2": 6,
+            "recapture": 6,
+            "same": true
+          },
+          "forecasts": {
+            "r2": 132,
+            "recapture": 132,
+            "same": true
+          },
+          "platform_status": {
+            "r2": 1,
+            "recapture": 1,
+            "same": true
+          },
+          "portfolio_positions": {
+            "r2": 0,
+            "recapture": 0,
+            "same": true
+          },
+          "recommendations": {
+            "r2": 6,
+            "recapture": 6,
+            "same": true
+          },
+          "risk_metrics": {
+            "r2": 6,
+            "recapture": 6,
+            "same": true
+          }
+        },
+        "r2_prior_run_id": "crypto-prod-20260815T122413Z-e7429e07",
+        "recapture_run_id": "crypto-prod-20260816T020351Z-df80b5bc"
+      },
+      "status": "PASS_WITH_GOVERNED_GAP"
+    },
+    "decision_readiness": {
+      "evidence": {
+        "bounded_use": "Crypto native intelligence may enter later UIP portfolio methodology with the exact-R2 row-comparison limitation disclosed. This review does not authorize cross-asset ranking, allocation weights, or trade execution.",
+        "predictive_accuracy_certified": false
+      },
+      "status": "PASS_WITH_GOVERNED_GAP"
+    },
+    "distribution_and_outliers": {
+      "evidence": {
+        "forecast_horizon_counts": {
+          "1": 24,
+          "12": 6,
+          "15": 6,
+          "18": 6,
+          "21": 6,
+          "24": 6,
+          "27": 6,
+          "3": 12,
+          "30": 6,
+          "33": 6,
+          "36": 6,
+          "39": 6,
+          "42": 6,
+          "45": 6,
+          "48": 6,
+          "6": 12,
+          "9": 6
+        },
+        "forecast_method_counts": {
+          "CALIBRATED_ENSEMBLE": 12,
+          "EVIDENCE_SHRINKAGE": 24,
+          "LONG_RANGE_SCENARIO_MODEL": 96
+        },
+        "forecast_numeric_summary": {
+          "current_value": {
+            "count": 132,
+            "max": 63024.0,
+            "mean": 10832.486666666666,
+            "min": 1.0,
+            "missing": 0
+          },
+          "expected_cagr": {
+            "count": 132,
+            "max": 1.5077487948446646,
+            "mean": -0.1037152305215116,
+            "min": -0.9949990904469166,
+            "missing": 0
+          },
+          "expected_total_return": {
+            "count": 132,
+            "max": 0.9278698251629539,
+            "mean": 0.023692271346532113,
+            "min": -0.47004026098820295,
+            "missing": 0
+          },
+          "forecast_confidence": {
+            "count": 132,
+            "max": 93.90978503740737,
+            "mean": 21.651944967124336,
+            "min": 3.0,
+            "missing": 0
+          },
+          "forecast_value_base": {
+            "count": 132,
+            "max": 72726.27725019945,
+            "mean": 11060.820632629044,
+            "min": 0.6157013944199454,
+            "missing": 0
+          },
+          "forecast_value_bear": {
+            "count": 132,
+            "max": 56930.19832477175,
+            "mean": 6688.334497067087,
+            "min": 0.37170228511275727,
+            "missing": 0
+          },
+          "forecast_value_bull": {
+            "count": 132,
+            "max": 175959.14371461346,
+            "mean": 19332.911892590113,
+            "min": 0.7216109239058428,
+            "missing": 0
+          },
+          "probability_positive_return": {
+            "count": 24,
+            "max": 0.549,
+            "mean": 0.5256870748882004,
+            "min": 0.4857142857142857,
+            "missing": 108
+          }
+        },
+        "native_recommendation_label_counts": {
+          "HOLD": 4,
+          "REDUCE": 1,
+          "WAIT": 1
+        },
+        "note": "R3 records distributions and mathematical invalidities without inventing universal investment thresholds or treating native extremes as defects solely because they are extreme.",
+        "recommendation_numeric_summary": {
+          "confidence_score": {
+            "count": 6,
+            "max": 30.42539090542325,
+            "mean": 26.346940977910858,
+            "min": 19.482917283595043,
+            "missing": 0
+          },
+          "maximum_weight": {
+            "count": 0,
+            "max": null,
+            "mean": null,
+            "min": null,
+            "missing": 6
+          },
+          "minimum_weight": {
+            "count": 0,
+            "max": null,
+            "mean": null,
+            "min": null,
+            "missing": 6
+          },
+          "normalized_score": {
+            "count": 6,
+            "max": 50.665398010197244,
+            "mean": 46.32858374233236,
+            "min": 40.52930708980266,
+            "missing": 0
+          },
+          "platform_native_score": {
+            "count": 6,
+            "max": 50.665398010197244,
+            "mean": 46.32858374233236,
+            "min": 40.52930708980266,
+            "missing": 0
+          },
+          "target_weight": {
+            "count": 6,
+            "max": 0.025000000000009587,
+            "mean": 0.02213595572531608,
+            "min": 0.01249999999999634,
+            "missing": 0
+          }
+        },
+        "risk_level_counts": {
+          "low": 1,
+          "medium": 5
+        },
+        "risk_numeric_summary": {
+          "annualized_volatility": {
+            "count": 6,
+            "max": 0.7626040759732752,
+            "mean": 0.6489959321385649,
+            "min": 0.424888013933445,
+            "missing": 0
+          },
+          "concentration_risk_score": {
+            "count": 6,
+            "max": 73.22297674347521,
+            "mean": 16.666666666666668,
+            "min": 0.0,
+            "missing": 0
+          },
+          "data_quality_score": {
+            "count": 0,
+            "max": null,
+            "mean": null,
+            "min": null,
+            "missing": 6
+          },
+          "downside_deviation": {
+            "count": 0,
+            "max": null,
+            "mean": null,
+            "min": null,
+            "missing": 6
+          },
+          "liquidity_risk_score": {
+            "count": 6,
+            "max": 0.0,
+            "mean": 0.0,
+            "min": 0.0,
+            "missing": 0
+          },
+          "maximum_drawdown": {
+            "count": 6,
+            "max": -0.5304939812328698,
+            "mean": -0.6996738869624931,
+            "min": -0.8327610376574589,
+            "missing": 0
+          },
+          "model_risk_score": {
+            "count": 0,
+            "max": null,
+            "mean": null,
+            "min": null,
+            "missing": 6
+          },
+          "risk_score": {
+            "count": 6,
+            "max": 50.0,
+            "mean": 45.833333333333336,
+            "min": 25.0,
+            "missing": 0
+          },
+          "value_at_risk_95": {
+            "count": 6,
+            "max": -0.03611424459833803,
+            "mean": -0.05341963433508856,
+            "min": -0.065300886957761,
+            "missing": 0
+          }
+        },
+        "scenario_counts": {
+          "30D": 6,
+          "7D": 6,
+          "M03": 6,
+          "M06": 6,
+          "M09": 6,
+          "M12": 6,
+          "M15": 6,
+          "M18": 6,
+          "M21": 6,
+          "M24": 6,
+          "M27": 6,
+          "M30": 6,
+          "M33": 6,
+          "M36": 6,
+          "M39": 6,
+          "M42": 6,
+          "M45": 6,
+          "M48": 6,
+          "NEGATIVE_180D": 6,
+          "NEGATIVE_30D": 5,
+          "NEGATIVE_7D": 3,
+          "NEGATIVE_90D": 6,
+          "NEUTRAL_7D": 3,
+          "POSITIVE_30D": 1
+        },
+        "universal_action_counts": {
+          "hold": 4,
+          "reduce": 1,
+          "watch": 1
+        }
+      },
+      "status": "PASS"
+    },
+    "freshness_and_completeness": {
+      "evidence": {
+        "data_as_of_date": "2026-08-15",
+        "dataset_counts": {
+          "asset_master": 6,
+          "forecasts": 132,
+          "platform_status": 1,
+          "portfolio_positions": 0,
+          "recommendations": 6,
+          "risk_metrics": 6
+        },
+        "native_validation_status": "PASS",
+        "producer_error_count": 0,
+        "run_id": "crypto-prod-20260816T020351Z-df80b5bc"
+      },
+      "status": "PASS"
+    },
+    "investigation_routing": {
+      "evidence": {
+        "investigation_owner": null,
+        "material_native_defect_detected": false,
+        "routing_rule": "Any later confirmed Crypto source/model defect routes to dlockar1mtg/CryptoIntelligencePlatform; UIP mapping/import/lineage defects route to UIP.",
+        "uip_mapping_defect_detected": false
+      },
+      "status": "PASS"
+    },
+    "native_self_consistency": {
+      "evidence": {
+        "asset_ids_unique": true,
+        "native_to_universal_mapping": [
+          {
+            "asset": "crypto:avalanche",
+            "native": "HOLD",
+            "universal": "hold"
+          },
+          {
+            "asset": "crypto:bitcoin",
+            "native": "HOLD",
+            "universal": "hold"
+          },
+          {
+            "asset": "crypto:chainlink",
+            "native": "HOLD",
+            "universal": "hold"
+          },
+          {
+            "asset": "crypto:ethereum",
+            "native": "REDUCE",
+            "universal": "reduce"
+          },
+          {
+            "asset": "crypto:solana",
+            "native": "WAIT",
+            "universal": "watch"
+          },
+          {
+            "asset": "crypto:xrp",
+            "native": "HOLD",
+            "universal": "hold"
+          }
+        ],
+        "positions_synthesized": false,
+        "recommendations_cover_current_universe": true,
+        "risk_metrics_cover_current_universe": true
+      },
+      "status": "PASS"
+    },
+    "uip_semantic_preservation": {
+      "evidence": {
+        "absent_holdings_preserved": true,
+        "authority_mode": "R3_PERSISTED_RECAPTURE",
+        "certified_native_recommendation_mapping_preserved": true,
+        "is_exact_r2_output": false,
+        "native_risk_semantics_not_normalized": true,
+        "source_commit_or_version": "951ca1111ef844a651eb6e12299441252ef5f56b",
+        "source_database_unchanged": true
+      },
+      "status": "PASS"
+    }
+  },
+  "domain_id": "crypto",
+  "finding": "PASS_WITH_GOVERNED_GAPS",
+  "governed_gaps": [
+    "Exact row-level R2 Crypto package was not retained; exact row-to-row comparison against R2 is unavailable unless the original package is later recovered."
+  ],
+  "investigation_owner": null,
+  "lineage_pointers": [
+    "docs/project_control/generated/r3_output_rationality_review/crypto_persisted_recapture/crypto-prod-20260816T020351Z-df80b5bc/r3_crypto_capture_manifest.json",
+    "docs/project_control/generated/r3_output_rationality_review/crypto_persisted_recapture/crypto-prod-20260816T020351Z-df80b5bc/run_summary.json",
+    "docs/project_control/generated/r3_output_rationality_review/crypto_persisted_recapture/crypto-prod-20260816T020351Z-df80b5bc/package_summary.json",
+    "docs/project_control/generated/r3_output_rationality_review/crypto_persisted_recapture/crypto-prod-20260816T020351Z-df80b5bc/validation_report.json",
+    "docs/project_control/generated/r2_refreshed_data_rehearsal/crypto_r2_rehearsal_evidence.json",
+    "docs/project_control/R3_GOVERNANCE_AND_DOMAIN_REVIEW_STANDARD.md",
+    "config/orchestration/r3_domain_review_contract.json"
+  ],
+  "milestone": "UIP_R3_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_REVIEW",
+  "next_gate": "R3_METALS_OUTPUT_RATIONALITY_REVIEW_AFTER_CRYPTO_EVIDENCE_COMMIT",
+  "observed_anomalies": [],
+  "population_count_comparison": {
+    "asset_master": {
+      "r2": 6,
+      "recapture": 6,
+      "same": true
+    },
+    "forecasts": {
+      "r2": 132,
+      "recapture": 132,
+      "same": true
+    },
+    "platform_status": {
+      "r2": 1,
+      "recapture": 1,
+      "same": true
+    },
+    "portfolio_positions": {
+      "r2": 0,
+      "recapture": 0,
+      "same": true
+    },
+    "recommendations": {
+      "r2": 6,
+      "recapture": 6,
+      "same": true
+    },
+    "risk_metrics": {
+      "r2": 6,
+      "recapture": 6,
+      "same": true
+    }
+  },
+  "predictive_accuracy_certified": false,
+  "prohibited_downstream_uses": [
+    "cross_asset_ranking_from_native_crypto_scores",
+    "universal_risk_score_from_crypto_native_risk_fields",
+    "portfolio_allocation_weights_from_native_recommendations",
+    "automatic_trade_or_purchase_execution",
+    "claim_of_exact_row_to_row_change_from_r2",
+    "claim_of_predictive_accuracy_from_r3_plausibility_review"
+  ],
+  "r2_evidence_authority": "docs/project_control/generated/r2_refreshed_data_rehearsal/crypto_r2_rehearsal_evidence.json",
+  "review_authority_mode": "R3_PERSISTED_RECAPTURE",
+  "review_package": "docs/project_control/generated/r3_output_rationality_review/crypto_persisted_recapture/crypto-prod-20260816T020351Z-df80b5bc",
+  "source_commit_or_native_boundary": "951ca1111ef844a651eb6e12299441252ef5f56b"
+}

@@ -1,0 +1,50 @@
+{
+  "adapter_version": "1.0.0",
+  "contract_version": "1.0.0",
+  "dataset_counts": {
+    "asset_master": 6,
+    "forecasts": 132,
+    "platform_status": 1,
+    "portfolio_positions": 0,
+    "recommendations": 6,
+    "risk_metrics": 6
+  },
+  "generated_at_utc": "2026-08-16T02:26:04.149340Z",
+  "holdings_available": false,
+  "manifest_record_count": 6,
+  "platform_id": "crypto",
+  "platform_name": "Crypto Intelligence Platform",
+  "platform_status": "RESEARCH ONLY",
+  "run_id": "crypto-prod-20260816T020351Z-df80b5bc",
+  "source_database": "C:\\Users\\DevonLockard\\AppData\\Local\\Temp\\uip-r3-crypto-capture-hcj9potw\\crypto_intelligence.duckdb",
+  "source_runs": [
+    {
+      "completed_at_utc": "2026-08-15T21:24:17.794049-05:00",
+      "module_number": 36,
+      "platform_version": "9.1.0",
+      "run_id": "58de268f-7ebd-4e6e-ac33-2ae6965f8a47",
+      "started_at_utc": "2026-08-15T21:24:17.726982-05:00",
+      "status": "SUCCESS",
+      "table_name": "module36_runs"
+    },
+    {
+      "completed_at_utc": "2026-08-15T21:25:06.470241-05:00",
+      "module_number": 39,
+      "platform_version": "10.1.1",
+      "run_id": "e2dc17c1-a94d-457e-8b71-9c89c3282cc4",
+      "started_at_utc": "2026-08-15T21:25:04.917739-05:00",
+      "status": "SUCCESS",
+      "table_name": "module39_runs"
+    },
+    {
+      "completed_at_utc": "2026-08-15T21:25:40.797016-05:00",
+      "module_number": 42,
+      "platform_version": "12.0.1",
+      "run_id": "2800e9f9-319e-4f34-aa80-33f3b5603bf8",
+      "started_at_utc": "2026-08-15T21:25:39.488608-05:00",
+      "status": "SUCCESS",
+      "table_name": "module42_runs"
+    }
+  ],
+  "status": "PASS"
+}

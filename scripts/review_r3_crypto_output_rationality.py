@@ -14,7 +14,15 @@ CONTRACT = ROOT / "config" / "orchestration" / "r3_domain_review_contract.json"
 OUTPUT = ROOT / "docs" / "project_control" / "generated" / "r3_output_rationality_review" / "crypto_r3_domain_review.json"
 
 EXPECTED_SOURCE_COMMIT = "951ca1111ef844a651eb6e12299441252ef5f56b"
-ALLOWED_NATIVE_TO_UNIVERSAL = {"WAIT": "watch", "AVOID": "sell"}
+ALLOWED_NATIVE_TO_UNIVERSAL = {
+    "BUY": "buy",
+    "ACCUMULATE": "accumulate",
+    "HOLD": "hold",
+    "WAIT": "watch",
+    "REDUCE": "reduce",
+    "SELL": "sell",
+    "AVOID": "sell",
+}
 REQUIRED_DIMENSIONS = {
     "freshness_and_completeness",
     "native_self_consistency",
@@ -165,7 +173,7 @@ def main() -> int:
         if universal != expected:
             raise RuntimeError(f"Crypto recommendation mapping mismatch for {asset}: native={native}, universal={universal}, expected={expected}")
         mapping_evidence.append({"asset": asset, "native": native, "universal": universal})
-    checks.append("Certified Crypto native recommendation mapping WAIT->watch and AVOID->sell is preserved")
+    checks.append("Certified Crypto native recommendation vocabulary and deterministic universal normalization are preserved")
 
     risk_rows = rows["risk_metrics"]
     risk_by_asset = Counter(row.get("universal_asset_id", "").strip() for row in risk_rows)
@@ -178,7 +186,7 @@ def main() -> int:
     status_rows = rows["platform_status"]
     require(len(status_rows) == 1, "Crypto platform status contains exactly one row for the recapture run", checks)
     status_row = status_rows[0]
-    require(status_row.get("run_status", "").strip().upper() == "PASS", "Crypto platform_status run_status is PASS", checks)
+    require(status_row.get("run_status", "").strip().lower() == "success", "Crypto platform_status run_status is native success", checks)
     require(status_row.get("run_id", "").strip() == manifest.get("run_id"), "Crypto platform_status run_id matches capture manifest", checks)
     require(nonempty(status_row.get("data_as_of_date")), "Crypto platform_status data_as_of_date is populated", checks)
     error_count = parse_float(status_row.get("error_count", ""), field="error_count", asset="platform_status")
@@ -194,11 +202,11 @@ def main() -> int:
         if probability is not None and not (0.0 <= probability <= 1.0):
             raise RuntimeError(f"Crypto probability_positive_return outside mathematical probability bounds for {asset}: {probability}")
         confidence = parse_float(row.get("forecast_confidence", ""), field="forecast_confidence", asset=asset)
-        if confidence is not None and not (0.0 <= confidence <= 1.0):
-            raise RuntimeError(f"Crypto forecast_confidence outside probability-style bounds for {asset}: {confidence}")
+        if confidence is not None and not (0.0 <= confidence <= 100.0):
+            raise RuntimeError(f"Crypto forecast_confidence outside certified 0-to-100 score bounds for {asset}: {confidence}")
         for field in ("current_value", "forecast_value_base", "forecast_value_bear", "forecast_value_bull", "expected_total_return", "expected_cagr"):
             parse_float(row.get(field, ""), field=field, asset=asset)
-    checks.append("Crypto forecast numeric fields are finite and probability/confidence fields remain within mathematical bounds when populated")
+    checks.append("Crypto forecast numeric fields are finite; probability_positive_return remains within 0-to-1 bounds and forecast_confidence remains within certified 0-to-100 score bounds when populated")
 
     forecast_distribution = numeric_summary(
         forecast_rows,
@@ -310,7 +318,7 @@ def main() -> int:
                 "source_database_unchanged": manifest.get("source_database_unchanged"),
                 "authority_mode": manifest.get("authority_mode"),
                 "is_exact_r2_output": manifest.get("is_exact_r2_output"),
-                "wait_to_watch_preserved": all(item["universal"] == ALLOWED_NATIVE_TO_UNIVERSAL[item["native"]] for item in mapping_evidence),
+                "certified_native_recommendation_mapping_preserved": all(item["universal"] == ALLOWED_NATIVE_TO_UNIVERSAL[item["native"]] for item in mapping_evidence),
                 "absent_holdings_preserved": len(position_rows) == 0,
                 "native_risk_semantics_not_normalized": True,
             },

@@ -1,0 +1,7 @@
+contract_version,platform_id,run_id,dataset_name,file_name,record_count,file_size_bytes,sha256,schema_version,generated_at_utc,validation_status
+1.0.0,crypto,crypto-prod-20260816T020351Z-df80b5bc,asset_master,asset_master.csv,6,1393,bbdfa0f36264da7aa4156d2e12e68ec418e674215fd95624adc003fdde2061de,1.0.0,2026-08-16T02:26:04.149340Z,PASS
+1.0.0,crypto,crypto-prod-20260816T020351Z-df80b5bc,forecasts,forecasts.csv,132,37122,3bae79e02a262ac5d6336f582ede136c52ee276d6783b74238272d279a192cea,1.0.0,2026-08-16T02:26:04.149340Z,PASS
+1.0.0,crypto,crypto-prod-20260816T020351Z-df80b5bc,platform_status,platform_status.csv,1,673,6ae01932d0be7042d13d923ab79fa010a4e62c2bb7dfae0bd73cde409e5ec96a,1.0.0,2026-08-16T02:26:04.149340Z,PASS
+1.0.0,crypto,crypto-prod-20260816T020351Z-df80b5bc,portfolio_positions,portfolio_positions.csv,0,248,f69329d78800bbe344d34e943fdf47106227432bfe8cc5de3b16a1c5e33c47cd,1.0.0,2026-08-16T02:26:04.149340Z,PASS
+1.0.0,crypto,crypto-prod-20260816T020351Z-df80b5bc,recommendations,recommendations.csv,6,2366,eb59cb366ac65495c30bb82ffb045f21b4eb80b90188334cf76c369fcf520c21,1.0.0,2026-08-16T02:26:04.149340Z,PASS
+1.0.0,crypto,crypto-prod-20260816T020351Z-df80b5bc,risk_metrics,risk_metrics.csv,6,2120,2d8fe177ac0a65b18ee89524dd613eefc532589d49f76a07a6357f7755c6e434,1.0.0,2026-08-16T02:26:04.149340Z,PASS
