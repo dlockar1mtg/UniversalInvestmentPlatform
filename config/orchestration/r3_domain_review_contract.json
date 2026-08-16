@@ -1,0 +1,135 @@
+{
+  "schema_version": "1.0.0",
+  "milestone": "UIP_R3_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_REVIEW",
+  "governing_standard": "docs/project_control/R3_GOVERNANCE_AND_DOMAIN_REVIEW_STANDARD.md",
+  "purpose": "Determine whether exact R2-certified domain outputs are sufficiently current, coherent, explainable, lineage-complete, and domain-faithful to be considered decision-ready inputs for later UIP portfolio intelligence without creating cross-domain ranking, allocation, or execution authority.",
+  "authorized_findings": [
+    "PASS",
+    "PASS_WITH_GOVERNED_GAPS",
+    "REVIEW",
+    "DOMAIN_INVESTIGATION_REQUIRED"
+  ],
+  "required_dimensions": [
+    "freshness_and_completeness",
+    "native_self_consistency",
+    "distribution_and_outliers",
+    "change_from_prior_plausibility",
+    "uip_semantic_preservation",
+    "decision_readiness",
+    "investigation_routing"
+  ],
+  "required_domain_evidence_fields": [
+    "domain_id",
+    "r2_evidence_authority",
+    "source_commit_or_native_boundary",
+    "data_as_of",
+    "dimension_results",
+    "checks_performed",
+    "observed_anomalies",
+    "governed_gaps",
+    "finding",
+    "decision_readiness_scope",
+    "prohibited_downstream_uses",
+    "investigation_owner",
+    "lineage_pointers"
+  ],
+  "global_rules": {
+    "native_authority_first": true,
+    "missing_authority_may_be_synthesized": false,
+    "native_thresholds_may_be_invented_by_uip": false,
+    "plausibility_equals_predictive_accuracy": false,
+    "cross_asset_ranking_authorized": false,
+    "cross_domain_allocation_authorized": false,
+    "automatic_execution_authorized": false,
+    "suspicious_native_outputs_may_be_silently_corrected_by_uip": false,
+    "failed_or_unresolved_material_evidence_may_enter_later_decision_logic": false
+  },
+  "finding_policy": {
+    "PASS": {
+      "decision_ready": true,
+      "requires_no_material_unresolved_anomaly": true,
+      "governed_gaps_allowed": true
+    },
+    "PASS_WITH_GOVERNED_GAPS": {
+      "decision_ready": true,
+      "bounded_use_required": true,
+      "governed_gaps_must_be_explicit": true
+    },
+    "REVIEW": {
+      "decision_ready": false,
+      "blocks_affected_evidence": true,
+      "requires_human_or_domain_review": true
+    },
+    "DOMAIN_INVESTIGATION_REQUIRED": {
+      "decision_ready": false,
+      "blocks_affected_evidence": true,
+      "requires_source_domain_investigation_and_recertification": true
+    }
+  },
+  "domains": {
+    "crypto": {
+      "r2_evidence": "docs/project_control/generated/r2_refreshed_data_rehearsal/crypto_r2_rehearsal_evidence.json",
+      "review_order": 1,
+      "native_rules": [
+        "source_defined_universe_not_permanent_constant",
+        "WAIT_maps_to_watch_only_at_certified_uip_boundary",
+        "AVOID_maps_to_sell_only_at_certified_uip_boundary",
+        "unknown_native_recommendation_fails_closed",
+        "absent_holdings_remain_absent",
+        "native_risk_semantics_remain_native",
+        "incremental_refresh_correction_is_governed_not_defect"
+      ],
+      "prohibited_inferences": [
+        "universal_risk_score",
+        "cross_asset_rank",
+        "portfolio_weight_from_native_recommendation"
+      ]
+    },
+    "metals": {
+      "r2_evidence": "docs/project_control/generated/r2_refreshed_data_rehearsal/metals_r2_rehearsal_evidence.json",
+      "review_order": 2,
+      "native_rules": [
+        "benchmark_not_silently_investable_vehicle",
+        "unsupported_liquidity_market_region_or_history_not_synthesized",
+        "missing_forecast_authority_remains_missing",
+        "native_recommendations_remain_native_evidence",
+        "vehicle_constraints_and_provider_authority_are_domain_specific"
+      ],
+      "prohibited_inferences": [
+        "cross_domain_weight_from_metals_output",
+        "benchmark_outlook_equals_vehicle_purchase_decision"
+      ]
+    },
+    "mtg": {
+      "r2_evidence": "docs/project_control/generated/r2_refreshed_data_rehearsal/mtg_r2_rehearsal_evidence.json",
+      "review_order": 3,
+      "native_rules": [
+        "collector_precollector_secret_lair_lanes_remain_distinct",
+        "native_rank_requires_native_rank_type",
+        "native_rank_is_not_global_mtg_or_cross_asset_rank",
+        "BUY_CANDIDATE_NOW_is_model_qualified_entry_candidate_not_execution_authority",
+        "manual_execution_price_check_preserved_where_governed",
+        "secret_lair_universe_is_dynamic",
+        "missing_price_forecast_rank_purchase_authority_remains_missing"
+      ],
+      "prohibited_inferences": [
+        "missing_authority_to_zero",
+        "missing_rank_to_worst_rank",
+        "missing_purchase_status_to_WAIT",
+        "native_rank_to_cross_asset_rank"
+      ]
+    }
+  },
+  "r3_closeout_requirements": {
+    "all_three_domains_reviewed": true,
+    "all_seven_dimensions_present_for_each_domain": true,
+    "all_findings_authorized": true,
+    "decision_readiness_scope_explicit": true,
+    "prohibited_downstream_uses_explicit": true,
+    "lineage_complete": true,
+    "unresolved_review_or_investigation_evidence_blocked": true,
+    "cross_asset_ranking_created": false,
+    "allocation_policy_created": false,
+    "automatic_execution_created": false
+  }
+}
