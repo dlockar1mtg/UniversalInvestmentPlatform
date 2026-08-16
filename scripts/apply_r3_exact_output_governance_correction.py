@@ -103,8 +103,9 @@ def append_once(path: Path, marker: str, addition: str) -> bool:
     text = path.read_text(encoding="utf-8")
     if marker in text:
         return False
+    normalized_addition = addition.strip("\r\n")
     with path.open("w", encoding="utf-8", newline="") as handle:
-        handle.write(text.rstrip("\r\n") + addition + "\n")
+        handle.write(text.rstrip("\r\n") + "\n\n" + normalized_addition + "\n")
     return True
 
 
