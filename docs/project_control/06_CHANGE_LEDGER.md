@@ -1152,6 +1152,60 @@ Next required action:
 
 ---
 
+
+## UIP-CHG-2026-033 - Certify UIP-R2 and Activate UIP-R3
+
+Date: 2026-08-15
+Status: ACTIVE
+Type: REFRESH_REHEARSAL, CERTIFICATION, ROADMAP_STATE, GOVERNANCE_CORRECTION
+Approval authority: Devon Lockard
+
+Decision:
+
+Certify `UIP_R2_REFRESHED_DATA_REHEARSAL` complete and activate `UIP_R3_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_REVIEW`.
+
+R2 evidence:
+
+- MTG: fresh source workflow run `31843560745`; producer commit `c40b1dd1191f7f3c2a760fd307fe1041e02ea24c`; disposable UIP reconciliation 968 rows; 161/161 certified live prices; 49/49 certified live decisions; lineage complete.
+- Metals: cycle `metals-20260814T232103Z-6f1943b6`; package `metals-20260814T232106Z-f3577228`; imported rows 62; 10 registry assets / 11 vehicles; 11/11 market vehicles current; readiness PASS.
+- Crypto: fresh run `crypto-prod-20260815T122413Z-e7429e07`; source commit `951ca1111ef844a651eb6e12299441252ef5f56b`; 43 active modules; disposable UIP import 151 rows; delivery and freshness PASS; source database unchanged.
+- all 19 governed R1 cycle-evidence fields populated for all three domains in consolidated certification evidence;
+- production UIP database modified: false;
+- native semantics reinterpreted: false;
+- cross-asset ranking created: false;
+- allocation policy created: false;
+- automatic execution created: false.
+
+Crypto execution correction:
+
+The original R2 plan requested `full_refresh=true`. Recovery evidence showed that Crypto's supported durable production architecture depends on the existing populated historical database and normal incremental refresh. R2 therefore used `full_refresh=false` after proving the path on disposable database copies. This preserved the native historical foundation, refreshed current source data, required no paid CoinGecko key, and did not alter Crypto-native methodology.
+
+Timestamp evidence note:
+
+The disposable Crypto producer summary did not persist its exact completion timestamp. The consolidated 19-field evidence uses the committed R2 evidence timestamp as a conservative upper bound and records this as a warning; no freshness authority is synthesized from it.
+
+Permanent evidence:
+
+`docs/project_control/generated/r2_refreshed_data_rehearsal/r2_refresh_rehearsal_certification.json`
+
+Prior state:
+
+`UIP_R2_REFRESHED_DATA_REHEARSAL`
+
+New state:
+
+`UIP_R3_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_REVIEW`
+
+Reversal:
+
+`FULLY_REVERSIBLE`
+
+Next required action:
+
+`EXECUTE_R3_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_REVIEW`
+
+---
+
 # Future change procedure
 
 Before material work:
