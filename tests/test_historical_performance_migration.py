@@ -63,6 +63,7 @@ def test_discovers_all_canonical_migrations() -> None:
         "004_historical_performance.sql",
         "005_mtg_native_authority.sql",
         "006_common_domain_registry_lineage.sql",
+        "007_metals_vehicle_identity_current_views.sql",
     ]
 
 
