@@ -1,0 +1,106 @@
+{
+  "status": "UIP_R3_CROSS_DOMAIN_RECONCILIATION_AND_CLOSEOUT_PASS",
+  "branch": "phase-uip-r3-cross-domain-closeout",
+  "governed_head_before_closeout_evidence": "7c94b0a97cd60c3145da8265fd092ec7e216e36e",
+  "authoritative_database": {
+    "pre_migration_010_sha256": "df7406361639e4b165afb8007f97feca60242e91d290c58ae521e423d82578cc",
+    "post_migration_010_sha256": "9af5e52882bdf61fed550a2ced9bc83ba1529c422633a7817660cf61d0e15a98",
+    "pre_migration_010_backup_sha256": "df7406361639e4b165afb8007f97feca60242e91d290c58ae521e423d82578cc",
+    "migration_010": "010_platform_registry_case_reconciliation.sql",
+    "migration_010_authoritative_application": "PASS",
+    "migration_010_authoritative_idempotence": "PASS"
+  },
+  "domain_health": {
+    "crypto": "HEALTHY",
+    "metals": "HEALTHY",
+    "mtg": "HEALTHY"
+  },
+  "generic_current_authority": {
+    "asset_master_current": {
+      "crypto": 6,
+      "metals": 16,
+      "mtg": 0
+    },
+    "forecasts_current": {
+      "crypto": 120,
+      "metals": 16,
+      "mtg": 0
+    },
+    "recommendations_current": {
+      "crypto": 6,
+      "metals": 12,
+      "mtg": 0
+    },
+    "risk_metrics_current": {
+      "crypto": 6,
+      "metals": 11,
+      "mtg": 0
+    }
+  },
+  "mtg_native_authority": {
+    "current_rows": 968,
+    "history_rows": 968,
+    "canonical_platform_id": "mtg",
+    "adapter_version": "mtg-v1-native-authority-binding-1.0.0",
+    "package_id": "mtg-v1-native-authority-aa363cd474ae6b846588bb4a",
+    "run_id": "94c2bd3273eaba4d05ee8f7f5c3d6c4dcc283768",
+    "import_id": "84bcb0f3-ed3f-4d09-9957-22f8b3e236e9",
+    "last_import_status": "IMPORTED",
+    "warning_count": 0,
+    "error_count": 0,
+    "generic_current_authority_rows": 0
+  },
+  "canonical_registry": {
+    "platform_ids": [
+      "crypto",
+      "metals",
+      "mtg"
+    ],
+    "latest_successful_import_rows_per_domain": 1,
+    "latest_import_attempt_rows_per_domain": 1,
+    "all_operational_domains_active": true,
+    "all_latest_imports_imported": true,
+    "all_import_health_healthy": true,
+    "operational_status_complete": true
+  },
+  "mtg_lineage_reconciliation": {
+    "legacy_uppercase_platform_rows": 19679,
+    "legacy_uppercase_rows_mapped_to_domain_mtg": 19679,
+    "native_lowercase_platform_rows": 969,
+    "native_lowercase_rows_mapped_to_domain_mtg": 969,
+    "unmapped_rows": 0,
+    "historical_case_variants_preserved": true,
+    "canonical_domain_mapping_case_insensitive": true
+  },
+  "history_preservation": {
+    "asset_master_history_rows": 8199,
+    "forecasts_history_rows": 5254,
+    "recommendations_history_rows": 5285,
+    "risk_metrics_history_rows": 2439,
+    "platform_status_history_rows": 25,
+    "mtg_native_authority_history_rows": 968,
+    "migration_010_changed_history": false
+  },
+  "cross_domain_boundaries": {
+    "non_mtg_analytical_authority_changed": false,
+    "native_domain_semantics_reinterpreted": false,
+    "missing_values_synthesized": false,
+    "universal_cross_domain_rank_created": false,
+    "cross_domain_allocation_policy_created": false,
+    "automatic_execution_authorized": false,
+    "mtg_execution_ready_purchase_authority": false
+  },
+  "source_certifications": {
+    "crypto": "docs/project_control/generated/crypto_a1_integration/crypto_a1_integration_certification.json",
+    "metals_r3": "docs/project_control/generated/r3_metals_domain_health/metals_r3_domain_health_certification.json",
+    "mtg_r3": "docs/project_control/generated/r3_mtg_domain_health/mtg_r3_domain_health_certification.json"
+  },
+  "final_certification": {
+    "status": "R3_AUTHORITATIVE_PLATFORM_REGISTRY_RECONCILIATION_GATE_PASS",
+    "failure_count": 0,
+    "unresolved_warning_count": 0,
+    "authoritative_database_sha256": "9af5e52882bdf61fed550a2ced9bc83ba1529c422633a7817660cf61d0e15a98"
+  },
+  "disposition": "UIP_R3_CERTIFIED_COMPLETE",
+  "next_gate": "UIP_E1_STOCKS_ETF_EXTENSION_BOUNDARY"
+}
