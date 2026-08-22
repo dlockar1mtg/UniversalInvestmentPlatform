@@ -234,18 +234,30 @@ Completed milestones:
 - `UIP_D1_COMMON_DOMAIN_REGISTRY_AND_LINEAGE_INTERFACE`
 - `UIP_R1_REFRESH_AND_ORCHESTRATION_CONTRACTS`
 - `UIP_R2_REFRESHED_DATA_REHEARSAL`
+- `UIP_R3_METALS_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_PASS`
+- `UIP_R3_MTG_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_PASS`
 
 Current milestone:
 
-`UIP_R3_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_REVIEW`
+`UIP_R3_CROSS_DOMAIN_RECONCILIATION_AND_CLOSEOUT`
+
+Current certified MTG production baseline:
+
+`df7406361639e4b165afb8007f97feca60242e91d290c58ae521e423d82578cc`
+
+MTG R3 permanent evidence:
+
+`docs/project_control/generated/r3_mtg_domain_health/mtg_r3_domain_health_certification.json`
 
 Next authorized action:
 
-`EXECUTE_R3_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_REVIEW`
+`EXECUTE_R3_CROSS_DOMAIN_RECONCILIATION_AND_CLOSEOUT`
 
 Expected subsequent action:
 
-`UIP_R3_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_REVIEW`
+`UIP_E1_STOCKS_ETF_EXTENSION_BOUNDARY`
+
+No universal cross-asset ranking, cross-domain investment weighting, or automatic execution is authorized by R3 closeout.
 
 ## Dependency principle
 
