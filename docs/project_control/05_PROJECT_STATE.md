@@ -13,13 +13,13 @@ Recovery classification:
 RECOVERED_AND_GOVERNED
 
 Current execution state:
-CERTIFIED_DOMAIN_INTEGRATION_SEQUENCE_ACTIVE
+DASHBOARD_PRODUCT_FOUNDATION_ACTIVE_ON_R3_CERTIFIED_AUTHORITY
 
 Current roadmap phase:
-Certified domain integration
+Dashboard product foundation on certified R3 authority
 
 Current milestone:
-UIP_E1_STOCKS_ETF_EXTENSION_BOUNDARY
+DASH_READ_1_CERTIFIED_PRESENTATION_READ_MODEL_PUBLICATION_CONTRACT
 
 Current certification:
 UIP_MTG_A1_EXPORT_ACCEPTANCE_PASS
@@ -32,9 +32,11 @@ UIP_R2_REFRESHED_DATA_REHEARSAL_PASS
 UIP_R3_METALS_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_PASS
 UIP_R3_MTG_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_PASS
 UIP_R3_CROSS_DOMAIN_RECONCILIATION_AND_CLOSEOUT_PASS
+UIP_DASHBOARD_PRODUCT_SPECIFICATION_V1_APPROVED
+UIP_DASHBOARD_V7_VISUAL_ACCEPTANCE_APPROVED
 
 Next authorized action:
-EXECUTE_UIP_E1_STOCKS_ETF_EXTENSION_BOUNDARY
+EXECUTE_DASH_READ_1_CERTIFIED_PRESENTATION_READ_MODEL_PUBLICATION_CONTRACT
 ```
 
 ## Repository authority
@@ -47,13 +49,13 @@ Stable branch:
 
 `main`
 
-Current closeout branch:
+Dashboard-governance branch:
 
-`phase-uip-r3-cross-domain-closeout`
+`phase-uip-dashboard-product-spec-v1`
 
-R3 closeout implementation/evidence baseline before final closeout commits:
+R3 merged main baseline used to create the dashboard-governance branch:
 
-`7c94b0a97cd60c3145da8265fd092ec7e216e36e`
+`cc2cfefb4c9135f0e93f20b2cb329d2347defdcf`
 
 Current certified authoritative UIP database SHA-256:
 
@@ -66,6 +68,35 @@ Pre-migration-010 backup SHA-256:
 Database classification:
 
 `AUTHORITATIVE_MULTI_DOMAIN_PRODUCTION_STATE — R3_CERTIFIED`
+
+## Approved dashboard product authority
+
+Product specification:
+
+`docs/project_control/UIP_DASHBOARD_PRODUCT_SPEC_V1.md`
+
+Visual acceptance record:
+
+`docs/project_control/UIP_DASHBOARD_V7_VISUAL_ACCEPTANCE.md`
+
+Approved V7 artifact SHA-256:
+
+`7403863ec8f662fbfbd293a3f19ac1d166dbde9bf79107da211f34da2c24d03a`
+
+Approved primary navigation:
+
+`Home | Recommendations | Portfolio | Transactions | Refresh | Operations`
+
+Dashboard purpose:
+
+- surface certified, domain-native investment recommendations in a user-friendly form;
+- show what changed and what requires attention;
+- track user holdings from an auditable transaction ledger;
+- support manual buy/sell recording without automatic execution;
+- expose portfolio value, pricing coverage, basis coverage, P/L, concentration, and history;
+- expose refresh/data-health state and preserve the last certified authority on failure;
+- preserve technical diagnostics under Operations rather than making them the primary user experience;
+- allow Stocks/ETF and later domains to integrate through the same domain-neutral contracts without redesigning the shell.
 
 ## Certified domain authority
 
@@ -81,7 +112,7 @@ Current generic UIP authority:
 - latest import status: `IMPORTED`
 - import health: `HEALTHY`
 
-Crypto native recommendation semantics remain Crypto-owned. R3 created no cross-domain rank or allocation policy.
+Crypto native recommendation semantics remain Crypto-owned. The dashboard may present them but may not silently redefine them into a universal scoring model.
 
 ### Metals
 
@@ -121,7 +152,7 @@ MTG lane populations remain:
 - Pre-Collector V1: `131`
 - Secret Lair V1.1: `787`
 
-Secret Lair remains a dynamic population. BUY candidates do not constitute execution authority.
+Secret Lair remains a dynamic population. Native rank semantics and tied ranks remain native. BUY candidates do not constitute execution authority and must preserve the manual execution-price-check requirement where applicable.
 
 ## R3 cross-domain closeout
 
@@ -148,15 +179,6 @@ Certified effects:
 - migration 010 changed no Crypto or Metals analytical current authority;
 - migration 010 is idempotent on the authoritative database.
 
-Append-only history populations at R3 closeout:
-
-- asset master history: `8,199`
-- forecasts history: `5,254`
-- recommendations history: `5,285`
-- risk metrics history: `2,439`
-- platform-status history: `25`
-- MTG native-authority history: `968`
-
 Permanent evidence:
 
 `docs/project_control/generated/r3_cross_domain_closeout/r3_cross_domain_closeout_certification.json`
@@ -168,6 +190,81 @@ Human-readable closeout:
 Disposition:
 
 `UIP_R3_CERTIFIED_COMPLETE`
+
+## Dashboard architecture boundaries
+
+The next technical boundary is not a visual rewrite. It is a governed publication contract between certified analytical authority and the Render application.
+
+Required separation:
+
+### Analytical authority
+
+- certified UIP/domain outputs;
+- domain-native recommendations, forecasts, risk, ranks, current prices, lineage, and health;
+- versioned/fingerprinted publication state.
+
+### Application state
+
+- user transactions;
+- accounts and cash state;
+- cost-basis correction metadata;
+- watch/dismiss/acted/review-later state;
+- UI preferences;
+- sessions and roles.
+
+Render/PostgreSQL must not independently reconstruct or reinterpret analytical authority. The intended next design is a versioned presentation/read-model publication from certified UIP authority into the hosted application boundary.
+
+## Dashboard V1 semantic requirements
+
+The following are mandatory implementation constraints:
+
+- the Home hero is selected by an explicit UI-priority rule, not a universal cross-domain score;
+- native source-domain status remains traceable separately from display labels;
+- native MTG rank values are shown exactly as published; UIP does not invent common denominators or compare rank numbers across domains/lanes;
+- unsupported horizons remain unavailable;
+- price history is never presented as forecast history;
+- portfolio-vs-benchmark comparison is historical unless a separately governed portfolio-level forecast model is certified;
+- portfolio value exposes pricing coverage;
+- portfolio return exposes cost-basis coverage and is labeled known-basis return while coverage is incomplete;
+- unknown basis remains unknown rather than zero;
+- descriptive allocation/concentration does not imply an allocation recommendation unless user policy or a separately governed allocation methodology exists;
+- refresh remains fail-closed and preserves the last certified state;
+- automatic purchase/sale execution remains prohibited.
+
+## Stocks/ETF disposition
+
+Stocks/ETF remains the next new analytical domain, but it is now required to integrate against the approved dashboard/read-model contracts rather than define the dashboard after the fact.
+
+Until E1 certification:
+
+- ETF holdings may exist in portfolio application state;
+- ETF recommendation/forecast authority remains unavailable;
+- UIP must not synthesize BUY/HOLD/forecast values for the future domain slot.
+
+## Protected recovery resources
+
+Historical recovery branches, archives, and local recovery resources remain evidence. They are not authorized for wholesale merge or destructive cleanup.
+
+Previously identified protected local resources remain protected from unrelated work:
+
+- `export_uip_interpretation_data.py`
+- `uip_interpretation_export/`
+- `uip_interpretation_input/`
+- `uip_recovery_inspection/`
+- `uip_recovery_inspection_output.txt`
+
+## Current risks and outstanding work
+
+1. `DASH-READ-1`: certify the presentation/read-model publication contract from authoritative UIP state to Render/PostgreSQL.
+2. `DASH-SHELL-1`: implement the approved six-screen application shell and persistent health/freshness status.
+3. `TXN-1`: implement the append-only transaction ledger and correction chain.
+4. `PORT-1`: derive holdings, cost basis, P/L, historical performance, pricing coverage, and basis coverage.
+5. `REC-UI-1`: publish certified Crypto, Metals, and MTG recommendation experiences without semantic reinterpretation.
+6. `REFRESH-UI-1`: expose governed refresh requests, certification state, failure stage, scheduler, and last-good authority.
+7. `OPS-1`: preserve current Render operations functionality under the approved Operations surface.
+8. `UIP_E1_STOCKS_ETF_EXTENSION_BOUNDARY`: integrate Stocks/ETF through the approved contracts.
+9. `DASH-CERT-1`: certify the full Render user experience against the product specification and V7 visual acceptance target.
+10. Remote infrastructure selection and laptop-independent production certification remain outstanding after the dashboard is a known functioning system.
 
 ## Governance boundaries
 
@@ -183,37 +280,6 @@ The following remain prohibited unless separately governed and certified:
 
 Refresh remains separate from model retraining. Forecast-model validation remains separate from recommendation-policy validation.
 
-## Protected recovery resources
-
-Historical recovery branches, archives, and local recovery resources remain evidence. They are not authorized for wholesale merge or destructive cleanup solely because R3 is complete.
-
-Previously identified protected local resources remain protected from unrelated work:
-
-- `export_uip_interpretation_data.py`
-- `uip_interpretation_export/`
-- `uip_interpretation_input/`
-- `uip_recovery_inspection/`
-- `uip_recovery_inspection_output.txt`
-
-Detailed historical recovery findings and prior transition records remain available in repository history and the permanent certification evidence under `docs/project_control/generated/`.
-
-## Current risks and outstanding work
-
-1. Stocks/ETF extension must be integrated under its own domain-native authority and certification.
-2. Phase 11 cross-domain production automation may be selectively ported only after review against the certified R3 architecture.
-3. Dashboard and user-facing service completion remain outstanding.
-4. Remote infrastructure selection and laptop-independent production certification remain outstanding.
-5. Protected personal financial/recovery snapshots must remain outside repository publication boundaries.
-
-## Next integration sequence
-
-1. `UIP_E1_STOCKS_ETF_EXTENSION_BOUNDARY` — define and certify the Stocks/ETF domain boundary without inheriting other-domain models or rankings.
-2. Continue remaining priority-domain integrations under domain-native governance as authorized.
-3. Evaluate selective Phase 11 automation after the certified domain set is ready.
-4. `UIP_DASH-1` and `UIP_DASH-2` — build the dashboard on certified multi-domain authority.
-5. Complete remote infrastructure and laptop-independent production certification.
-6. Govern any future cross-asset ranking, comparison, or allocation methodology separately.
-
 ## State principle
 
-> UIP recovery history remains preserved, but current integration proceeds from certified repository and domain-package authority. Each domain retains its native semantics; UIP may accept certified outputs, preserve lineage, orchestrate governed refreshes, and present evidence without silently redefining native models, ranks, recommendations, or execution authority.
+> UIP now has a certified R3 analytical foundation and an approved dashboard product target. Future implementation must connect those two through governed contracts: certified analytical truth flows into a versioned presentation model, user actions flow into an auditable application ledger, and future domains such as Stocks/ETF plug into the same interface without redefining existing authority.

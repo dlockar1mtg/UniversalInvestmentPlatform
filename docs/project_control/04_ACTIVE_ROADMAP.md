@@ -3,11 +3,53 @@
 ## Priority sequence
 
 1. Stabilize recovered UIP work.
-2. Complete and certify asset integrations.
-3. Establish automated end-to-end certification.
-4. Complete dashboard and user-facing services.
-5. Build final remote production infrastructure.
-6. Certify laptop-independent production.
+2. Complete and certify the core asset integrations required for a trusted multi-domain foundation.
+3. Freeze the dashboard product specification and visual acceptance target.
+4. Establish the certified presentation/read-model boundary and implement the user-facing dashboard foundation.
+5. Add remaining domains, including Stocks/ETF, through the approved domain-neutral dashboard/read-model contracts rather than redesigning the interface.
+6. Establish automated end-to-end certification.
+7. Complete dashboard and user-facing services.
+8. Build final remote production infrastructure.
+9. Certify laptop-independent production.
+
+## Dashboard-first product interlock
+
+The approved dashboard is now a direct project goal, not a cosmetic final step.
+
+Approved product specification:
+
+`docs/project_control/UIP_DASHBOARD_PRODUCT_SPEC_V1.md`
+
+Approved V7 visual acceptance record:
+
+`docs/project_control/UIP_DASHBOARD_V7_VISUAL_ACCEPTANCE.md`
+
+The approved primary navigation is:
+
+`Home | Recommendations | Portfolio | Transactions | Refresh | Operations`
+
+Implementation must preserve:
+
+- domain-native recommendation, rank, forecast, and risk semantics;
+- missing-as-missing behavior;
+- append-only transaction corrections;
+- portfolio pricing and basis coverage visibility;
+- fail-closed refresh with last-good-state preservation;
+- no automatic trading;
+- no hidden universal cross-domain ranking or allocation policy;
+- future Stocks/ETF extensibility without redesigning the application shell.
+
+The next implementation sequence is:
+
+1. `DASH-READ-1` — certified presentation/read-model publication contract;
+2. `DASH-SHELL-1` — application shell, authentication, six-screen navigation, persistent status;
+3. `TXN-1` — append-only user transaction ledger;
+4. `PORT-1` — holdings, basis, P/L, pricing coverage, portfolio history;
+5. `REC-UI-1` — domain-native recommendation and asset-detail experience;
+6. `REFRESH-UI-1` — refresh/data-health orchestration experience;
+7. `OPS-1` — preserve and move the existing Render technical dashboard into Operations;
+8. `UIP_E1_STOCKS_ETF_EXTENSION_BOUNDARY` — integrate Stocks/ETF against the approved contracts;
+9. `DASH-CERT-1` — end-to-end Render usability and authority certification.
 
 ## Phase A — Project control and recovery stabilization
 
@@ -122,6 +164,8 @@ Each domain requires:
 - integration tests;
 - portfolio participation.
 
+The dashboard/read-model contract must allow each future domain to register into the approved application without requiring hard-coded redesign.
+
 Completion gate:
 
 `ALL_PRIORITY_DOMAINS_CERTIFIED`
@@ -153,18 +197,25 @@ Current provisional platform:
 
 `Render`
 
+Approved dashboard authority:
+
+- product specification: `docs/project_control/UIP_DASHBOARD_PRODUCT_SPEC_V1.md`;
+- V7 visual acceptance: `docs/project_control/UIP_DASHBOARD_V7_VISUAL_ACCEPTANCE.md`.
+
 Objectives:
 
-- inventory current Render frontend, backend, data sources, environment variables by name, authentication, roles, and local dependencies;
-- complete Portfolio, Recommendations, Forecasts, Risk, Assets, Transactions, Performance, History, Operations, and Administration;
-- implement purchase and sale workflows;
-- implement recommendation completion and performance impact;
-- implement lineage drill-down;
+- publish certified analytical authority into a versioned presentation/read model rather than reconstructing analytical truth independently in Render;
+- preserve analytical authority separately from application state;
+- implement Home, Recommendations, Portfolio, Transactions, Refresh, and Operations;
+- implement purchase and sale workflows through an auditable append-only transaction ledger;
+- derive holdings, cost basis, realized/unrealized P/L, pricing coverage, and known-basis return from application state plus certified prices;
+- implement recommendation completion, watch/review state, and performance impact without redefining native recommendation semantics;
+- implement lineage and freshness drill-down;
 - implement incident visibility and linked GitHub issues;
 - implement archive retrieval;
-- implement graceful degradation;
+- implement graceful degradation and explicit empty/stale/not-certified states;
 - certify viewer, operator, and administrator roles;
-- add dashboard, API, transaction UI, role, lineage, and degradation gates.
+- add dashboard, API, transaction UI, role, lineage, degradation, and visual-acceptance gates.
 
 Completion gate:
 
@@ -218,7 +269,7 @@ Completion gate:
 
 Active phase:
 
-`Certified domain integration`
+`Dashboard product foundation on certified R3 authority`
 
 Completed milestones:
 
@@ -237,10 +288,12 @@ Completed milestones:
 - `UIP_R3_METALS_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_PASS`
 - `UIP_R3_MTG_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_PASS`
 - `UIP_R3_CROSS_DOMAIN_RECONCILIATION_AND_CLOSEOUT_PASS`
+- `UIP_DASHBOARD_PRODUCT_SPECIFICATION_V1_APPROVED`
+- `UIP_DASHBOARD_V7_VISUAL_ACCEPTANCE_APPROVED`
 
 Current milestone:
 
-`UIP_E1_STOCKS_ETF_EXTENSION_BOUNDARY`
+`DASH_READ_1_CERTIFIED_PRESENTATION_READ_MODEL_PUBLICATION_CONTRACT`
 
 Current certified multi-domain production baseline:
 
@@ -254,13 +307,25 @@ R3 cross-domain closeout record:
 
 `docs/project_control/R3_CROSS_DOMAIN_CLOSEOUT.md`
 
+Approved dashboard specification:
+
+`docs/project_control/UIP_DASHBOARD_PRODUCT_SPEC_V1.md`
+
+Approved dashboard visual acceptance record:
+
+`docs/project_control/UIP_DASHBOARD_V7_VISUAL_ACCEPTANCE.md`
+
 Next authorized action:
 
-`EXECUTE_UIP_E1_STOCKS_ETF_EXTENSION_BOUNDARY`
+`EXECUTE_DASH_READ_1_CERTIFIED_PRESENTATION_READ_MODEL_PUBLICATION_CONTRACT`
 
-No universal cross-asset ranking, cross-domain investment weighting, or automatic execution is authorized by R3 closeout or E1 boundary definition.
+Stocks/ETF remains explicitly reserved as the next new analytical domain and must integrate through the approved domain-neutral read-model/dashboard contracts.
+
+No universal cross-asset ranking, cross-domain investment weighting, or automatic execution is authorized by R3 closeout or dashboard approval.
 
 ## Dependency principle
+
+The dashboard product contract and core user workflows must be established on certified authority before remaining domains are allowed to drive interface design. Stocks/ETF must plug into the approved contract rather than redefine it.
 
 The complete dashboard and analytics must be certified before final production infrastructure is selected and hardened. Final infrastructure should deploy a known functioning system rather than define the system prematurely.
 
@@ -268,4 +333,4 @@ The complete dashboard and analytics must be certified before final production i
 
 No recovered branch may be merged wholesale solely to accelerate the roadmap.
 
-No deletion or major new feature begins before Phase A establishes a certified governance and schema baseline.
+No destructive recovery cleanup is authorized by dashboard work.
