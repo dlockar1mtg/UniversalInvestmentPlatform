@@ -1,0 +1,91 @@
+{
+  "status": "UIP_R3_METALS_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_PASS",
+  "domain": "metals",
+  "branch": "phase-uip-r3-metals-domain-health",
+  "governed_head_before_closeout": "43443aa94a08d8bbea27d0b889a8a37120eda332",
+  "authoritative_database_sha256": "22320b879c1737cec054b91db0abf147ac5f18e0f9d395031c0f4524d3eeca59",
+  "latest_package_id": "metals-20260728T182311Z-5da5336b",
+  "latest_import_id": "14cfce16-f806-4db1-9303-210de844c194",
+  "domain_health": {
+    "health_status": "HEALTHY",
+    "registry_status": "ACTIVE",
+    "last_import_status": "IMPORTED",
+    "warning_count": 0,
+    "error_count": 0,
+    "successful_imports": 11,
+    "failed_imports": 0
+  },
+  "current_counts": {
+    "asset_master_current": 16,
+    "forecasts_current": 16,
+    "recommendations_current": 12,
+    "risk_metrics_current": 11
+  },
+  "identity_reconciliation": {
+    "status": "PASS",
+    "legacy_case_split_vehicle_ids_reconciled_in_current_views": true,
+    "stale_current_rows": 0,
+    "duplicate_platform_asset_groups": 0,
+    "legacy_history_deleted": false
+  },
+  "forecast_alias_recovery": {
+    "status": "PASS",
+    "expected_return_recovered": 16,
+    "probability_positive_recovered": 16,
+    "confidence_recovered": 16,
+    "point_forecast_synthesized": false,
+    "forecast_bounds_synthesized": false,
+    "scenario_synthesized": false,
+    "synthetic_forecast_values_created": false,
+    "native_metals_model_rerun": false,
+    "metals_source_refresh": false
+  },
+  "rationality_review": {
+    "failure_count": 0,
+    "warning_count": 0,
+    "portfolio_risk_semantics_accepted": true,
+    "vehicle_allocation_sum": 99.99999999999999,
+    "vehicle_allocation_sum_100": true,
+    "expected_return_authority_present": true,
+    "probability_authority_present": true,
+    "confidence_authority_present": true
+  },
+  "selected_24m_forecasts": {
+    "gold": {
+      "expected_return": 0.280223505110176,
+      "probability_positive": 0.9244486103920526,
+      "confidence_score": 42.977885044041656
+    },
+    "silver": {
+      "expected_return": 0.3635054369364323,
+      "probability_positive": 0.8056390197291838,
+      "confidence_score": 16.946061494822104
+    },
+    "platinum": {
+      "expected_return": 0.2038571574995906,
+      "probability_positive": 0.7190154088754698,
+      "confidence_score": 44.3133591183412
+    },
+    "copper": {
+      "expected_return": 0.1259262229007256,
+      "probability_positive": 0.7007023185145664,
+      "confidence_score": 61.17138065129944
+    }
+  },
+  "production_cycle_23_disposition": {
+    "classification": "HISTORICAL_FAILURE_EXACT_ROOT_CAUSE_UNRESOLVED_NO_CURRENT_DOMAIN_HEALTH_BLOCKER",
+    "exact_root_cause_known": false,
+    "persistent_native_source_defect_evidenced": false,
+    "persistent_native_model_defect_evidenced": false,
+    "persistent_domain_health_defect_evidenced": false,
+    "compatible_with_transient_operational_or_infrastructure_failure": true,
+    "rerun_authorized_or_required": false
+  },
+  "governance": {
+    "cross_asset_ranking_authorized": false,
+    "allocation_policy_created": false,
+    "automatic_purchase_execution": false,
+    "native_semantics_reinterpreted": false
+  },
+  "next_gate": "UIP_R3_MTG_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_REVIEW"
+}
