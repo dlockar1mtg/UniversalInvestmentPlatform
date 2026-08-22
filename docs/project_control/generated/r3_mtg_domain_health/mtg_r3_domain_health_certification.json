@@ -1,0 +1,110 @@
+{
+  "status": "UIP_R3_MTG_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_PASS",
+  "domain": "mtg",
+  "branch": "phase-uip-r3-mtg-domain-health",
+  "governed_head_before_closeout": "e2259a1b113be86773e505f5ce21198937ec6f7a",
+  "authoritative_database_sha256": "df7406361639e4b165afb8007f97feca60242e91d290c58ae521e423d82578cc",
+  "pre_cutover_database_sha256": "22320b879c1737cec054b91db0abf147ac5f18e0f9d395031c0f4524d3eeca59",
+  "pre_migration_009_database_sha256": "e4320a722e2feebfd99bc05b6bd9aa7189a9f063e229b3d04045f6835d374470",
+  "forecast_current_fingerprint": "4bb256b40df170060e503273b0ee9cb117b94a9be3252a8c82502fc2d134e17b",
+  "native_authority": {
+    "package_id": "mtg-v1-native-authority-aa363cd474ae6b846588bb4a",
+    "import_id": "84bcb0f3-ed3f-4d09-9957-22f8b3e236e9",
+    "current_rows": 968,
+    "history_rows": 968,
+    "lineage_missing_rows": 0,
+    "collector_rows": 50,
+    "pre_collector_rows": 131,
+    "secret_lair_rows": 787,
+    "collector_ranked_rows": 49,
+    "pre_collector_ranked_rows": 95,
+    "secret_lair_ranked_rows": 787,
+    "secret_lair_production_rank_groups": 704,
+    "secret_lair_buy_candidates": 88,
+    "current_price_null_rows": 10,
+    "forecast_price_null_rows": 37,
+    "forecast_return_null_rows": 37,
+    "native_rank_null_rows": 37,
+    "native_purchase_status_null_rows": 37,
+    "purchase_semantic_null_rows": 37,
+    "price_authority_mismatch_rows": 0,
+    "forecast_authority_mismatch_rows": 0,
+    "max_forecast_arithmetic_residual": 0.0
+  },
+  "population_semantics": {
+    "collector_snapshot_population_is_permanent_true_rows": 0,
+    "pre_collector_snapshot_population_is_permanent_true_rows": 131,
+    "secret_lair_snapshot_population_is_permanent_true_rows": 0,
+    "full_mtg_snapshot_population_is_permanent": false
+  },
+  "legacy_authority_reconciliation": {
+    "generic_mtg_asset_current_rows": 0,
+    "generic_mtg_forecast_current_rows": 0,
+    "generic_mtg_recommendation_current_rows": 0,
+    "generic_mtg_risk_current_rows": 0,
+    "legacy_history_preserved": true,
+    "legacy_package_import_ledger_preserved": true,
+    "legacy_asset_history_rows": 7987,
+    "legacy_forecast_history_rows": 4286,
+    "legacy_recommendation_history_rows": 5117,
+    "legacy_risk_history_rows": 2282,
+    "legacy_platform_status_history_rows": 7,
+    "legacy_packages": 7,
+    "legacy_imports": 7,
+    "legacy_import_datasets": 30,
+    "legacy_import_errors": 0
+  },
+  "forecast_current_determinism": {
+    "status": "PASS",
+    "migration": "009_forecasts_current_deterministic_tie_breaker.sql",
+    "underlying_non_mtg_history_changed": false,
+    "non_mtg_forecast_semantics_changed": false,
+    "non_mtg_current_forecast_rows": 136,
+    "nondeterministic_tie_selection_root_cause_confirmed": true,
+    "changed_semantic_forecast_fields": 0,
+    "deterministic_selection_rehearsal_passed": true,
+    "repeated_rebuild_fingerprint_stable": true
+  },
+  "current_authority_cutover": {
+    "status": "PASS",
+    "migration": "008_mtg_native_authority_current_cutover.sql",
+    "r3_activation_wrapper": "foundation/integrations/mtg/r3_native_activation.py",
+    "platform_status_current_rows": 1,
+    "platform_status_current_platform_id": "mtg",
+    "platform_status_current_adapter_version": "mtg-v1-native-authority-binding-1.0.0",
+    "legacy_generic_current_authority_retained": false,
+    "legacy_history_deleted": false
+  },
+  "secret_lair_execution_boundary": {
+    "buy_candidate_rows": 88,
+    "buy_semantic_mismatch_rows": 0,
+    "buy_manual_price_check_failure_rows": 0,
+    "automatic_purchase_true_rows": 0,
+    "execution_ready_true_rows": 0
+  },
+  "preservation": {
+    "non_mtg_history_preserved": true,
+    "non_mtg_nonforecast_current_preserved": true,
+    "non_mtg_forecast_semantics_preserved": true,
+    "migration_009_history_immutable": true,
+    "pre_cutover_backup_preserved": true,
+    "pre_migration_009_backup_preserved": true
+  },
+  "governance": {
+    "cross_asset_ranking_authorized": false,
+    "cross_domain_allocation_policy_created": false,
+    "automatic_purchase_execution": false,
+    "execution_ready_purchase_authority": false,
+    "native_semantics_reinterpreted": false,
+    "missing_values_synthesized": false,
+    "mtg_native_model_rerun": false,
+    "mtg_source_refresh_rerun": false
+  },
+  "final_certification": {
+    "status": "R3_MTG_AUTHORITATIVE_FINAL_CERTIFICATION_GATE_PASS",
+    "database_modified_by_final_certification": false,
+    "failure_count": 0,
+    "unresolved_warning_count": 0
+  },
+  "next_gate": "UIP_R3_CROSS_DOMAIN_RECONCILIATION_AND_CLOSEOUT"
+}
