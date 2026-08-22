@@ -236,28 +236,29 @@ Completed milestones:
 - `UIP_R2_REFRESHED_DATA_REHEARSAL`
 - `UIP_R3_METALS_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_PASS`
 - `UIP_R3_MTG_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_PASS`
+- `UIP_R3_CROSS_DOMAIN_RECONCILIATION_AND_CLOSEOUT_PASS`
 
 Current milestone:
 
-`UIP_R3_CROSS_DOMAIN_RECONCILIATION_AND_CLOSEOUT`
+`UIP_E1_STOCKS_ETF_EXTENSION_BOUNDARY`
 
-Current certified MTG production baseline:
+Current certified multi-domain production baseline:
 
-`df7406361639e4b165afb8007f97feca60242e91d290c58ae521e423d82578cc`
+`9af5e52882bdf61fed550a2ced9bc83ba1529c422633a7817660cf61d0e15a98`
 
-MTG R3 permanent evidence:
+R3 cross-domain permanent evidence:
 
-`docs/project_control/generated/r3_mtg_domain_health/mtg_r3_domain_health_certification.json`
+`docs/project_control/generated/r3_cross_domain_closeout/r3_cross_domain_closeout_certification.json`
+
+R3 cross-domain closeout record:
+
+`docs/project_control/R3_CROSS_DOMAIN_CLOSEOUT.md`
 
 Next authorized action:
 
-`EXECUTE_R3_CROSS_DOMAIN_RECONCILIATION_AND_CLOSEOUT`
+`EXECUTE_UIP_E1_STOCKS_ETF_EXTENSION_BOUNDARY`
 
-Expected subsequent action:
-
-`UIP_E1_STOCKS_ETF_EXTENSION_BOUNDARY`
-
-No universal cross-asset ranking, cross-domain investment weighting, or automatic execution is authorized by R3 closeout.
+No universal cross-asset ranking, cross-domain investment weighting, or automatic execution is authorized by R3 closeout or E1 boundary definition.
 
 ## Dependency principle
 
