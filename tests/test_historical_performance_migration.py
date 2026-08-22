@@ -66,6 +66,7 @@ def test_discovers_all_canonical_migrations() -> None:
         "007_metals_vehicle_identity_current_views.sql",
         "008_mtg_native_authority_current_cutover.sql",
         "009_forecasts_current_deterministic_tie_breaker.sql",
+        "010_platform_registry_case_reconciliation.sql",
     ]
 
 
