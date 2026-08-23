@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import hashlib
 import json
 from pathlib import Path
 
@@ -26,6 +27,14 @@ def _blank_to_none(value: object) -> object | None:
     return None if text == "" else text
 
 
+def _sha256(path: Path) -> str:
+    digest = hashlib.sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
 def _load_package_rows(path: Path) -> list[dict[str, str]]:
     with path.open("r", encoding="utf-8-sig", newline="") as handle:
         reader = csv.DictReader(handle)
@@ -46,17 +55,40 @@ def _source_identity(row: dict[str, str]) -> tuple[str, int, str]:
     return asset_id, horizon, method
 
 
-def repair_crypto_forecast_alias_backfill(*, database_path: Path) -> dict[str, object]:
+def repair_crypto_forecast_alias_backfill(
+    *,
+    database_path: Path,
+    package_path: Path,
+    expected_forecast_sha256: str,
+) -> dict[str, object]:
     database_path = database_path.resolve()
+    package_path = package_path.resolve()
+    expected_forecast_sha256 = expected_forecast_sha256.strip().lower()
+
     if not database_path.is_file():
         raise RuntimeError(f"UIP database not found: {database_path}")
+    if not package_path.is_dir():
+        raise RuntimeError(f"Certified Crypto package path is missing: {package_path}")
+    if len(expected_forecast_sha256) != 64:
+        raise RuntimeError("Expected forecast SHA-256 is not a 64-character digest.")
+
+    forecasts_path = package_path / "forecasts.csv"
+    if not forecasts_path.is_file():
+        raise RuntimeError(f"Missing Crypto forecasts.csv: {forecasts_path}")
+
+    actual_forecast_sha256 = _sha256(forecasts_path)
+    if actual_forecast_sha256 != expected_forecast_sha256:
+        raise RuntimeError(
+            "Explicit Crypto forecasts.csv does not match the expected certified SHA-256: "
+            f"expected={expected_forecast_sha256} actual={actual_forecast_sha256}"
+        )
 
     con = duckdb.connect(str(database_path))
     try:
         health = con.execute(
             """
-            SELECT health_status, registry_status, last_package_id, last_import_id,
-                   last_import_status, warning_count, error_count
+            SELECT health_status, registry_status, last_package_id, last_run_id,
+                   last_import_id, last_import_status, warning_count, error_count
             FROM universal_import_health
             WHERE lower(platform_id) = 'crypto'
             """
@@ -68,6 +100,7 @@ def repair_crypto_forecast_alias_backfill(*, database_path: Path) -> dict[str, o
             health_status,
             registry_status,
             package_id,
+            run_id,
             import_id,
             import_status,
             warning_count,
@@ -80,12 +113,12 @@ def repair_crypto_forecast_alias_backfill(*, database_path: Path) -> dict[str, o
             raise RuntimeError("Current Crypto import is not IMPORTED.")
         if int(warning_count or 0) != 0 or int(error_count or 0) != 0:
             raise RuntimeError("Current Crypto import health contains warnings or errors.")
-        if not package_id or not import_id:
-            raise RuntimeError("Current Crypto package/import identity is missing.")
+        if not package_id or not run_id or not import_id:
+            raise RuntimeError("Current Crypto package/run/import identity is missing.")
 
         package = con.execute(
             """
-            SELECT package_path, successful_import_id
+            SELECT manifest_sha256, successful_import_id
             FROM universal_packages
             WHERE package_id = ? AND lower(platform_id) = 'crypto'
             """,
@@ -94,20 +127,14 @@ def repair_crypto_forecast_alias_backfill(*, database_path: Path) -> dict[str, o
         if len(package) != 1:
             raise RuntimeError("Current Crypto package is not uniquely registered.")
 
-        package_path = Path(str(package[0][0])).resolve()
         successful_import_id = str(package[0][1])
         if successful_import_id != str(import_id):
             raise RuntimeError("Crypto package successful import does not match current import.")
-        if not package_path.is_dir():
-            raise RuntimeError(f"Registered Crypto package path is missing: {package_path}")
-
-        forecasts_path = package_path / "forecasts.csv"
-        if not forecasts_path.is_file():
-            raise RuntimeError(f"Missing Crypto forecasts.csv: {forecasts_path}")
 
         dataset = con.execute(
             """
-            SELECT expected_row_count, imported_row_count, contract_status,
+            SELECT source_filename, expected_row_count, imported_row_count,
+                   source_sha256, calculated_sha256, contract_status,
                    checksum_status, load_status, warning_count, error_count
             FROM universal_import_datasets
             WHERE import_id = ? AND dataset_name = 'forecasts'
@@ -118,8 +145,11 @@ def repair_crypto_forecast_alias_backfill(*, database_path: Path) -> dict[str, o
             raise RuntimeError("Expected exactly one Crypto forecasts import-dataset row.")
 
         (
+            source_filename,
             expected_rows,
             imported_rows,
+            source_sha256,
+            calculated_sha256,
             contract_status,
             checksum_status,
             load_status,
@@ -127,10 +157,25 @@ def repair_crypto_forecast_alias_backfill(*, database_path: Path) -> dict[str, o
             dataset_errors,
         ) = dataset[0]
 
+        if str(source_filename) != "forecasts.csv":
+            raise RuntimeError(f"Unexpected Crypto forecast source filename: {source_filename}")
         if (contract_status, checksum_status, load_status) != ("PASS", "PASS", "IMPORTED"):
             raise RuntimeError("Crypto forecast dataset did not pass contract/checksum/load gates.")
         if int(dataset_warnings or 0) != 0 or int(dataset_errors or 0) != 0:
             raise RuntimeError("Crypto forecast dataset contains warnings or errors.")
+        if str(source_sha256).lower() != expected_forecast_sha256:
+            raise RuntimeError("Registered Crypto forecast source SHA-256 does not match expectation.")
+        if str(calculated_sha256).lower() != expected_forecast_sha256:
+            raise RuntimeError("Registered Crypto forecast calculated SHA-256 does not match expectation.")
+
+        summary_path = package_path / "package_summary.json"
+        if not summary_path.is_file():
+            raise RuntimeError(f"Missing Crypto package_summary.json: {summary_path}")
+        summary = json.loads(summary_path.read_text(encoding="utf-8"))
+        if not isinstance(summary, dict) or summary.get("status") != "PASS":
+            raise RuntimeError("Explicit Crypto package summary is not PASS.")
+        if str(summary.get("run_id", "")) != str(run_id):
+            raise RuntimeError("Explicit Crypto package run_id does not match current UIP authority.")
 
         package_rows = _load_package_rows(forecasts_path)
         expected_row_count = int(expected_rows)
@@ -305,8 +350,10 @@ def repair_crypto_forecast_alias_backfill(*, database_path: Path) -> dict[str, o
             "status": "PASS",
             "platform_id": "crypto",
             "package_id": str(package_id),
+            "run_id": str(run_id),
             "import_id": str(import_id),
             "package_path": str(package_path),
+            "forecast_sha256": actual_forecast_sha256,
             "forecast_row_count": expected_row_count,
             "source_populated_counts": {
                 key: int(value) for key, value in source_populated_counts.items()
@@ -328,8 +375,14 @@ def repair_crypto_forecast_alias_backfill(*, database_path: Path) -> dict[str, o
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--database", required=True, type=Path)
+    parser.add_argument("--package-path", required=True, type=Path)
+    parser.add_argument("--expected-forecast-sha256", required=True)
     args = parser.parse_args()
-    result = repair_crypto_forecast_alias_backfill(database_path=args.database)
+    result = repair_crypto_forecast_alias_backfill(
+        database_path=args.database,
+        package_path=args.package_path,
+        expected_forecast_sha256=args.expected_forecast_sha256,
+    )
     print(json.dumps(result, indent=2, sort_keys=True))
 
 
