@@ -30,6 +30,12 @@ class RecommendationListRepository:
         limit: int,
         offset: int,
         query: str | None = None,
+        native_status: str | None = None,
+        native_rank_type: str | None = None,
+        has_forecast: bool | None = None,
+        has_risk: bool | None = None,
+        current_price_authority_available: bool | None = None,
+        manual_execution_price_check_required: bool | None = None,
     ) -> dict[str, object]:
         domain = domain_id.strip().lower()
         if not domain:
@@ -37,6 +43,12 @@ class RecommendationListRepository:
         search = None if query is None else query.strip()
         if search == "":
             search = None
+        status_filter = None if native_status is None else native_status.strip()
+        if status_filter == "":
+            status_filter = None
+        rank_type_filter = None if native_rank_type is None else native_rank_type.strip()
+        if rank_type_filter == "":
+            rank_type_filter = None
 
         with closing(self.connection_factory()) as db, db.cursor() as cursor:
             cursor.execute(
@@ -55,7 +67,7 @@ class RecommendationListRepository:
             parameters: list[object] = [publication_id, domain]
             if search is not None:
                 filters.append(
-                    "(" 
+                    "("
                     "r.asset_id ILIKE %s OR "
                     "COALESCE(a.payload_json->>'asset_name','') ILIKE %s OR "
                     "COALESCE(a.payload_json->>'asset_symbol','') ILIKE %s"
@@ -63,6 +75,46 @@ class RecommendationListRepository:
                 )
                 pattern = f"%{search}%"
                 parameters.extend([pattern, pattern, pattern])
+            if status_filter is not None:
+                filters.append(
+                    "COALESCE("
+                    "r.payload_json->>'native_purchase_status',"
+                    "r.payload_json->>'native_recommendation',"
+                    "r.payload_json->>'recommendation'"
+                    ")=%s"
+                )
+                parameters.append(status_filter)
+            if rank_type_filter is not None:
+                filters.append("r.payload_json->>'native_rank_type'=%s")
+                parameters.append(rank_type_filter)
+            if has_forecast is not None:
+                filters.append(
+                    ("EXISTS" if has_forecast else "NOT EXISTS")
+                    + " (SELECT 1 FROM presentation_records f "
+                    "WHERE f.publication_id=r.publication_id "
+                    "AND f.domain_id=r.domain_id "
+                    "AND f.asset_id=r.asset_id "
+                    "AND f.record_type='forecast')"
+                )
+            if has_risk is not None:
+                filters.append(
+                    ("EXISTS" if has_risk else "NOT EXISTS")
+                    + " (SELECT 1 FROM presentation_records k "
+                    "WHERE k.publication_id=r.publication_id "
+                    "AND k.domain_id=r.domain_id "
+                    "AND k.asset_id=r.asset_id "
+                    "AND k.record_type='risk')"
+                )
+            if current_price_authority_available is not None:
+                filters.append(
+                    "(a.payload_json->>'current_price_authority_available')::boolean=%s"
+                )
+                parameters.append(current_price_authority_available)
+            if manual_execution_price_check_required is not None:
+                filters.append(
+                    "(r.payload_json->>'manual_execution_price_check_required')::boolean=%s"
+                )
+                parameters.append(manual_execution_price_check_required)
             where_sql = " AND ".join(filters)
 
             cursor.execute(
@@ -79,7 +131,18 @@ class RecommendationListRepository:
                 parameters,
             )
             total = int(cursor.fetchone()[0])
-            if total == 0 and search is None:
+            if total == 0 and all(
+                value is None
+                for value in (
+                    search,
+                    status_filter,
+                    rank_type_filter,
+                    has_forecast,
+                    has_risk,
+                    current_price_authority_available,
+                    manual_execution_price_check_required,
+                )
+            ):
                 raise LookupError(
                     f"No recommendations for domain '{domain}' in active presentation"
                 )
@@ -137,7 +200,7 @@ class RecommendationListRepository:
             asset = dict(asset_payload)
 
             status_source = None
-            native_status = None
+            native_status_value = None
             for candidate in (
                 "native_purchase_status",
                 "native_recommendation",
@@ -145,7 +208,7 @@ class RecommendationListRepository:
             ):
                 value = recommendation.get(candidate)
                 if value is not None:
-                    native_status = value
+                    native_status_value = value
                     status_source = candidate
                     break
 
@@ -160,7 +223,7 @@ class RecommendationListRepository:
                     "asset_name": asset.get("asset_name"),
                     "asset_symbol": asset.get("asset_symbol"),
                     "asset_subclass": asset.get("asset_subclass"),
-                    "native_status": native_status,
+                    "native_status": native_status_value,
                     "native_status_source_field": status_source,
                     "confidence_score": recommendation.get("confidence_score"),
                     "native_rank": recommendation.get("native_rank"),
@@ -186,6 +249,14 @@ class RecommendationListRepository:
             "limit": limit,
             "offset": offset,
             "query": search,
+            "filters": {
+                "native_status": status_filter,
+                "native_rank_type": rank_type_filter,
+                "has_forecast": has_forecast,
+                "has_risk": has_risk,
+                "current_price_authority_available": current_price_authority_available,
+                "manual_execution_price_check_required": manual_execution_price_check_required,
+            },
             "items": items,
             "domain_native_semantics": True,
             "universal_cross_domain_rank": False,
@@ -229,6 +300,12 @@ def install_recommendation_list_routes(
         limit: int = Query(default=50, ge=1, le=200),
         offset: int = Query(default=0, ge=0),
         query: str | None = Query(default=None, max_length=200),
+        native_status: str | None = Query(default=None, max_length=200),
+        native_rank_type: str | None = Query(default=None, max_length=300),
+        has_forecast: bool | None = Query(default=None),
+        has_risk: bool | None = Query(default=None),
+        current_price_authority_available: bool | None = Query(default=None),
+        manual_execution_price_check_required: bool | None = Query(default=None),
         x_api_key: str | None = Header(default=None),
     ):
         denied = authorize(x_api_key)
@@ -240,6 +317,12 @@ def install_recommendation_list_routes(
                 limit=limit,
                 offset=offset,
                 query=query,
+                native_status=native_status,
+                native_rank_type=native_rank_type,
+                has_forecast=has_forecast,
+                has_risk=has_risk,
+                current_price_authority_available=current_price_authority_available,
+                manual_execution_price_check_required=manual_execution_price_check_required,
             )
         except ValueError as error:
             return JSONResponse(
