@@ -126,7 +126,8 @@
     assetInput.dataset.assetId=exact?String(exact.asset_id):"";
   });
 
-  form.addEventListener("submit",event=>{
+  document.addEventListener("submit",event=>{
+    if(event.target!==form)return;
     const selected=matches.get(assetInput.value.trim());
     if(!domainSelect.value){
       event.preventDefault();
@@ -144,9 +145,10 @@
     }
     clearTimeout(searchTimer);
     const visibleLabel=assetInput.value;
-    assetInput.value=String(selected.asset_id);
-    assetInput.dataset.assetId=String(selected.asset_id);
-    queueMicrotask(()=>{if(assetInput.value===String(selected.asset_id))assetInput.value=visibleLabel;});
+    const canonicalAssetId=String(selected.asset_id);
+    assetInput.value=canonicalAssetId;
+    assetInput.dataset.assetId=canonicalAssetId;
+    queueMicrotask(()=>{if(assetInput.value===canonicalAssetId)assetInput.value=visibleLabel;});
   },true);
 
   if(authForm)authForm.addEventListener("submit",()=>setTimeout(loadDomains,0));

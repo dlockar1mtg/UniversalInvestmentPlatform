@@ -130,4 +130,7 @@ def test_dashboard_loads_governed_picker_asset_and_uses_catalog_routes():
     assert "/v1/presentation/domains" in picker
     assert "/v1/presentation/assets?domain=" in picker
     assert "Choose an exact governed asset" in picker
-    assert "assetInput.value=String(selected.asset_id)" in picker
+    assert 'document.addEventListener("submit",event=>' in picker
+    assert "if(event.target!==form)return" in picker
+    assert "const canonicalAssetId=String(selected.asset_id)" in picker
+    assert "assetInput.value=canonicalAssetId" in picker
