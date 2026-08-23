@@ -2,19 +2,15 @@
 
 ## Priority sequence
 
-1. Stabilize recovered UIP work.
-2. Complete and certify the core asset integrations required for a trusted multi-domain foundation.
-3. Freeze the dashboard product specification and visual acceptance target.
-4. Establish the certified presentation/read-model boundary and implement the user-facing dashboard foundation.
-5. Add remaining domains, including Stocks/ETF, through the approved domain-neutral dashboard/read-model contracts rather than redesigning the interface.
-6. Establish automated end-to-end certification.
-7. Complete dashboard and user-facing services.
-8. Build final remote production infrastructure.
-9. Certify laptop-independent production.
+1. Preserve the certified R3 multi-domain analytical foundation.
+2. Preserve the approved Dashboard Product Specification V1 and V7 visual target.
+3. Build the dashboard product on the certified hosted presentation/read-model boundary.
+4. Complete transaction, portfolio, recommendation, refresh, and operations workflows.
+5. Add Stocks/ETF through the approved domain-neutral contracts.
+6. Complete end-to-end dashboard certification.
+7. Finalize remote production infrastructure and laptop-independent operation.
 
 ## Dashboard-first product interlock
-
-The approved dashboard is now a direct project goal, not a cosmetic final step.
 
 Approved product specification:
 
@@ -24,244 +20,123 @@ Approved V7 visual acceptance record:
 
 `docs/project_control/UIP_DASHBOARD_V7_VISUAL_ACCEPTANCE.md`
 
-The approved primary navigation is:
+Approved primary navigation:
 
 `Home | Recommendations | Portfolio | Transactions | Refresh | Operations`
 
-Implementation must preserve:
+Mandatory product constraints:
 
 - domain-native recommendation, rank, forecast, and risk semantics;
-- missing-as-missing behavior;
-- append-only transaction corrections;
-- portfolio pricing and basis coverage visibility;
-- fail-closed refresh with last-good-state preservation;
+- missing stays missing;
+- no universal cross-domain ranking or allocation policy;
 - no automatic trading;
-- no hidden universal cross-domain ranking or allocation policy;
-- future Stocks/ETF extensibility without redesigning the application shell.
+- append-only transaction corrections;
+- pricing and basis coverage visibility;
+- fail-closed refresh with last-good-state preservation;
+- future Stocks/ETF extensibility without redesigning the shell.
 
-The next implementation sequence is:
+## Dashboard implementation sequence
 
-1. `DASH-READ-1` — certified presentation/read-model publication contract;
-2. `DASH-SHELL-1` — application shell, authentication, six-screen navigation, persistent status;
-3. `TXN-1` — append-only user transaction ledger;
-4. `PORT-1` — holdings, basis, P/L, pricing coverage, portfolio history;
-5. `REC-UI-1` — domain-native recommendation and asset-detail experience;
-6. `REFRESH-UI-1` — refresh/data-health orchestration experience;
-7. `OPS-1` — preserve and move the existing Render technical dashboard into Operations;
-8. `UIP_E1_STOCKS_ETF_EXTENSION_BOUNDARY` — integrate Stocks/ETF against the approved contracts;
+1. `DASH-READ-1` — certified presentation/read-model publication contract — **CERTIFIED COMPLETE**.
+2. `DASH-SHELL-1` — application shell, authentication, six-screen navigation, persistent status — **CURRENT**.
+3. `TXN-1` — append-only user transaction ledger.
+4. `PORT-1` — holdings, basis, P/L, pricing coverage, portfolio history.
+5. `REC-UI-1` — domain-native recommendation and asset-detail experience.
+6. `REFRESH-UI-1` — refresh/data-health orchestration experience.
+7. `OPS-1` — preserve and move existing Render technical dashboard capability under Operations.
+8. `UIP_E1_STOCKS_ETF_EXTENSION_BOUNDARY` — integrate Stocks/ETF against the approved contracts.
 9. `DASH-CERT-1` — end-to-end Render usability and authority certification.
 
-## Phase A — Project control and recovery stabilization
+## Completed foundation
 
-Objectives:
+The following milestones are complete and must not be reopened without a new governed reason:
 
-- create the Project Control Center;
-- preserve recovery evidence;
-- verify the stable baseline;
-- inventory branches, databases, schemas, workflows, and local resources;
-- classify recovered work;
-- establish reconciliation order;
-- generate schema-control artifacts.
+- project-control/recovery stabilization;
+- UIP universal-core stabilization;
+- MTG A1/A2 integration certification;
+- Metals A0/A1 integration certification;
+- Crypto A0/A1 integration certification;
+- D1 common domain registry and lineage;
+- R1 refresh/orchestration contracts;
+- R2 refreshed-data rehearsal;
+- R3 Metals rationality/domain health;
+- R3 MTG rationality/domain health;
+- R3 cross-domain reconciliation and closeout;
+- Dashboard Product Specification V1 approval;
+- Dashboard V7 visual acceptance approval;
+- DASH-READ-1 hosted presentation/read-model certification.
 
-Known evidence:
+## DASH-READ-1 permanent authority
 
-- stable baseline `7bd8d0e`;
-- 1,201 baseline tests passed;
-- recovered historical-performance commit `c6606d0`;
-- four targeted recovered tests failed;
-- recovery archive integrity verified;
-- multi-branch reconciliation required.
+Status:
 
-Completion gate:
+`DASH_READ_1_CERTIFIED_COMPLETE`
 
-`PHASE_A_CERTIFIED`
+Permanent evidence:
 
-## Phase B — Universal core stabilization
+- `docs/project_control/DASH_READ_1_CERTIFICATION.md`
+- `docs/project_control/generated/dash_read_1/dash_read_1_certification.json`
 
-Objectives:
+Merged production commit:
 
-- establish ordered migration authority;
-- create schema manifest;
-- generate schema catalog;
-- complete semantic data dictionary;
-- certify import atomicity, rollback, replay protection, lineage, ledger, and current views;
-- reconcile duplicate or obsolete database roles without destructive cleanup.
+`497e92f4c49b2ce84413035840e74305e92bbaed`
 
-Completion gate:
+Active hosted publication:
 
-`UNIVERSAL_CORE_CERTIFIED`
+- ID: `dash-read-1-r3-certified-postgres-9af5e52882bd`
+- version: `1.0.0`
+- fingerprint: `cc3ab02cf9e7411641e384d27fd2ec48bf687ec98d7fa191ddcc6ff3b768bd3f`
+- records: `4031`
+- source authority SHA-256: `9af5e52882bdf61fed550a2ced9bc83ba1529c422633a7817660cf61d0e15a98`
 
-## Phase C — Metals native-domain completion
+Hosted Render certification proved `LIVE`, `READY`, authenticated active-publication reads, certified three-domain health, expected recommendation populations, asset detail, lineage, native MTG semantics, fail-closed unauthenticated access, and rejection of the uncertified Stocks domain.
 
-Objectives:
+## Current milestone — DASH-SHELL-1
 
-- verify native Metals ownership and storage;
-- certify providers and freshness;
-- certify native publication boundary;
-- reconcile operational databases and packages;
-- validate forecasts, risk, recommendations, outcome tracking, and retirement of legacy dependencies;
-- certify remote-readiness requirements.
+Milestone:
 
-Completion gate:
+`DASH_SHELL_1_APPROVED_V7_APPLICATION_SHELL`
 
-`METALS_NATIVE_DOMAIN_CERTIFIED`
+Authorized objective:
 
-## Phase D — MTG integration completion
+Implement the approved V7 application shell on Render using the certified DASH-READ-1 presentation boundary.
 
-Interpretation:
+Authorized scope:
 
-This phase reconciles, hardens, and certifies an advanced existing integration rather than starting from nothing.
+- replace the current `/dashboard` landing experience with the approved V7 application shell;
+- preserve the approved six-screen navigation;
+- implement persistent global UIP health/freshness status;
+- preserve viewer/operator authentication boundaries;
+- implement responsive desktop/mobile shell behavior;
+- use real DASH-READ-1 status/domain-health data where already supported;
+- use explicit empty or future-work states for TXN-1, PORT-1, REC-UI-1, REFRESH-UI-1, and E1-owned features rather than fabricating values;
+- preserve existing technical operational functionality for later placement under Operations.
 
-Objectives:
+DASH-SHELL-1 does **not** authorize:
 
-- reconstruct historical-performance integration under ordered migrations;
-- create the historical-performance contract;
-- separate permanent invariants from recovery-package expectations;
-- selectively port valuable MTG production-orchestration work from remote tip `b22ccc0`;
-- certify source audit, ownership, entrypoints, delivery, imports, lineage, privacy boundary, and performance history;
-- preserve diverged branches as evidence.
-
-Completion gate:
-
-`MTG_INTEGRATION_CERTIFIED`
-
-## Phase E — Crypto integration completion
-
-Interpretation:
-
-Crypto ingestion and line-ending-integrity work are already contained in `main`.
-
-Objectives:
-
-- verify source production state;
-- certify current delivery contract;
-- certify package byte integrity;
-- validate imports, lineage, recommendations, forecasts, risk, and current operations;
-- reconcile remote production requirements.
+- transaction-ledger accounting;
+- cost-basis/P&L derivation;
+- universal recommendation normalization;
+- refresh execution changes;
+- ETF/Stocks analytical authority;
+- synthetic Crypto/Metals current prices;
+- automatic purchases or sales.
 
 Completion gate:
 
-`CRYPTO_INTEGRATION_CERTIFIED`
+`DASH_SHELL_1_CERTIFIED`
 
-## Phase F — Remaining asset-domain integrations
+## Remaining domain work
 
-Domains may include:
+Stocks/ETF remains the next new analytical domain after the core dashboard workflow milestones. It must register through the approved read-model/dashboard contracts and may not redefine the application shell.
 
-- Stocks and ETFs;
-- Acorns;
-- Housing;
-- Macro;
-- cash and cash equivalents.
+Other possible later domains remain Acorns, Housing, Macro, and cash/cash equivalents, each subject to separate authority, contract, lineage, and certification.
 
-Each domain requires:
+## Final infrastructure sequence
 
-- ownership;
-- source authority;
-- contract;
-- full asset coverage;
-- certification;
-- lineage;
-- integration tests;
-- portfolio participation.
+Only after the dashboard is a known functioning, certified product should final infrastructure selection/hardening be completed. Final certification must prove source refresh, publication, imports, analytics, recommendations, dashboard, transactions, lineage, roles, backups, recovery, failure handling, remote operation, and laptop independence.
 
-The dashboard/read-model contract must allow each future domain to register into the approved application without requiring hard-coded redesign.
-
-Completion gate:
-
-`ALL_PRIORITY_DOMAINS_CERTIFIED`
-
-## Phase G — Automated certification framework
-
-Build and certify the non-dashboard certification framework:
-
-- source certification;
-- package certification;
-- contract and schema validation;
-- migration validation;
-- ledger reconciliation;
-- analytical validation;
-- lineage validation;
-- evidence generation;
-- retry and escalation testing;
-- cross-domain full-import certification.
-
-Evaluate and selectively port useful Phase 11 work after domain reconciliation.
-
-Completion gate:
-
-`AUTOMATED_CERTIFICATION_FRAMEWORK_CERTIFIED`
-
-## Phase H — Complete dashboard and user-facing services
-
-Current provisional platform:
-
-`Render`
-
-Approved dashboard authority:
-
-- product specification: `docs/project_control/UIP_DASHBOARD_PRODUCT_SPEC_V1.md`;
-- V7 visual acceptance: `docs/project_control/UIP_DASHBOARD_V7_VISUAL_ACCEPTANCE.md`.
-
-Objectives:
-
-- publish certified analytical authority into a versioned presentation/read model rather than reconstructing analytical truth independently in Render;
-- preserve analytical authority separately from application state;
-- implement Home, Recommendations, Portfolio, Transactions, Refresh, and Operations;
-- implement purchase and sale workflows through an auditable append-only transaction ledger;
-- derive holdings, cost basis, realized/unrealized P/L, pricing coverage, and known-basis return from application state plus certified prices;
-- implement recommendation completion, watch/review state, and performance impact without redefining native recommendation semantics;
-- implement lineage and freshness drill-down;
-- implement incident visibility and linked GitHub issues;
-- implement archive retrieval;
-- implement graceful degradation and explicit empty/stale/not-certified states;
-- certify viewer, operator, and administrator roles;
-- add dashboard, API, transaction UI, role, lineage, degradation, and visual-acceptance gates.
-
-Completion gate:
-
-`FULL_DASHBOARD_CERTIFIED`
-
-## Phase I — Remote infrastructure implementation
-
-Objectives:
-
-- compare provider and cost options;
-- decide whether to retain, restructure, pair, or replace Render;
-- provision persistent remote database;
-- provision final frontend and API;
-- provision object storage and archives;
-- provision backups;
-- configure GitHub environments and secrets;
-- configure monitoring;
-- support Codespaces or equivalent remote development;
-- remove final local production dependencies;
-- complete deployment and migration.
-
-Completion gate:
-
-`REMOTE_INFRASTRUCTURE_OPERATIONAL`
-
-## Phase J — Full remote production certification
-
-Run one combined end-to-end certification proving:
-
-- source refresh;
-- certified package publication;
-- universal imports;
-- analytics;
-- recommendations;
-- dashboard;
-- transactions;
-- lineage;
-- roles;
-- backups;
-- recovery;
-- archive retrieval;
-- failure handling;
-- remote operation;
-- laptop independence.
-
-Completion gate:
+Final gate:
 
 `UIP_REMOTE_PRODUCTION_CERTIFIED`
 
@@ -269,68 +144,24 @@ Completion gate:
 
 Active phase:
 
-`Dashboard product foundation on certified R3 authority`
-
-Completed milestones:
-
-- `INSPECT_RECOVERED_REPOSITORY`
-- `PROJECT_CONTROL_CENTER_COMMITTED`
-- `SCHEMA_CONTROL_ARTIFACTS_COMMITTED`
-- `MIGRATION_CHAIN_RECONCILIATION_PASS`
-- `MTG_RECONCILIATION_BRANCH_CREATED`
-- `UIP_MTG_A1_EXPORT_ACCEPTANCE_AND_SEMANTIC_PRESERVATION`
-- `UIP_MTG_A2_INTEGRATION_CERTIFICATION`
-- `UIP_METALS_A0_A1_DOMAIN_BINDING`
-- `UIP_CRYPTO_A0_A1_DOMAIN_BINDING`
-- `UIP_D1_COMMON_DOMAIN_REGISTRY_AND_LINEAGE_INTERFACE`
-- `UIP_R1_REFRESH_AND_ORCHESTRATION_CONTRACTS`
-- `UIP_R2_REFRESHED_DATA_REHEARSAL`
-- `UIP_R3_METALS_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_PASS`
-- `UIP_R3_MTG_OUTPUT_RATIONALITY_AND_DOMAIN_HEALTH_PASS`
-- `UIP_R3_CROSS_DOMAIN_RECONCILIATION_AND_CLOSEOUT_PASS`
-- `UIP_DASHBOARD_PRODUCT_SPECIFICATION_V1_APPROVED`
-- `UIP_DASHBOARD_V7_VISUAL_ACCEPTANCE_APPROVED`
+`Dashboard product implementation on certified hosted authority`
 
 Current milestone:
 
-`DASH_READ_1_CERTIFIED_PRESENTATION_READ_MODEL_PUBLICATION_CONTRACT`
+`DASH_SHELL_1_APPROVED_V7_APPLICATION_SHELL`
 
 Current certified multi-domain production baseline:
 
 `9af5e52882bdf61fed550a2ced9bc83ba1529c422633a7817660cf61d0e15a98`
 
-R3 cross-domain permanent evidence:
+Current implementation branch:
 
-`docs/project_control/generated/r3_cross_domain_closeout/r3_cross_domain_closeout_certification.json`
-
-R3 cross-domain closeout record:
-
-`docs/project_control/R3_CROSS_DOMAIN_CLOSEOUT.md`
-
-Approved dashboard specification:
-
-`docs/project_control/UIP_DASHBOARD_PRODUCT_SPEC_V1.md`
-
-Approved dashboard visual acceptance record:
-
-`docs/project_control/UIP_DASHBOARD_V7_VISUAL_ACCEPTANCE.md`
+`phase-uip-dash-shell-1`
 
 Next authorized action:
 
-`EXECUTE_DASH_READ_1_CERTIFIED_PRESENTATION_READ_MODEL_PUBLICATION_CONTRACT`
-
-Stocks/ETF remains explicitly reserved as the next new analytical domain and must integrate through the approved domain-neutral read-model/dashboard contracts.
-
-No universal cross-asset ranking, cross-domain investment weighting, or automatic execution is authorized by R3 closeout or dashboard approval.
-
-## Dependency principle
-
-The dashboard product contract and core user workflows must be established on certified authority before remaining domains are allowed to drive interface design. Stocks/ETF must plug into the approved contract rather than redefine it.
-
-The complete dashboard and analytics must be certified before final production infrastructure is selected and hardened. Final infrastructure should deploy a known functioning system rather than define the system prematurely.
+`IMPLEMENT_DASH_SHELL_1_APPROVED_V7_APPLICATION_SHELL`
 
 ## Recovery restriction
 
-No recovered branch may be merged wholesale solely to accelerate the roadmap.
-
-No destructive recovery cleanup is authorized by dashboard work.
+No recovered branch may be merged wholesale solely to accelerate the roadmap. No destructive recovery cleanup is authorized by dashboard work. Protected local recovery resources remain untouched.
