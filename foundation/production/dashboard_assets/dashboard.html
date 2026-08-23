@@ -71,8 +71,37 @@
           </section>
 
           <section id="transactions" class="page">
-            <div class="page-heading"><div><span class="eyebrow">TRANSACTIONS</span><h2>Record investment activity</h2></div><span class="page-note">TXN-1 reserved</span></div>
-            <article class="panel governed-empty"><span class="empty-icon">＋</span><h3>Append-only transaction ledger comes next</h3><p>`TXN-1` will support buys, sells, transfers, gifts, adjustments, fees, accounts, notes, and auditable correction chains. DASH-SHELL-1 does not create transaction records or infer ownership from analytical data.</p></article>
+            <div class="page-heading"><div><span class="eyebrow">TRANSACTIONS</span><h2>Record investment activity</h2></div><span class="page-note">TXN-1 · retained in Neon</span></div>
+            <div class="transaction-layout">
+              <section class="panel transaction-form-panel">
+                <div class="section-title"><div><h3>Record transaction</h3><span>Append-only application state</span></div><span class="pill good">PERSISTENT</span></div>
+                <p class="governance-note">Saving creates a permanent ledger row. Corrections are new rows linked to the original; UIP never silently edits or deletes a recorded transaction.</p>
+                <form id="transaction-form" class="transaction-form">
+                  <label>Type<select id="txn-type" required><option>BUY</option><option>SELL</option><option>TRANSFER</option><option>GIFT</option><option>ADJUSTMENT</option></select></label>
+                  <label>Domain<input id="txn-domain" placeholder="crypto, metals, mtg, etf…" required></label>
+                  <label class="wide">Asset<input id="txn-asset" placeholder="Asset name or governed asset ID" required></label>
+                  <label>Date / time<input id="txn-occurred" type="datetime-local" required></label>
+                  <label>Quantity<input id="txn-quantity" type="number" min="0" step="any" required></label>
+                  <label>Price / unit<input id="txn-price" type="number" min="0" step="any" placeholder="Leave blank if unknown"></label>
+                  <label>Fees<input id="txn-fees" type="number" min="0" step="any" value="0"></label>
+                  <label>Currency<input id="txn-currency" value="USD" maxlength="3" required></label>
+                  <label>Account<input id="txn-account" placeholder="Brokerage, wallet, collection…" required></label>
+                  <label id="txn-destination-wrap" hidden>Destination account<input id="txn-destination" placeholder="Required for transfer"></label>
+                  <label>Venue<input id="txn-venue" placeholder="Coinbase, dealer, store…"></label>
+                  <label>External reference<input id="txn-reference" placeholder="Optional receipt/order ID"></label>
+                  <label class="wide">Notes<textarea id="txn-notes" rows="3" placeholder="Optional notes"></textarea></label>
+                  <label class="wide correction-field">Corrects transaction ID<input id="txn-corrects" placeholder="Leave blank for a new transaction"></label>
+                  <label class="wide correction-field">Correction reason<input id="txn-correction-reason" placeholder="Required only when correcting a prior row"></label>
+                  <div class="wide transaction-actions"><button type="submit">Record transaction</button><span id="txn-form-message" class="form-message"></span></div>
+                </form>
+              </section>
+
+              <section class="panel transaction-history-panel">
+                <div class="section-title"><div><h3>Transaction history</h3><span id="txn-history-count">Loading…</span></div><button id="txn-history-refresh" class="secondary" type="button">Refresh</button></div>
+                <div id="txn-history-empty" class="empty">No transactions have been recorded yet.</div>
+                <div id="txn-history" class="transaction-history"></div>
+              </section>
+            </div>
           </section>
 
           <section id="refresh-page" class="page">
