@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 import sqlite3
 
@@ -18,7 +18,7 @@ from foundation.production.transactions import create_transaction
 NOW = datetime(2026, 8, 23, 12, 0, tzinfo=timezone.utc)
 
 
-def txn(*, transaction_id, transaction_type="BUY", domain_id="mtg", asset_id="mtg:test", quantity="1", price="100", fees="0", account="collection", destination=None, corrects=None, reason=None, occurred=NOW):
+def txn(*, transaction_id, transaction_type="BUY", domain_id="mtg", asset_id="mtg:test", quantity="1", price="100", fees="0", account="collection", destination=None, corrects=None, reason=None, occurred=NOW, recorded=None):
     return create_transaction(
         transaction_id=transaction_id,
         transaction_type=transaction_type,
@@ -34,7 +34,7 @@ def txn(*, transaction_id, transaction_type="BUY", domain_id="mtg", asset_id="mt
         recorded_by="test",
         corrects_transaction_id=corrects,
         correction_reason=reason,
-        recorded_at=NOW,
+        recorded_at=NOW if recorded is None else recorded,
     )
 
 
@@ -81,8 +81,15 @@ def test_unknown_basis_stays_unknown_not_zero():
 
 
 def test_known_basis_sell_calculates_realized_pl_and_remaining_basis():
-    buy = txn(transaction_id="buy", quantity="2", price="100", fees="0")
-    sell = txn(transaction_id="sell", transaction_type="SELL", quantity="1", price="150", fees="5")
+    buy = txn(transaction_id="buy", quantity="2", price="100", fees="0", occurred=NOW)
+    sell = txn(
+        transaction_id="sell",
+        transaction_type="SELL",
+        quantity="1",
+        price="150",
+        fees="5",
+        occurred=NOW + timedelta(minutes=1),
+    )
     portfolio = derive_portfolio((buy, sell))
     position = portfolio.positions[0]
     assert position.quantity == Decimal("1")
@@ -91,7 +98,7 @@ def test_known_basis_sell_calculates_realized_pl_and_remaining_basis():
 
 
 def test_transfer_moves_basis_without_changing_total_quantity():
-    buy = txn(transaction_id="buy", quantity="2", price="50", account="vault")
+    buy = txn(transaction_id="buy", quantity="2", price="50", account="vault", occurred=NOW)
     transfer = txn(
         transaction_id="transfer",
         transaction_type="TRANSFER",
@@ -99,6 +106,7 @@ def test_transfer_moves_basis_without_changing_total_quantity():
         price=None,
         account="vault",
         destination="display-case",
+        occurred=NOW + timedelta(minutes=1),
     )
     portfolio = derive_portfolio((buy, transfer))
     assert sum((item.quantity for item in portfolio.positions), Decimal("0")) == Decimal("2")
@@ -108,11 +116,30 @@ def test_transfer_moves_basis_without_changing_total_quantity():
 
 
 def test_partial_basis_sell_fails_closed_without_lot_policy():
-    known = txn(transaction_id="known", quantity="1", price="100")
-    unknown = txn(transaction_id="unknown", transaction_type="GIFT", quantity="1", price=None)
-    sell = txn(transaction_id="sell", transaction_type="SELL", quantity="1", price="150")
+    known = txn(transaction_id="known", quantity="1", price="100", occurred=NOW)
+    unknown = txn(
+        transaction_id="unknown",
+        transaction_type="GIFT",
+        quantity="1",
+        price=None,
+        occurred=NOW + timedelta(minutes=1),
+    )
+    sell = txn(
+        transaction_id="sell",
+        transaction_type="SELL",
+        quantity="1",
+        price="150",
+        occurred=NOW + timedelta(minutes=2),
+    )
     with pytest.raises(ValueError, match="partial-basis"):
         derive_portfolio((known, unknown, sell))
+
+
+def test_same_timestamp_disposal_order_fails_closed_as_ambiguous():
+    buy = txn(transaction_id="buy", quantity="1", price="100")
+    sell = txn(transaction_id="sell", transaction_type="SELL", quantity="1", price="150")
+    with pytest.raises(ValueError, match="ambiguous transaction ordering"):
+        derive_portfolio((buy, sell))
 
 
 def test_correction_fork_is_rejected_as_ambiguous():
