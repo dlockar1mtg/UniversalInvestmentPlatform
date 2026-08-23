@@ -38,6 +38,10 @@ def test_dashboard_shell_and_assets_are_public_but_contain_no_credentials(tmp_pa
     assert "Connect to load certified domains" in picker.text
     assert 'authForm.addEventListener("submit",()=>setTimeout(loadDomains,0))' in picker.text
     assert 'refreshButton.addEventListener("click",()=>setTimeout(loadDomains,0))' in picker.text
+    assert "const exactExisting=matches.get(query)" in picker.text
+    assert "Governed asset selected." in picker.text
+    assert "clearTimeout(searchTimer)" in picker.text
+    assert "assetInput.dataset.assetId!==String(selected.asset_id)" in picker.text
 
 
 def test_dashboard_data_requires_read_permission(tmp_path):
