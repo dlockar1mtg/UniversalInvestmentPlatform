@@ -33,9 +33,10 @@ def test_dashboard_home_uses_certified_presentation_status_and_domain_health():
     assert "content_fingerprint" in javascript
 
 
-def test_remaining_reserved_workflows_are_explicit_while_txn_and_portfolio_are_real():
+def test_remaining_reserved_workflows_are_explicit_while_txn_portfolio_and_rec_ui_are_real():
     html, _, javascript = assets()
-    assert "REC-UI-1 reserved" in html
+    assert "REC-UI-1 · certified catalog" in html
+    assert "REC-UI-1 reserved" not in html
     assert "REFRESH-UI-1 reserved" in html
     assert "TXN-1 · retained in Neon" in html
     assert 'id="transaction-form"' in html
@@ -44,6 +45,7 @@ def test_remaining_reserved_workflows_are_explicit_while_txn_and_portfolio_are_r
     assert 'request("/v1/portfolio/enriched")' in javascript
     assert "PORT-1 · transaction-derived" in javascript
     assert "renderDerivedPortfolio" in javascript
+    assert '/dashboard/assets/recommendation_ui.js' in html
 
 
 def test_transaction_derived_portfolio_exposes_v7_kpis_and_holdings_contract():
