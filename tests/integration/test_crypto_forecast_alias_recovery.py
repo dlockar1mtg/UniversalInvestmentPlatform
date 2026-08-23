@@ -10,8 +10,8 @@ def read(path: str) -> str:
 
 def test_crypto_forecast_alias_recovery_is_current_package_scoped_and_fail_closed():
     source = read("scripts/repair_r3_crypto_forecast_alias_backfill.py")
-    assert 'WHERE lower(platform_id) = \'crypto\'' in source
     assert "last_package_id" in source
+    assert "last_run_id" in source
     assert "last_import_id" in source
     assert "HEALTHY" in source
     assert "ACTIVE" in source
@@ -22,6 +22,17 @@ def test_crypto_forecast_alias_recovery_is_current_package_scoped_and_fail_close
     assert "Refusing to overwrite non-null" in source
     assert 'con.execute("BEGIN TRANSACTION")' in source
     assert 'con.execute("ROLLBACK")' in source
+
+
+def test_crypto_forecast_alias_recovery_binds_explicit_certified_package_and_sha():
+    source = read("scripts/repair_r3_crypto_forecast_alias_backfill.py")
+    assert 'parser.add_argument("--package-path", required=True, type=Path)' in source
+    assert 'parser.add_argument("--expected-forecast-sha256", required=True)' in source
+    assert "actual_forecast_sha256 = _sha256(forecasts_path)" in source
+    assert "Registered Crypto forecast source SHA-256 does not match expectation." in source
+    assert "Registered Crypto forecast calculated SHA-256 does not match expectation." in source
+    assert "Explicit Crypto package run_id does not match current UIP authority." in source
+    assert '"forecast_sha256": actual_forecast_sha256' in source
 
 
 def test_crypto_forecast_alias_recovery_uses_governed_contract_aliases_only():
