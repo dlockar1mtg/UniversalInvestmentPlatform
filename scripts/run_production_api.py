@@ -17,6 +17,7 @@ from foundation.production.transaction_persistence import PostgresTransactionRep
 from foundation.presentation.asset_catalog import GovernedAssetCatalogRepository, install_governed_asset_catalog_routes
 from foundation.presentation.read_api import PresentationReadRepository, install_presentation_read_routes
 from foundation.presentation.recommendation_summary import RecommendationSummaryRepository, install_recommendation_summary_routes
+from foundation.presentation.recommendation_list import RecommendationListRepository, install_recommendation_list_routes
 
 repository = None
 portfolio_repository = None
@@ -24,6 +25,7 @@ transaction_repository = None
 presentation_repository = None
 asset_catalog_repository = None
 recommendation_summary_repository = None
+recommendation_list_repository = None
 if os.getenv("RENDER_EXTERNAL_HOSTNAME"):
     free_settings = FreeStagingSettings.from_environment()
     os.environ.update(free_settings.application_environment())
@@ -35,6 +37,7 @@ if os.getenv("RENDER_EXTERNAL_HOSTNAME"):
     presentation_repository = PresentationReadRepository.from_dsn(free_settings.database_url)
     asset_catalog_repository = GovernedAssetCatalogRepository.from_dsn(free_settings.database_url)
     recommendation_summary_repository = RecommendationSummaryRepository.from_dsn(free_settings.database_url)
+    recommendation_list_repository = RecommendationListRepository.from_dsn(free_settings.database_url)
 settings = HTTPServiceSettings.from_environment()
 app = create_http_app(settings, repository=repository)
 if portfolio_repository is not None:
@@ -46,6 +49,12 @@ if recommendation_summary_repository is not None:
         app,
         settings.credentials,
         recommendation_summary_repository,
+    )
+if recommendation_list_repository is not None:
+    install_recommendation_list_routes(
+        app,
+        settings.credentials,
+        recommendation_list_repository,
     )
 if asset_catalog_repository is not None:
     install_governed_asset_catalog_routes(app, settings.credentials, asset_catalog_repository)
