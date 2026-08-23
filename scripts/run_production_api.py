@@ -11,19 +11,24 @@ from foundation.production.http_service import HTTPServiceSettings, create_http_
 from foundation.production.live_security import LiveSecuritySettings, install_live_security
 from foundation.production.hosted_portfolio import install_hosted_portfolio_routes
 from foundation.production.portfolio_persistence import PostgresPortfolioSnapshotRepository
+from foundation.presentation.read_api import PresentationReadRepository, install_presentation_read_routes
 
 repository = None
 portfolio_repository = None
+presentation_repository = None
 if os.getenv("RENDER_EXTERNAL_HOSTNAME"):
     free_settings = FreeStagingSettings.from_environment()
     os.environ.update(free_settings.application_environment())
     repository, _ = build_neon_repositories(free_settings)
     portfolio_repository = PostgresPortfolioSnapshotRepository.from_dsn(free_settings.database_url)
     portfolio_repository.initialize()
+    presentation_repository = PresentationReadRepository.from_dsn(free_settings.database_url)
 settings = HTTPServiceSettings.from_environment()
 app = create_http_app(settings, repository=repository)
 if portfolio_repository is not None:
     install_hosted_portfolio_routes(app, settings, portfolio_repository)
+if presentation_repository is not None:
+    install_presentation_read_routes(app, settings.credentials, presentation_repository)
 if os.getenv("EBAY_DELETION_VERIFICATION_TOKEN") and os.getenv("EBAY_DELETION_ENDPOINT_URL"):
     install_ebay_compliance_routes(app, EbayComplianceSettings.from_environment())
 install_live_security(app, LiveSecuritySettings.from_environment())
