@@ -97,6 +97,64 @@ class PresentationReadRepository:
             "payload": dict(payload),
         } for domain, asset_id, record_key, payload in rows)
 
+    def recommendation_catalog(self, *, domain_id: str | None, limit: int, offset: int) -> tuple[dict[str, object], ...]:
+        parameters: list[object] = []
+        where = ["r.publication_id=a.publication_id", "a.singleton_id=1", "r.record_type='recommendation'"]
+        if domain_id is not None:
+            where.append("r.domain_id=%s")
+            parameters.append(domain_id)
+        parameters.extend([limit, offset])
+        with closing(self.connection_factory()) as db, db.cursor() as cursor:
+            cursor.execute(
+                f"""
+                SELECT r.domain_id, r.asset_id, r.record_key, r.payload_json,
+                       (
+                           SELECT ar.payload_json
+                           FROM presentation_records ar
+                           WHERE ar.publication_id=r.publication_id
+                             AND ar.domain_id=r.domain_id
+                             AND ar.asset_id=r.asset_id
+                             AND ar.record_type='asset'
+                           ORDER BY ar.record_key
+                           LIMIT 1
+                       ) AS asset_payload_json
+                FROM presentation_records r
+                JOIN presentation_active_publication a ON TRUE
+                WHERE {' AND '.join(where)}
+                ORDER BY r.domain_id, r.record_key
+                LIMIT %s OFFSET %s
+                """,
+                parameters,
+            )
+            rows = cursor.fetchall()
+
+        items: list[dict[str, object]] = []
+        for domain, asset_id, record_key, payload, asset_payload in rows:
+            identity = {} if asset_payload is None else dict(asset_payload)
+            canonical_asset_id = None if asset_id is None else str(asset_id)
+            display_name = (
+                identity.get("asset_name")
+                or identity.get("product_name")
+                or identity.get("name")
+                or canonical_asset_id
+            )
+            symbol = identity.get("asset_symbol") or identity.get("symbol")
+            subclass = (
+                identity.get("asset_subclass")
+                or identity.get("lane")
+                or identity.get("mtg_lane")
+            )
+            items.append({
+                "domain_id": str(domain),
+                "asset_id": canonical_asset_id,
+                "record_key": str(record_key),
+                "asset_name": None if display_name is None else str(display_name),
+                "asset_symbol": None if symbol is None else str(symbol),
+                "asset_subclass": None if subclass is None else str(subclass),
+                "payload": dict(payload),
+            })
+        return tuple(items)
+
     def asset_detail(self, domain_id: str, asset_id: str) -> dict[str, object] | None:
         with closing(self.connection_factory()) as db, db.cursor() as cursor:
             publication_id = self._active_id(cursor)
@@ -155,6 +213,12 @@ def install_presentation_read_routes(
             return JSONResponse({"error": {"code": "FORBIDDEN", "message": "read permission is required"}}, status_code=403)
         return None
 
+    def normalize_domain(domain: str | None):
+        normalized = None if domain is None else domain.strip().lower()
+        if normalized is not None and normalized not in {"crypto", "metals", "mtg"}:
+            return None, JSONResponse({"error": {"code": "INVALID_DOMAIN", "message": "domain must be crypto, metals, or mtg"}}, status_code=400)
+        return normalized, None
+
     @app.get("/v1/presentation/status")
     def presentation_status(x_api_key: str | None = Header(default=None)):
         denied = authorize(x_api_key)
@@ -180,10 +244,25 @@ def install_presentation_read_routes(
         denied = authorize(x_api_key)
         if denied:
             return denied
-        normalized = None if domain is None else domain.strip().lower()
-        if normalized is not None and normalized not in {"crypto", "metals", "mtg"}:
-            return JSONResponse({"error": {"code": "INVALID_DOMAIN", "message": "domain must be crypto, metals, or mtg"}}, status_code=400)
+        normalized, invalid = normalize_domain(domain)
+        if invalid:
+            return invalid
         return {"items": repository.recommendations(domain_id=normalized, limit=limit, offset=offset), "limit": limit, "offset": offset}
+
+    @app.get("/v1/presentation/recommendation-catalog")
+    def presentation_recommendation_catalog(
+        domain: str | None = Query(default=None),
+        limit: int = Query(default=50, ge=1, le=200),
+        offset: int = Query(default=0, ge=0),
+        x_api_key: str | None = Header(default=None),
+    ):
+        denied = authorize(x_api_key)
+        if denied:
+            return denied
+        normalized, invalid = normalize_domain(domain)
+        if invalid:
+            return invalid
+        return {"items": repository.recommendation_catalog(domain_id=normalized, limit=limit, offset=offset), "limit": limit, "offset": offset}
 
     @app.get("/v1/presentation/assets/{domain_id}/{asset_id}")
     def presentation_asset(domain_id: str, asset_id: str, x_api_key: str | None = Header(default=None)):

@@ -1,0 +1,75 @@
+from pathlib import Path
+
+
+ROOT = Path(__file__).resolve().parents[2]
+
+
+def read(path: str) -> str:
+    return (ROOT / path).read_text(encoding="utf-8")
+
+
+def test_recommendation_catalog_joins_governed_identity_without_mutating_native_payload():
+    source = read("foundation/presentation/read_api.py")
+    assert "def recommendation_catalog" in source
+    assert "record_type='recommendation'" in source
+    assert "ar.record_type='asset'" in source
+    assert 'identity.get("asset_name")' in source
+    assert 'identity.get("product_name")' in source
+    assert '"payload": dict(payload)' in source
+    assert '@app.get("/v1/presentation/recommendation-catalog")' in source
+
+
+def test_rec_ui_uses_native_domain_contracts_and_never_creates_universal_rank():
+    javascript = read("foundation/production/dashboard_assets/recommendation_ui.js")
+    assert 'REC_DOMAINS=["crypto","metals","mtg"]' in javascript
+    assert "/v1/presentation/recommendation-catalog" in javascript
+    assert "native_recommendation" in javascript
+    assert "native_purchase_status" in javascript
+    assert "native_rank" in javascript
+    assert "native_rank_type" in javascript
+    assert "evidence_state" in javascript
+    assert "actionability_state" in javascript
+    assert "manual_execution_price_check_required" in javascript
+    assert "execution_ready_purchase_certified" in javascript
+    assert "automatic_purchase_execution" in javascript
+    assert "does not create a universal recommendation score or cross-domain ranking" in javascript
+
+
+def test_rec_ui_all_view_groups_domains_instead_of_cross_domain_ordering():
+    javascript = read("foundation/production/dashboard_assets/recommendation_ui.js")
+    assert "renderDomainSummary" in javascript
+    assert "REC_DOMAINS.map(domain=>renderDomainSummary" in javascript
+    assert 'selectedDomain="all"' in javascript
+    assert 'if(selectedDomain==="mtg")' in javascript
+    assert "MTG native rank is used only inside MTG where provided" in javascript
+    assert "Catalog order is presentation order; UIP does not manufacture a rank for this domain" in javascript
+
+
+def test_rec_ui_has_search_native_status_filter_and_bounded_pagination():
+    javascript = read("foundation/production/dashboard_assets/recommendation_ui.js")
+    assert 'id="rec-search"' in javascript
+    assert 'id="rec-status"' in javascript
+    assert "REC_PAGE_SIZE=50" in javascript
+    assert "offset>5000" in javascript
+    assert 'id="rec-prev"' in javascript
+    assert 'id="rec-next"' in javascript
+
+
+def test_rec_ui_is_lazy_and_does_not_break_login_when_unauthenticated():
+    javascript = read("foundation/production/dashboard_assets/recommendation_ui.js")
+    assert 'sessionStorage.getItem("uiip-dashboard-key")' in javascript
+    assert "Connect to UIP to load certified recommendations" in javascript
+    assert '.nav-item[data-page="recommendations"]' in javascript
+    assert "loadCatalog(false)" in javascript
+
+
+def test_dashboard_serves_and_loads_rec_ui_asset_after_core_dashboard_script():
+    service = read("foundation/production/http_service.py")
+    html = read("foundation/production/dashboard_assets/dashboard.html")
+    assert '@app.get("/dashboard/assets/recommendation_ui.js"' in service
+    core = html.index('/dashboard/assets/dashboard.js')
+    rec = html.index('/dashboard/assets/recommendation_ui.js')
+    picker = html.index('/dashboard/assets/governed_asset_picker.js')
+    assert core < rec < picker
+    assert "REC-UI-1" in html
+    assert "universal score or cross-domain rank" in html
