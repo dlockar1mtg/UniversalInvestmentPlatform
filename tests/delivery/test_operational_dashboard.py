@@ -42,6 +42,10 @@ def test_dashboard_shell_and_assets_are_public_but_contain_no_credentials(tmp_pa
     assert "Governed asset selected." in picker.text
     assert "clearTimeout(searchTimer)" in picker.text
     assert "assetInput.dataset.assetId!==String(selected.asset_id)" in picker.text
+    assert 'document.addEventListener("submit",event=>' in picker.text
+    assert "if(event.target!==form)return" in picker.text
+    assert "const canonicalAssetId=String(selected.asset_id)" in picker.text
+    assert "assetInput.value=canonicalAssetId" in picker.text
 
 
 def test_dashboard_data_requires_read_permission(tmp_path):
