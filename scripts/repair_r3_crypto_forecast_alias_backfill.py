@@ -196,26 +196,29 @@ def repair_crypto_forecast_alias_backfill(
         if missing:
             raise RuntimeError(f"Crypto forecast package missing columns: {sorted(missing)}")
 
-        source_keys = [_source_identity(row) for row in package_rows]
-        if len(set(source_keys)) != len(source_keys):
-            raise RuntimeError("Crypto forecast package contains duplicate asset/horizon/method keys.")
+        history_lineage = con.execute(
+            """
+            SELECT COUNT(*) AS rows,
+                   COUNT(DISTINCT _source_row_number) AS distinct_source_rows,
+                   MIN(_source_row_number) AS minimum_source_row,
+                   MAX(_source_row_number) AS maximum_source_row
+            FROM forecasts_history
+            WHERE lower(platform_id) = 'crypto'
+              AND _package_id = ?
+              AND _import_id = ?
+              AND _source_filename = 'forecasts.csv'
+            """,
+            [package_id, import_id],
+        ).fetchone()
 
-        history_count = int(
-            con.execute(
-                """
-                SELECT COUNT(*)
-                FROM forecasts_history
-                WHERE lower(platform_id) = 'crypto'
-                  AND _package_id = ?
-                  AND _import_id = ?
-                """,
-                [package_id, import_id],
-            ).fetchone()[0]
-        )
-        if history_count != expected_row_count:
+        if int(history_lineage[0]) != expected_row_count:
             raise RuntimeError(
-                f"Expected {expected_row_count} Crypto forecast history rows; got {history_count}"
+                f"Expected {expected_row_count} Crypto forecast history rows; got {history_lineage[0]}"
             )
+        if int(history_lineage[1]) != expected_row_count:
+            raise RuntimeError("Crypto forecast history source-row lineage is not unique.")
+        if int(history_lineage[2]) != 2 or int(history_lineage[3]) != expected_row_count + 1:
+            raise RuntimeError("Crypto forecast source-row lineage range is unexpected.")
 
         source_populated_counts = {destination: 0 for destination in FIELD_MAP.values()}
         pre_populated_counts = dict(
@@ -230,6 +233,7 @@ def repair_crypto_forecast_alias_backfill(
                     WHERE lower(platform_id) = 'crypto'
                       AND _package_id = ?
                       AND _import_id = ?
+                      AND _source_filename = 'forecasts.csv'
                     """,
                     [package_id, import_id],
                 ).fetchone(),
@@ -238,28 +242,40 @@ def repair_crypto_forecast_alias_backfill(
         )
 
         updates: list[tuple[object, ...]] = []
-        for source in package_rows:
+        for source_row_number, source in enumerate(package_rows, start=2):
             asset_id, horizon, method = _source_identity(source)
             existing = con.execute(
                 """
-                SELECT point_forecast, lower_bound, upper_bound, expected_return,
+                SELECT universal_asset_id, forecast_horizon_months, forecast_method,
+                       point_forecast, lower_bound, upper_bound, expected_return,
                        probability_positive, confidence_score, scenario
                 FROM forecasts_history
                 WHERE lower(platform_id) = 'crypto'
                   AND _package_id = ?
                   AND _import_id = ?
-                  AND universal_asset_id = ?
-                  AND forecast_horizon_months = ?
-                  AND forecast_method = ?
+                  AND _source_filename = 'forecasts.csv'
+                  AND _source_row_number = ?
                 """,
-                [package_id, import_id, asset_id, horizon, method],
+                [package_id, import_id, source_row_number],
             ).fetchall()
             if len(existing) != 1:
                 raise RuntimeError(
-                    f"Crypto forecast row is not uniquely addressable: {asset_id}/{horizon}/{method}"
+                    f"Crypto forecast source row is not uniquely addressable: {source_row_number}"
                 )
 
-            current_values = dict(zip(FIELD_MAP.values(), existing[0], strict=True))
+            row = existing[0]
+            if (
+                str(row[0]) != asset_id
+                or int(row[1]) != horizon
+                or str(row[2]) != method
+            ):
+                raise RuntimeError(
+                    f"Crypto forecast lineage mismatch at source row {source_row_number}: "
+                    f"source={asset_id}/{horizon}/{method} "
+                    f"history={row[0]}/{row[1]}/{row[2]}"
+                )
+
+            current_values = dict(zip(FIELD_MAP.values(), row[3:], strict=True))
             replacement: dict[str, object | None] = {}
             for source_column, destination_column in FIELD_MAP.items():
                 source_value = _blank_to_none(source.get(source_column))
@@ -268,8 +284,9 @@ def repair_crypto_forecast_alias_backfill(
                     source_populated_counts[destination_column] += 1
                     if current_value is not None and str(current_value) != str(source_value):
                         raise RuntimeError(
-                            f"Refusing to overwrite non-null {destination_column} for "
-                            f"{asset_id}/{horizon}/{method}: db={current_value!r} source={source_value!r}"
+                            f"Refusing to overwrite non-null {destination_column} at "
+                            f"source row {source_row_number}: db={current_value!r} "
+                            f"source={source_value!r}"
                         )
                 replacement[destination_column] = (
                     current_value if current_value is not None else source_value
@@ -286,9 +303,7 @@ def repair_crypto_forecast_alias_backfill(
                     replacement["scenario"],
                     package_id,
                     import_id,
-                    asset_id,
-                    horizon,
-                    method,
+                    source_row_number,
                 )
             )
 
@@ -309,9 +324,8 @@ def repair_crypto_forecast_alias_backfill(
                     scenario = ?
                 WHERE _package_id = ?
                   AND _import_id = ?
-                  AND universal_asset_id = ?
-                  AND forecast_horizon_months = ?
-                  AND forecast_method = ?
+                  AND _source_filename = 'forecasts.csv'
+                  AND _source_row_number = ?
                 """,
                 updates,
             )
@@ -325,6 +339,7 @@ def repair_crypto_forecast_alias_backfill(
                 WHERE lower(platform_id) = 'crypto'
                   AND _package_id = ?
                   AND _import_id = ?
+                  AND _source_filename = 'forecasts.csv'
                 """,
                 [package_id, import_id],
             ).fetchone()
@@ -341,6 +356,42 @@ def repair_crypto_forecast_alias_backfill(
                         f"expected {expected_populated}, got {post_populated_counts[destination]}"
                     )
 
+            current_count = int(
+                con.execute(
+                    """
+                    SELECT COUNT(*)
+                    FROM forecasts_current
+                    WHERE lower(platform_id) = 'crypto'
+                    """
+                ).fetchone()[0]
+            )
+            if current_count != 120:
+                raise RuntimeError(
+                    f"Expected 120 Crypto current forecasts after recovery; got {current_count}"
+                )
+
+            current_36 = int(
+                con.execute(
+                    """
+                    SELECT COUNT(*)
+                    FROM forecasts_current
+                    WHERE lower(platform_id) = 'crypto'
+                      AND forecast_horizon_months = 36
+                      AND forecast_method = 'LONG_RANGE_SCENARIO_MODEL'
+                      AND point_forecast IS NOT NULL
+                      AND lower_bound IS NOT NULL
+                      AND upper_bound IS NOT NULL
+                      AND expected_return IS NOT NULL
+                      AND confidence_score IS NOT NULL
+                      AND scenario IS NOT NULL
+                    """
+                ).fetchone()[0]
+            )
+            if current_36 != 6:
+                raise RuntimeError(
+                    f"Expected 6 populated 36-month Crypto current forecasts; got {current_36}"
+                )
+
             con.execute("COMMIT")
         except Exception:
             con.execute("ROLLBACK")
@@ -354,7 +405,8 @@ def repair_crypto_forecast_alias_backfill(
             "import_id": str(import_id),
             "package_path": str(package_path),
             "forecast_sha256": actual_forecast_sha256,
-            "forecast_row_count": expected_row_count,
+            "forecast_history_row_count": expected_row_count,
+            "forecast_current_row_count": 120,
             "source_populated_counts": {
                 key: int(value) for key, value in source_populated_counts.items()
             },
@@ -364,6 +416,7 @@ def repair_crypto_forecast_alias_backfill(
             "post_populated_counts": {
                 key: int(value) for key, value in post_populated_counts.items()
             },
+            "current_36_month_populated_count": current_36,
             "synthetic_values_created": False,
             "native_model_rerun": False,
             "source_refresh": False,
