@@ -1,0 +1,84 @@
+{
+  "milestone": "DASH_READ_1_CERTIFIED_PRESENTATION_READ_MODEL_PUBLICATION_CONTRACT",
+  "status": "PASS_FOR_PR_REVIEW",
+  "certification_date": "2026-08-23",
+  "repository": "dlockar1mtg/UniversalInvestmentPlatform",
+  "branch": "phase-uip-dash-read-1",
+  "certified_branch_head": "350ef7e7fba3c9493484e7ce61b95acadf7b44a7",
+  "main_merge_base": "bb26db207b717ccaae44937c7d8b22cea4f8f6b5",
+  "authoritative_database": {
+    "classification": "AUTHORITATIVE_MULTI_DOMAIN_PRODUCTION_STATE_R3_CERTIFIED",
+    "sha256": "9af5e52882bdf61fed550a2ced9bc83ba1529c422633a7817660cf61d0e15a98",
+    "modified_by_dash_read_1": false
+  },
+  "presentation_publication": {
+    "publication_id": "dash-read-1-r3-certified-postgres-9af5e52882bd",
+    "publication_version": "1.0.0",
+    "content_fingerprint": "cc3ab02cf9e7411641e384d27fd2ec48bf687ec98d7fa191ddcc6ff3b768bd3f",
+    "record_count": 4031,
+    "status": "ACTIVE",
+    "source_database_sha256": "9af5e52882bdf61fed550a2ced9bc83ba1529c422633a7817660cf61d0e15a98",
+    "atomic_activation_pass": true,
+    "failed_replacement_preserves_last_good": true,
+    "invalid_publication_activated": false,
+    "existing_application_tables_changed": false
+  },
+  "presentation_populations": {
+    "crypto": {
+      "asset": 6,
+      "domain_health": 1,
+      "forecast": 120,
+      "recommendation": 6,
+      "risk": 6
+    },
+    "metals": {
+      "asset": 16,
+      "domain_health": 1,
+      "forecast": 16,
+      "recommendation": 12,
+      "risk": 11
+    },
+    "mtg": {
+      "asset": 968,
+      "domain_health": 1,
+      "forecast": 931,
+      "native_authority": 968,
+      "recommendation": 968
+    }
+  },
+  "render_read_api": {
+    "authenticated": true,
+    "active_publication_only": true,
+    "surfaces": [
+      "/v1/presentation/status",
+      "/v1/presentation/domain-health",
+      "/v1/presentation/recommendations",
+      "/v1/presentation/assets/{domain_id}/{asset_id}",
+      "/v1/presentation/lineage/{domain_id}/{asset_id}"
+    ],
+    "real_neon_read_rehearsal_pass": true,
+    "recommendation_counts": {
+      "crypto": 6,
+      "metals": 12,
+      "mtg": 968
+    },
+    "asset_detail_readable": true,
+    "lineage_readable": true
+  },
+  "governance_invariants": {
+    "missing_authority_synthesis_prohibited": true,
+    "crypto_current_price_synthesized": false,
+    "metals_current_price_synthesized": false,
+    "mtg_native_authority_preserved": true,
+    "cross_domain_ranking_created": false,
+    "automatic_execution_created": false,
+    "presentation_store_is_projection_only": true,
+    "render_is_not_analytical_authority": true
+  },
+  "focused_regression": {
+    "tests_passed": 28,
+    "warnings": 1,
+    "warning_classification": "StarletteDeprecationWarning for current TestClient dependency; non-blocking for DASH-READ-1 semantics"
+  },
+  "next_gate": "PR_CI_AND_POST_MERGE_RENDER_ENDPOINT_CERTIFICATION"
+}
