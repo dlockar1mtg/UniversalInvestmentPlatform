@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
-from typing import Mapping
+from typing import Callable, Mapping
 from uuid import uuid4
 
 from fastapi import Header, Request
@@ -14,6 +14,9 @@ from .http_service import HTTPServiceSettings
 from .observability import OperationalEvent
 from .security import APIKeyAuthenticator, Permission
 from .transactions import TransactionType, create_transaction
+
+
+AssetIdentityValidator = Callable[[str, str], bool]
 
 
 def _authenticator(settings: HTTPServiceSettings) -> APIKeyAuthenticator:
@@ -47,7 +50,13 @@ def _optional_decimal(value: object) -> Decimal | None:
     return Decimal(str(value))
 
 
-def install_hosted_transaction_routes(app, settings: HTTPServiceSettings, repository) -> None:
+def install_hosted_transaction_routes(
+    app,
+    settings: HTTPServiceSettings,
+    repository,
+    *,
+    asset_identity_validator: AssetIdentityValidator | None = None,
+) -> None:
     authenticator = _authenticator(settings)
     app.state.transaction_repository = repository
 
@@ -78,10 +87,14 @@ def install_hosted_transaction_routes(app, settings: HTTPServiceSettings, reposi
             body = await request.json()
             if not isinstance(body, dict):
                 raise ValueError("transaction body must be a JSON object")
+            domain_id = str(body.get("domain_id", "")).strip().lower()
+            asset_id = str(body.get("asset_id", "")).strip()
+            if asset_identity_validator is not None and not asset_identity_validator(domain_id, asset_id):
+                raise ValueError("domain_id and asset_id must identify an asset in the active certified UIP asset catalog")
             item = create_transaction(
                 transaction_type=body.get("transaction_type", ""),
-                domain_id=str(body.get("domain_id", "")),
-                asset_id=str(body.get("asset_id", "")),
+                domain_id=domain_id,
+                asset_id=asset_id,
                 occurred_at=_parse_datetime(body.get("occurred_at")),
                 quantity=body.get("quantity", ""),
                 price_per_unit=_optional_decimal(body.get("price_per_unit")),
@@ -95,7 +108,7 @@ def install_hosted_transaction_routes(app, settings: HTTPServiceSettings, reposi
                 recorded_by=principal.principal_id,
                 corrects_transaction_id=body.get("corrects_transaction_id"),
                 correction_reason=body.get("correction_reason"),
-                metadata={"source": "hosted-dashboard"},
+                metadata={"source": "hosted-dashboard", "identity_source": "active-certified-asset-catalog"},
             )
             repository.append(item)
         except (ValueError, InvalidOperation, KeyError) as exc:
