@@ -24,7 +24,10 @@ def client(tmp_path):
 def test_dashboard_shell_and_assets_are_public_but_contain_no_credentials(tmp_path):
     service = client(tmp_path)
     page = service.get("/dashboard")
-    assert page.status_code == 200 and "UIIP Operations" in page.text
+    assert page.status_code == 200
+    assert "Universal Investment Platform" in page.text
+    for label in ("Home", "Recommendations", "Portfolio", "Transactions", "Refresh", "Operations"):
+        assert f'>{label}<' in page.text
     assert "view-key" not in page.text and "operate-key" not in page.text
     assert service.get("/dashboard/assets/dashboard.css").status_code == 200
     assert service.get("/dashboard/assets/dashboard.js").status_code == 200
@@ -78,7 +81,7 @@ def test_metric_endpoint_returns_stable_counter_documents(tmp_path):
 
 def test_dashboard_javascript_has_loading_error_empty_and_session_only_key_states(tmp_path):
     script = client(tmp_path).get("/dashboard/assets/dashboard.js").text
-    assert "Loading operational data" in script
+    assert "Loading certified presentation authority" in script
     assert "No operational events recorded yet" in script
     assert "sessionStorage" in script and "localStorage" not in script
     assert "response.ok" in script
