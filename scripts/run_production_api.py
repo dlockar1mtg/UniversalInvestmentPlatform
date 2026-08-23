@@ -10,11 +10,14 @@ from foundation.production.free_staging import FreeStagingSettings, build_neon_r
 from foundation.production.http_service import HTTPServiceSettings, create_http_app
 from foundation.production.live_security import LiveSecuritySettings, install_live_security
 from foundation.production.hosted_portfolio import install_hosted_portfolio_routes
+from foundation.production.hosted_transactions import install_hosted_transaction_routes
 from foundation.production.portfolio_persistence import PostgresPortfolioSnapshotRepository
+from foundation.production.transaction_persistence import PostgresTransactionRepository
 from foundation.presentation.read_api import PresentationReadRepository, install_presentation_read_routes
 
 repository = None
 portfolio_repository = None
+transaction_repository = None
 presentation_repository = None
 if os.getenv("RENDER_EXTERNAL_HOSTNAME"):
     free_settings = FreeStagingSettings.from_environment()
@@ -22,11 +25,15 @@ if os.getenv("RENDER_EXTERNAL_HOSTNAME"):
     repository, _ = build_neon_repositories(free_settings)
     portfolio_repository = PostgresPortfolioSnapshotRepository.from_dsn(free_settings.database_url)
     portfolio_repository.initialize()
+    transaction_repository = PostgresTransactionRepository.from_dsn(free_settings.database_url)
+    transaction_repository.initialize()
     presentation_repository = PresentationReadRepository.from_dsn(free_settings.database_url)
 settings = HTTPServiceSettings.from_environment()
 app = create_http_app(settings, repository=repository)
 if portfolio_repository is not None:
     install_hosted_portfolio_routes(app, settings, portfolio_repository)
+if transaction_repository is not None:
+    install_hosted_transaction_routes(app, settings, transaction_repository)
 if presentation_repository is not None:
     install_presentation_read_routes(app, settings.credentials, presentation_repository)
 if os.getenv("EBAY_DELETION_VERIFICATION_TOKEN") and os.getenv("EBAY_DELETION_ENDPOINT_URL"):

@@ -33,14 +33,16 @@ def test_dashboard_home_uses_certified_presentation_status_and_domain_health():
     assert "content_fingerprint" in javascript
 
 
-def test_later_workflows_are_explicit_governed_empty_states_not_mock_financial_values():
-    html, _, _ = assets()
+def test_unimplemented_workflows_remain_explicit_governed_states_while_txn_1_is_real():
+    html, _, javascript = assets()
     assert "REC-UI-1 reserved" in html
     assert "PORT-1 reserved" in html
-    assert "TXN-1 reserved" in html
     assert "REFRESH-UI-1 reserved" in html
     assert "Unknown basis will remain unknown" in html
-    assert "does not create transaction records" in html
+    assert "TXN-1 · retained in Neon" in html
+    assert 'id="transaction-form"' in html
+    assert 'request("/v1/transactions"' in javascript
+    assert "corrects_transaction_id" in javascript
 
 
 def test_dashboard_preserves_legacy_operations_portfolio_for_reconciliation_only():
@@ -64,9 +66,18 @@ def test_portfolio_content_is_escaped_and_credential_remains_session_only():
     assert '"X-API-Key":apiKey' in javascript
 
 
+def test_transaction_content_is_escaped_and_unknown_price_is_not_zero():
+    _, _, javascript = assets()
+    assert "renderTransactions" in javascript
+    assert "esc(item.asset_id)" in javascript
+    assert "Price unknown" in javascript
+    assert 'price_per_unit:$("txn-price").value===""?null' in javascript
+
+
 def test_empty_stale_loading_and_error_states_are_explicit():
     html, _, javascript = assets()
     assert "No hosted portfolio snapshot is available" in html
+    assert "No transactions have been recorded yet" in html
     assert '"Stale":"Ready"' in javascript
     assert "older than 7 days" in javascript
     assert "Loading certified presentation authority" in javascript
@@ -85,4 +96,5 @@ def test_dashboard_layout_is_responsive_scroll_safe_and_print_safe():
     assert ".table-wrap{overflow-x:auto" in css
     assert "@media(max-width:760px)" in css
     assert ".portfolio-layout{grid-template-columns:1fr}" in css
+    assert ".transaction-form{grid-template-columns:1fr}" in css
     assert "@media print" in css and "table{min-width:0}" in css
