@@ -8,7 +8,6 @@
   const refreshButton=byId("refresh");
   if(!domainInput||!assetInput||!form)return;
 
-  const credentialKey="uiip-dashboard-key";
   const domainSelect=document.createElement("select");
   domainSelect.id="txn-domain";
   domainSelect.required=true;
@@ -26,6 +25,7 @@
   let searchTimer=null;
   let searchGeneration=0;
 
+  const credentialKey="uiip-dashboard-key";
   const currentKey=()=>sessionStorage.getItem(credentialKey)||"";
   const api=async path=>{
     const key=currentKey();
@@ -150,4 +150,11 @@
   if(authForm)authForm.addEventListener("submit",()=>setTimeout(loadDomains,0));
   if(refreshButton)refreshButton.addEventListener("click",()=>setTimeout(loadDomains,0));
   loadDomains();
+
+  if(!document.getElementById("rec-ui-1-script")){
+    const script=document.createElement("script");
+    script.id="rec-ui-1-script";
+    script.src="/dashboard/assets/recommendation_ui.js?v=rec-ui-1";
+    document.body.appendChild(script);
+  }
 })();
