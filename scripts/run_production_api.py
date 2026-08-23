@@ -13,12 +13,14 @@ from foundation.production.hosted_portfolio import install_hosted_portfolio_rout
 from foundation.production.hosted_transactions import install_hosted_transaction_routes
 from foundation.production.portfolio_persistence import PostgresPortfolioSnapshotRepository
 from foundation.production.transaction_persistence import PostgresTransactionRepository
+from foundation.presentation.asset_catalog import GovernedAssetCatalogRepository, install_governed_asset_catalog_routes
 from foundation.presentation.read_api import PresentationReadRepository, install_presentation_read_routes
 
 repository = None
 portfolio_repository = None
 transaction_repository = None
 presentation_repository = None
+asset_catalog_repository = None
 if os.getenv("RENDER_EXTERNAL_HOSTNAME"):
     free_settings = FreeStagingSettings.from_environment()
     os.environ.update(free_settings.application_environment())
@@ -28,14 +30,22 @@ if os.getenv("RENDER_EXTERNAL_HOSTNAME"):
     transaction_repository = PostgresTransactionRepository.from_dsn(free_settings.database_url)
     transaction_repository.initialize()
     presentation_repository = PresentationReadRepository.from_dsn(free_settings.database_url)
+    asset_catalog_repository = GovernedAssetCatalogRepository.from_dsn(free_settings.database_url)
 settings = HTTPServiceSettings.from_environment()
 app = create_http_app(settings, repository=repository)
 if portfolio_repository is not None:
     install_hosted_portfolio_routes(app, settings, portfolio_repository)
-if transaction_repository is not None:
-    install_hosted_transaction_routes(app, settings, transaction_repository)
 if presentation_repository is not None:
     install_presentation_read_routes(app, settings.credentials, presentation_repository)
+if asset_catalog_repository is not None:
+    install_governed_asset_catalog_routes(app, settings.credentials, asset_catalog_repository)
+if transaction_repository is not None:
+    install_hosted_transaction_routes(
+        app,
+        settings,
+        transaction_repository,
+        asset_identity_validator=None if asset_catalog_repository is None else asset_catalog_repository.asset_exists,
+    )
 if os.getenv("EBAY_DELETION_VERIFICATION_TOKEN") and os.getenv("EBAY_DELETION_ENDPOINT_URL"):
     install_ebay_compliance_routes(app, EbayComplianceSettings.from_environment())
 install_live_security(app, LiveSecuritySettings.from_environment())
