@@ -33,16 +33,53 @@ def test_dashboard_home_uses_certified_presentation_status_and_domain_health():
     assert "content_fingerprint" in javascript
 
 
-def test_unimplemented_workflows_remain_explicit_governed_states_while_txn_1_is_real():
+def test_remaining_reserved_workflows_are_explicit_while_txn_and_portfolio_are_real():
     html, _, javascript = assets()
     assert "REC-UI-1 reserved" in html
-    assert "PORT-1 reserved" in html
     assert "REFRESH-UI-1 reserved" in html
-    assert "Unknown basis will remain unknown" in html
     assert "TXN-1 · retained in Neon" in html
     assert 'id="transaction-form"' in html
     assert 'request("/v1/transactions"' in javascript
     assert "corrects_transaction_id" in javascript
+    assert 'request("/v1/portfolio/enriched")' in javascript
+    assert "PORT-1 · transaction-derived" in javascript
+    assert "renderDerivedPortfolio" in javascript
+
+
+def test_transaction_derived_portfolio_exposes_v7_kpis_and_holdings_contract():
+    _, _, javascript = assets()
+    for marker in (
+        "Market value",
+        "Cost basis",
+        "Unrealized P/L",
+        "Realized P/L",
+        "Total return",
+        "Positions",
+        "Allocation by domain",
+        "Pricing coverage",
+        "Basis coverage",
+        "Current price",
+        "Market value",
+        "Model status",
+        "Last updated",
+    ):
+        assert marker in javascript
+    assert "item.asset_name||item.asset_id" in javascript
+    assert "item.asset_subclass" in javascript
+    assert "item.recommendation" in javascript
+    assert "item.freshness" in javascript
+    assert "document.effective_transaction_count" in javascript
+    assert "document.superseded_transaction_count" in javascript
+
+
+def test_transaction_derived_portfolio_preserves_missing_and_currency_semantics():
+    _, _, javascript = assets()
+    assert 'item.current_price==null?"Unpriced"' in javascript
+    assert 'item.cost_basis==null?"Unknown"' in javascript
+    assert "Requires complete price + basis coverage" in javascript
+    assert "governed FX conversion layer" in javascript
+    assert "currencies.length===1" in javascript
+    assert "Allocation unavailable until UIP has a governed FX conversion layer" in javascript
 
 
 def test_dashboard_preserves_legacy_operations_portfolio_for_reconciliation_only():
@@ -61,6 +98,7 @@ def test_portfolio_content_is_escaped_and_credential_remains_session_only():
     html, _, javascript = assets()
     assert "snapshot.positions.map" in javascript
     assert "esc(item.name" in javascript and "esc(item.symbol" in javascript
+    assert "esc(item.asset_name||item.asset_id)" in javascript
     assert "sessionStorage" in javascript and "localStorage" not in javascript
     assert "dashboard-viewer" not in html and "uiip-dashboard-key" not in html
     assert '"X-API-Key":apiKey' in javascript
@@ -78,6 +116,8 @@ def test_empty_stale_loading_and_error_states_are_explicit():
     html, _, javascript = assets()
     assert "No hosted portfolio snapshot is available" in html
     assert "No transactions have been recorded yet" in html
+    assert "No transaction-derived holdings yet" in javascript
+    assert "Portfolio accounting is blocked" in javascript
     assert '"Stale":"Ready"' in javascript
     assert "older than 7 days" in javascript
     assert "Loading certified presentation authority" in javascript

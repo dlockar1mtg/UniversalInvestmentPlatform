@@ -10,6 +10,7 @@ from foundation.production.free_staging import FreeStagingSettings, build_neon_r
 from foundation.production.http_service import HTTPServiceSettings, create_http_app
 from foundation.production.live_security import LiveSecuritySettings, install_live_security
 from foundation.production.hosted_portfolio import install_hosted_portfolio_routes
+from foundation.production.hosted_portfolio_accounting import install_transaction_portfolio_routes, install_enriched_portfolio_routes
 from foundation.production.hosted_transactions import install_hosted_transaction_routes
 from foundation.production.portfolio_persistence import PostgresPortfolioSnapshotRepository
 from foundation.production.transaction_persistence import PostgresTransactionRepository
@@ -46,6 +47,18 @@ if transaction_repository is not None:
         transaction_repository,
         asset_identity_validator=None if asset_catalog_repository is None else asset_catalog_repository.asset_exists,
     )
+    install_transaction_portfolio_routes(
+        app,
+        settings.credentials,
+        transaction_repository,
+    )
+    if presentation_repository is not None:
+        install_enriched_portfolio_routes(
+            app,
+            settings.credentials,
+            transaction_repository,
+            presentation_repository,
+        )
 if os.getenv("EBAY_DELETION_VERIFICATION_TOKEN") and os.getenv("EBAY_DELETION_ENDPOINT_URL"):
     install_ebay_compliance_routes(app, EbayComplianceSettings.from_environment())
 install_live_security(app, LiveSecuritySettings.from_environment())
