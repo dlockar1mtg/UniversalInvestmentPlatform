@@ -132,14 +132,15 @@ class PostgresPresentationRepository:
             if health != {"crypto": 1, "metals": 1, "mtg": 1}:
                 raise ValueError("Staged publication must contain one health record per certified domain")
             cursor.execute(
-                """SELECT COUNT(*) FROM presentation_records
-                   WHERE publication_id=%s AND domain_id='mtg' AND record_type='asset'""",
+                """SELECT domain_id, COUNT(*) FROM presentation_records
+                   WHERE publication_id=%s AND record_type='asset'
+                   GROUP BY domain_id ORDER BY domain_id""",
                 (publication_id,),
             )
-            mtg_assets = int(cursor.fetchone()[0])
-            if mtg_assets != 968:
-                raise ValueError("Staged publication does not preserve the certified MTG current population")
-            return {"record_count": actual, "mtg_asset_count": mtg_assets}
+            asset_counts = {str(domain): int(count) for domain, count in cursor.fetchall()}
+            if set(asset_counts) != {"crypto", "metals", "mtg"} or any(count <= 0 for count in asset_counts.values()):
+                raise ValueError("Staged publication must contain a non-empty current asset surface for every certified domain")
+            return {"record_count": actual, **{f"{domain}_asset_count": count for domain, count in asset_counts.items()}}
 
     def activate(self, publication_id: str) -> None:
         """Atomically switch the active pointer; rollback preserves the previous version."""
