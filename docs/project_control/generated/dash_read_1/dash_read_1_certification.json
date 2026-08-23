@@ -1,11 +1,11 @@
 {
   "milestone": "DASH_READ_1_CERTIFIED_PRESENTATION_READ_MODEL_PUBLICATION_CONTRACT",
-  "status": "PASS_FOR_PR_REVIEW",
+  "status": "CERTIFIED_COMPLETE",
   "certification_date": "2026-08-23",
   "repository": "dlockar1mtg/UniversalInvestmentPlatform",
-  "branch": "phase-uip-dash-read-1",
-  "certified_branch_head": "350ef7e7fba3c9493484e7ce61b95acadf7b44a7",
-  "main_merge_base": "bb26db207b717ccaae44937c7d8b22cea4f8f6b5",
+  "implementation_branch": "phase-uip-dash-read-1",
+  "merged_pr": 46,
+  "merged_main_commit": "497e92f4c49b2ce84413035840e74305e92bbaed",
   "authoritative_database": {
     "classification": "AUTHORITATIVE_MULTI_DOMAIN_PRODUCTION_STATE_R3_CERTIFIED",
     "sha256": "9af5e52882bdf61fed550a2ced9bc83ba1529c422633a7817660cf61d0e15a98",
@@ -24,27 +24,9 @@
     "existing_application_tables_changed": false
   },
   "presentation_populations": {
-    "crypto": {
-      "asset": 6,
-      "domain_health": 1,
-      "forecast": 120,
-      "recommendation": 6,
-      "risk": 6
-    },
-    "metals": {
-      "asset": 16,
-      "domain_health": 1,
-      "forecast": 16,
-      "recommendation": 12,
-      "risk": 11
-    },
-    "mtg": {
-      "asset": 968,
-      "domain_health": 1,
-      "forecast": 931,
-      "native_authority": 968,
-      "recommendation": 968
-    }
+    "crypto": {"asset": 6, "domain_health": 1, "forecast": 120, "recommendation": 6, "risk": 6},
+    "metals": {"asset": 16, "domain_health": 1, "forecast": 16, "recommendation": 12, "risk": 11},
+    "mtg": {"asset": 968, "domain_health": 1, "forecast": 931, "native_authority": 968, "recommendation": 968}
   },
   "render_read_api": {
     "authenticated": true,
@@ -56,12 +38,12 @@
       "/v1/presentation/assets/{domain_id}/{asset_id}",
       "/v1/presentation/lineage/{domain_id}/{asset_id}"
     ],
-    "real_neon_read_rehearsal_pass": true,
-    "recommendation_counts": {
-      "crypto": 6,
-      "metals": 12,
-      "mtg": 968
-    },
+    "hosted_render_live": true,
+    "hosted_render_ready": true,
+    "hosted_endpoint_certification_pass": true,
+    "unauthenticated_access_rejected": true,
+    "uncertified_stocks_domain_rejected": true,
+    "recommendation_counts": {"crypto": 6, "metals": 12, "mtg": 968},
     "asset_detail_readable": true,
     "lineage_readable": true
   },
@@ -80,5 +62,6 @@
     "warnings": 1,
     "warning_classification": "StarletteDeprecationWarning for current TestClient dependency; non-blocking for DASH-READ-1 semantics"
   },
-  "next_gate": "PR_CI_AND_POST_MERGE_RENDER_ENDPOINT_CERTIFICATION"
+  "disposition": "DASH_READ_1_CERTIFIED_COMPLETE",
+  "next_gate": "DASH_SHELL_1_APPROVED_V7_APPLICATION_SHELL"
 }

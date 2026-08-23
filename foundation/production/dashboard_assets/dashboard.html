@@ -3,51 +3,121 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>UIIP Operations</title>
+  <title>UIP Dashboard</title>
   <link rel="stylesheet" href="/dashboard/assets/dashboard.css">
 </head>
 <body>
-  <header class="topbar">
-    <div><span class="eyebrow">UNIVERSAL INVESTMENT PLATFORM</span><h1>Operations</h1></div>
-    <button id="refresh" class="secondary">Refresh</button>
-  </header>
-  <main>
-    <section id="auth" class="panel auth-panel">
-      <div><h2>Connect securely</h2><p>Enter a viewer or operator API key. It stays in this browser tab and is never written to the page.</p></div>
-      <form id="auth-form"><label for="api-key">API key</label><div class="input-row"><input id="api-key" type="password" autocomplete="off" required><button type="submit">Connect</button></div></form>
-    </section>
-    <div id="message" class="message" role="status" aria-live="polite">Waiting for authentication.</div>
-    <section id="content" hidden>
-      <div class="status-line"><span id="status-dot" class="dot"></span><span id="service-status">Checking service</span><span id="updated"></span></div>
-      <div class="cards">
-        <article class="card"><span>API requests</span><strong id="request-count">—</strong><small>Since service start</small></article>
-        <article class="card"><span>Recorded events</span><strong id="event-count">—</strong><small>Redacted audit activity</small></article>
-        <article class="card"><span>Portfolio source</span><strong id="portfolio-status">—</strong><small>Configured holdings CSV</small></article>
-        <article class="card"><span>Providers</span><strong id="provider-status">—</strong><small>Alpha Vantage + FRED</small></article>
-      </div>
-      <section id="portfolio-panel" class="panel portfolio-panel">
-        <div class="section-title"><div><h2>Portfolio snapshot</h2><span id="portfolio-meta">No persisted snapshot</span></div><span id="portfolio-fingerprint"></span></div>
-        <div id="portfolio-empty" class="empty">No hosted portfolio snapshot is available yet.</div>
-        <div id="portfolio-data" hidden>
-          <div class="portfolio-cards">
-            <article><span>Market value</span><strong id="portfolio-market">—</strong></article>
-            <article><span>Cost basis</span><strong id="portfolio-cost">—</strong></article>
-            <article><span>Gain / loss</span><strong id="portfolio-gain">—</strong><small id="portfolio-return">—</small></article>
-            <article><span>Positions</span><strong id="portfolio-count">—</strong></article>
-          </div>
-          <div class="portfolio-layout">
-            <section><h3>Allocation by group</h3><div id="portfolio-allocation" class="allocation"></div></section>
-            <section><h3>Snapshot history</h3><div id="portfolio-history" class="history"></div></section>
-          </div>
-          <div class="table-wrap"><table><thead><tr><th>Position</th><th>Group</th><th>Quantity</th><th>Cost basis</th><th>Market value</th><th>Gain / loss</th></tr></thead><tbody id="portfolio-positions"></tbody></table></div>
-        </div>
-      </section>
-      <div class="grid">
-        <section class="panel"><div class="section-title"><h2>Recent activity</h2><span>Newest first</span></div><div id="events" class="events"></div></section>
-        <section class="panel"><div class="section-title"><h2>Request metrics</h2><span>By method and status</span></div><div id="metrics" class="metrics"></div></section>
-      </div>
-    </section>
-  </main>
+  <div class="app-shell">
+    <aside class="sidebar" aria-label="Primary navigation">
+      <div class="brand"><span class="brand-mark">U</span><div><strong>UIP</strong><small>Universal Investment Platform</small></div></div>
+      <nav id="primary-nav" class="nav" hidden>
+        <button class="nav-item active" data-page="home">Home</button>
+        <button class="nav-item" data-page="recommendations">Recommendations</button>
+        <button class="nav-item" data-page="portfolio">Portfolio</button>
+        <button class="nav-item" data-page="transactions">Transactions</button>
+        <button class="nav-item" data-page="refresh-page">Refresh</button>
+        <button class="nav-item" data-page="operations">Operations</button>
+      </nav>
+      <div class="sidebar-foot"><span>Certified authority</span><small id="sidebar-publication">Not connected</small></div>
+    </aside>
+
+    <div class="workspace">
+      <header class="topbar">
+        <div><span class="eyebrow">UNIVERSAL INVESTMENT PLATFORM</span><h1 id="page-title">Dashboard</h1></div>
+        <div class="top-actions"><span id="principal" class="principal"></span><button id="refresh" class="secondary" hidden>Refresh</button></div>
+      </header>
+
+      <main>
+        <section id="auth" class="panel auth-panel">
+          <div><span class="eyebrow">SECURE ACCESS</span><h2>Connect to UIP</h2><p>Enter a viewer or operator API key. The key stays in this browser tab and is not rendered back into the interface.</p></div>
+          <form id="auth-form"><label for="api-key">API key</label><div class="input-row"><input id="api-key" type="password" autocomplete="off" required><button type="submit">Connect</button></div></form>
+        </section>
+
+        <div id="message" class="message" role="status" aria-live="polite">Waiting for authentication.</div>
+
+        <section id="app-content" hidden>
+          <section class="global-status" aria-label="UIP certified status">
+            <div><span id="status-dot" class="dot"></span><strong id="global-status-text">Checking certified authority</strong></div>
+            <span id="global-refresh">—</span>
+            <span id="global-publication">—</span>
+          </section>
+
+          <section id="home" class="page active-page">
+            <div class="page-heading"><div><span class="eyebrow">TODAY</span><h2>What needs your attention</h2></div><span class="page-note">Certified authority only</span></div>
+            <div class="hero-grid">
+              <article class="decision-panel">
+                <span class="eyebrow">CERTIFIED PLATFORM STATUS</span>
+                <h3 id="home-authority-title">Loading active publication…</h3>
+                <p id="home-authority-copy">UIP is reading the active hosted presentation publication.</p>
+                <div class="hero-meta"><span id="home-record-count">— records</span><span id="home-source-sha">Source —</span></div>
+              </article>
+              <article class="panel attention-panel">
+                <div class="section-title"><h3>System attention</h3><span>Current hosted state</span></div>
+                <div id="attention-items" class="attention-list"></div>
+              </article>
+            </div>
+            <div class="section-title home-health-title"><div><h3>Certified domains</h3><span>Domain-native authority is preserved</span></div><span id="home-health-updated">—</span></div>
+            <div id="domain-cards" class="domain-cards"></div>
+          </section>
+
+          <section id="recommendations" class="page">
+            <div class="page-heading"><div><span class="eyebrow">RECOMMENDATIONS</span><h2>Domain-native opportunities</h2></div><span class="page-note">REC-UI-1 reserved</span></div>
+            <article class="panel governed-empty"><span class="empty-icon">↗</span><h3>Recommendation experience is the next dedicated UI milestone</h3><p>The certified read API is live, but this shell will not normalize or rank Crypto, Metals, and MTG recommendations before `REC-UI-1`. Native semantics, supported horizons, rank behavior, and missing fields will be rendered there exactly as governed.</p><div id="recommendation-domain-summary" class="mini-statuses"></div></article>
+          </section>
+
+          <section id="portfolio" class="page">
+            <div class="page-heading"><div><span class="eyebrow">PORTFOLIO</span><h2>Your holdings and performance</h2></div><span class="page-note">PORT-1 reserved</span></div>
+            <article class="panel governed-empty"><span class="empty-icon">◫</span><h3>Transaction-derived portfolio accounting is not active yet</h3><p>`PORT-1` will derive holdings, known-basis return, realized/unrealized P/L, pricing coverage, concentration, and portfolio history from the append-only transaction ledger plus certified prices. Unknown basis will remain unknown.</p></article>
+          </section>
+
+          <section id="transactions" class="page">
+            <div class="page-heading"><div><span class="eyebrow">TRANSACTIONS</span><h2>Record investment activity</h2></div><span class="page-note">TXN-1 reserved</span></div>
+            <article class="panel governed-empty"><span class="empty-icon">＋</span><h3>Append-only transaction ledger comes next</h3><p>`TXN-1` will support buys, sells, transfers, gifts, adjustments, fees, accounts, notes, and auditable correction chains. DASH-SHELL-1 does not create transaction records or infer ownership from analytical data.</p></article>
+          </section>
+
+          <section id="refresh-page" class="page">
+            <div class="page-heading"><div><span class="eyebrow">REFRESH &amp; DATA HEALTH</span><h2>Certified data lifecycle</h2></div><span class="page-note">REFRESH-UI-1 reserved</span></div>
+            <div id="refresh-domain-cards" class="domain-cards"></div>
+            <article class="panel governed-empty compact"><h3>Refresh execution remains source-owned</h3><p>`REFRESH-UI-1` will expose request → source refresh → certification → UIP import → activation → complete, while preserving last-good certified state on failure. Refresh remains separate from model retraining.</p></article>
+          </section>
+
+          <section id="operations" class="page">
+            <div class="page-heading"><div><span class="eyebrow">OPERATIONS</span><h2>Technical diagnostics</h2></div><span class="page-note">Existing Render capability preserved</span></div>
+            <div class="cards">
+              <article class="card"><span>API requests</span><strong id="request-count">—</strong><small>Since service start</small></article>
+              <article class="card"><span>Recorded events</span><strong id="event-count">—</strong><small>Redacted audit activity</small></article>
+              <article class="card"><span>Legacy portfolio snapshot</span><strong id="portfolio-status">—</strong><small>Setup/reconciliation only</small></article>
+              <article class="card"><span>Providers</span><strong id="provider-status">—</strong><small>Operational integrations</small></article>
+            </div>
+
+            <section id="portfolio-panel" class="panel portfolio-panel">
+              <div class="section-title"><div><h3>Legacy hosted portfolio snapshot</h3><span id="portfolio-meta">No persisted snapshot</span></div><span id="portfolio-fingerprint"></span></div>
+              <p class="governance-note">This CSV snapshot surface is preserved for setup/reconciliation/recovery. It is not the future transaction-ledger source of ownership.</p>
+              <div id="portfolio-empty" class="empty">No hosted portfolio snapshot is available.</div>
+              <div id="portfolio-data" hidden>
+                <div class="portfolio-cards">
+                  <article><span>Market value</span><strong id="portfolio-market">—</strong></article>
+                  <article><span>Cost basis</span><strong id="portfolio-cost">—</strong></article>
+                  <article><span>Gain / loss</span><strong id="portfolio-gain">—</strong><small id="portfolio-return">—</small></article>
+                  <article><span>Positions</span><strong id="portfolio-count">—</strong></article>
+                </div>
+                <div class="portfolio-layout">
+                  <section><h4>Allocation by group</h4><div id="portfolio-allocation" class="allocation"></div></section>
+                  <section><h4>Snapshot history</h4><div id="portfolio-history" class="history"></div></section>
+                </div>
+                <div class="table-wrap"><table><thead><tr><th>Position</th><th>Group</th><th>Quantity</th><th>Cost basis</th><th>Market value</th><th>Gain / loss</th></tr></thead><tbody id="portfolio-positions"></tbody></table></div>
+              </div>
+            </section>
+
+            <div class="grid">
+              <section class="panel"><div class="section-title"><h3>Recent activity</h3><span>Newest first</span></div><div id="events" class="events"></div></section>
+              <section class="panel"><div class="section-title"><h3>API metrics</h3><span>By method and status</span></div><div id="metrics" class="metrics"></div></section>
+            </div>
+          </section>
+        </section>
+      </main>
+    </div>
+  </div>
   <script src="/dashboard/assets/dashboard.js" defer></script>
 </body>
 </html>

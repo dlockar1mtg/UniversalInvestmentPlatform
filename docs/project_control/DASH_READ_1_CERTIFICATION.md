@@ -1,6 +1,6 @@
 # UIP DASH-READ-1 Certification
 
-Status: `PASS_FOR_PR_REVIEW`
+Status: `CERTIFIED_COMPLETE`
 
 Milestone:
 
@@ -38,9 +38,7 @@ Active record count:
 
 `4031`
 
-The publication was built from the certified R3 DuckDB authority, staged in PostgreSQL/Neon, validated, and activated through an atomic active-publication pointer.
-
-An intentionally invalid replacement missing Metals domain health was rejected before staging. The existing active publication remained unchanged. Existing non-presentation application tables remained preserved.
+The publication was built from the certified R3 DuckDB authority, staged in PostgreSQL/Neon, validated, and activated through an atomic active-publication pointer. An intentionally invalid replacement was rejected without displacing the last-good active publication. Existing non-presentation application tables remained preserved.
 
 ## Certified presentation populations
 
@@ -50,11 +48,11 @@ An intentionally invalid replacement missing Metals domain health was rejected b
 | Metals | 16 | 1 | 16 | 12 | 11 | — |
 | MTG | 968 | 1 | 931 | 968 | — | 968 |
 
-MTG remains native-authority driven. The presentation layer does not repopulate generic MTG analytical authority.
+MTG remains native-authority driven. Generic MTG analytical current authority remains suppressed.
 
 ## Render presentation read API
 
-The implemented hosted read boundary exposes the active presentation publication through authenticated viewer/operator access:
+Authenticated active-publication-only endpoints:
 
 - `GET /v1/presentation/status`
 - `GET /v1/presentation/domain-health`
@@ -62,15 +60,28 @@ The implemented hosted read boundary exposes the active presentation publication
 - `GET /v1/presentation/assets/{domain_id}/{asset_id}`
 - `GET /v1/presentation/lineage/{domain_id}/{asset_id}`
 
-The real Neon rehearsal proved that the read repository returns:
+## Final closure evidence
 
-- exactly three certified domain-health records: Crypto, Metals, MTG;
-- 6 Crypto recommendations;
-- 12 Metals recommendations;
-- 968 MTG recommendations;
-- MTG native rank/status semantics;
-- asset detail from the active publication;
-- lineage/provenance from the active publication.
+PR #46 merged to `main` at:
+
+`497e92f4c49b2ce84413035840e74305e92bbaed`
+
+Post-merge GitHub CI and Container Delivery passed. Render deployed the merged commit successfully.
+
+Hosted Render certification then proved:
+
+- `/health/live` returned `LIVE`;
+- `/health/ready` returned `READY`;
+- unauthenticated presentation access returned the governed `UNAUTHENTICATED` error;
+- the active publication ID, source SHA, fingerprint, status, and 4,031 record count matched certified authority;
+- Crypto, Metals, and MTG domain-health surfaces were readable and certified;
+- recommendation counts were Crypto `6`, Metals `12`, MTG `968`;
+- no Crypto/Metals cross-domain rank was exposed;
+- MTG native ranks remained available;
+- MTG automatic purchase execution remained `FALSE`;
+- MTG asset detail and lineage were readable through the hosted Render endpoints;
+- the uncertified future `stocks` domain failed closed with `INVALID_DOMAIN`;
+- the authoritative DuckDB remained byte-identical after hosted certification.
 
 ## Governance invariants preserved
 
@@ -85,37 +96,18 @@ DASH-READ-1 does not authorize or create:
 
 The PostgreSQL presentation store is a versioned projection only. Certified UIP/domain outputs remain analytical authority.
 
-## Focused regression
+## Regression evidence
 
-The final local regression gate passed:
+Focused final regression before PR review:
 
 `28 passed`
 
-One non-blocking `StarletteDeprecationWarning` was observed for the current FastAPI/Starlette TestClient dependency. It does not change DASH-READ-1 semantic or authority certification.
-
-## Repository state at rehearsal
-
-Certified implementation HEAD before permanent evidence commits:
-
-`350ef7e7fba3c9493484e7ce61b95acadf7b44a7`
-
-Main merge base:
-
-`bb26db207b717ccaae44937c7d8b22cea4f8f6b5`
-
-The branch was 15 commits ahead and 0 behind main before certification evidence was added.
+One non-blocking `StarletteDeprecationWarning` was observed for the current FastAPI/Starlette TestClient dependency. It does not affect semantic or authority certification.
 
 ## Disposition
 
-DASH-READ-1 implementation is certified for pull-request review.
+`DASH_READ_1_CERTIFIED_COMPLETE`
 
-Final milestone closure still requires:
+DASH-READ-1 is closed. The next governed milestone is:
 
-1. PR CI PASS;
-2. merge to `main`;
-3. post-merge Render deployment;
-4. authenticated hosted endpoint certification against the active Neon publication.
-
-Next gate:
-
-`PR_CI_AND_POST_MERGE_RENDER_ENDPOINT_CERTIFICATION`
+`DASH_SHELL_1_APPROVED_V7_APPLICATION_SHELL`
