@@ -35,6 +35,9 @@ def test_dashboard_shell_and_assets_are_public_but_contain_no_credentials(tmp_pa
     assert picker.status_code == 200
     assert "Select certified domain" in picker.text
     assert "/v1/presentation/assets?domain=" in picker.text
+    assert "Connect to load certified domains" in picker.text
+    assert 'authForm.addEventListener("submit",()=>setTimeout(loadDomains,0))' in picker.text
+    assert 'refreshButton.addEventListener("click",()=>setTimeout(loadDomains,0))' in picker.text
 
 
 def test_dashboard_data_requires_read_permission(tmp_path):
