@@ -60,28 +60,48 @@ class RecommendationSummaryRepository:
                     COUNT(*) FILTER (
                         WHERE (r.payload_json->>'automatic_purchase_execution')::boolean IS TRUE
                     ) AS automatic_execution_count,
-                    COUNT(a.asset_id) AS matched_asset_count,
                     COUNT(*) FILTER (
-                        WHERE (a.payload_json->>'current_price_authority_available')::boolean IS TRUE
+                        WHERE EXISTS (
+                            SELECT 1
+                            FROM presentation_records a
+                            WHERE a.publication_id=r.publication_id
+                              AND a.domain_id=r.domain_id
+                              AND a.asset_id=r.asset_id
+                              AND a.record_type='asset'
+                        )
+                    ) AS matched_asset_count,
+                    COUNT(*) FILTER (
+                        WHERE EXISTS (
+                            SELECT 1
+                            FROM presentation_records a
+                            WHERE a.publication_id=r.publication_id
+                              AND a.domain_id=r.domain_id
+                              AND a.asset_id=r.asset_id
+                              AND a.record_type='asset'
+                              AND (a.payload_json->>'current_price_authority_available')::boolean IS TRUE
+                        )
                     ) AS certified_current_price_authority_count,
-                    COUNT(DISTINCT f.asset_id) AS forecast_asset_count,
-                    COUNT(DISTINCT k.asset_id) AS risk_asset_count
+                    COUNT(*) FILTER (
+                        WHERE EXISTS (
+                            SELECT 1
+                            FROM presentation_records f
+                            WHERE f.publication_id=r.publication_id
+                              AND f.domain_id=r.domain_id
+                              AND f.asset_id=r.asset_id
+                              AND f.record_type='forecast'
+                        )
+                    ) AS forecast_asset_count,
+                    COUNT(*) FILTER (
+                        WHERE EXISTS (
+                            SELECT 1
+                            FROM presentation_records k
+                            WHERE k.publication_id=r.publication_id
+                              AND k.domain_id=r.domain_id
+                              AND k.asset_id=r.asset_id
+                              AND k.record_type='risk'
+                        )
+                    ) AS risk_asset_count
                 FROM presentation_records r
-                LEFT JOIN presentation_records a
-                  ON a.publication_id=r.publication_id
-                 AND a.domain_id=r.domain_id
-                 AND a.asset_id=r.asset_id
-                 AND a.record_type='asset'
-                LEFT JOIN presentation_records f
-                  ON f.publication_id=r.publication_id
-                 AND f.domain_id=r.domain_id
-                 AND f.asset_id=r.asset_id
-                 AND f.record_type='forecast'
-                LEFT JOIN presentation_records k
-                  ON k.publication_id=r.publication_id
-                 AND k.domain_id=r.domain_id
-                 AND k.asset_id=r.asset_id
-                 AND k.record_type='risk'
                 WHERE r.publication_id=%s
                   AND r.record_type='recommendation'
                 GROUP BY r.domain_id
