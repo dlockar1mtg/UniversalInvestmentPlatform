@@ -97,6 +97,46 @@ class PortfolioAccountingResult:
         }
 
 
+def _economic_key(item: InvestmentTransaction) -> tuple[str, str, str, str]:
+    return (item.domain_id, item.asset_id, item.account_id, item.currency)
+
+
+def _reject_ambiguous_same_time_order(items: tuple[InvestmentTransaction, ...]) -> None:
+    """Reject exact timestamp ties when ordering can change portfolio economics.
+
+    Transaction IDs are identifiers, not chronology. If multiple effective events for the
+    same source position have identical occurred/recorded timestamps and at least one is a
+    SELL or TRANSFER, choosing an arbitrary ID-based order could change quantity or basis.
+    """
+
+    grouped: dict[
+        tuple[object, object, str, str, str, str],
+        list[InvestmentTransaction],
+    ] = {}
+    for item in items:
+        key = (
+            item.occurred_at,
+            item.recorded_at,
+            item.domain_id,
+            item.asset_id,
+            item.account_id,
+            item.currency,
+        )
+        grouped.setdefault(key, []).append(item)
+
+    for tied in grouped.values():
+        if len(tied) < 2:
+            continue
+        if any(
+            item.transaction_type in {TransactionType.SELL, TransactionType.TRANSFER}
+            for item in tied
+        ):
+            raise ValueError(
+                "ambiguous transaction ordering: same position has multiple effective "
+                "events with identical occurred_at and recorded_at timestamps"
+            )
+
+
 def resolve_effective_transactions(
     transactions: Iterable[InvestmentTransaction],
 ) -> EffectiveTransactionSet:
@@ -134,9 +174,11 @@ def resolve_effective_transactions(
             raise ValueError("correction cycle detected")
 
     superseded = tuple(sorted(corrections))
+    leaves_unsorted = tuple(item for item in items if item.transaction_id not in corrections)
+    _reject_ambiguous_same_time_order(leaves_unsorted)
     leaves = tuple(
         sorted(
-            (item for item in items if item.transaction_id not in corrections),
+            leaves_unsorted,
             key=lambda item: (item.occurred_at, item.recorded_at, item.transaction_id),
         )
     )
