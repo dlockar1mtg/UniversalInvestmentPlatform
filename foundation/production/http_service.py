@@ -97,6 +97,10 @@ def create_http_app(settings: HTTPServiceSettings, repository=None, dashboard_se
     def dashboard_javascript():
         return FileResponse(assets / "dashboard.js", media_type="text/javascript")
 
+    @app.get("/dashboard/assets/governed_asset_picker.js", include_in_schema=False)
+    def governed_asset_picker_javascript():
+        return FileResponse(assets / "governed_asset_picker.js", media_type="text/javascript")
+
     def dashboard_authorization(credential: str | None):
         principal = authenticator.authenticate(credential)
         if principal is None:

@@ -31,6 +31,10 @@ def test_dashboard_shell_and_assets_are_public_but_contain_no_credentials(tmp_pa
     assert "view-key" not in page.text and "operate-key" not in page.text
     assert service.get("/dashboard/assets/dashboard.css").status_code == 200
     assert service.get("/dashboard/assets/dashboard.js").status_code == 200
+    picker = service.get("/dashboard/assets/governed_asset_picker.js")
+    assert picker.status_code == 200
+    assert "Select certified domain" in picker.text
+    assert "/v1/presentation/assets?domain=" in picker.text
 
 
 def test_dashboard_data_requires_read_permission(tmp_path):
