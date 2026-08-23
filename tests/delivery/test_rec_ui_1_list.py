@@ -16,7 +16,20 @@ ROOT = Path(__file__).resolve().parents[2]
 
 
 class FakeRecommendationListRepository:
-    def list(self, *, domain_id, limit, offset, query=None):
+    def list(
+        self,
+        *,
+        domain_id,
+        limit,
+        offset,
+        query=None,
+        native_status=None,
+        native_rank_type=None,
+        has_forecast=None,
+        has_risk=None,
+        current_price_authority_available=None,
+        manual_execution_price_check_required=None,
+    ):
         domain = domain_id.strip().lower()
         if domain not in {"crypto", "metals", "mtg"}:
             raise LookupError(f"No recommendations for domain '{domain}' in active presentation")
@@ -47,6 +60,14 @@ class FakeRecommendationListRepository:
             "limit": limit,
             "offset": offset,
             "query": query,
+            "filters": {
+                "native_status": native_status,
+                "native_rank_type": native_rank_type,
+                "has_forecast": has_forecast,
+                "has_risk": has_risk,
+                "current_price_authority_available": current_price_authority_available,
+                "manual_execution_price_check_required": manual_execution_price_check_required,
+            },
             "items": [item],
             "domain_native_semantics": True,
             "universal_cross_domain_rank": False,
@@ -106,6 +127,33 @@ def test_list_preserves_native_payload_and_missing_fields_without_synthesis():
     assert body["missing_fields_policy"] == "PRESERVE_MISSING"
 
 
+def test_list_exposes_domain_native_filters_without_changing_ordering_contract():
+    response = client().get(
+        "/v1/presentation/recommendation-list"
+        "?domain=mtg"
+        "&native_status=BUY_CANDIDATE_NOW"
+        "&native_rank_type=SECRET_LAIR_V1_1_PRODUCTION_COMPETITION_RANK"
+        "&has_forecast=true"
+        "&has_risk=false"
+        "&current_price_authority_available=true"
+        "&manual_execution_price_check_required=true",
+        headers={"X-API-Key": "view-key"},
+    )
+    assert response.status_code == 200
+    body = response.json()
+    assert body["filters"] == {
+        "native_status": "BUY_CANDIDATE_NOW",
+        "native_rank_type": "SECRET_LAIR_V1_1_PRODUCTION_COMPETITION_RANK",
+        "has_forecast": True,
+        "has_risk": False,
+        "current_price_authority_available": True,
+        "manual_execution_price_check_required": True,
+    }
+    assert body["ordering_policy"] == "STABLE_ASSET_IDENTITY_NOT_NATIVE_RANK"
+    assert body["rank_comparison_scope"] == "NATIVE_RANK_TYPE_ONLY"
+    assert body["universal_cross_domain_rank"] is False
+
+
 def test_list_rejects_domain_not_present_in_active_certified_publication():
     response = client().get(
         "/v1/presentation/recommendation-list?domain=stocks",
@@ -115,7 +163,7 @@ def test_list_rejects_domain_not_present_in_active_certified_publication():
     assert response.json()["error"]["code"] == "DOMAIN_NOT_IN_ACTIVE_PRESENTATION"
 
 
-def test_production_list_contract_avoids_row_multiplication_and_rank_sorting():
+def test_production_list_contract_avoids_row_multiplication_rank_sorting_and_cross_domain_filters():
     source = (
         ROOT
         / "foundation"
@@ -131,6 +179,9 @@ def test_production_list_contract_avoids_row_multiplication_and_rank_sorting():
         "native_recommendation",
         "native_rank_type",
         "manual_execution_price_check_required",
+        "current_price_authority_available",
+        "has_forecast",
+        "has_risk",
         "automatic_purchase_execution",
         '"universal_cross_domain_rank": False',
         '"ordering_policy": "STABLE_ASSET_IDENTITY_NOT_NATIVE_RANK"',
