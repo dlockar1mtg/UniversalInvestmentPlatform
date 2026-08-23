@@ -72,6 +72,11 @@
   const searchAssets=async()=>{
     const domain=domainSelect.value;
     const query=assetInput.value.trim();
+    const exactExisting=matches.get(query);
+    if(exactExisting&&String(exactExisting.domain_id)===domain){
+      assetInput.dataset.assetId=String(exactExisting.asset_id);
+      return;
+    }
     const generation=++searchGeneration;
     assetInput.dataset.assetId="";
     if(!domain||query.length<1){dataList.innerHTML="";matches=new Map();return;}
@@ -105,8 +110,14 @@
 
   assetInput.addEventListener("input",()=>{
     const exact=matches.get(assetInput.value.trim());
-    assetInput.dataset.assetId=exact?String(exact.asset_id):"";
     clearTimeout(searchTimer);
+    if(exact&&String(exact.domain_id)===domainSelect.value){
+      assetInput.dataset.assetId=String(exact.asset_id);
+      message.className="form-message";
+      message.textContent="Governed asset selected.";
+      return;
+    }
+    assetInput.dataset.assetId="";
     searchTimer=setTimeout(searchAssets,180);
   });
 
@@ -124,13 +135,14 @@
       message.textContent="Select a certified domain.";
       return;
     }
-    if(!selected||String(selected.domain_id)!==domainSelect.value){
+    if(!selected||String(selected.domain_id)!==domainSelect.value||assetInput.dataset.assetId!==String(selected.asset_id)){
       event.preventDefault();
       event.stopImmediatePropagation();
       message.className="form-message bad";
       message.textContent="Choose an exact governed asset from the certified search results.";
       return;
     }
+    clearTimeout(searchTimer);
     const visibleLabel=assetInput.value;
     assetInput.value=String(selected.asset_id);
     assetInput.dataset.assetId=String(selected.asset_id);
