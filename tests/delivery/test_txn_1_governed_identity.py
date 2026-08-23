@@ -122,15 +122,20 @@ def test_transaction_accepts_exact_governed_identity(tmp_path):
     assert len(ledger.list(limit=10, offset=0)) == 1
 
 
-def test_dashboard_loads_governed_picker_asset_and_uses_catalog_routes():
+def test_dashboard_loads_governed_picker_asset_and_posts_canonical_asset_id_directly():
     root = Path(__file__).resolve().parents[2]
-    html = (root / "foundation" / "production" / "dashboard_assets" / "dashboard.html").read_text(encoding="utf-8")
-    picker = (root / "foundation" / "production" / "dashboard_assets" / "governed_asset_picker.js").read_text(encoding="utf-8")
+    assets = root / "foundation" / "production" / "dashboard_assets"
+    html = (assets / "dashboard.html").read_text(encoding="utf-8")
+    picker = (assets / "governed_asset_picker.js").read_text(encoding="utf-8")
+    dashboard = (assets / "dashboard.js").read_text(encoding="utf-8")
     assert "/dashboard/assets/governed_asset_picker.js" in html
     assert "/v1/presentation/domains" in picker
     assert "/v1/presentation/assets?domain=" in picker
     assert "Choose an exact governed asset" in picker
     assert 'document.addEventListener("submit",event=>' in picker
     assert "if(event.target!==form)return" in picker
-    assert "const canonicalAssetId=String(selected.asset_id)" in picker
-    assert "assetInput.value=canonicalAssetId" in picker
+    assert 'assetInput.dataset.assetId=String(selected.asset_id)' in picker
+    assert 'const canonicalAssetId=($("txn-asset").dataset.assetId||"").trim()' in dashboard
+    assert 'asset_id:canonicalAssetId' in dashboard
+    assert 'asset_id:$("txn-asset").value.trim()' not in dashboard
+    assert 'assetInput.value=canonicalAssetId' not in picker

@@ -144,11 +144,7 @@
       return;
     }
     clearTimeout(searchTimer);
-    const visibleLabel=assetInput.value;
-    const canonicalAssetId=String(selected.asset_id);
-    assetInput.value=canonicalAssetId;
-    assetInput.dataset.assetId=canonicalAssetId;
-    queueMicrotask(()=>{if(assetInput.value===canonicalAssetId)assetInput.value=visibleLabel;});
+    assetInput.dataset.assetId=String(selected.asset_id);
   },true);
 
   if(authForm)authForm.addEventListener("submit",()=>setTimeout(loadDomains,0));

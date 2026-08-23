@@ -30,7 +30,8 @@ def test_dashboard_shell_and_assets_are_public_but_contain_no_credentials(tmp_pa
         assert f'>{label}<' in page.text
     assert "view-key" not in page.text and "operate-key" not in page.text
     assert service.get("/dashboard/assets/dashboard.css").status_code == 200
-    assert service.get("/dashboard/assets/dashboard.js").status_code == 200
+    dashboard = service.get("/dashboard/assets/dashboard.js")
+    assert dashboard.status_code == 200
     picker = service.get("/dashboard/assets/governed_asset_picker.js")
     assert picker.status_code == 200
     assert "Select certified domain" in picker.text
@@ -44,8 +45,10 @@ def test_dashboard_shell_and_assets_are_public_but_contain_no_credentials(tmp_pa
     assert "assetInput.dataset.assetId!==String(selected.asset_id)" in picker.text
     assert 'document.addEventListener("submit",event=>' in picker.text
     assert "if(event.target!==form)return" in picker.text
-    assert "const canonicalAssetId=String(selected.asset_id)" in picker.text
-    assert "assetInput.value=canonicalAssetId" in picker.text
+    assert 'assetInput.dataset.assetId=String(selected.asset_id)' in picker.text
+    assert 'const canonicalAssetId=($("txn-asset").dataset.assetId||"").trim()' in dashboard.text
+    assert 'asset_id:canonicalAssetId' in dashboard.text
+    assert 'asset_id:$("txn-asset").value.trim()' not in dashboard.text
 
 
 def test_dashboard_data_requires_read_permission(tmp_path):
