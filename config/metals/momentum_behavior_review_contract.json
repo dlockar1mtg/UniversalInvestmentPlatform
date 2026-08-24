@@ -1,0 +1,37 @@
+{
+  "contract_id": "METALS-MOMENTUM-REVIEW-1",
+  "version": "1.0.0",
+  "source_authority": "METALS-MOMENTUM-1",
+  "purpose": "Review cross-sectional behavior and internal consistency of certified Metals momentum features before any interpretation policy is authorized.",
+  "required_vehicle_count": 11,
+  "family_consistency_groups": {
+    "gold_physical": ["GLD", "IAU", "SGOL"],
+    "silver_physical": ["SIVR", "SLV"]
+  },
+  "review_fields": [
+    "return_1m_pct",
+    "return_3m_pct",
+    "return_6m_pct",
+    "return_12m_pct",
+    "distance_ma20_pct",
+    "distance_ma50_pct",
+    "distance_ma200_pct",
+    "position_52w_range_pct",
+    "current_drawdown_pct",
+    "max_drawdown_52w_pct",
+    "realized_volatility_3m_pct",
+    "benchmark_relative_return_3m_pct",
+    "momentum_acceleration_pct"
+  ],
+  "controls": {
+    "production_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "momentum_feature_calculation_authorized": true,
+    "momentum_interpretation_policy_authorized": false,
+    "tactical_posture_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  }
+}
