@@ -32,17 +32,51 @@ def test_rec_ui_uses_native_domain_contracts_and_never_creates_universal_rank():
     assert "manual_execution_price_check_required" in javascript
     assert "execution_ready_purchase_certified" in javascript
     assert "automatic_purchase_execution" in javascript
-    assert "does not create a universal recommendation score or cross-domain ranking" in javascript
+    assert "without manufacturing a universal score, cross-domain ranking, or automatic purchase decision" in javascript
 
 
-def test_rec_ui_all_view_groups_domains_instead_of_cross_domain_ordering():
+def test_rec_ui_all_view_groups_domains_by_decision_utility():
     javascript = read("foundation/production/dashboard_assets/recommendation_ui.js")
     assert "renderDomainSummary" in javascript
     assert "REC_DOMAINS.map(domain=>renderDomainSummary" in javascript
     assert 'selectedDomain="all"' in javascript
+    assert "3-year growth outlook" in javascript
+    assert "Long-term thesis + tactical opportunity" in javascript
+    assert "Native sealed-product opportunity" in javascript
+    assert "Start with the investment horizon, then inspect risk and entry context" in javascript
+
+
+def test_rec_ui_crypto_reads_asset_detail_and_uses_certified_36_month_authority():
+    javascript = read("foundation/production/dashboard_assets/recommendation_ui.js")
+    assert "/v1/presentation/assets/" in javascript
+    assert "readAssetDetail" in javascript
+    assert "hydrateCryptoResearch" in javascript
+    assert 'forecastBy(detail,36,"LONG_RANGE_SCENARIO_MODEL")' in javascript
+    assert "3Y expected return" in javascript
+    assert "Bear / Base / Bull" in javascript
+    assert "3-YEAR GROWTH OUTLOOK" in javascript
+    assert "UIP does not extrapolate a shorter forecast into three years" in javascript
+
+
+def test_rec_ui_crypto_detail_exposes_forecast_path_risk_and_raw_confidence():
+    javascript = read("foundation/production/dashboard_assets/recommendation_ui.js")
+    assert "forecastRows(detail)" in javascript
+    assert "riskMetrics(detail)" in javascript
+    assert "Forecast path & entry context" in javascript
+    assert "Short horizons inform accumulation timing" in javascript
+    assert "Confidence raw" in javascript
+    assert "Confidence values are shown as raw source values, not percentages" in javascript
+    assert "Missing probability-positive values remain missing" in javascript
+
+
+def test_rec_ui_preserves_mtg_native_rank_and_execution_semantics():
+    javascript = read("foundation/production/dashboard_assets/recommendation_ui.js")
     assert 'if(selectedDomain==="mtg")' in javascript
     assert "MTG native rank is used only inside MTG where provided" in javascript
-    assert "Catalog order is presentation order; UIP does not manufacture a rank for this domain" in javascript
+    assert "manual_execution_price_check_required" in javascript
+    assert "execution_ready_purchase_certified" in javascript
+    assert "automatic_purchase_execution" in javascript
+    assert "Recommendation does not authorize execution" in javascript
 
 
 def test_rec_ui_has_search_native_status_filter_and_bounded_pagination():
