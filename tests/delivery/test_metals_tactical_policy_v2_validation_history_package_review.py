@@ -80,6 +80,6 @@ def test_reviewer_has_no_network_or_outcome_engine_imports():
     assert "candidate_posture =" not in lowered
 
 
-def test_next_decision_is_evaluation_design_not_evaluation_execution():
+def test_next_decision_restores_current_price_semantic_gate():
     contract = load_contract()
-    assert contract["next_decision"] == "AUTHORIZE_METALS_TACTICAL_POLICY_V2_VALIDATION_EVALUATION_DESIGN"
+    assert contract["next_decision"] == "AUTHORIZE_METALS_CURRENT_PRICE_SEMANTIC_REVIEW"
