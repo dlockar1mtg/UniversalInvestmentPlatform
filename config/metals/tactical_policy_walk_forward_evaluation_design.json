@@ -1,0 +1,96 @@
+{
+  "design_id": "METALS-TACTICAL-POLICY-WALK-FORWARD-EVALUATION-DESIGN-1",
+  "version": "1.0.0",
+  "source_candidate_rule_design": "METALS-TACTICAL-POLICY-CANDIDATE-RULE-DESIGN-1",
+  "source_feasibility_audit": "METALS-TACTICAL-POLICY-HISTORICAL-INPUT-FEASIBILITY-AUDIT-1",
+  "domain_id": "metals",
+  "objective": "Lock the walk-forward evaluation mechanics and interpretation rules before calculating candidate-policy forward outcomes.",
+  "eligible_vehicle_count": 10,
+  "reference_control_asset_ids": ["metals:vehicle:BIL"],
+  "candidate_postures": ["ACCUMULATE", "HOLD", "WATCH", "REDUCE", "AVOID"],
+  "evaluation_grid": {
+    "walk_forward_step_observations": 5,
+    "forward_horizons_observations": [21, 63],
+    "forward_evaluable_grid_points_per_asset": 88,
+    "opportunity_grid_points": 880,
+    "reference_control_grid_points": 88,
+    "development_grid_points_per_asset": 53,
+    "holdout_grid_points_per_asset": 35,
+    "development_opportunity_grid_points": 530,
+    "holdout_opportunity_grid_points": 350,
+    "split_method": "CHRONOLOGICAL_FIRST_53_DEVELOPMENT_LAST_35_HOLDOUT",
+    "same_grid_position_split_applied_to_every_asset": true
+  },
+  "outcome_definitions": {
+    "forward_return_pct": "100 * (price_at_t_plus_horizon / price_at_t - 1)",
+    "maximum_adverse_excursion_pct": "minimum percentage return from entry price observed within the forward horizon",
+    "maximum_favorable_excursion_pct": "maximum percentage return from entry price observed within the forward horizon",
+    "positive_return": "forward_return_pct > 0",
+    "all_outcomes_use_only_prices_strictly_after_the_decision_date": true
+  },
+  "required_posture_metrics_by_horizon": [
+    "observation_count",
+    "mean_forward_return_pct",
+    "median_forward_return_pct",
+    "positive_return_rate",
+    "p25_forward_return_pct",
+    "p75_forward_return_pct",
+    "mean_maximum_adverse_excursion_pct",
+    "median_maximum_adverse_excursion_pct",
+    "mean_maximum_favorable_excursion_pct"
+  ],
+  "required_policy_behavior_metrics": [
+    "posture_distribution",
+    "posture_change_count",
+    "posture_change_rate",
+    "mean_consecutive_grid_points_in_same_posture"
+  ],
+  "required_baselines": {
+    "buy_and_hold_forward_return_baseline": true,
+    "no_tactical_overlay_pooled_opportunity_baseline": true,
+    "bil_reference_control_reported_separately": true,
+    "baseline_results_may_not_be_used_to_rewrite_locked_candidate_rules": true
+  },
+  "interpretation_rules": {
+    "development_results_are_diagnostic_only": true,
+    "candidate_rules_may_not_change_after_development_results_without_starting_a_new_validation_cycle": true,
+    "holdout_results_are_final_for_this_candidate_version": true,
+    "overlapping_forward_windows_must_be_disclosed": true,
+    "vehicle_cluster_dependence_must_be_disclosed": true,
+    "duplicate_exposure_families_must_not_be_treated_as_independent_confirmation": true,
+    "posture_with_fewer_than_10_holdout_observations_is_insufficiently_supported": true,
+    "insufficiently_supported_posture_may_not_be interpreted_as validated": true
+  },
+  "candidate_pass_fail_rules": {
+    "required_for_pass": [
+      "holdout_accumulate_or_hold_63d_median_return_exceeds_holdout_reduce_or_avoid_63d_median_return",
+      "holdout_accumulate_or_hold_63d_positive_return_rate_exceeds_holdout_reduce_or_avoid_63d_positive_return_rate",
+      "holdout_reduce_or_avoid_63d_mean_maximum_adverse_excursion_is_no_worse_than_holdout_accumulate_or_hold_63d_mean_maximum_adverse_excursion",
+      "holdout_posture_change_rate_lte_0_50",
+      "no_semantic_or_governance_violation"
+    ],
+    "grouping": {
+      "constructive": ["ACCUMULATE", "HOLD"],
+      "neutral": ["WATCH"],
+      "defensive": ["REDUCE", "AVOID"]
+    },
+    "minimum_supported_holdout_observations_per_compared_group": 20,
+    "if_minimum_group_support_not_met": "INCONCLUSIVE_NOT_PASS",
+    "passing_candidate_does_not_authorize_production_posture": true
+  },
+  "controls": {
+    "walk_forward_evaluation_design_authorized": true,
+    "forward_outcome_calculation_authorized": false,
+    "historical_candidate_evaluation_authorized": false,
+    "candidate_threshold_change_authorized": false,
+    "tactical_posture_authorized": false,
+    "presentation_activation_authorized": false,
+    "production_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision": "AUTHORIZE_METALS_TACTICAL_POLICY_WALK_FORWARD_EVALUATION"
+}
