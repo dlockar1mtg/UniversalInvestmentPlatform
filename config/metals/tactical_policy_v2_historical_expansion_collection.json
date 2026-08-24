@@ -1,0 +1,52 @@
+{
+  "collection_id": "METALS-TACTICAL-POLICY-V2-HISTORICAL-EXPANSION-COLLECTION-1",
+  "version": "1.0.0",
+  "source_collection_design": "METALS-TACTICAL-POLICY-V2-HISTORICAL-EXPANSION-COLLECTION-DESIGN-1",
+  "source_candidate_rule_design": "METALS-TACTICAL-POLICY-V2-CANDIDATE-RULE-DESIGN-1",
+  "domain_id": "metals",
+  "package_id": "metals-v2-validation-history-20191204-20230821",
+  "collection_boundary": {
+    "common_start_date": "2019-12-04",
+    "common_end_date": "2023-08-21",
+    "expected_common_observation_count": 934,
+    "existing_certified_history_start_date": "2023-08-22",
+    "interval_disjoint_from_v1": true
+  },
+  "source_contract": {
+    "provider": "yfinance",
+    "symbols": ["BIL", "COPX", "CPER", "GLD", "IAU", "PPLT", "SGOL", "SIVR", "SLV", "URA", "URNM"],
+    "daily_interval": "1d",
+    "price_fields": ["open_usd", "high_usd", "low_usd", "close_usd", "adjusted_close_usd", "volume"]
+  },
+  "artifact_contract": {
+    "history_filename": "metals_v2_validation_history.jsonl",
+    "coverage_filename": "coverage.json",
+    "manifest_filename": "manifest.json",
+    "common_calendar_intersection_required": true,
+    "missing_rows_may_not_be_synthesized": true,
+    "exact_common_observation_count_required": true,
+    "sha256_required": true
+  },
+  "outcome_blindness": {
+    "candidate_postures_calculated": false,
+    "forward_returns_calculated": false,
+    "maximum_adverse_or_favorable_excursion_calculated": false,
+    "policy_pass_fail_checks_calculated": false,
+    "new_validation_outcome_inspection_executed": false
+  },
+  "controls": {
+    "historical_expansion_collection_authorized": true,
+    "validation_package_review_authorized": false,
+    "historical_candidate_evaluation_authorized": false,
+    "tactical_posture_authorized": false,
+    "presentation_activation_authorized": false,
+    "production_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false,
+    "missing_authority_may_be_synthesized": false
+  },
+  "next_decision": "REVIEW_METALS_TACTICAL_POLICY_V2_VALIDATION_HISTORY_PACKAGE"
+}
