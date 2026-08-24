@@ -43,7 +43,8 @@ def test_rec_ui_all_view_groups_domains_by_decision_utility():
     assert "3-year growth outlook" in javascript
     assert "Long-term thesis + tactical opportunity" in javascript
     assert "Native sealed-product opportunity" in javascript
-    assert "Start with the investment horizon, then inspect risk and entry context" in javascript
+    assert "Investment research" in javascript
+    assert "Domain-native research, long-term thesis first" in javascript
 
 
 def test_rec_ui_crypto_reads_asset_detail_and_uses_certified_36_month_authority():
@@ -53,7 +54,9 @@ def test_rec_ui_crypto_reads_asset_detail_and_uses_certified_36_month_authority(
     assert "hydrateCryptoResearch" in javascript
     assert 'forecastBy(detail,36,"LONG_RANGE_SCENARIO_MODEL")' in javascript
     assert "3Y expected return" in javascript
-    assert "Bear / Base / Bull" in javascript
+    assert "Bear" in javascript
+    assert "Base" in javascript
+    assert "Bull" in javascript
     assert "3-YEAR GROWTH OUTLOOK" in javascript
     assert "UIP does not extrapolate a shorter forecast into three years" in javascript
 
@@ -97,13 +100,35 @@ def test_rec_ui_is_lazy_and_does_not_break_login_when_unauthenticated():
     assert "loadCatalog(false)" in javascript
 
 
-def test_dashboard_serves_and_loads_rec_ui_asset_after_core_dashboard_script():
+def test_rec_ui_premium_visual_shell_uses_cards_scenario_ranges_and_charts():
+    javascript = read("foundation/production/dashboard_assets/recommendation_ui.js")
+    stylesheet = read("foundation/production/dashboard_assets/recommendation_visual.css")
+    assert "rec-domain-grid" in javascript
+    assert "rec-asset-grid" in javascript
+    assert "rec-range" in javascript
+    assert "rec-strategic-hero" in javascript
+    assert "rec-range-chart" in javascript
+    assert "rec-line-chart" in javascript
+    assert "forecastChart(detail)" in javascript
+    assert "horizonTabs(detail)" in javascript
+    assert "rec-risk-gauge" in javascript
+    assert ".rec-asset-card" in stylesheet
+    assert ".rec-strategic-hero" in stylesheet
+    assert ".rec-line-chart" in stylesheet
+    assert ".rec-risk-gauge" in stylesheet
+
+
+def test_dashboard_serves_and_loads_rec_ui_assets_after_core_dashboard_styles_and_script():
     service = read("foundation/production/http_service.py")
     html = read("foundation/production/dashboard_assets/dashboard.html")
     assert '@app.get("/dashboard/assets/recommendation_ui.js"' in service
+    assert '@app.get("/dashboard/assets/recommendation_visual.css"' in service
+    base_css = html.index('/dashboard/assets/dashboard.css')
+    rec_css = html.index('/dashboard/assets/recommendation_visual.css')
     core = html.index('/dashboard/assets/dashboard.js')
     rec = html.index('/dashboard/assets/recommendation_ui.js')
     picker = html.index('/dashboard/assets/governed_asset_picker.js')
+    assert base_css < rec_css
     assert core < rec < picker
     assert "REC-UI-1" in html
     assert "universal score or cross-domain rank" in html
