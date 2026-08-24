@@ -11,6 +11,15 @@ import duckdb
 
 from rehearse_metals_native_evidence_promotion import MIGRATION, current_lineage, promote
 
+EXPECTED_COUNTS = {
+    "components": 64,
+    "regimes": 12,
+    "adjusted": 32,
+    "changes": 10,
+    "freshness": 21,
+    "health": 1,
+}
+
 
 def sha256_file(path: Path) -> str:
     digest = hashlib.sha256()
@@ -18,6 +27,17 @@ def sha256_file(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1024 * 1024), b""):
             digest.update(chunk)
     return digest.hexdigest()
+
+
+def tactical_schema_exists(connection: duckdb.DuckDBPyConnection) -> bool:
+    row = connection.execute(
+        """
+        SELECT COUNT(*)
+        FROM information_schema.tables
+        WHERE table_name='metals_forecast_model_component_history'
+        """
+    ).fetchone()
+    return bool(row and row[0] == 1)
 
 
 def current_counts(connection: duckdb.DuckDBPyConnection) -> dict[str, int]:
@@ -58,6 +78,51 @@ def main() -> int:
     if not (args.package_root / "package_summary.json").is_file():
         raise FileNotFoundError("Certified Metals package summary is missing.")
 
+    connection = duckdb.connect(str(args.database))
+    try:
+        package_id, import_id, manifest = current_lineage(connection)
+        summary = json.loads((args.package_root / "package_summary.json").read_text(encoding="utf-8"))
+        source_package_id = str(summary.get("package_id", ""))
+        if source_package_id != package_id:
+            raise RuntimeError(f"Package ID mismatch: source={source_package_id} current={package_id}")
+
+        schema_exists = tactical_schema_exists(connection)
+        if schema_exists:
+            existing = package_counts(connection, package_id)
+            if any(existing.values()):
+                if existing != EXPECTED_COUNTS:
+                    raise RuntimeError(f"Partial prior promotion detected for current package: {existing}")
+                observed = current_counts(connection)
+                if observed != EXPECTED_COUNTS:
+                    raise RuntimeError(f"Current tactical authority does not match expected certified counts: {observed}")
+                mode = "NOOP_ALREADY_PROMOTED"
+            else:
+                mode = "PROMOTION_REQUIRED"
+        else:
+            mode = "PROMOTION_REQUIRED"
+    finally:
+        connection.close()
+
+    if mode == "NOOP_ALREADY_PROMOTED":
+        after = sha256_file(args.database)
+        if after.lower() != before.lower():
+            raise RuntimeError("Database changed during an idempotent no-op promotion check.")
+        print(json.dumps({
+            "status": "PASS",
+            "mode": mode,
+            "package_id": package_id,
+            "import_id": import_id,
+            "manifest_sha256": manifest,
+            "database_sha256_before": before,
+            "database_sha256_after": after,
+            "backup_path": None,
+            "backup_sha256": None,
+            "promoted_counts": observed,
+            "automatic_execution_authorized": False,
+            "next_decision": "VERIFY_AND_PUBLISH_METALS_TACTICAL_EVIDENCE",
+        }, indent=2))
+        return 0
+
     args.backup_root.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
     backup = args.backup_root / f"universal_investment_pre_metals_native_promotion_{stamp}.duckdb"
@@ -69,44 +134,29 @@ def main() -> int:
 
     connection = duckdb.connect(str(args.database))
     try:
-        connection.execute(MIGRATION.read_text(encoding="utf-8"))
-        package_id, import_id, manifest = current_lineage(connection)
-        summary = json.loads((args.package_root / "package_summary.json").read_text(encoding="utf-8"))
-        source_package_id = str(summary.get("package_id", ""))
-        if source_package_id != package_id:
-            raise RuntimeError(f"Package ID mismatch: source={source_package_id} current={package_id}")
-
-        existing = package_counts(connection, package_id)
-        if any(existing.values()):
-            expected = {"components": 64, "regimes": 12, "adjusted": 32, "changes": 10, "freshness": 21, "health": 1}
-            if existing != expected:
-                raise RuntimeError(f"Partial prior promotion detected for current package: {existing}")
-            observed = current_counts(connection)
-            mode = "NOOP_ALREADY_PROMOTED"
-        else:
-            connection.execute("BEGIN TRANSACTION")
-            try:
-                source_counts = promote(connection, args.package_root)
-                connection.execute("COMMIT")
-            except Exception:
-                connection.execute("ROLLBACK")
-                raise
+        connection.execute("BEGIN TRANSACTION")
+        try:
+            connection.execute(MIGRATION.read_text(encoding="utf-8"))
+            source_counts = promote(connection, args.package_root)
             observed = package_counts(connection, package_id)
+            if source_counts != EXPECTED_COUNTS:
+                raise RuntimeError(f"Certified source counts changed unexpectedly: {source_counts}")
             if observed != source_counts:
                 raise RuntimeError(f"Production promotion count mismatch: source={source_counts} current={observed}")
-            mode = "PRODUCTION_PROMOTION"
+            connection.execute("COMMIT")
+        except Exception:
+            connection.execute("ROLLBACK")
+            raise
     finally:
         connection.close()
 
     after = sha256_file(args.database)
-    if mode == "PRODUCTION_PROMOTION" and after.lower() == before.lower():
+    if after.lower() == before.lower():
         raise RuntimeError("Production database hash did not change after authorized promotion.")
-    if mode == "NOOP_ALREADY_PROMOTED" and after.lower() != before.lower():
-        raise RuntimeError("Database changed during an idempotent no-op promotion check.")
 
     print(json.dumps({
         "status": "PASS",
-        "mode": mode,
+        "mode": "PRODUCTION_PROMOTION",
         "package_id": package_id,
         "import_id": import_id,
         "manifest_sha256": manifest,
