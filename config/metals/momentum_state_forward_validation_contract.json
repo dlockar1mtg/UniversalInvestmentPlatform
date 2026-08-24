@@ -1,0 +1,34 @@
+{
+  "contract_id": "METALS-MOMENTUM-FORWARD-VALIDATION-1",
+  "version": "1.0.0",
+  "source_authority": "METALS-MOMENTUM-VALIDATION-1",
+  "market_history_authority": "METALS-MARKET-HISTORY-1",
+  "source": "yfinance",
+  "run_id": "metals-market-history-backfill-20260824",
+  "minimum_history_observations": 252,
+  "evaluation_step_observations": 5,
+  "forward_windows": {
+    "1m": 21,
+    "3m": 63
+  },
+  "candidate_states": [
+    "ESTABLISHED_UPWARD",
+    "STRENGTHENING_UPWARD",
+    "WEAKENING_UPWARD",
+    "NEUTRAL_CONSOLIDATING",
+    "STRENGTHENING_DOWNWARD",
+    "ESTABLISHED_DOWNWARD",
+    "POTENTIALLY_REVERSING"
+  ],
+  "controls": {
+    "candidate_state_forward_validation_authorized": true,
+    "momentum_interpretation_policy_authorized": false,
+    "tactical_posture_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false,
+    "production_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false
+  }
+}
