@@ -13,10 +13,16 @@ def test_momentum_read_api_verifier_is_read_only() -> None:
     assert "DASH-READ-1-METALS-MOMENTUM-READ-API-VERIFY-1" in text
     assert "PresentationReadRepository" in text
     assert 'repository.asset_detail("metals", asset_id)' in text
-    assert "metals_momentum_state" not in text
+    assert 'str(contract["record_type"])' in text
     assert "INSERT INTO" not in text.upper()
     assert "UPDATE " not in text.upper()
     assert "DELETE FROM" not in text.upper()
+
+
+def test_momentum_read_api_verifier_is_directly_executable() -> None:
+    text = (ROOT / "scripts" / "verify_metals_momentum_state_read_api.py").read_text(encoding="utf-8")
+    assert "import sys" in text
+    assert "sys.path.insert(0, str(ROOT))" in text
 
 
 def test_momentum_read_api_verifier_locks_governance() -> None:
