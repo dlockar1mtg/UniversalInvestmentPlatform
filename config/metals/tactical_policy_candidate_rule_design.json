@@ -1,0 +1,97 @@
+{
+  "design_id": "METALS-TACTICAL-POLICY-CANDIDATE-RULE-DESIGN-1",
+  "version": "1.0.0",
+  "source_validation_design": "METALS-TACTICAL-POLICY-VALIDATION-DESIGN-1",
+  "domain_id": "metals",
+  "objective": "Pre-specify a falsifiable medium-term tactical candidate policy before observing candidate-policy forward outcomes.",
+  "eligible_vehicle_asset_ids": [
+    "metals:vehicle:COPX",
+    "metals:vehicle:CPER",
+    "metals:vehicle:GLD",
+    "metals:vehicle:IAU",
+    "metals:vehicle:PPLT",
+    "metals:vehicle:SGOL",
+    "metals:vehicle:SIVR",
+    "metals:vehicle:SLV",
+    "metals:vehicle:URA",
+    "metals:vehicle:URNM"
+  ],
+  "reference_control_asset_ids": ["metals:vehicle:BIL"],
+  "candidate_postures": ["ACCUMULATE", "HOLD", "WATCH", "REDUCE", "AVOID"],
+  "historical_validation_input_scope": {
+    "time_aligned_price_derived_inputs_only": true,
+    "required_price_derived_inputs": [
+      "return_1m_pct",
+      "return_3m_pct",
+      "return_6m_pct",
+      "distance_ma50_pct",
+      "distance_ma200_pct",
+      "current_drawdown_pct",
+      "realized_volatility_3m_pct"
+    ],
+    "current_only_recommendation_or_risk_may_not_be_backfilled_into_history": true,
+    "missing_historical_vintage_authority_must_remain_missing": true
+  },
+  "candidate_signal_rules": {
+    "return_1m": {"positive_if_gte": 2.0, "negative_if_lte": -2.0, "weight": 1},
+    "return_3m": {"positive_if_gte": 5.0, "negative_if_lte": -5.0, "weight": 2},
+    "return_6m": {"positive_if_gte": 8.0, "negative_if_lte": -8.0, "weight": 2},
+    "distance_ma50": {"positive_if_gte": 2.0, "negative_if_lte": -2.0, "weight": 1},
+    "distance_ma200": {"positive_if_gte": 3.0, "negative_if_lte": -3.0, "weight": 2},
+    "drawdown_penalty": {
+      "penalty_1_if_lte": -15.0,
+      "penalty_2_if_lte": -25.0
+    },
+    "volatility_penalty": {
+      "penalty_1_if_gte": 45.0
+    }
+  },
+  "candidate_score_mapping": {
+    "ACCUMULATE": {"minimum_score": 5},
+    "HOLD": {"minimum_score": 2, "maximum_score": 4},
+    "WATCH": {"minimum_score": -1, "maximum_score": 1},
+    "REDUCE": {"minimum_score": -4, "maximum_score": -2},
+    "AVOID": {"maximum_score": -5}
+  },
+  "hard_gates": {
+    "reference_control_receives_no_opportunity_posture": true,
+    "minimum_history_observations": 252,
+    "all_required_price_derived_inputs_must_be_available": true,
+    "current_application_requires_current_price_authority": true,
+    "current_application_requires_recommendation_and_risk_authority": true,
+    "insufficient_current_authority_yields_no_tactical_posture": true
+  },
+  "validation_plan": {
+    "walk_forward_step_observations": 5,
+    "forward_horizons_observations": [21, 63],
+    "development_then_holdout_required": true,
+    "candidate_rules_locked_before_forward_outcome_evaluation": true,
+    "measure_return_distribution_by_posture": true,
+    "measure_downside_and_drawdown_by_posture": true,
+    "measure_turnover_and_posture_churn": true,
+    "compare_buy_and_hold_baseline": true,
+    "compare_no_tactical_overlay_baseline": true,
+    "production_threshold_changes_require_new_validation_cycle": true
+  },
+  "semantic_constraints": {
+    "momentum_state_is_descriptive_not_predictive": true,
+    "candidate_policy_is_not_yet_authorized_advice": true,
+    "forecast_validation_separate_from_policy_validation": true,
+    "cross_domain_rank_prohibited": true,
+    "universal_allocation_policy_prohibited": true,
+    "automatic_execution_prohibited": true
+  },
+  "controls": {
+    "candidate_rule_design_authorized": true,
+    "historical_candidate_evaluation_authorized": false,
+    "tactical_posture_authorized": false,
+    "presentation_activation_authorized": false,
+    "production_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision": "AUTHORIZE_METALS_TACTICAL_POLICY_HISTORICAL_INPUT_FEASIBILITY_AUDIT"
+}
