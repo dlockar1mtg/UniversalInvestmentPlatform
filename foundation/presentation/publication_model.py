@@ -250,16 +250,19 @@ def build_presentation_publication(
     """Project current certified analytical state without mutating its source."""
     contract = contract or load_presentation_contract(repository_root)
     validate_authority_schema(connection, contract)
+    source_sha256 = sha256_file(database_path)
     records: list[PresentationRecord] = []
     records.extend(_domain_health_records(connection))
     records.extend(_generic_records(connection, "crypto"))
     records.extend(_generic_records(connection, "metals"))
+    from .metals_tactical_projection import build_metals_tactical_records
+    records.extend(build_metals_tactical_records(repository_root, connection, source_sha256))
     records.extend(_mtg_records(connection))
     records.sort(key=lambda item: (item.record_type, item.domain_id, item.asset_id or "", item.record_key))
     return PresentationPublication(
         publication_id=publication_id or str(uuid4()),
         publication_version=PUBLICATION_VERSION,
-        source_database_sha256=sha256_file(database_path),
+        source_database_sha256=source_sha256,
         source_database_classification=SOURCE_CLASSIFICATION,
         published_at_utc=published_at_utc or datetime.now(timezone.utc).isoformat(),
         publication_status="STAGED",
