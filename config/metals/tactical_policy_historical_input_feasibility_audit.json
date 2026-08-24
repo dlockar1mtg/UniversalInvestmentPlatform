@@ -1,0 +1,58 @@
+{
+  "audit_id": "METALS-TACTICAL-POLICY-HISTORICAL-INPUT-FEASIBILITY-AUDIT-1",
+  "version": "1.0.0",
+  "source_candidate_rule_design": "METALS-TACTICAL-POLICY-CANDIDATE-RULE-DESIGN-1",
+  "source_package_id": "metals-price-history-20260824",
+  "source_authority": "METALS-MARKET-HISTORY-1",
+  "expected_history_sha256": "c3749acbcf3a6d11ee9a6ca392b8421e7654936af489fbb93a2f4ae659470f31",
+  "eligible_vehicle_asset_ids": [
+    "metals:vehicle:COPX",
+    "metals:vehicle:CPER",
+    "metals:vehicle:GLD",
+    "metals:vehicle:IAU",
+    "metals:vehicle:PPLT",
+    "metals:vehicle:SGOL",
+    "metals:vehicle:SIVR",
+    "metals:vehicle:SLV",
+    "metals:vehicle:URA",
+    "metals:vehicle:URNM"
+  ],
+  "reference_control_asset_ids": ["metals:vehicle:BIL"],
+  "required_price_derived_inputs": [
+    "return_1m_pct",
+    "return_3m_pct",
+    "return_6m_pct",
+    "distance_ma50_pct",
+    "distance_ma200_pct",
+    "current_drawdown_pct",
+    "realized_volatility_3m_pct"
+  ],
+  "minimum_history_observations": 252,
+  "walk_forward_step_observations": 5,
+  "forward_horizons_observations": [21, 63],
+  "expected_history_observations_per_asset": 753,
+  "expected_input_ready_observations_per_asset": 502,
+  "expected_forward_evaluable_grid_points_per_asset": 88,
+  "semantic_constraints": {
+    "point_in_time_inputs_only": true,
+    "future_values_may_not_enter_feature_calculation": true,
+    "forward_outcomes_may_not_be_calculated_in_this_audit": true,
+    "current_only_recommendation_or_risk_may_not_be_backfilled": true,
+    "missing_historical_authority_must_remain_missing": true
+  },
+  "controls": {
+    "historical_input_feasibility_audit_authorized": true,
+    "historical_candidate_evaluation_authorized": false,
+    "tactical_posture_authorized": false,
+    "presentation_activation_authorized": false,
+    "production_database_write_authorized": false,
+    "native_source_query_authorized": false,
+    "export_execution_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision": "AUTHORIZE_METALS_TACTICAL_POLICY_WALK_FORWARD_EVALUATION_DESIGN"
+}
