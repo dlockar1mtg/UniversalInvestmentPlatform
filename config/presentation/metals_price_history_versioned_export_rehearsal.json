@@ -1,0 +1,30 @@
+{
+  "contract_id": "METALS-PRICE-HISTORY-VERSIONED-EXPORT-REHEARSAL-1",
+  "version": "1.0.0",
+  "source_authority": "METALS-MARKET-HISTORY-1",
+  "source_system": "yfinance",
+  "source_run_id": "metals-market-history-backfill-20260824",
+  "expected_vehicle_count": 11,
+  "expected_history_point_count": 8283,
+  "current_price_filename": "metals_current_price.jsonl",
+  "price_history_filename": "metals_price_history.jsonl",
+  "manifest_filename": "manifest.json",
+  "current_price_record_type": "metals_current_price",
+  "price_history_record_type": "metals_price_history",
+  "required_current_price_fields": ["asset_id", "ticker", "observation_date", "current_price_usd", "source_authority", "source_run_id"],
+  "required_history_fields": ["asset_id", "ticker", "observation_date", "close_usd", "adjusted_close_usd", "volume", "source_authority", "source_run_id"],
+  "controls": {
+    "native_source_read_authorized": true,
+    "versioned_export_execution_authorized": true,
+    "production_database_write_authorized": false,
+    "presentation_activation_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "tactical_posture_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false,
+    "missing_authority_may_be_synthesized": false
+  },
+  "next_decision": "REVIEW_METALS_PRICE_HISTORY_VERSIONED_EXPORT_REHEARSAL"
+}
