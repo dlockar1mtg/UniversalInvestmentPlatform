@@ -1,0 +1,51 @@
+{
+  "contract_id": "UIP-METALS-TACTICAL-RESEARCH-1",
+  "version": "1.0.0",
+  "status": "DESIGN_LOCKED",
+  "objective": "Promote Metals-native evidence to a first-class UIP tactical research surface before premium dashboard implementation.",
+  "governing_horizon": {
+    "portfolio_objective": "three_year_wealth_growth",
+    "metals_decision_style": "medium_term_tactical_investing",
+    "day_trading_authorized": false,
+    "primary_forecast_horizons_months": [3, 6, 12, 24],
+    "strategic_context": "12-24m+"
+  },
+  "required_native_evidence": {
+    "forecast_model_components": "latest_forecast_model_components.csv",
+    "learned_regime_probabilities": "latest_learned_regime_probabilities.csv",
+    "uncertainty_adjusted_views": "latest_uncertainty_adjusted_views.csv",
+    "recommendation_change_explanations": "latest_recommendation_change_explanations.csv",
+    "data_freshness_details": "latest_data_freshness_details.csv",
+    "platform_health": "latest_platform_health_score.csv"
+  },
+  "target_research_dimensions": [
+    "long_term_thesis",
+    "multi_horizon_expected_return",
+    "probability_positive",
+    "forecast_confidence",
+    "model_component_agreement",
+    "learned_market_regime",
+    "uncertainty_adjusted_return",
+    "momentum_direction",
+    "momentum_strength",
+    "reversal_risk",
+    "risk_and_downside",
+    "current_market_context",
+    "tactical_posture",
+    "evidence_freshness"
+  ],
+  "tactical_posture_policy": {
+    "states": ["ACCUMULATE", "HOLD", "WATCH", "REDUCE", "AVOID"],
+    "status": "NOT_YET_GOVERNED",
+    "automatic_execution": false
+  },
+  "prohibited_shortcuts": [
+    "do_not_copy_crypto_policy",
+    "do_not_invent_current_price",
+    "do_not_invent_historical_prices",
+    "do_not_convert_missing_forecast_bounds_into_synthetic_scenarios",
+    "do_not_create_tactical_posture_from_ui_logic",
+    "do_not_authorize_automatic_purchase_or_sale",
+    "do_not_create_cross_domain_rank_in_this_phase"
+  ]
+}
