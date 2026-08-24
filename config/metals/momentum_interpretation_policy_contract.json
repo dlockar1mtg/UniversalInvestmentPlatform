@@ -1,0 +1,39 @@
+{
+  "contract_id": "METALS-MOMENTUM-INTERPRETATION-1",
+  "version": "1.0.0",
+  "source_authorities": [
+    "METALS-MARKET-HISTORY-1",
+    "METALS-MOMENTUM-1",
+    "METALS-MOMENTUM-VALIDATION-1",
+    "METALS-MOMENTUM-FORWARD-VALIDATION-1"
+  ],
+  "semantic_scope": "DESCRIPTIVE_CURRENT_MARKET_STATE_NOT_FORWARD_RETURN_FORECAST",
+  "states": [
+    "ESTABLISHED_UPWARD",
+    "STRENGTHENING_UPWARD",
+    "WEAKENING_UPWARD",
+    "NEUTRAL_CONSOLIDATING",
+    "STRENGTHENING_DOWNWARD",
+    "ESTABLISHED_DOWNWARD",
+    "POTENTIALLY_REVERSING"
+  ],
+  "controls": {
+    "momentum_interpretation_policy_authorized": true,
+    "state_is_descriptive_not_predictive": true,
+    "tactical_posture_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false,
+    "production_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false
+  },
+  "validation_notes": {
+    "gold_family_historical_disagreement_rate_pct": 0.0,
+    "silver_family_historical_disagreement_rate_pct": 0.990099,
+    "all_seven_states_observed": true,
+    "forward_behavior_used_for_semantic_review": true,
+    "downward_state_forward_returns_do_not_convert_state_into_a_forecast": true
+  },
+  "next_decision": "AUTHORIZE_METALS_CURRENT_MOMENTUM_STATE_PUBLICATION_REHEARSAL"
+}
