@@ -57,5 +57,5 @@
     "automatic_execution_authorized": false,
     "missing_authority_may_be_synthesized": false
   },
-  "next_decision": "AUTHORIZE_METALS_TACTICAL_POLICY_V2_VALIDATION_EVALUATION_DESIGN"
+  "next_decision": "AUTHORIZE_METALS_CURRENT_PRICE_SEMANTIC_REVIEW"
 }
