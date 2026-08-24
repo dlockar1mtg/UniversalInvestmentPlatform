@@ -1,0 +1,49 @@
+{
+  "extension_id": "DASH-READ-1-METALS-TACTICAL-EVIDENCE",
+  "version": "1.0.0",
+  "status": "AUTHORIZED_FOR_PRESENTATION_PROJECTION",
+  "base_contract": "DASH_READ_1_CERTIFIED_PRESENTATION_READ_MODEL_PUBLICATION_CONTRACT",
+  "domain_id": "metals",
+  "source_database_sha256": "dff98e56d27cbc5ef879c18939309c5ab8661fa8fa6dfe74e82537fd53954f7c",
+  "controls": {
+    "current_authority_only": true,
+    "presentation_store_is_analytical_authority": false,
+    "missing_authority_may_be_synthesized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false,
+    "tactical_posture_authorized": false
+  },
+  "surfaces": {
+    "metals_model_component": {
+      "source": "metals_forecast_model_component_current",
+      "asset_identity": "universal_asset_id",
+      "required_fields": ["universal_asset_id", "forecast_run_id", "metal", "horizon_months", "model_name", "model_forecast", "model_weight", "_import_id", "_package_id", "_source_filename", "_source_row_number", "_manifest_sha256", "_promoted_at_utc"]
+    },
+    "metals_regime_probability": {
+      "source": "metals_regime_probability_current",
+      "asset_identity": "universal_asset_id",
+      "required_fields": ["universal_asset_id", "forecast_run_id", "metal", "regime", "probability", "_import_id", "_package_id", "_source_filename", "_source_row_number", "_manifest_sha256", "_promoted_at_utc"]
+    },
+    "metals_uncertainty_adjusted": {
+      "source": "metals_uncertainty_adjusted_view_current",
+      "asset_identity": "universal_vehicle_id",
+      "required_fields": ["universal_vehicle_id", "universal_metal_id", "forecast_run_id", "ticker", "metal", "horizon_months", "raw_expected_return", "uncertainty_penalty", "downside_penalty", "adjusted_expected_return", "_import_id", "_package_id", "_source_filename", "_source_row_number", "_manifest_sha256", "_promoted_at_utc"]
+    },
+    "metals_recommendation_change": {
+      "source": "metals_recommendation_change_current",
+      "asset_identity": "universal_vehicle_id",
+      "required_fields": ["universal_vehicle_id", "decision_run_id", "ticker", "previous_action", "current_action", "previous_weight_pct", "current_weight_pct", "weight_change_pct", "previous_confidence", "current_confidence", "confidence_change", "explanation", "_import_id", "_package_id", "_source_filename", "_source_row_number", "_manifest_sha256", "_promoted_at_utc"]
+    },
+    "metals_data_freshness": {
+      "source": "metals_data_freshness_current",
+      "asset_identity": null,
+      "required_fields": ["decision_run_id", "series_key", "frequency", "last_observation", "age_days", "freshness_status", "health_score", "message", "_import_id", "_package_id", "_source_filename", "_source_row_number", "_manifest_sha256", "_promoted_at_utc"]
+    },
+    "metals_platform_health": {
+      "source": "metals_platform_health_current",
+      "asset_identity": null,
+      "required_fields": ["decision_run_id", "data_freshness_score", "model_confidence_score", "recommendation_quality_score", "pipeline_completeness_score", "overall_platform_health", "platform_grade", "explanation", "_import_id", "_package_id", "_source_filename", "_source_row_number", "_manifest_sha256", "_promoted_at_utc"]
+    }
+  }
+}
