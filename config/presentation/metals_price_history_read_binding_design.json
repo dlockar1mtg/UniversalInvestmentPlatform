@@ -1,0 +1,36 @@
+{
+  "design_id": "METALS-PRICE-HISTORY-READ-BINDING-DESIGN-1",
+  "version": "1.0.0",
+  "source_authority": "METALS-MARKET-HISTORY-1",
+  "transport_contract": "VERSIONED_EXPORT_PACKAGE_REQUIRED",
+  "presentation_targets": {
+    "current_price_record_type": "metals_current_price",
+    "price_history_record_type": "metals_price_history",
+    "expected_vehicle_count": 11,
+    "expected_history_points": 8283
+  },
+  "architecture": {
+    "native_store_may_be_read_by_exporter": true,
+    "universal_production_may_query_native_tables_directly": false,
+    "presentation_projection_may_query_native_tables_directly": false,
+    "read_api_may_query_native_tables_directly": false,
+    "versioned_export_package_required": true,
+    "export_manifest_sha256_required": true,
+    "source_run_id_required": true,
+    "source_authority_required": true,
+    "missing_authority_may_be_synthesized": false
+  },
+  "controls": {
+    "design_authorized": true,
+    "export_execution_authorized": false,
+    "presentation_activation_authorized": false,
+    "production_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "tactical_posture_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision": "AUTHORIZE_METALS_PRICE_HISTORY_VERSIONED_EXPORT_REHEARSAL"
+}
