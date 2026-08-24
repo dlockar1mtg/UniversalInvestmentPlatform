@@ -2,9 +2,13 @@ from __future__ import annotations
 
 import json
 import os
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 CONTRACT_PATH = ROOT / "config" / "presentation" / "dash_read_1_metals_momentum_read_api_verification.json"
 
 
@@ -115,7 +119,13 @@ def main() -> int:
     if gold is None:
         raise RuntimeError("GLD detail missing")
     gold_types = set((gold.get("records") or {}).keys())
-    required_gold_types = {"asset", "recommendation", "risk", "metals_momentum_state", "metals_uncertainty_adjusted"}
+    required_gold_types = {
+        "asset",
+        "recommendation",
+        "risk",
+        str(contract["record_type"]),
+        "metals_uncertainty_adjusted",
+    }
     if not required_gold_types.issubset(gold_types):
         raise RuntimeError(f"GLD read surface is incomplete: missing={sorted(required_gold_types - gold_types)}")
 
