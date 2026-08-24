@@ -1,0 +1,56 @@
+{
+  "review_id": "METALS-TACTICAL-POLICY-WALK-FORWARD-EVALUATION-REVIEW-1",
+  "version": "1.0.0",
+  "source_evaluation": "METALS-TACTICAL-POLICY-WALK-FORWARD-EVALUATION-1",
+  "source_candidate_rule_design": "METALS-TACTICAL-POLICY-CANDIDATE-RULE-DESIGN-1",
+  "domain_id": "metals",
+  "review_status": "INCONCLUSIVE_NOT_AUTHORIZED",
+  "observed_holdout": {
+    "constructive_observation_count": 280,
+    "defensive_observation_count": 15,
+    "minimum_supported_observations_per_compared_group": 20,
+    "minimum_group_support_met": false,
+    "constructive_63d_median_return_pct": 6.756357645469169,
+    "defensive_63d_median_return_pct": -15.407323070056556,
+    "constructive_63d_positive_return_rate": 0.625,
+    "defensive_63d_positive_return_rate": 0.2,
+    "constructive_63d_mean_maximum_adverse_excursion_pct": -9.916918268018302,
+    "defensive_63d_mean_maximum_adverse_excursion_pct": -16.504686332992097,
+    "holdout_posture_change_rate": 0.29705882352941176
+  },
+  "review_findings": {
+    "candidate_version_1_may_not_be_declared_pass": true,
+    "candidate_version_1_may_not_be_declared_fail_due_to_locked_inconclusive_rule": true,
+    "constructive_vs_defensive_return_separation_is_directionally_favorable_but_not_validated": true,
+    "constructive_vs_defensive_positive_rate_separation_is_directionally_favorable_but_not_validated": true,
+    "defensive_group_support_is_insufficient": true,
+    "defensive_group_showed_more_adverse_excursion_than_constructive": true,
+    "original_mae_pass_rule_is_semantically_misaligned_with_a_defensive_risk_signal": true,
+    "observed_holdout_results_are_now_consumed_and_may_not_be_reused_as_unseen_validation_for_a_revised_candidate": true
+  },
+  "required_next_cycle_constraints": {
+    "new_candidate_version_required_for_any_rule_change": true,
+    "candidate_v1_thresholds_may_not_be_rewritten": true,
+    "new_validation_authority_required_before_any_live_tactical_posture": true,
+    "revised_mae_interpretation_must_be_pre_specified_before_new_outcome_evaluation": true,
+    "defensive_support_problem_must_be_addressed_without_relaxing_support_after_the_fact": true,
+    "previously_observed_holdout_may_be_used_for_research_diagnostics_only": true,
+    "new_unseen_validation_evidence_required_for_production_authorization": true
+  },
+  "controls": {
+    "evaluation_review_authorized": true,
+    "candidate_v1_pass_authorized": false,
+    "candidate_v1_fail_authorized": false,
+    "candidate_v1_inconclusive_certified": true,
+    "candidate_threshold_change_authorized": false,
+    "tactical_posture_authorized": false,
+    "presentation_activation_authorized": false,
+    "production_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision": "AUTHORIZE_METALS_TACTICAL_POLICY_V2_RESEARCH_DESIGN"
+}
