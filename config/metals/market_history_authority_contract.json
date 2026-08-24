@@ -1,0 +1,36 @@
+{
+  "contract_id": "METALS-MARKET-HISTORY-1",
+  "version": "1.0.0",
+  "purpose": "Establish the minimum evidence contract for Metals current-price, historical-chart, and future momentum-feature authority without changing forecast or recommendation policy.",
+  "vehicle_source": "yfinance",
+  "benchmark_market_source": "yfinance",
+  "collection_period": "3y",
+  "interval": "1d",
+  "minimum_vehicle_rows_per_ticker": 500,
+  "minimum_benchmark_rows_per_symbol": 500,
+  "maximum_latest_market_age_days": 7,
+  "required_vehicle_fields": [
+    "ticker",
+    "observation_date",
+    "close",
+    "volume",
+    "source"
+  ],
+  "required_benchmark_fields": [
+    "benchmark_symbol",
+    "observation_date",
+    "close",
+    "source"
+  ],
+  "controls": {
+    "production_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "momentum_policy_authorized": false,
+    "tactical_posture_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false,
+    "missing_history_may_be_synthesized": false
+  }
+}
