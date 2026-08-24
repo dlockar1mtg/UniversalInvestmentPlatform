@@ -43,6 +43,16 @@ class MetalsVehicleObservation:
 
 
 @dataclass(frozen=True)
+class MetalsMarketBenchmarkObservation:
+    benchmark_symbol: str
+    observation_date: str
+    close: float
+    source: str
+    collected_at_utc: str
+    run_id: str
+
+
+@dataclass(frozen=True)
 class MetalsStoreSummary:
     benchmark_observation_count: int
     vehicle_observation_count: int
@@ -64,6 +74,11 @@ _SCHEMA_STATEMENTS = (
         close DOUBLE PRECISION NOT NULL, adjusted_close DOUBLE PRECISION, volume DOUBLE PRECISION,
         source TEXT NOT NULL, collected_at_utc TEXT NOT NULL, run_id TEXT NOT NULL,
         PRIMARY KEY (ticker, observation_date, source))""",
+    """CREATE TABLE IF NOT EXISTS metals_market_benchmark_observations (
+        benchmark_symbol TEXT NOT NULL, observation_date TEXT NOT NULL,
+        close DOUBLE PRECISION NOT NULL, source TEXT NOT NULL,
+        collected_at_utc TEXT NOT NULL, run_id TEXT NOT NULL,
+        PRIMARY KEY (benchmark_symbol, observation_date, source))""",
     """CREATE TABLE IF NOT EXISTS metals_native_runs (
         run_id TEXT PRIMARY KEY, started_at_utc TEXT NOT NULL, completed_at_utc TEXT,
         status TEXT NOT NULL, benchmark_rows INTEGER NOT NULL DEFAULT 0,
@@ -133,6 +148,24 @@ class MetalsNativeStore:
             "INSERT INTO metals_vehicle_observations (ticker, observation_date, close, adjusted_close, volume, source, collected_at_utc, run_id) "
             "VALUES (?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(ticker, observation_date, source) DO UPDATE SET "
             "close=excluded.close, adjusted_close=excluded.adjusted_close, volume=excluded.volume, collected_at_utc=excluded.collected_at_utc, run_id=excluded.run_id"
+        )
+        cursor = self.connection.cursor()
+        try:
+            cursor.executemany(sql, values)
+            self.connection.commit()
+            return len(values)
+        except Exception:
+            self.connection.rollback()
+            raise
+
+    def upsert_market_benchmark_observations(self, rows: Iterable[MetalsMarketBenchmarkObservation]) -> int:
+        values = [(r.benchmark_symbol, r.observation_date, r.close, r.source, r.collected_at_utc, r.run_id) for r in rows]
+        if not values:
+            return 0
+        sql = self._sql(
+            "INSERT INTO metals_market_benchmark_observations (benchmark_symbol, observation_date, close, source, collected_at_utc, run_id) "
+            "VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(benchmark_symbol, observation_date, source) DO UPDATE SET "
+            "close=excluded.close, collected_at_utc=excluded.collected_at_utc, run_id=excluded.run_id"
         )
         cursor = self.connection.cursor()
         try:
