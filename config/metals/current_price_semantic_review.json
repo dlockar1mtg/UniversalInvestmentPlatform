@@ -1,0 +1,49 @@
+{
+  "review_id": "METALS-CURRENT-PRICE-SEMANTIC-REVIEW-1",
+  "version": "1.0.0",
+  "domain_id": "metals",
+  "objective": "Determine whether the published Metals current_price_usd field is semantically based on the latest unadjusted market close rather than adjusted close, without querying native sources or modifying presentation state.",
+  "source_package": {
+    "package_id": "metals-price-history-20260824",
+    "current_filename": "metals_current_price.jsonl",
+    "history_filename": "metals_price_history.jsonl",
+    "manifest_filename": "manifest.json",
+    "current_sha256": "e18ece1a8dbc5b23f6ec7bb2d014822bdccd8a7f82fca0b6c23d5fda3bc8a4ed",
+    "history_sha256": "c3749acbcf3a6d11ee9a6ca392b8421e7654936af489fbb93a2f4ae659470f31",
+    "manifest_sha256": "82ead8e711e0fde4b30fa4e0e7196681e41e7f0ffa363af201c0ee0737473dcf",
+    "expected_vehicle_count": 11,
+    "symbols": ["BIL", "COPX", "CPER", "GLD", "IAU", "PPLT", "SGOL", "SIVR", "SLV", "URA", "URNM"]
+  },
+  "semantic_target": {
+    "published_field": "current_price_usd",
+    "required_basis": "UNADJUSTED_CLOSE",
+    "history_reference_field": "close_usd",
+    "comparison_field": "adjusted_close_usd",
+    "comparison_tolerance": 1e-9,
+    "classifications": ["RAW_CLOSE", "ADJUSTED_CLOSE", "BOTH", "NEITHER"]
+  },
+  "certification_rule": {
+    "current_price_semantics_certified_when": "EVERY_CURRENT_PRICE_MATCHES_LATEST_UNADJUSTED_CLOSE_WITHIN_TOLERANCE",
+    "adjusted_only_match_is_failure": true,
+    "neither_match_is_failure": true,
+    "synthetic_correction_prohibited": true,
+    "presentation_correction_required_if_not_certified": true
+  },
+  "controls": {
+    "semantic_review_authorized": true,
+    "native_source_query_authorized": false,
+    "package_regeneration_authorized": false,
+    "presentation_activation_authorized": false,
+    "production_database_write_authorized": false,
+    "historical_candidate_evaluation_authorized": false,
+    "new_validation_outcome_inspection_authorized": false,
+    "tactical_posture_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision_if_certified": "AUTHORIZE_METALS_TACTICAL_POLICY_V2_VALIDATION_EVALUATION_DESIGN",
+  "next_decision_if_not_certified": "REQUIRE_METALS_CURRENT_PRICE_RAW_CLOSE_EXPORT_CORRECTION"
+}
