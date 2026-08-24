@@ -18,9 +18,16 @@ import uvicorn
 
 from foundation.production.free_staging import FreeStagingSettings, build_neon_repositories
 from foundation.production.hosted_portfolio import install_hosted_portfolio_routes
+from foundation.production.hosted_portfolio_accounting import (
+    install_enriched_portfolio_routes,
+    install_transaction_portfolio_routes,
+)
+from foundation.production.hosted_transactions import install_hosted_transaction_routes
 from foundation.production.http_service import HTTPServiceSettings, create_http_app
 from foundation.production.live_security import LiveSecuritySettings, install_live_security
 from foundation.production.portfolio_persistence import PostgresPortfolioSnapshotRepository
+from foundation.production.transaction_persistence import PostgresTransactionRepository
+from foundation.presentation.asset_catalog import GovernedAssetCatalogRepository, install_governed_asset_catalog_routes
 from foundation.presentation.read_api import PresentationReadRepository, install_presentation_read_routes
 
 
@@ -51,7 +58,10 @@ def main() -> None:
 
     portfolio_repository = PostgresPortfolioSnapshotRepository.from_dsn(database_url)
     portfolio_repository.initialize()
+    transaction_repository = PostgresTransactionRepository.from_dsn(database_url)
+    transaction_repository.initialize()
     presentation_repository = PresentationReadRepository.from_dsn(database_url)
+    asset_catalog_repository = GovernedAssetCatalogRepository.from_dsn(database_url)
 
     local_values = dict(os.environ)
     local_values.update(
@@ -63,8 +73,29 @@ def main() -> None:
     )
     settings = HTTPServiceSettings.from_environment(local_values)
     app = create_http_app(settings, repository=production_repository)
+
+    # Mirror the route composition used by the hosted production launcher so the
+    # dashboard's authenticated bootstrap cannot fail on locally omitted routes.
     install_hosted_portfolio_routes(app, settings, portfolio_repository)
     install_presentation_read_routes(app, settings.credentials, presentation_repository)
+    install_governed_asset_catalog_routes(app, settings.credentials, asset_catalog_repository)
+    install_hosted_transaction_routes(
+        app,
+        settings,
+        transaction_repository,
+        asset_identity_validator=asset_catalog_repository.asset_exists,
+    )
+    install_transaction_portfolio_routes(
+        app,
+        settings.credentials,
+        transaction_repository,
+    )
+    install_enriched_portfolio_routes(
+        app,
+        settings.credentials,
+        transaction_repository,
+        presentation_repository,
+    )
 
     # Localhost-only HTTP is permitted solely for this local browser acceptance
     # helper. Production/Render still requires HTTPS through its normal launcher.
@@ -81,6 +112,7 @@ def main() -> None:
     print("UIP DASH-SHELL-1 LOCAL BROWSER ACCEPTANCE")
     print("=" * 72)
     print(f"Open: http://127.0.0.1:{port}/dashboard")
+    print("Local route composition mirrors the hosted dashboard runtime.")
     print("This helper does not weaken the Render HTTPS policy.")
     print("Press Ctrl+C when browser review is complete.")
     print("=" * 72)
