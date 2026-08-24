@@ -1,0 +1,72 @@
+{
+  "design_id": "METALS-TACTICAL-POLICY-V2-RESEARCH-DESIGN-1",
+  "version": "1.0.0",
+  "source_v1_review": "METALS-TACTICAL-POLICY-WALK-FORWARD-EVALUATION-REVIEW-1",
+  "domain_id": "metals",
+  "objective": "Define the governed research boundary for a revised Metals tactical-policy candidate after V1 produced an inconclusive consumed holdout.",
+  "v1_findings": {
+    "candidate_v1_result": "INCONCLUSIVE",
+    "constructive_holdout_observations": 280,
+    "defensive_holdout_observations": 15,
+    "minimum_supported_observations_per_compared_group": 20,
+    "minimum_group_support_met": false,
+    "directional_return_separation_observed_not_validated": true,
+    "directional_positive_rate_separation_observed_not_validated": true,
+    "mae_rule_semantic_misalignment_identified": true,
+    "observed_v1_evaluation_evidence_consumed": true
+  },
+  "v2_research_requirements": {
+    "new_candidate_version_required": true,
+    "v1_candidate_may_not_be_relabelled_as_pass": true,
+    "v1_observed_outcomes_may_inform_research_but_not_validate_v2": true,
+    "five_posture_vocabulary_preserved_for_research": ["ACCUMULATE", "HOLD", "WATCH", "REDUCE", "AVOID"],
+    "bil_remains_reference_control_only": true,
+    "time_aligned_price_derived_historical_inputs_only": true,
+    "current_only_recommendation_or_risk_backfill_prohibited": true,
+    "candidate_rule_changes_must_be_explicitly_versioned": true,
+    "candidate_rules_must_be_locked_before_new_validation_outcomes_are_inspected": true,
+    "defensive_group_support_must_be_addressed_before_final_validation": true,
+    "defensive_signal_is_a_warning_of_worse_subsequent_outcomes_not_a_low_drawdown_state": true,
+    "corrected_downside_validation_direction_required": true,
+    "new_unseen_validation_evidence_required": true
+  },
+  "unseen_validation_strategy": {
+    "strategy": "GOVERNED_HISTORICAL_EXPANSION_ACQUIRED_AFTER_V2_RULE_LOCK",
+    "existing_certified_history_start_date": "2023-08-22",
+    "existing_certified_history_end_date": "2026-08-21",
+    "v1_outcomes_from_existing_history_are_consumed": true,
+    "expanded_history_must_end_before_existing_certified_history_start_date": true,
+    "expanded_history_outcomes_may_not_be_inspected_before_v2_rule_lock": true,
+    "network_or_native_history_collection_not_authorized_by_this_design": true,
+    "historical_expansion_feasibility_must_be_audited_after_v2_rule_lock": true,
+    "minimum_common_history_start_date_must_be_discovered_not_assumed": true,
+    "new_validation_interval_must_be_disjoint_from_v1_evaluation_interval": true
+  },
+  "v2_candidate_design_scope": {
+    "may_revise_signal_thresholds": true,
+    "may_revise_signal_weights": true,
+    "may_revise_posture_score_boundaries": true,
+    "may_revise_downside_pass_fail_semantics": true,
+    "may_not_use_new_unseen_outcomes_during_rule_design": true,
+    "may_not_reduce_minimum_compared_group_support_below_20": true,
+    "must_preserve_no_missing_authority_synthesis": true,
+    "must_preserve_forecast_validation_separate_from_policy_validation": true
+  },
+  "controls": {
+    "v2_research_design_authorized": true,
+    "v2_candidate_rule_design_authorized": false,
+    "historical_expansion_execution_authorized": false,
+    "new_validation_outcome_inspection_authorized": false,
+    "historical_candidate_evaluation_authorized": false,
+    "tactical_posture_authorized": false,
+    "presentation_activation_authorized": false,
+    "production_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false,
+    "missing_authority_may_be_synthesized": false
+  },
+  "next_decision": "AUTHORIZE_METALS_TACTICAL_POLICY_V2_CANDIDATE_RULE_DESIGN"
+}
