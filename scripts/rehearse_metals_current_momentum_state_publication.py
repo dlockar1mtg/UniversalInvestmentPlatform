@@ -90,8 +90,8 @@ def main() -> int:
         asset_rows = connection.execute(
             """SELECT DISTINCT asset_id FROM presentation_records
                WHERE publication_id=%s AND domain_id='metals' AND record_type='asset'
-                 AND asset_id LIKE 'metals:vehicle:%'""",
-            (active_id,),
+                 AND asset_id LIKE %s""",
+            (active_id, "metals:vehicle:%"),
         ).fetchall()
         presentation_asset_ids = {str(row[0]) for row in asset_rows}
 
