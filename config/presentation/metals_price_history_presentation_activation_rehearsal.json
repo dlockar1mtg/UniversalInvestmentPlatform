@@ -1,0 +1,29 @@
+{
+  "contract_id": "METALS-PRICE-HISTORY-PRESENTATION-ACTIVATION-REHEARSAL-1",
+  "version": "1.0.0",
+  "source_package_id": "metals-price-history-20260824",
+  "source_authority": "METALS-MARKET-HISTORY-1",
+  "expected_previous_active_publication_id": "dash-read-1-metals-momentum-dff98e56d27c",
+  "expected_previous_fingerprint": "7bef2ada719080b47d0bf12c4048755bd9f3307636e140e3a8297f9ba3ed560f",
+  "publication_id": "dash-read-1-metals-price-history-dff98e56d27c",
+  "expected_extended_record_count": 12476,
+  "expected_extended_fingerprint": "c8742b715c8e6d4120eea6a1d717c0d2ebe7a90e78339f7b17cb4e64ee3d831f",
+  "expected_current_price_record_count": 11,
+  "expected_history_record_count": 8283,
+  "expected_current_price_sha256": "e18ece1a8dbc5b23f6ec7bb2d014822bdccd8a7f82fca0b6c23d5fda3bc8a4ed",
+  "expected_price_history_sha256": "c3749acbcf3a6d11ee9a6ca392b8421e7654936af489fbb93a2f4ae659470f31",
+  "expected_manifest_sha256": "82ead8e711e0fde4b30fa4e0e7196681e41e7f0ffa363af201c0ee0737473dcf",
+  "controls": {
+    "presentation_activation_authorized": true,
+    "native_source_query_authorized": false,
+    "export_execution_authorized": false,
+    "production_analytical_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "tactical_posture_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision": "VERIFY_METALS_PRICE_HISTORY_READ_API"
+}
