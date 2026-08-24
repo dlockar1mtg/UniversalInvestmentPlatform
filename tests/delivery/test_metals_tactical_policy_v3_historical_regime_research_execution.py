@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import ast
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -18,11 +19,12 @@ def test_runner_and_verifier_exist_and_parse() -> None:
 
 def test_runner_uses_frozen_authority_and_unadjusted_close_only() -> None:
     source = RUNNER.read_text(encoding="utf-8")
+    lowered = source.lower()
     assert "tactical_policy_v3_historical_regime_research_freeze.json" in source
     assert "UNADJUSTED_CLOSE" not in source or "unadjusted_close" in source
     assert '"unadjusted_close", "raw_close", "close"' in source
-    assert "adjusted_close" not in source.lower()
-    assert "adj_close" not in source.lower()
+    assert re.search(r"(?<![a-z0-9_])adjusted_close(?![a-z0-9_])", lowered) is None
+    assert re.search(r"(?<![a-z0-9_])adj_close(?![a-z0-9_])", lowered) is None
 
 
 def test_runner_has_no_network_database_or_production_write_capability() -> None:
