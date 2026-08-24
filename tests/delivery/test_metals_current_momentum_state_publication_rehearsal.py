@@ -20,6 +20,13 @@ def test_publication_rehearsal_script_locks_semantics() -> None:
     assert "metals:vehicle:" in text
 
 
+def test_publication_rehearsal_parameterizes_like_pattern() -> None:
+    text = (ROOT / "scripts" / "rehearse_metals_current_momentum_state_publication.py").read_text(encoding="utf-8")
+    assert "asset_id LIKE %s" in text
+    assert '(active_id, "metals:vehicle:%")' in text
+    assert "asset_id LIKE 'metals:vehicle:%'" not in text
+
+
 def test_publication_rehearsal_does_not_mutate_postgres() -> None:
     text = (ROOT / "scripts" / "rehearse_metals_current_momentum_state_publication.py").read_text(encoding="utf-8")
     assert 'connection.execute("BEGIN READ ONLY")' in text
