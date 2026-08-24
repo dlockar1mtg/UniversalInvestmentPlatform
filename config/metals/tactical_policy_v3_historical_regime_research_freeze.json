@@ -1,0 +1,157 @@
+{
+  "freeze_id": "METALS-TACTICAL-POLICY-V3-HISTORICAL-REGIME-RESEARCH-FREEZE-1",
+  "version": "1.0.0",
+  "source_authorization": "METALS-TACTICAL-POLICY-V3-HISTORICAL-REGIME-RESEARCH-AUTHORIZATION-1",
+  "source_regime_research_design": "METALS-TACTICAL-POLICY-V3-REGIME-RESEARCH-DESIGN-1",
+  "domain_id": "metals",
+  "purpose": "Freeze the point-in-time candidate input definitions and candidate regime-assignment logic before any authorized historical regime research outcomes are generated or inspected.",
+  "research_role": "DEVELOPMENT_ONLY_ON_CONSUMED_EVIDENCE",
+  "price_basis": {
+    "required_price_field": "UNADJUSTED_CLOSE",
+    "trading_day_windows": {
+      "return_1m": 21,
+      "return_3m": 63,
+      "return_6m": 126,
+      "ma50": 50,
+      "ma200": 200,
+      "recent_extreme": 126,
+      "drawdown_lookback": 252,
+      "volatility_short": 21,
+      "volatility_medium": 63,
+      "trend_slope": 63,
+      "adaptive_threshold_history": 252
+    },
+    "minimum_history_before_candidate_label": 452,
+    "missing_or_nonpositive_close_must_produce_no_candidate_label": true
+  },
+  "candidate_input_definitions": {
+    "return_1m_pct": "100 * (close_t / close_t_minus_21 - 1)",
+    "return_3m_pct": "100 * (close_t / close_t_minus_63 - 1)",
+    "return_6m_pct": "100 * (close_t / close_t_minus_126 - 1)",
+    "distance_ma50_pct": "100 * (close_t / mean(close[t-49:t]) - 1)",
+    "distance_ma200_pct": "100 * (close_t / mean(close[t-199:t]) - 1)",
+    "current_drawdown_pct": "100 * (close_t / max(close[t-251:t]) - 1)",
+    "realized_volatility_3m_pct": "100 * stdev(simple_daily_return[t-62:t]) * sqrt(252)",
+    "trend_slope": "100 * (exp(ols_slope(log(close[t-62:t])) * 252) - 1)",
+    "return_dispersion": "stdev(return_1m_pct values available over observations t-62 through t)",
+    "volatility_change": "100 * stdev(simple_daily_return[t-20:t]) * sqrt(252) - realized_volatility_3m_pct",
+    "drawdown_recovery_rate": "current_drawdown_pct_t - current_drawdown_pct_t_minus_21",
+    "distance_from_recent_extreme": "if return_6m_pct >= 0 then 100 * (close_t / max(close[t-125:t]) - 1) else 100 * (close_t / min(close[t-125:t]) - 1)",
+    "short_vs_long_momentum_spread": "return_1m_pct - return_6m_pct / 6"
+  },
+  "point_in_time_adaptive_thresholds": {
+    "threshold_history_uses_only_values_available_through_t_minus_1": true,
+    "minimum_prior_threshold_observations": 126,
+    "strong_momentum_abs_return_3m_percentile": 0.75,
+    "high_volatility_change_percentile": 0.75,
+    "high_return_dispersion_percentile": 0.75,
+    "near_recent_extreme_abs_distance_percentile": 0.25,
+    "percentiles_are_computed_per_vehicle": true,
+    "no_cross_vehicle_future_or_contemporaneous_information_may_enter_thresholds": true
+  },
+  "candidate_regime_assignment_logic": {
+    "logic_version": "METALS-V3-REGIME-CANDIDATE-RULES-1",
+    "assignment_order": [
+      "ELIGIBILITY_GATE",
+      "TREND_PERSISTENCE",
+      "MEAN_REVERSION_OR_EXHAUSTION",
+      "NEUTRAL_OR_UNCERTAIN"
+    ],
+    "eligibility_gate": {
+      "all_required_candidate_inputs_present": true,
+      "minimum_history_requirement_met": true,
+      "adaptive_threshold_history_requirement_met": true,
+      "ineligible_rows_receive_label": "NEUTRAL_OR_UNCERTAIN",
+      "ineligible_rows_receive_reason": "INSUFFICIENT_POINT_IN_TIME_EVIDENCE"
+    },
+    "trend_persistence": {
+      "directional_alignment_required": "return_1m_pct, return_3m_pct, return_6m_pct, distance_ma50_pct, and distance_ma200_pct must all have the same non-zero sign",
+      "trend_slope_alignment_required": "trend_slope must have the same sign as return_6m_pct",
+      "momentum_spread_conflict_prohibited": "short_vs_long_momentum_spread may be zero or have the same sign as return_6m_pct",
+      "strong_momentum_required": "abs(return_3m_pct) must be at or above its vehicle-specific trailing point-in-time 75th percentile",
+      "volatility_spike_prohibited": "volatility_change must be at or below its vehicle-specific trailing point-in-time 75th percentile",
+      "minimum_conditions_required": 5,
+      "all_five_conditions_are_required": true
+    },
+    "mean_reversion_or_exhaustion": {
+      "strong_momentum_required": "abs(return_3m_pct) must be at or above its vehicle-specific trailing point-in-time 75th percentile",
+      "persistence_failure_required": true,
+      "exhaustion_evidence_conditions": [
+        "trend_slope has the opposite sign from return_3m_pct",
+        "short_vs_long_momentum_spread has the opposite sign from return_3m_pct",
+        "volatility_change is above its vehicle-specific trailing point-in-time 75th percentile",
+        "return_dispersion is above its vehicle-specific trailing point-in-time 75th percentile",
+        "abs(distance_from_recent_extreme) is at or below its vehicle-specific trailing point-in-time 25th percentile and momentum spread opposes return_3m_pct",
+        "drawdown_recovery_rate has the opposite sign from return_3m_pct and absolute value is greater than 1 percentage point"
+      ],
+      "minimum_exhaustion_conditions_required": 2,
+      "v2_failure_alone_may_not_satisfy_any_condition": true
+    },
+    "neutral_or_uncertain": {
+      "default_when_neither_directional_family_is_satisfied": true,
+      "default_when_evidence_conflicts": true,
+      "default_when_point_in_time_support_is_insufficient": true,
+      "may_not_be_forced_into_directional_family": true
+    },
+    "action_mapping": {
+      "authorized": false,
+      "candidate_or_live_tactical_posture_may_not_be_assigned": true
+    }
+  },
+  "research_outcome_protocol": {
+    "candidate_labels_must_be_materialized_before_outcome_columns_are_calculated_or_joined": true,
+    "label_ledger_hash_must_be_recorded_before_outcome_comparison": true,
+    "subsequent_return_horizons_trading_days": [21, 63, 126],
+    "subsequent_mae_mfe_horizons_trading_days": [21, 63, 126],
+    "future_returns_and_excursions_are_research_targets_only": true,
+    "overlapping_forward_windows_must_be_disclosed": true,
+    "results_must_be_labelled_development_evidence_not_unseen_validation": true,
+    "no_threshold_or_rule_may_be_changed_after_label_ledger_materialization_without_new_version_and_new_governance_decision": true
+  },
+  "support_and_exposure_family_controls": {
+    "minimum_compared_group_support": 20,
+    "bil_is_reference_control_only": true,
+    "bil_may_not_be_treated_as_opportunity": true,
+    "known_non_independent_groups": [
+      ["GLD", "IAU", "SGOL"],
+      ["SIVR", "SLV"]
+    ],
+    "duplicate_family_members_may_not_be_counted_as_independent_confirmations": true,
+    "support_must_be_reported_by_vehicle_and_exposure_family": true,
+    "family_coverage_must_be_disclosed_before_any_regime_definition_lock": true
+  },
+  "required_execution_outputs": [
+    "versioned_candidate_input_definition",
+    "versioned_candidate_regime_assignment_logic",
+    "point_in_time_regime_label_ledger",
+    "point_in_time_regime_label_ledger_sha256",
+    "regime_support_by_vehicle_and_exposure_family",
+    "regime_separability_summary",
+    "conflict_and_neutral_assignment_summary",
+    "subsequent_outcome_research_summary",
+    "overlapping_forward_window_disclosure",
+    "consumed_evidence_disclosure",
+    "development_not_validation_disclosure"
+  ],
+  "controls": {
+    "v3_historical_regime_research_authorized": true,
+    "v3_historical_regime_research_execution_authorized": true,
+    "candidate_input_definition_frozen": true,
+    "candidate_regime_assignment_logic_frozen": true,
+    "historical_outcome_inspection_executed": false,
+    "v3_regime_definition_authorized": false,
+    "v3_candidate_rule_design_authorized": false,
+    "new_validation_outcome_inspection_authorized": false,
+    "tactical_posture_authorized": false,
+    "presentation_activation_authorized": false,
+    "production_database_write_authorized": false,
+    "native_source_query_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false,
+    "missing_authority_may_be_synthesized": false
+  },
+  "next_decision": "EXECUTE_METALS_TACTICAL_POLICY_V3_HISTORICAL_REGIME_RESEARCH_USING_FROZEN_RULES"
+}
