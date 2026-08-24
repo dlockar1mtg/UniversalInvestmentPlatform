@@ -1,0 +1,29 @@
+{
+  "contract_id": "METALS-MOMENTUM-VALIDATION-1",
+  "version": "1.0.0",
+  "source_authority": "METALS-MOMENTUM-1",
+  "objective": "Evaluate candidate momentum-state interpretation behavior across historical rolling windows without authorizing a production interpretation policy or tactical posture.",
+  "candidate_states": [
+    "ESTABLISHED_UPWARD",
+    "STRENGTHENING_UPWARD",
+    "WEAKENING_UPWARD",
+    "NEUTRAL_CONSOLIDATING",
+    "STRENGTHENING_DOWNWARD",
+    "ESTABLISHED_DOWNWARD",
+    "POTENTIALLY_REVERSING"
+  ],
+  "minimum_history_observations": 252,
+  "evaluation_step_observations": 5,
+  "controls": {
+    "production_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "candidate_state_evaluation_authorized": true,
+    "momentum_interpretation_policy_authorized": false,
+    "tactical_posture_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision": "REVIEW_METALS_MOMENTUM_INTERPRETATION_VALIDATION"
+}
