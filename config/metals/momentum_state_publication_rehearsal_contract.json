@@ -1,0 +1,20 @@
+{
+  "contract_id": "METALS-MOMENTUM-PUBLICATION-REHEARSAL-1",
+  "source_authority": "METALS-MOMENTUM-INTERPRETATION-1",
+  "presentation_record_type": "metals_momentum_state",
+  "semantic_scope": "DESCRIPTIVE_CURRENT_MARKET_STATE_NOT_FORWARD_RETURN_FORECAST",
+  "expected_vehicle_count": 11,
+  "expected_active_publication_id": "dash-read-1-metals-tactical-dff98e56d27c",
+  "controls": {
+    "publication_projection_rehearsal_authorized": true,
+    "presentation_activation_authorized": false,
+    "production_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "tactical_posture_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision": "AUTHORIZE_METALS_MOMENTUM_STATE_PRESENTATION_CONTRACT_EXTENSION"
+}
