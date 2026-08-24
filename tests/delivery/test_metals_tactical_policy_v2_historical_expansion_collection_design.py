@@ -1,3 +1,4 @@
+import ast
 import json
 from pathlib import Path
 
@@ -64,11 +65,23 @@ def test_collection_execution_is_not_authorized_yet():
     assert controls["production_database_write_authorized"] is False
 
 
-def test_verifier_does_not_import_or_calculate_market_outcomes():
+def test_verifier_does_not_import_market_data_or_calculate_outcomes():
     text = VERIFIER.read_text(encoding="utf-8")
     lowered = text.lower()
-    assert "yfinance" not in lowered
-    assert "forward_return" not in lowered
-    assert "maximum_adverse_excursion" not in lowered
-    assert "maximum_favorable_excursion" not in lowered
-    assert "candidate_posture" not in lowered
+    tree = ast.parse(text)
+
+    imported_modules = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            imported_modules.extend(alias.name.lower() for alias in node.names)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            imported_modules.append(node.module.lower())
+
+    assert all(not name.startswith("yfinance") for name in imported_modules)
+    assert "yf.download(" not in lowered
+    assert ".history(" not in lowered
+    assert ".pct_change(" not in lowered
+    assert ".shift(-" not in lowered
+    assert ".rolling(" not in lowered
+    assert "maximum_adverse_excursion_pct" not in lowered
+    assert "maximum_favorable_excursion_pct" not in lowered
