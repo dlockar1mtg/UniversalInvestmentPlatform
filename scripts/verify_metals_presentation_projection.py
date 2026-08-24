@@ -3,10 +3,15 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+import sys
 from collections import Counter
 from pathlib import Path
 
 import duckdb
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 from foundation.presentation.publication_model import build_presentation_publication
 
@@ -38,15 +43,21 @@ def main() -> int:
     parser.add_argument("--expected-sha256", default=EXPECTED_SHA256)
     args = parser.parse_args()
 
-    before = sha256_file(args.database)
+    repository_root = args.repository_root.resolve()
+    database = args.database.resolve()
+
+    if repository_root != ROOT:
+        raise RuntimeError(f"Repository root mismatch: script={ROOT} requested={repository_root}")
+
+    before = sha256_file(database)
     if before.lower() != args.expected_sha256.lower():
         raise RuntimeError(f"Database SHA-256 mismatch: {before}")
 
-    connection = duckdb.connect(str(args.database), read_only=True)
+    connection = duckdb.connect(str(database), read_only=True)
     try:
         publication = build_presentation_publication(
-            args.repository_root,
-            args.database,
+            repository_root,
+            database,
             connection,
             publication_id="metals-tactical-projection-verification",
             published_at_utc="2026-08-24T00:00:00+00:00",
@@ -54,7 +65,7 @@ def main() -> int:
     finally:
         connection.close()
 
-    after = sha256_file(args.database)
+    after = sha256_file(database)
     if after.lower() != before.lower():
         raise RuntimeError("Authoritative DuckDB changed during read-only presentation projection verification.")
 
@@ -64,7 +75,7 @@ def main() -> int:
         raise RuntimeError(f"Metals tactical presentation counts mismatch: {observed_tactical}")
     if len(publication.records) != EXPECTED_TOTAL_RECORDS:
         raise RuntimeError(f"Unexpected total presentation record count: {len(publication.records)}")
-    if publication.source_database_sha256.lower() != EXPECTED_SHA256:
+    if publication.source_database_sha256.lower() != args.expected_sha256.lower():
         raise RuntimeError("Presentation publication source SHA-256 is not the verified Metals authority.")
 
     payload = {
