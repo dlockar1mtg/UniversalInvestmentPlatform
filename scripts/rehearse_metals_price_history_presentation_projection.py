@@ -108,6 +108,13 @@ def main() -> int:
     if len(history_rows) != int(contract["expected_history_record_count"]):
         raise RuntimeError("history package population changed")
 
+    package_asset_ids = {str(row["asset_id"]) for row in current_rows}
+    history_package_asset_ids = {str(row["asset_id"]) for row in history_rows}
+    if package_asset_ids != history_package_asset_ids:
+        raise RuntimeError("current-price and history package asset coverage differ")
+    if len(package_asset_ids) != int(contract["expected_current_price_record_count"]):
+        raise RuntimeError("package canonical asset coverage does not reconcile")
+
     dsn = os.environ.get("UIIP_DATABASE_URL", "").strip()
     if not dsn:
         raise RuntimeError("UIIP_DATABASE_URL is required")
@@ -164,12 +171,18 @@ def main() -> int:
     if base.content_fingerprint != str(active_fingerprint):
         raise RuntimeError("reconstructed active presentation fingerprint mismatch")
 
-    asset_ids = {record.asset_id for record in base_records if record.domain_id == "metals" and record.record_type == "asset"}
+    presentation_metals_asset_ids = {
+        str(record.asset_id)
+        for record in base_records
+        if record.domain_id == "metals" and record.record_type == "asset" and record.asset_id is not None
+    }
+    missing_package_assets = sorted(package_asset_ids - presentation_metals_asset_ids)
+    if missing_package_assets:
+        raise RuntimeError(f"price/history package references absent presentation assets: {missing_package_assets}")
+
     current_records: list[PresentationRecord] = []
     for row in current_rows:
         asset_id = str(row["asset_id"])
-        if asset_id not in asset_ids:
-            raise RuntimeError(f"current-price record references absent asset: {asset_id}")
         payload = dict(row)
         payload["package_id"] = contract["source_package_id"]
         payload["manifest_sha256"] = contract["expected_manifest_sha256"]
@@ -184,8 +197,6 @@ def main() -> int:
     seen_history_keys: set[str] = set()
     for row in history_rows:
         asset_id = str(row["asset_id"])
-        if asset_id not in asset_ids:
-            raise RuntimeError(f"history record references absent asset: {asset_id}")
         record_key = f"{asset_id}|{row['observation_date']}"
         if record_key in seen_history_keys:
             raise RuntimeError(f"duplicate history presentation key: {record_key}")
@@ -214,13 +225,13 @@ def main() -> int:
     if len(extended.records) != int(contract["expected_extended_record_count"]):
         raise RuntimeError("extended price/history presentation count does not reconcile")
 
-    current_asset_ids = {record.asset_id for record in current_records}
-    history_asset_ids = {record.asset_id for record in history_records}
-    if current_asset_ids != asset_ids or history_asset_ids != asset_ids:
-        raise RuntimeError("price/history presentation asset coverage does not reconcile")
+    current_asset_ids = {str(record.asset_id) for record in current_records if record.asset_id is not None}
+    history_asset_ids = {str(record.asset_id) for record in history_records if record.asset_id is not None}
+    if current_asset_ids != package_asset_ids or history_asset_ids != package_asset_ids:
+        raise RuntimeError("price/history presentation governed-vehicle coverage does not reconcile")
 
     coverage = []
-    for asset_id in sorted(str(item) for item in asset_ids if item is not None):
+    for asset_id in sorted(package_asset_ids):
         history_count = sum(1 for item in history_records if item.asset_id == asset_id)
         current = next(item for item in current_records if item.asset_id == asset_id)
         coverage.append({
@@ -239,6 +250,8 @@ def main() -> int:
         "base_publication_id": str(active_id),
         "base_content_fingerprint": str(active_fingerprint),
         "base_record_count": len(base_records),
+        "presentation_metals_asset_count": len(presentation_metals_asset_ids),
+        "governed_price_history_asset_count": len(package_asset_ids),
         "current_price_record_count": len(current_records),
         "history_record_count": len(history_records),
         "extended_record_count": len(extended.records),
