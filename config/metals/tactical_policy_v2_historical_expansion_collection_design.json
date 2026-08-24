@@ -1,0 +1,66 @@
+{
+  "design_id": "METALS-TACTICAL-POLICY-V2-HISTORICAL-EXPANSION-COLLECTION-DESIGN-1",
+  "version": "1.0.0",
+  "source_feasibility_audit": "METALS-TACTICAL-POLICY-V2-HISTORICAL-EXPANSION-FEASIBILITY-AUDIT-1",
+  "source_candidate_rule_design": "METALS-TACTICAL-POLICY-V2-CANDIDATE-RULE-DESIGN-1",
+  "domain_id": "metals",
+  "objective": "Lock the exact historical-expansion collection boundary and artifact contract before persisting any new unseen V2 validation history.",
+  "collection_boundary": {
+    "common_start_date": "2019-12-04",
+    "common_end_date": "2023-08-21",
+    "expected_common_observation_count": 934,
+    "existing_certified_history_start_date": "2023-08-22",
+    "interval_disjoint_from_v1": true,
+    "vehicle_count": 11,
+    "opportunity_vehicle_count": 10,
+    "reference_control_asset_id": "metals:vehicle:BIL"
+  },
+  "source_contract": {
+    "provider": "yfinance",
+    "symbols": ["BIL", "COPX", "CPER", "GLD", "IAU", "PPLT", "SGOL", "SIVR", "SLV", "URA", "URNM"],
+    "daily_interval_required": true,
+    "price_fields_required": ["open_usd", "high_usd", "low_usd", "close_usd", "adjusted_close_usd", "volume"],
+    "date_field_required": "observation_date",
+    "source_timestamp_or_run_identity_required": true,
+    "provider_metadata_required": true
+  },
+  "artifact_contract": {
+    "package_id": "metals-v2-validation-history-20191204-20230821",
+    "history_filename": "metals_v2_validation_history.jsonl",
+    "manifest_filename": "manifest.json",
+    "coverage_filename": "coverage.json",
+    "sha256_required_for_every_artifact": true,
+    "manifest_must_bind_candidate_design_id": true,
+    "manifest_must_bind_collection_boundary": true,
+    "manifest_must_bind_symbols": true,
+    "manifest_must_bind_source_provider": true,
+    "missing_rows_may_not_be_synthesized": true,
+    "common_calendar_intersection_required": true,
+    "exact_common_observation_count_must_reconcile": true
+  },
+  "outcome_blindness": {
+    "candidate_postures_may_not_be_calculated_during_collection": true,
+    "forward_returns_may_not_be_calculated_during_collection": true,
+    "mae_or_mfe_may_not_be_calculated_during_collection": true,
+    "policy_pass_fail_checks_may_not_be_calculated_during_collection": true,
+    "new_validation_outcomes_may_not_be_inspected_during_collection": true,
+    "raw_price_rows_may_be_persisted_as_collection_artifact": true
+  },
+  "controls": {
+    "historical_expansion_collection_design_authorized": true,
+    "historical_expansion_execution_authorized": false,
+    "validation_package_review_authorized": false,
+    "historical_candidate_evaluation_authorized": false,
+    "new_validation_outcome_inspection_authorized": false,
+    "tactical_posture_authorized": false,
+    "presentation_activation_authorized": false,
+    "production_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false,
+    "missing_authority_may_be_synthesized": false
+  },
+  "next_decision": "AUTHORIZE_METALS_TACTICAL_POLICY_V2_HISTORICAL_EXPANSION_COLLECTION"
+}
