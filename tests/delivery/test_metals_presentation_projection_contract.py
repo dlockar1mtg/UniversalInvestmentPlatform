@@ -44,3 +44,11 @@ def test_projection_does_not_create_tactical_posture_or_cross_domain_rank() -> N
     assert '"cross_domain_rank_authorized": False' in source
     assert "ACCUMULATE" not in source
     assert "REDUCE" not in source
+
+
+def test_projection_verifier_bootstraps_repository_import_path() -> None:
+    source = (ROOT / "scripts/verify_metals_presentation_projection.py").read_text(encoding="utf-8")
+    assert "import sys" in source
+    assert "ROOT = Path(__file__).resolve().parents[1]" in source
+    assert "sys.path.insert(0, str(ROOT))" in source
+    assert "from foundation.presentation.publication_model import build_presentation_publication" in source
