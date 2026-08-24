@@ -1,0 +1,74 @@
+{
+  "design_id": "METALS-TACTICAL-POLICY-VALIDATION-DESIGN-1",
+  "version": "1.0.0",
+  "domain_id": "metals",
+  "objective": "Define a governed validation design for medium-term tactical posture without converting descriptive momentum states into forecasts.",
+  "eligible_vehicle_asset_ids": [
+    "metals:vehicle:COPX",
+    "metals:vehicle:CPER",
+    "metals:vehicle:GLD",
+    "metals:vehicle:IAU",
+    "metals:vehicle:PPLT",
+    "metals:vehicle:SGOL",
+    "metals:vehicle:SIVR",
+    "metals:vehicle:SLV",
+    "metals:vehicle:URA",
+    "metals:vehicle:URNM"
+  ],
+  "reference_control_asset_ids": [
+    "metals:vehicle:BIL"
+  ],
+  "candidate_postures": [
+    "ACCUMULATE",
+    "HOLD",
+    "WATCH",
+    "REDUCE",
+    "AVOID"
+  ],
+  "required_evidence_types": [
+    "metals_momentum_state",
+    "metals_current_price",
+    "metals_price_history",
+    "recommendation",
+    "risk"
+  ],
+  "optional_evidence_types": [
+    "forecast",
+    "metals_uncertainty_adjusted",
+    "metals_recommendation_change",
+    "metals_regime_probability",
+    "metals_model_component"
+  ],
+  "semantic_constraints": {
+    "momentum_state_is_descriptive_not_predictive": true,
+    "forecast_validation_separate_from_policy_validation": true,
+    "missing_evidence_must_remain_missing": true,
+    "reference_control_may_not_receive_opportunity_posture": true,
+    "cross_domain_rank_prohibited": true,
+    "universal_allocation_policy_prohibited": true,
+    "automatic_execution_prohibited": true
+  },
+  "validation_requirements": {
+    "historical_walk_forward_required": true,
+    "posture_outcomes_must_be_measured_by_horizon": true,
+    "downside_and_drawdown_behavior_must_be_measured": true,
+    "turnover_and_state_churn_must_be_measured": true,
+    "policy_must_be_compared_against_non_tactical_baselines": true,
+    "thresholds_must_be_locked_before_final_validation": true,
+    "no_production_posture_publication_before_validation_pass": true
+  },
+  "controls": {
+    "validation_design_authorized": true,
+    "policy_execution_authorized": false,
+    "tactical_posture_authorized": false,
+    "presentation_activation_authorized": false,
+    "production_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false,
+    "missing_authority_may_be_synthesized": false
+  },
+  "next_decision": "AUTHORIZE_METALS_TACTICAL_POLICY_CANDIDATE_RULE_DESIGN"
+}
