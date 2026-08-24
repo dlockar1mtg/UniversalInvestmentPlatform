@@ -1,0 +1,145 @@
+{
+  "design_id": "METALS-TACTICAL-POLICY-V3-REGIME-RESEARCH-DESIGN-1",
+  "version": "1.0.0",
+  "source_v3_research_design": "METALS-TACTICAL-POLICY-V3-RESEARCH-DESIGN-1",
+  "source_v2_failed_validation_review": "METALS-TACTICAL-POLICY-V2-FAILED-VALIDATION-REVIEW-1",
+  "domain_id": "metals",
+  "objective": "Define a governed research study for distinguishing trend-persistence, mean-reversion-or-exhaustion, and neutral-or-uncertain market regimes using only point-in-time Metals evidence, without assigning tactical postures.",
+  "research_boundary": {
+    "consumed_v1_v2_evidence_may_be_used_for_research_and_development_only": true,
+    "consumed_v1_v2_intervals_may_not_be_called_unseen_again": true,
+    "regime_classification_must_remain_separate_from_action_mapping": true,
+    "regime_research_must_not_assign_live_or_candidate_tactical_postures": true,
+    "new_validation_outcomes_may_not_be_inspected": true,
+    "production_database_writes_prohibited": true,
+    "presentation_activation_prohibited": true,
+    "model_retraining_prohibited": true,
+    "cross_domain_rank_prohibited": true,
+    "allocation_policy_prohibited": true,
+    "automatic_execution_prohibited": true
+  },
+  "candidate_regime_families": [
+    {
+      "regime_id": "TREND_PERSISTENCE",
+      "research_definition": "A point-in-time state in which directional price behavior appears internally consistent across horizons and is supported by persistence evidence rather than momentum magnitude alone.",
+      "must_distinguish_trend_strength_from_persistence": true,
+      "candidate_evidence_dimensions": [
+        "directional_alignment_across_return_horizons",
+        "trend_slope",
+        "short_vs_long_momentum_spread",
+        "volatility_level_and_change",
+        "drawdown_and_recovery_state",
+        "distance_from_recent_extreme"
+      ]
+    },
+    {
+      "regime_id": "MEAN_REVERSION_OR_EXHAUSTION",
+      "research_definition": "A point-in-time state in which strong directional movement may be stretched, decelerating, unstable, or recovering in a manner consistent with exhaustion or reversal risk; the V2 inversion is hypothesis-generation evidence only and is not predictive authority.",
+      "must_not_infer_predictive_mean_reversion_from_v2_failure_alone": true,
+      "candidate_evidence_dimensions": [
+        "momentum_magnitude_with_deceleration",
+        "short_vs_long_momentum_spread",
+        "volatility_level_and_change",
+        "drawdown_recovery_rate",
+        "distance_from_recent_extreme",
+        "trend_slope_change_or_flattening"
+      ]
+    },
+    {
+      "regime_id": "NEUTRAL_OR_UNCERTAIN",
+      "research_definition": "A point-in-time state used when regime evidence is weak, conflicting, under-supported, or not sufficiently separable between persistence and exhaustion hypotheses.",
+      "conflicting_evidence_must_be_allowed_to_resolve_to_neutral": true,
+      "insufficient_support_must_be_allowed_to_resolve_to_neutral": true,
+      "no_action_compatibility_required_for_later_policy_design": true
+    }
+  ],
+  "candidate_input_registry": {
+    "inputs_must_be_point_in_time": true,
+    "future_returns_or_future_excursions_prohibited_as_classifier_inputs": true,
+    "current_only_recommendation_or_risk_fields_prohibited_from_historical_backfill": true,
+    "missing_historical_vintage_authority_must_remain_missing": true,
+    "existing_inputs": [
+      "return_1m_pct",
+      "return_3m_pct",
+      "return_6m_pct",
+      "distance_ma50_pct",
+      "distance_ma200_pct",
+      "current_drawdown_pct",
+      "realized_volatility_3m_pct"
+    ],
+    "additional_candidate_inputs_to_define_before_execution": [
+      "trend_slope",
+      "return_dispersion",
+      "volatility_change",
+      "drawdown_recovery_rate",
+      "distance_from_recent_extreme",
+      "short_vs_long_momentum_spread"
+    ],
+    "additional_candidate_inputs_are_research_candidates_not_final_authorized_features": true
+  },
+  "research_questions": [
+    "Does strong momentum behave differently when trend slope is persistent versus flattening or reversing?",
+    "Does strong momentum behave differently across low, rising, and elevated realized-volatility states?",
+    "Does drawdown depth and recovery state separate persistent trends from exhaustion or rebound behavior?",
+    "Does the short-versus-long momentum spread distinguish acceleration, persistence, deceleration, and conflict?",
+    "Does distance from recent extremes help distinguish trend continuation from stretched or exhausted states?",
+    "Can conflicting or weak evidence be isolated into a neutral-or-uncertain regime rather than forced into a directional class?"
+  ],
+  "research_method": {
+    "historical_study_role": "DEVELOPMENT_ONLY_ON_CONSUMED_EVIDENCE",
+    "classifier_inputs_must_be_frozen_before_historical_regime_study_execution": true,
+    "candidate_regime_assignment_logic_must_be_versioned": true,
+    "research_may_compare_subsequent_outcomes_only_after_point_in_time_regime_labels_are_generated": true,
+    "subsequent_outcomes_are_research_targets_not_classifier_inputs": true,
+    "overlapping_forward_windows_must_be_disclosed": true,
+    "minimum_compared_group_support": 20,
+    "minimum_compared_group_support_may_not_be_lowered_below_20": true,
+    "regime_separability_must_be_reviewed_before_regime_definition_lock": true,
+    "regime_support_must_be_reviewed_before_regime_definition_lock": true,
+    "no_regime_family_may_be_forced_when_evidence_is_conflicting": true
+  },
+  "exposure_family_controls": {
+    "bil_is_reference_control_only": true,
+    "bil_may_not_be_treated_as_an_opportunity": true,
+    "duplicate_exposure_families_are_not_independent_confirmation": true,
+    "known_non_independent_groups": [
+      ["GLD", "IAU", "SGOL"],
+      ["SIVR", "SLV"]
+    ],
+    "family_coverage_requirements_must_be_defined_before_validation": true,
+    "regime_support_requirements_must_be_defined_before_validation": true,
+    "validation_may_not_count_duplicate_family_members_as_independent_confirmations": true
+  },
+  "required_research_outputs_before_regime_definition_lock": [
+    "versioned_candidate_input_definition",
+    "versioned_candidate_regime_assignment_logic",
+    "regime_support_by_exposure_family",
+    "regime_separability_summary",
+    "conflict_and_neutral_assignment_summary",
+    "overlapping_forward_window_disclosure",
+    "consumed_evidence_disclosure",
+    "explicit_statement_that_results_are_development_evidence_not_unseen_validation"
+  ],
+  "controls": {
+    "v3_research_design_authorized": true,
+    "v3_regime_research_design_authorized": true,
+    "v3_regime_definition_authorized": false,
+    "v3_candidate_rule_design_authorized": false,
+    "v3_historical_regime_research_execution_authorized": false,
+    "v3_historical_research_execution_authorized": false,
+    "new_validation_data_collection_authorized": false,
+    "new_validation_outcome_inspection_authorized": false,
+    "historical_candidate_evaluation_authorized": false,
+    "tactical_posture_authorized": false,
+    "presentation_activation_authorized": false,
+    "production_database_write_authorized": false,
+    "native_source_query_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false,
+    "missing_authority_may_be_synthesized": false
+  },
+  "next_decision": "AUTHORIZE_METALS_TACTICAL_POLICY_V3_HISTORICAL_REGIME_RESEARCH"
+}
