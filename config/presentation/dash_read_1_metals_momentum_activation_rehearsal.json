@@ -1,0 +1,23 @@
+{
+  "contract_id": "DASH-READ-1-METALS-MOMENTUM-ACTIVATION-REHEARSAL-1",
+  "version": "1.0.0",
+  "source_extension": "DASH-READ-1-METALS-MOMENTUM-STATE",
+  "expected_previous_active_publication_id": "dash-read-1-metals-tactical-dff98e56d27c",
+  "expected_previous_fingerprint": "fa76508d2c009a644eba9eabaef3600eb96459441336577a16c5f97299f9dda0",
+  "expected_extended_record_count": 4182,
+  "expected_extended_fingerprint": "7bef2ada719080b47d0bf12c4048755bd9f3307636e140e3a8297f9ba3ed560f",
+  "publication_id": "dash-read-1-metals-momentum-dff98e56d27c",
+  "controls": {
+    "presentation_activation_authorized": true,
+    "invalid_replacement_test_required": true,
+    "last_good_preservation_required": true,
+    "production_analytical_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "tactical_posture_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision": "VERIFY_METALS_MOMENTUM_STATE_READ_API"
+}
