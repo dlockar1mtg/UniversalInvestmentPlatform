@@ -1,0 +1,119 @@
+{
+  "authorization_id": "METALS-TACTICAL-POLICY-V3-HISTORICAL-REGIME-RESEARCH-AUTHORIZATION-1",
+  "version": "1.0.0",
+  "source_v3_regime_research_design": "METALS-TACTICAL-POLICY-V3-REGIME-RESEARCH-DESIGN-1",
+  "domain_id": "metals",
+  "decision": "AUTHORIZE_METALS_TACTICAL_POLICY_V3_HISTORICAL_REGIME_RESEARCH",
+  "objective": "Authorize a bounded development-only historical regime research study on already-consumed Metals evidence, without converting consumed evidence into unseen validation authority and without authorizing tactical actions.",
+  "authorization_scope": {
+    "historical_regime_research_execution_authorized": true,
+    "research_role": "DEVELOPMENT_ONLY_ON_CONSUMED_EVIDENCE",
+    "consumed_v1_v2_evidence_may_be_used_for_hypothesis_development": true,
+    "consumed_v1_v2_intervals_may_not_be_called_unseen_again": true,
+    "point_in_time_regime_labels_must_be_generated_before_subsequent_outcomes_are_compared": true,
+    "subsequent_outcomes_may_be_used_only_as_research_targets": true,
+    "research_results_must_be_labelled_development_evidence_not_unseen_validation": true
+  },
+  "pre_execution_freeze_requirements": {
+    "candidate_input_definitions_must_be_versioned_and_frozen_before_execution": true,
+    "candidate_regime_assignment_logic_must_be_versioned_and_frozen_before_execution": true,
+    "future_returns_or_future_excursions_may_not_be_classifier_inputs": true,
+    "current_only_recommendation_or_risk_fields_may_not_be_backfilled_historically": true,
+    "missing_historical_vintage_authority_must_remain_missing": true,
+    "minimum_compared_group_support": 20,
+    "minimum_compared_group_support_may_not_be_lowered": true
+  },
+  "authorized_candidate_regime_families": [
+    "TREND_PERSISTENCE",
+    "MEAN_REVERSION_OR_EXHAUSTION",
+    "NEUTRAL_OR_UNCERTAIN"
+  ],
+  "authorized_candidate_input_research_scope": {
+    "existing_inputs": [
+      "return_1m_pct",
+      "return_3m_pct",
+      "return_6m_pct",
+      "distance_ma50_pct",
+      "distance_ma200_pct",
+      "current_drawdown_pct",
+      "realized_volatility_3m_pct"
+    ],
+    "additional_candidate_inputs_may_be_defined_before_execution": [
+      "trend_slope",
+      "return_dispersion",
+      "volatility_change",
+      "drawdown_recovery_rate",
+      "distance_from_recent_extreme",
+      "short_vs_long_momentum_spread"
+    ],
+    "additional_candidate_inputs_are_not_final_authorized_production_features": true,
+    "trend_strength_must_be_distinguished_from_trend_persistence": true,
+    "conflicting_or_weak_evidence_must_be_allowed_to_resolve_to_neutral_or_uncertain": true
+  },
+  "exposure_family_controls": {
+    "bil_is_reference_control_only": true,
+    "bil_may_not_be_treated_as_an_opportunity": true,
+    "duplicate_exposure_families_are_not_independent_confirmation": true,
+    "known_non_independent_groups": [
+      ["GLD", "IAU", "SGOL"],
+      ["SIVR", "SLV"]
+    ],
+    "support_must_be_reported_by_exposure_family": true,
+    "duplicate_family_members_may_not_be_counted_as_independent_confirmations": true
+  },
+  "required_execution_outputs": [
+    "versioned_candidate_input_definition",
+    "versioned_candidate_regime_assignment_logic",
+    "point_in_time_regime_label_ledger",
+    "regime_support_by_exposure_family",
+    "regime_separability_summary",
+    "conflict_and_neutral_assignment_summary",
+    "subsequent_outcome_research_summary",
+    "overlapping_forward_window_disclosure",
+    "consumed_evidence_disclosure",
+    "development_not_validation_disclosure"
+  ],
+  "post_execution_review_requirements": {
+    "regime_support_must_be_reviewed_before_regime_definition_lock": true,
+    "regime_separability_must_be_reviewed_before_regime_definition_lock": true,
+    "conflict_and_neutral_behavior_must_be_reviewed_before_regime_definition_lock": true,
+    "no_regime_definition_may_be_locked_automatically_from_execution_results": true,
+    "separate_governance_decision_required_to_lock_v3_regime_definition": true
+  },
+  "prohibited_authorities": {
+    "new_validation_data_collection_authorized": false,
+    "new_validation_outcome_inspection_authorized": false,
+    "unseen_validation_claim_authorized": false,
+    "v3_regime_definition_authorized": false,
+    "v3_candidate_rule_design_authorized": false,
+    "action_mapping_authorized": false,
+    "historical_candidate_evaluation_authorized": false,
+    "tactical_posture_authorized": false,
+    "presentation_activation_authorized": false,
+    "production_database_write_authorized": false,
+    "native_source_query_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false,
+    "missing_authority_may_be_synthesized": false
+  },
+  "controls": {
+    "v3_research_design_authorized": true,
+    "v3_regime_research_design_authorized": true,
+    "v3_historical_regime_research_authorized": true,
+    "v3_historical_regime_research_execution_authorized": true,
+    "v3_regime_definition_authorized": false,
+    "v3_candidate_rule_design_authorized": false,
+    "new_validation_outcome_inspection_authorized": false,
+    "tactical_posture_authorized": false,
+    "production_database_write_authorized": false,
+    "presentation_activation_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision": "EXECUTE_METALS_TACTICAL_POLICY_V3_HISTORICAL_REGIME_RESEARCH"
+}
