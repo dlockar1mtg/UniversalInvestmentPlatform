@@ -30,6 +30,18 @@ def test_price_history_projection_preserves_existing_momentum_surface() -> None:
     assert "expected_extended_record_count" in text
 
 
+def test_price_history_projection_uses_governed_vehicle_subset_not_all_metals_assets() -> None:
+    text = (ROOT / "scripts" / "rehearse_metals_price_history_presentation_projection.py").read_text(encoding="utf-8")
+    assert "package_asset_ids" in text
+    assert "presentation_metals_asset_ids" in text
+    assert "package_asset_ids - presentation_metals_asset_ids" in text
+    assert "current_asset_ids != package_asset_ids" in text
+    assert "history_asset_ids != package_asset_ids" in text
+    assert "presentation_metals_asset_count" in text
+    assert "governed_price_history_asset_count" in text
+    assert "current_asset_ids != asset_ids or history_asset_ids != asset_ids" not in text
+
+
 def test_price_history_projection_locks_governance() -> None:
     text = (ROOT / "scripts" / "rehearse_metals_price_history_presentation_projection.py").read_text(encoding="utf-8")
     assert '"tactical_posture_authorized": False' in text
