@@ -72,7 +72,7 @@
     "new_unseen_validation_authority_required_before_live_use": true,
     "duplicate_exposure_families_must_not_be_treated_as_independent_confirmation": true,
     "overlapping_forward_windows_must_be_disclosed": true,
-    "minimum_compared_group_support_may_not_be_lowered_below_20": true,
+    "minimum_compared_group_support_may_not_be_lowered_below_20": 20,
     "family_coverage_and_regime_support_requirements_must_be_defined_before_validation": true
   },
   "semantic_constraints": {
