@@ -1,0 +1,48 @@
+{
+  "evaluation_id": "METALS-TACTICAL-POLICY-V2-VALIDATION-EVALUATION-1",
+  "version": "1.0.0",
+  "source_design": "METALS-TACTICAL-POLICY-V2-VALIDATION-EVALUATION-DESIGN-1",
+  "source_candidate_rule_design": "METALS-TACTICAL-POLICY-V2-CANDIDATE-RULE-DESIGN-1",
+  "source_validation_package_review": "METALS-TACTICAL-POLICY-V2-VALIDATION-HISTORY-PACKAGE-REVIEW-1",
+  "source_current_price_semantic_review": "METALS-CURRENT-PRICE-SEMANTIC-REVIEW-1",
+  "domain_id": "metals",
+  "package_id": "metals-v2-validation-history-20191204-20230821",
+  "expected_history_sha256": "400aa5792533653eccf7bdfb3dd4b67fddb8f45ad138bda1a7d4ac1c1137bd62",
+  "expected_coverage_sha256": "26477acb7f50169980ea6c1ede73b6cfac7ffbc21b34273a1253f1ffa6b5f9f9",
+  "expected_manifest_sha256": "602521ce36c4f1cb0797dc29d932c803bd0e0a12c38652211c1cdd1cf32216dd",
+  "expected_common_observation_count": 934,
+  "expected_grid_points_per_vehicle": 124,
+  "expected_total_grid_points": 1364,
+  "expected_opportunity_grid_points": 1240,
+  "expected_reference_control_grid_points": 124,
+  "controls": {
+    "validation_outcome_calculation_authorized": true,
+    "historical_candidate_evaluation_authorized": true,
+    "new_validation_outcome_inspection_authorized": true,
+    "candidate_rule_change_authorized": false,
+    "candidate_threshold_change_authorized": false,
+    "tactical_posture_authorized": false,
+    "presentation_activation_authorized": false,
+    "production_database_write_authorized": false,
+    "native_source_query_authorized": false,
+    "package_regeneration_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false,
+    "missing_authority_may_be_synthesized": false
+  },
+  "result_semantics": {
+    "minimum_group_support_failure": "INCONCLUSIVE",
+    "directional_or_behavior_check_failure": "FAIL",
+    "all_required_checks_pass": "PASS",
+    "passing_result_does_not_authorize_live_tactical_postures": true,
+    "validation_interval_consumed_once_evaluation_executes": true
+  },
+  "next_decision_by_result": {
+    "PASS": "REVIEW_METALS_TACTICAL_POLICY_V2_POLICY_AUTHORITY",
+    "FAIL": "REVIEW_METALS_TACTICAL_POLICY_V2_FAILED_VALIDATION",
+    "INCONCLUSIVE": "REVIEW_METALS_TACTICAL_POLICY_V2_INCONCLUSIVE_VALIDATION"
+  }
+}
