@@ -1,0 +1,75 @@
+{
+  "review_id": "METALS-TACTICAL-POLICY-V2-FAILED-VALIDATION-REVIEW-1",
+  "version": "1.0.0",
+  "source_evaluation": "METALS-TACTICAL-POLICY-V2-VALIDATION-EVALUATION-1",
+  "domain_id": "metals",
+  "evaluation_result": "FAIL",
+  "evaluation_artifact_sha256": "70b8d0fb10e2debbf205548b66d82b16fedba446a690036ba8355f7c842b5a53",
+  "validation_package_id": "metals-v2-validation-history-20191204-20230821",
+  "validation_interval": {
+    "start_date": "2019-12-04",
+    "end_date": "2023-08-21",
+    "consumed": true
+  },
+  "observed_support": {
+    "constructive_63d_observations": 489,
+    "defensive_63d_observations": 639,
+    "minimum_required_per_compared_group": 20,
+    "support_requirement_met": true
+  },
+  "observed_directional_results": {
+    "constructive_63d_median_return_pct": -2.6212253827862964,
+    "defensive_63d_median_return_pct": 2.7131829747854663,
+    "constructive_63d_positive_return_rate": 0.39059304703476483,
+    "defensive_63d_positive_return_rate": 0.6071987480438185,
+    "constructive_63d_mean_mae_pct": -10.634902707934065,
+    "defensive_63d_mean_mae_pct": -6.741309158919896,
+    "posture_change_rate": 0.2975609756097561
+  },
+  "governed_check_results": {
+    "constructive_63d_median_return_gt_defensive": false,
+    "constructive_63d_positive_return_rate_gt_defensive": false,
+    "defensive_63d_mean_mae_more_negative_than_constructive": false,
+    "holdout_posture_change_rate_lte_0_50": true,
+    "minimum_group_support_met": true,
+    "no_semantic_or_governance_violation": true
+  },
+  "review_findings": {
+    "v2_failure_is_conclusive_under_locked_rules": true,
+    "failure_is_not_due_to_insufficient_group_support": true,
+    "directional_relationship_is_opposite_locked_tactical_semantics": true,
+    "constructive_group_had_lower_63d_median_return_than_defensive": true,
+    "constructive_group_had_lower_63d_positive_return_rate_than_defensive": true,
+    "constructive_group_had_more_negative_63d_mean_mae_than_defensive": true,
+    "posture_churn_gate_passed": true,
+    "no_governance_violation_detected": true,
+    "v2_candidate_may_not_be_authorized_for_live_tactical_posture": true,
+    "consumed_validation_interval_may_not_be_reused_as_unseen_evidence": true
+  },
+  "interpretation": {
+    "primary_conclusion": "The locked V2 trend-following tactical mapping failed final unseen validation because the defensive labels were followed by better 63-day returns and less adverse excursion than the constructive labels.",
+    "research_implication": "The observed inversion is consistent with mean-reversion behavior over this historical interval and indicates that a revised tactical framework must not preserve the V2 posture semantics without a new research cycle and new validation evidence.",
+    "v2_failure_may_not_be_relabelled_as_inconclusive": true,
+    "v2_thresholds_may_not_be_changed_and_retested_on_consumed_interval": true,
+    "v2_result_is_research_evidence_not_live_advice": true
+  },
+  "controls": {
+    "failed_validation_review_authorized": true,
+    "v2_candidate_pass_authorized": false,
+    "v2_candidate_live_use_authorized": false,
+    "candidate_rule_change_authorized": false,
+    "candidate_threshold_change_authorized": false,
+    "consumed_interval_reuse_as_unseen_authorized": false,
+    "v3_research_design_authorized": false,
+    "tactical_posture_authorized": false,
+    "presentation_activation_authorized": false,
+    "production_database_write_authorized": false,
+    "native_source_query_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision": "AUTHORIZE_METALS_TACTICAL_POLICY_V3_RESEARCH_DESIGN"
+}
