@@ -1,0 +1,51 @@
+{
+  "authorization_id": "METALS-TACTICAL-POLICY-V3-ONE-BOUNDED-PRODUCTION-DATABASE-WRITE-AUTHORIZATION-1",
+  "source_implementation_id": "METALS-TACTICAL-POLICY-V3-PRODUCTION-PERSISTENCE-IMPLEMENTATION-1",
+  "source_implementation_head": "d64d2b3d3d948d61a3a3525bef3e4bd682720ad6",
+  "authorization_decision": "AUTHORIZE_ONE_BOUNDED_METALS_V3_PRODUCTION_DATABASE_WRITE",
+  "production_database_write_authorized": true,
+  "execution_limit": 1,
+  "execution_is_one_time": true,
+  "target_database_path": "C:\\Users\\DevonLockard\\InvestmentPlatform\\data\\universal\\universal_investment.duckdb",
+  "required_prewrite_database_sha256": "dff98e56d27cbc5ef879c18939309c5ab8661fa8fa6dfe74e82537fd53954f7c",
+  "exact_state_sha256": "00ea9954ead2eaa66085a38468972315b0414f0ad1039f833518d70d40882c3a",
+  "exact_manifest_sha256": "f8bbeedfbfe16bea01bdf7bd6c53d5d5b9db22e197bec533c84daa9ae8bb5a75",
+  "exact_as_of_date": "2026-08-21",
+  "exact_row_count": 11,
+  "exact_opportunity_row_count": 10,
+  "exact_reference_control_row_count": 1,
+  "history_table": "metals_tactical_state_history",
+  "current_view": "metals_tactical_state_current",
+  "required_execution_controls": {
+    "source_hashes_must_match_before_write": true,
+    "prewrite_database_hash_must_match": true,
+    "single_transaction_required": true,
+    "rollback_on_any_failure": true,
+    "postwrite_history_readback_exact_match_required": true,
+    "postwrite_current_view_exact_match_required": true,
+    "postwrite_database_sha256_must_be_recorded": true,
+    "duplicate_exact_import_must_fail_closed": true,
+    "second_execution_forbidden": true,
+    "history_replacement_forbidden": true,
+    "history_deletion_forbidden": true,
+    "business_key_upsert_forbidden": true
+  },
+  "semantic_guardrails": {
+    "tactical_state_is_not_buy_sell_authority": true,
+    "tactical_state_is_not_position_sizing": true,
+    "tactical_state_is_not_expected_return_forecast": true,
+    "no_tactical_overlay_is_not_negative_long_term_thesis": true,
+    "bil_remains_reference_control_only": true
+  },
+  "downstream_authorization_boundary": {
+    "presentation_activation_authorized": false,
+    "native_source_query_authorized": false,
+    "network_collection_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision": "EXECUTE_ONE_BOUNDED_METALS_TACTICAL_POLICY_V3_PRODUCTION_DATABASE_WRITE"
+}
