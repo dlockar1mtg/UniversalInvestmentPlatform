@@ -1,0 +1,42 @@
+{
+  "review_id": "METALS-TACTICAL-POLICY-V3-OUT-OF-SEQUENCE-MAIN-MERGE-RECOVERY-REVIEW-1",
+  "source_pr_authorization_head": "d4f58c74d6528e0829f60ad89f59637d93fa4415",
+  "pull_request_number": 60,
+  "pull_request_title": "Deploy bounded Metals V3 tactical dashboard UI",
+  "authorized_pr_head": "deploy/metals-v3-tactical-ui",
+  "authorized_pr_head_sha": "11c9f8909c63d42aee8b8a7324d172f551b17b37",
+  "authorized_pr_base": "main",
+  "authorized_main_base_sha": "10f4f4c0e3e96194314a46c058432dd6d04553d7",
+  "merge_occurred_before_separate_merge_authorization": true,
+  "merge_commit_sha": "32668f5bcb73fc6b6f00c5b562e5f5433e6bf9cd",
+  "post_merge_main_head": "32668f5bcb73fc6b6f00c5b562e5f5433e6bf9cd",
+  "merge_tree_sha": "216e79e61f2ec0ec58d91b99819464b2afe501c1",
+  "certified_deployment_tree_sha": "216e79e61f2ec0ec58d91b99819464b2afe501c1",
+  "merge_tree_matches_certified_deployment_tree": true,
+  "merged_commit_count_from_deployment_package": 1,
+  "merged_runtime_file_count": 4,
+  "whole_research_branch_merged": false,
+  "post_merge_ci": {
+    "universal_investment_platform_ci_run": 1029,
+    "universal_investment_platform_ci_conclusion": "success",
+    "container_delivery_run": 122,
+    "container_delivery_conclusion": "success"
+  },
+  "technical_result": {
+    "certified_bounded_runtime_package_reached_main": true,
+    "rollback_required": false,
+    "repeat_merge_required": false,
+    "hosted_tactical_publication_reactivation_required": false,
+    "analytical_database_rewrite_required": false
+  },
+  "review_decision": "ACCEPT_TECHNICAL_MERGE_RESULT_AND_CLOSE_OUT_OF_SEQUENCE_GOVERNANCE_DISCREPANCY",
+  "boundaries": {
+    "retroactive_merge_authorization_claimed": false,
+    "analytical_database_write_authorized": false,
+    "hosted_presentation_reactivation_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision": "DESIGN_METALS_V3_CRYPTO_PARITY_VISUAL_UTILITY_REFRESH"
+}
