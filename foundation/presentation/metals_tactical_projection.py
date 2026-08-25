@@ -8,7 +8,7 @@ from .publication_model import PresentationRecord
 
 
 EXTENSION_PATH = Path("config/presentation/dash_read_1_metals_tactical_extension.json")
-EXPECTED_SOURCE_SHA256 = "dff98e56d27cbc5ef879c18939309c5ab8661fa8fa6dfe74e82537fd53954f7c"
+EXPECTED_SOURCE_SHA256 = "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f"
 
 
 def _rows(connection: Any, sql: str) -> tuple[dict[str, Any], ...]:
@@ -38,7 +38,7 @@ def load_and_validate_extension(repository_root: Path, connection: Any, source_d
     payload = json.loads(path.read_text(encoding="utf-8"))
     if payload.get("extension_id") != "DASH-READ-1-METALS-TACTICAL-EVIDENCE":
         raise RuntimeError("Unexpected Metals tactical presentation extension ID.")
-    if payload.get("version") != "1.0.0":
+    if payload.get("version") != "1.1.0":
         raise RuntimeError("Unsupported Metals tactical presentation extension version.")
     if payload.get("source_database_sha256") != EXPECTED_SOURCE_SHA256:
         raise RuntimeError("Metals tactical extension source hash changed unexpectedly.")
@@ -52,12 +52,12 @@ def load_and_validate_extension(repository_root: Path, connection: Any, source_d
         "cross_domain_rank_authorized": False,
         "allocation_policy_authorized": False,
         "automatic_execution_authorized": False,
-        "tactical_posture_authorized": False,
+        "tactical_posture_authorized": True,
     }
     if controls != expected_controls:
         raise RuntimeError("Metals tactical presentation controls changed unexpectedly.")
     surfaces = payload.get("surfaces")
-    if not isinstance(surfaces, dict) or len(surfaces) != 6:
+    if not isinstance(surfaces, dict) or len(surfaces) != 7:
         raise RuntimeError("Metals tactical presentation surfaces are incomplete.")
     for record_type, surface in surfaces.items():
         source = str(surface.get("source", ""))
@@ -101,5 +101,11 @@ def build_metals_tactical_records(repository_root: Path, connection: Any, source
     for row in _rows(connection, "SELECT * FROM metals_platform_health_current ORDER BY decision_run_id"):
         key = str(row["decision_run_id"])
         records.append(_record("metals_platform_health", None, key, row))
+
+    for row in _rows(connection, "SELECT * FROM metals_tactical_state_current ORDER BY universal_asset_id"):
+        asset_id = str(row["universal_asset_id"])
+        if bool(row.get("is_reference_control")):
+            continue
+        records.append(_record("tactical_state", asset_id, asset_id, row))
 
     return records
