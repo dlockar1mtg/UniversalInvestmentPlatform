@@ -7,6 +7,15 @@ ROOT = Path(__file__).resolve().parents[2]
 DESIGN_PATH = ROOT / "config" / "metals" / "tactical_policy_v3_post_validation_live_use_authorization_design.json"
 REVIEW_PATH = ROOT / "config" / "metals" / "tactical_policy_v3_unseen_validation_result_review.json"
 
+EXPECTED_CHANGE_CONTROL_KEYS = {
+    "validated_classifier_and_mapping_are_immutable_for_v3_live_use",
+    "any_classifier_formula_change_requires_new_policy_version",
+    "any_threshold_logic_change_requires_new_policy_version",
+    "any_action_mapping_change_requires_new_policy_version",
+    "any_new_policy_version_requires_new_unseen_validation_before_live_use",
+    "consumed_v1_v2_and_v3_validation_intervals_may_not_be_reused_as_unseen_evidence",
+}
+
 
 def load_design() -> dict:
     return json.loads(DESIGN_PATH.read_text(encoding="utf-8"))
@@ -70,6 +79,7 @@ def test_interpretation_chain_and_non_override_rules_are_fixed() -> None:
     assert rules["risk_and_downside_remain_independent"] is True
     assert rules["tactical_overlay_may_not_convert_a_non_opportunity_into_an_opportunity_by_itself"] is True
     assert rules["tactical_overlay_may_not_suppress_or_hide_material_risk"] is True
+    assert rules["tactical_overlay_may_not_override_domain_governance"] is True
     assert rules["neutral_state_may_not_be_forced_directional"] is True
     assert rules["duplicate_exposure_families_may_not_be_treated_as_independent_confirmation"] is True
 
@@ -118,9 +128,11 @@ def test_presentation_semantics_do_not_become_trade_signals() -> None:
     assert presentation["must_not_display_as_position_size"] is True
 
 
-def test_change_control_requires_new_version_and_new_unseen_validation() -> None:
+def test_change_control_requires_exact_keys_new_version_and_new_unseen_validation() -> None:
     change = load_design()["change_control_design"]
-    assert all(change.values())
+    assert set(change.keys()) == EXPECTED_CHANGE_CONTROL_KEYS
+    assert all(change[key] is True for key in EXPECTED_CHANGE_CONTROL_KEYS)
+    assert "any new policy version_requires_new_unseen_validation_before_live_use" not in change
 
 
 def test_design_is_complete_but_no_downstream_authority_is_enabled() -> None:
