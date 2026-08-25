@@ -1,0 +1,61 @@
+{
+  "authorization_id": "METALS-TACTICAL-POLICY-V3-PRESENTATION-ACTIVATION-AUTHORIZATION-1",
+  "source_design_id": "METALS-TACTICAL-POLICY-V3-PRESENTATION-ACTIVATION-AUTHORIZATION-DESIGN-1",
+  "source_design_head": "ddba473097b1e7ae3656bd0f327942a98b847c0a",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "source_state_sha256": "00ea9954ead2eaa66085a38468972315b0414f0ad1039f833518d70d40882c3a",
+  "source_manifest_sha256": "f8bbeedfbfe16bea01bdf7bd6c53d5d5b9db22e197bec533c84daa9ae8bb5a75",
+  "authorization_decision": "AUTHORIZE_METALS_V3_PRESENTATION_IMPLEMENTATION_ONLY",
+  "authorized_presentation_implementation": {
+    "record_type": "tactical_state",
+    "domain_id": "metals",
+    "source_relation": "metals_tactical_state_current",
+    "asset_detail_endpoint": "/v1/presentation/assets/{domain_id}/{asset_id}",
+    "presentation_publication_implementation_authorized": true,
+    "non_active_publication_validation_authorized": true,
+    "recommendation_ui_metals_tactical_rendering_authorized": true,
+    "aggregate_neutral_count_rendering_authorized": true
+  },
+  "required_implementation_controls": {
+    "analytical_duckdb_read_only": true,
+    "existing_recommendation_records_preserved": true,
+    "existing_forecast_records_preserved": true,
+    "existing_risk_records_preserved": true,
+    "native_recommendation_preserved": true,
+    "cross_domain_ordering_preserved": true,
+    "tactical_state_visually_separate_from_long_term_thesis": true,
+    "as_of_date_visible": true,
+    "state_reason_explainable": true,
+    "bil_reference_control_not_presented_as_opportunity": true,
+    "missing_or_unknown_tactical_state_fails_closed": true,
+    "source_database_hash_verified_before_publication_build": true,
+    "source_lineage_verified_before_publication_build": true
+  },
+  "semantic_guardrails": {
+    "tactical_state_is_not_buy_sell_authority": true,
+    "tactical_state_is_not_position_sizing": true,
+    "tactical_state_is_not_expected_return_forecast": true,
+    "tactical_state_is_not_long_term_recommendation": true,
+    "no_tactical_overlay_is_not_negative_long_term_thesis": true,
+    "no_tactical_overlay_is_not_sell_signal": true,
+    "no_tactical_overlay_is_not_zero_expected_return": true,
+    "no_tactical_overlay_is_not_allocation_instruction": true,
+    "tactical_state_must_not_override_material_risk": true,
+    "bil_remains_reference_control_only": true
+  },
+  "authorization_boundary": {
+    "presentation_activation_authorization_created": true,
+    "presentation_publication_implementation_authorized": true,
+    "presentation_activation_authorized": false,
+    "presentation_activation_executed": false,
+    "analytical_database_write_authorized": false,
+    "second_production_database_write_authorized": false,
+    "network_collection_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision": "IMPLEMENT_METALS_TACTICAL_POLICY_V3_PRESENTATION_PUBLICATION_AND_UI"
+}
