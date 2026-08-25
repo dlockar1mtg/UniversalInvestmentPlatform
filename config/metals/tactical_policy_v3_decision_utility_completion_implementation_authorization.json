@@ -1,0 +1,62 @@
+{
+  "authorization_id": "METALS-TACTICAL-POLICY-V3-DECISION-UTILITY-COMPLETION-IMPLEMENTATION-AUTHORIZATION-1",
+  "source_design_id": "METALS-TACTICAL-POLICY-V3-DECISION-UTILITY-COMPLETION-DESIGN-1",
+  "source_design_head": "caa82377a6bd5ac997bbf4d248c4fd091baedd54",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "authorization_decision": "AUTHORIZE_BOUNDED_METALS_DECISION_UTILITY_COMPLETION_IMPLEMENTATION",
+  "authorized_files": [
+    "foundation/presentation/metals_tactical_projection.py",
+    "config/presentation/dash_read_1_metals_tactical_extension.json",
+    "foundation/production/dashboard_assets/recommendation_ui.js",
+    "foundation/production/dashboard_assets/metals_tactical_ui.js"
+  ],
+  "required_behavior": {
+    "vehicle_current_price_uses_current_price_usd": true,
+    "vehicle_current_price_includes_observation_date": true,
+    "vehicle_price_history_uses_close_usd": true,
+    "vehicle_price_history_uses_observation_date": true,
+    "history_semantics_remain_unadjusted_close": true,
+    "vehicle_cards_surface_current_price_when_supported": true,
+    "vehicle_research_surfaces_current_price_when_supported": true,
+    "vehicle_research_surfaces_price_history_when_supported": true,
+    "vehicle_raw_and_adjusted_return_are_distinct": true,
+    "vehicle_tactical_context_remains_separate_from_long_term_thesis": true,
+    "commodity_expected_return_horizons_3_6_12_24_are_used_when_supported": true,
+    "commodity_model_and_regime_evidence_remain_visible": true,
+    "commodity_tactical_state_is_not_applicable": true,
+    "no_contradictory_no_forecast_message_when_supporting_forecast_evidence_exists": true,
+    "bil_remains_reference_control_only": true,
+    "unsupported_fields_remain_explicitly_unavailable": true
+  },
+  "unsupported_fields": [
+    "forecast_point_price",
+    "forecast_lower_bound",
+    "forecast_upper_bound",
+    "full_investment_rationale",
+    "recommendation_risk_summary",
+    "uranium_standard_commodity_forecast",
+    "commodity_numeric_current_price"
+  ],
+  "semantic_guardrails": {
+    "do_not_use_adjusted_close_for_presentation_history": true,
+    "do_not_infer_commodity_price_from_vehicle_price": true,
+    "do_not_invent_forecast_bounds": true,
+    "do_not_upgrade_recommendation_change_explanation_into_full_investment_thesis": true,
+    "do_not_mutate_long_term_recommendation_from_tactical_state": true,
+    "no_cross_domain_rank": true,
+    "no_allocation_instruction": true,
+    "no_execution_authority": true
+  },
+  "boundaries": {
+    "analytical_database_write_authorized": false,
+    "hosted_publication_write_authorized": false,
+    "main_deployment_authorized": false,
+    "pull_request_authorized": false,
+    "model_refresh_authorized": false,
+    "forecast_refresh_authorized": false,
+    "network_collection_authorized": false,
+    "allocation_policy_change_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision": "IMPLEMENT_AND_CERTIFY_METALS_DECISION_UTILITY_COMPLETION"
+}
