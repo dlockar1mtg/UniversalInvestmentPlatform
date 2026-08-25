@@ -1,0 +1,46 @@
+{
+  "review_id": "METALS-TACTICAL-POLICY-V3-FAILED-LIVE-PRESENTATION-ACTIVATION-REVIEW-1",
+  "source_authorization_id": "METALS-TACTICAL-POLICY-V3-LIVE-PRESENTATION-ACTIVATION-AUTHORIZATION-1",
+  "source_authorization_consumed": true,
+  "source_implementation_head": "6054738f3b6f812fb06dc9923faf472e4f0a77e7",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "failed_target_publication_id": "metals-v3-live-tactical-20260825",
+  "failed_target_publication_exists": false,
+  "failed_target_record_count": 0,
+  "failed_target_tactical_state_count": 0,
+  "preserved_active_publication": {
+    "publication_id": "dash-read-1-metals-price-history-dff98e56d27c",
+    "publication_status": "ACTIVE",
+    "source_database_sha256": "dff98e56d27cbc5ef879c18939309c5ab8661fa8fa6dfe74e82537fd53954f7c",
+    "content_fingerprint": "c8742b715c8e6d4120eea6a1d717c0d2ebe7a90e78339f7b17cb4e64ee3d831f",
+    "record_count": 12476
+  },
+  "hosted_state": {
+    "presentation_schema_exists": true,
+    "active_pointer_count": 1,
+    "active_status_count": 1,
+    "hosted_state_preserved": true,
+    "partial_hosted_write_detected": false
+  },
+  "failure_classification": "PRECONDITION_ENVIRONMENT_FAILURE_BEFORE_HOSTED_PRESENTATION_WRITE",
+  "failure_reason": "UIIP_DATABASE_URL was absent from the execution process before hosted presentation access.",
+  "review_decision": "FAILED_ATTEMPT_CLOSED_WITH_NO_HOSTED_MUTATION_NEW_AUTHORIZATION_MAY_BE_CONSIDERED",
+  "controls": {
+    "consumed_authorization_may_be_reused": false,
+    "failed_target_publication_may_be_reused": false,
+    "new_activation_authorization_may_be_considered": true,
+    "analytical_database_write_authorized": false,
+    "second_metals_production_write_authorized": false,
+    "network_collection_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "recovery_evidence": {
+    "consumed_attempt_root": "C:/Users/DevonLockard/UIP_Evidence/metals_v3_live_presentation_activation_20260825",
+    "hosted_recovery_state": "C:/Users/DevonLockard/UIP_Evidence/metals_v3_live_presentation_activation_recovery_20260825/hosted_state_after_failed_activation.json"
+  },
+  "next_decision": "CONSIDER_FRESH_METALS_TACTICAL_POLICY_V3_LIVE_PRESENTATION_ACTIVATION_AUTHORIZATION"
+}
