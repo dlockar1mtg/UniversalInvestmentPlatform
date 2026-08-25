@@ -1,0 +1,98 @@
+{
+  "authorization_id": "METALS-TACTICAL-POLICY-V3-POST-VALIDATION-LIVE-USE-AUTHORIZATION-1",
+  "version": "1.0.0",
+  "domain_id": "metals",
+  "source_design_id": "METALS-TACTICAL-POLICY-V3-POST-VALIDATION-LIVE-USE-AUTHORIZATION-DESIGN-1",
+  "source_review_id": "METALS-TACTICAL-POLICY-V3-UNSEEN-VALIDATION-RESULT-REVIEW-1",
+  "source_validation_result": "PASS",
+  "source_regime_definition": "METALS-TACTICAL-POLICY-V3-REGIME-DEFINITION-1",
+  "source_classifier_rule_version": "METALS-V3-REGIME-CANDIDATE-RULES-1",
+  "source_action_mapping_version": "METALS-V3-ACTION-MAPPING-1",
+  "authorization_decision": "AUTHORIZE_BOUNDED_METALS_V3_LIVE_TACTICAL_INTERPRETATION",
+  "authorized_mapping": {
+    "TREND_PERSISTENCE": "TACTICAL_SUPPORTIVE",
+    "MEAN_REVERSION_OR_EXHAUSTION": "TACTICAL_DEFENSIVE",
+    "NEUTRAL_OR_UNCERTAIN": "NO_TACTICAL_OVERLAY"
+  },
+  "authorized_live_use": {
+    "role": "BOUNDED_METALS_TACTICAL_INTERPRETATION_OVERLAY",
+    "current_state_materialization_authorized": true,
+    "candidate_tactical_posture_authorized": true,
+    "live_tactical_posture_authorized": true,
+    "point_in_time_only": true,
+    "price_basis": "UNADJUSTED_CLOSE",
+    "required_current_price_field": "close_usd",
+    "latest_certified_available_market_observation_required": true,
+    "future_outcomes_may_not_enter_live_classification": true,
+    "same_locked_feature_formulas_as_validated_policy": true,
+    "same_locked_assignment_order_as_validated_policy": true,
+    "same_locked_action_mapping_as_validated_policy": true,
+    "reference_control_bil_remains_non_opportunity": true
+  },
+  "interpretation_limits": {
+    "not_a_buy_signal": true,
+    "not_a_sell_signal": true,
+    "not_position_sizing": true,
+    "not_portfolio_allocation": true,
+    "not_expected_return_forecast": true,
+    "not_long_term_thesis": true,
+    "not_medium_term_opportunity_score": true,
+    "not_risk_override": true,
+    "tactical_overlay_may_not_convert_a_non_opportunity_into_an_opportunity_by_itself": true,
+    "tactical_overlay_may_not_suppress_or_hide_material_risk": true,
+    "neutral_state_may_not_be_forced_directional": true
+  },
+  "live_output_contract": {
+    "required_fields": [
+      "asset_id",
+      "ticker",
+      "as_of_date",
+      "candidate_regime",
+      "tactical_state",
+      "classifier_rule_version",
+      "action_mapping_version",
+      "price_semantics",
+      "source_package_id",
+      "state_available",
+      "state_reason"
+    ],
+    "state_labels": {
+      "TACTICAL_SUPPORTIVE": "Supportive",
+      "TACTICAL_DEFENSIVE": "Defensive",
+      "NO_TACTICAL_OVERLAY": "Neutral / No Overlay"
+    },
+    "raw_validation_outcomes_may_not_be_presented_as_current_forecasts": true,
+    "historical_validation_statistics_may_be_used_only_as_provenance_or_methodology_context": true
+  },
+  "freshness_and_fail_closed_controls": {
+    "state_as_of_date_must_be_persisted": true,
+    "source_package_id_or_equivalent_provenance_must_be_persisted": true,
+    "classifier_version_must_be_persisted": true,
+    "action_mapping_version_must_be_persisted": true,
+    "stale_or_missing_required_history_must_not_produce_directional_live_state": true,
+    "incomplete_feature_history_must_fail_to_no_tactical_overlay_or_unavailable": true,
+    "unmapped_regime_must_fail_closed": true,
+    "price_semantics_mismatch_must_fail_closed": true,
+    "classifier_or_mapping_version_mismatch_must_fail_closed": true
+  },
+  "change_control": {
+    "validated_classifier_and_mapping_are_immutable_for_v3_live_use": true,
+    "any_classifier_formula_change_requires_new_policy_version": true,
+    "any_threshold_logic_change_requires_new_policy_version": true,
+    "any_action_mapping_change_requires_new_policy_version": true,
+    "any_new_policy_version_requires_new_unseen_validation_before_live_use": true,
+    "consumed_v1_v2_and_v3_validation_intervals_may_not_be_reused_as_unseen_evidence": true
+  },
+  "downstream_authorization_boundary": {
+    "production_database_write_authorized": false,
+    "presentation_activation_authorized": false,
+    "native_source_query_authorized": false,
+    "network_collection_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision": "IMPLEMENT_METALS_TACTICAL_POLICY_V3_CURRENT_STATE_MATERIALIZATION"
+}
