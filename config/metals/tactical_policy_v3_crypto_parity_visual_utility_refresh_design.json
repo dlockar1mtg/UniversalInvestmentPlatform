@@ -1,0 +1,102 @@
+{
+  "design_id": "METALS-TACTICAL-POLICY-V3-CRYPTO-PARITY-VISUAL-UTILITY-REFRESH-DESIGN-1",
+  "source_recovery_review_id": "METALS-TACTICAL-POLICY-V3-OUT-OF-SEQUENCE-MAIN-MERGE-RECOVERY-REVIEW-1",
+  "source_recovery_review_head": "6351738eeff72270d6490ca2db7cb47380b22ccf",
+  "production_main_baseline_head": "32668f5bcb73fc6b6f00c5b562e5f5433e6bf9cd",
+  "objective": "ADAPT_CERTIFIED_CRYPTO_PRESENTATION_PATTERNS_TO_METALS_WITH_METALS_NATIVE_ANALYTICAL_SEMANTICS",
+  "visual_principles": {
+    "crypto_is_visual_reference_not_semantic_template": true,
+    "card_first_overview_required": true,
+    "plain_table_must_be_secondary": true,
+    "research_drilldown_required": true,
+    "charts_and_visual_hierarchy_required": true,
+    "rationale_and_risk_must_be_visible": true,
+    "long_term_and_tactical_layers_must_be_visually_separate": true
+  },
+  "reuse_targets": {
+    "recommendation_ui_shared_shell": true,
+    "crypto_asset_card_visual_language": true,
+    "crypto_research_button_interaction": true,
+    "crypto_metric_card_layout": true,
+    "crypto_scenario_and_range_visual_language": true,
+    "crypto_risk_panel_visual_language": true,
+    "existing_asset_detail_endpoint": true,
+    "existing_presentation_record_types": true
+  },
+  "metals_overview": {
+    "featured_opportunity_cards_required": true,
+    "all_metals_table_retained_as_secondary_view": true,
+    "card_fields": [
+      "native_recommendation",
+      "normalized_score",
+      "confidence_score",
+      "current_price_when_available",
+      "return_1m_pct_when_available",
+      "return_3m_pct_when_available",
+      "return_6m_pct_when_available",
+      "current_drawdown_pct_when_available",
+      "risk_level_when_available",
+      "tactical_state_when_available",
+      "candidate_regime_when_available"
+    ],
+    "reference_control_handling": {
+      "bil_is_reference_control": true,
+      "bil_must_not_be_presented_as_featured_opportunity": true,
+      "bil_may_remain_visible_in_secondary_research_table": true
+    }
+  },
+  "metals_detail": {
+    "hero_long_term_thesis_required": true,
+    "native_recommendation_required": true,
+    "rationale_panel_required": true,
+    "risk_panel_required": true,
+    "forecast_or_scenario_panel_required_when_supported": true,
+    "price_history_visual_required_when_supported": true,
+    "momentum_visual_required_when_supported": true,
+    "drawdown_visual_required_when_supported": true,
+    "tactical_context_panel_required": true,
+    "tactical_context_fields": [
+      "tactical_state",
+      "candidate_regime",
+      "as_of_date",
+      "return_1m_pct_when_available",
+      "return_3m_pct_when_available",
+      "return_6m_pct_when_available",
+      "distance_ma50_pct_when_available",
+      "distance_ma200_pct_when_available",
+      "current_drawdown_pct_when_available",
+      "realized_volatility_3m_pct_when_available"
+    ]
+  },
+  "semantic_guardrails": {
+    "no_tactical_overlay_is_not_sell": true,
+    "no_tactical_overlay_is_not_negative_long_term_thesis": true,
+    "tactical_supportive_is_not_buy_instruction": true,
+    "tactical_defensive_is_not_sell_instruction": true,
+    "tactical_state_does_not_authorize_position_sizing": true,
+    "tactical_state_does_not_authorize_automatic_execution": true,
+    "tactical_state_does_not_overwrite_recommendation": true,
+    "tactical_state_does_not_overwrite_forecast": true,
+    "tactical_state_does_not_overwrite_risk": true,
+    "no_cross_domain_rank_created": true
+  },
+  "implementation_boundaries": {
+    "visual_design_authorized": true,
+    "runtime_implementation_authorized": false,
+    "main_deployment_authorized": false,
+    "hosted_publication_reactivation_authorized": false,
+    "analytical_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "network_collection_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "candidate_runtime_files": [
+    "foundation/production/dashboard_assets/recommendation_ui.js",
+    "foundation/production/dashboard_assets/metals_tactical_ui.js",
+    "foundation/production/dashboard_assets/dashboard.css"
+  ],
+  "design_decision": "APPROVE_METALS_V3_CRYPTO_PARITY_VISUAL_UTILITY_REFRESH_DESIGN_FOR_IMPLEMENTATION_CONSIDERATION",
+  "next_decision": "AUTHORIZE_METALS_V3_CRYPTO_PARITY_VISUAL_UTILITY_REFRESH_IMPLEMENTATION"
+}
