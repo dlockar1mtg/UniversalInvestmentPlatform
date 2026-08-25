@@ -1,0 +1,35 @@
+{
+  "audit_id": "METALS-TACTICAL-POLICY-V3-DECISION-UTILITY-SOURCE-RESOLUTION-AUDIT-1",
+  "status": "AUTHORIZED_READ_ONLY_AUDIT",
+  "source_preview_head": "6d1d3d2aaac887d1c884e1f01f8606319d8541db",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "objective": "RESOLVE_EXACT_GOVERNED_AUTHORITIES_FOR_REMAINING_METALS_DECISION_UTILITY_FIELDS",
+  "questions": [
+    "numeric_current_price",
+    "dated_price_history",
+    "commodity_forecast_lower_bound",
+    "commodity_forecast_upper_bound",
+    "vehicle_forecast_bounds",
+    "asset_rationale_or_recommendation_explanation"
+  ],
+  "semantic_rules": {
+    "price_semantics_is_not_numeric_price": true,
+    "downside_penalty_is_not_forecast_lower_bound": true,
+    "uncertainty_penalty_is_not_generic_risk_score": true,
+    "recommendation_change_explanation_is_not_full_investment_thesis": true,
+    "candidate_field_names_do_not_establish_authority_without_row_and_identity_evidence": true
+  },
+  "controls": {
+    "analytical_database_write_authorized": false,
+    "hosted_publication_write_authorized": false,
+    "runtime_ui_change_authorized": false,
+    "main_deployment_authorized": false,
+    "model_or_forecast_refresh_authorized": false,
+    "network_collection_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "decision": "AUTHORIZE_READ_ONLY_METALS_DECISION_UTILITY_SOURCE_RESOLUTION_AUDIT",
+  "next_decision": "DESIGN_METALS_DECISION_UTILITY_COMPLETION_FROM_RESOLVED_AUTHORITIES"
+}
