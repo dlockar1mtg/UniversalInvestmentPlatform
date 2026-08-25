@@ -1,0 +1,38 @@
+{
+  "implementation_id": "METALS-TACTICAL-POLICY-V3-RECOMMENDATION-UI-TACTICAL-INTEGRATION-1",
+  "source_readiness_review_id": "METALS-TACTICAL-POLICY-V3-MAIN-DEPLOYMENT-READINESS-REVIEW-1",
+  "source_readiness_review_head": "c13ccd0dcdc0fd02854ece852910c85780162815",
+  "active_publication_id": "metals-v3-live-tactical-r2-20260825",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "implementation": {
+    "recommendation_ui_metals_research_action_added": true,
+    "metals_asset_detail_loaded_from_existing_presentation_asset_endpoint": true,
+    "window_UIPMetalsTactical_renderTacticalPanel_invoked": true,
+    "tactical_panel_kept_separate_from_long_term_recommendation": true,
+    "tactical_panel_kept_separate_from_forecast": true,
+    "tactical_panel_kept_separate_from_risk": true,
+    "missing_tactical_renderer_fails_closed": true,
+    "crypto_behavior_intentionally_changed": false,
+    "mtg_behavior_intentionally_changed": false
+  },
+  "semantic_guardrails": {
+    "no_tactical_overlay_is_not_negative_long_term_thesis": true,
+    "tactical_state_is_not_buy_sell_instruction": true,
+    "tactical_state_is_not_position_sizing_authority": true,
+    "tactical_state_is_not_automatic_execution_authority": true
+  },
+  "deployment_boundary": {
+    "main_deployment_authorized": false,
+    "whole_research_branch_merge_authorized": false,
+    "hosted_presentation_reactivation_authorized": false,
+    "analytical_database_write_authorized": false,
+    "second_metals_production_write_authorized": false
+  },
+  "candidate_runtime_files_after_integration": [
+    "foundation/production/http_service.py",
+    "foundation/production/dashboard_assets/dashboard.html",
+    "foundation/production/dashboard_assets/metals_tactical_ui.js",
+    "foundation/production/dashboard_assets/recommendation_ui.js"
+  ],
+  "next_decision": "CERTIFY_METALS_V3_RECOMMENDATION_UI_TACTICAL_INTEGRATION"
+}
