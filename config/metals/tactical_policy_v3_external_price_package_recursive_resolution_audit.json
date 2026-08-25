@@ -1,0 +1,27 @@
+{
+  "audit_id": "METALS-TACTICAL-POLICY-V3-EXTERNAL-PRICE-PACKAGE-RECURSIVE-RESOLUTION-AUDIT-1",
+  "source_row_level_audit_head": "871ba774f92aee3d1c8b10654ecf2b4ba91ace3e",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "price_package_root": "C:\\Users\\DevonLockard\\UIP_Evidence\\metals_price_history_export_20260824",
+  "objective": "RESOLVE_NUMERIC_CURRENT_PRICE_AND_DATED_HISTORY_FROM_CERTIFIED_EXTERNAL_METALS_PRICE_PACKAGE",
+  "read_only": true,
+  "required_checks": {
+    "recursive_file_inventory": true,
+    "csv_headers_inspected": true,
+    "json_keys_inspected_when_applicable": true,
+    "numeric_price_requires_identity_and_numeric_value": true,
+    "dated_history_requires_identity_date_and_numeric_value": true,
+    "no_semantic_substitution": true
+  },
+  "controls": {
+    "analytical_database_write": false,
+    "hosted_publication_write": false,
+    "ui_change": false,
+    "main_deployment": false,
+    "network_collection": false,
+    "model_refresh": false,
+    "forecast_refresh": false
+  },
+  "decision": "AUTHORIZE_READ_ONLY_EXTERNAL_METALS_PRICE_PACKAGE_RECURSIVE_RESOLUTION_AUDIT",
+  "next_decision": "DESIGN_METALS_DECISION_UTILITY_COMPLETION_FROM_RESOLVED_AUTHORITIES"
+}
