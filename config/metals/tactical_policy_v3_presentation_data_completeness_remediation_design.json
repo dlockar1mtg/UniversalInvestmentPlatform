@@ -1,0 +1,124 @@
+{
+  "design_id": "METALS-TACTICAL-POLICY-V3-PRESENTATION-DATA-COMPLETENESS-REMEDIATION-DESIGN-1",
+  "source_audit_id": "METALS-TACTICAL-POLICY-V3-PRESENTATION-DATA-COMPLETENESS-AUDIT-1",
+  "source_audit_head": "dd6f5df48b5324b0bbfc3e7db7bb35b7642df11c",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "objective": "POPULATE_METALS_PRESENTATION_FROM_EXISTING_CERTIFIED_EVIDENCE_WITHOUT_SYNTHESIZING_UNSUPPORTED_FIELDS",
+  "audit_conclusions": {
+    "metals_tables_discovered": 14,
+    "tactical_rows": 11,
+    "tactical_non_reference_opportunities": 10,
+    "tactical_metrics_complete_for_all_tactical_rows": true,
+    "forecast_model_component_rows": 64,
+    "uncertainty_adjusted_rows": 32,
+    "recommendation_change_rows": 10,
+    "regime_probability_rows": 12
+  },
+  "approved_semantic_mappings": {
+    "vehicle_tactical_context": {
+      "source": "metals_tactical_state_current",
+      "fields": [
+        "return_1m_pct",
+        "return_3m_pct",
+        "return_6m_pct",
+        "distance_ma50_pct",
+        "distance_ma200_pct",
+        "current_drawdown_pct",
+        "realized_volatility_3m_pct",
+        "candidate_regime",
+        "tactical_state",
+        "state_available",
+        "state_reason",
+        "as_of_date"
+      ]
+    },
+    "vehicle_forecast_return_context": {
+      "source": "metals_uncertainty_adjusted_view_current",
+      "fields": [
+        "horizon_months",
+        "raw_expected_return",
+        "uncertainty_penalty",
+        "downside_penalty",
+        "adjusted_expected_return"
+      ]
+    },
+    "commodity_model_components": {
+      "source": "metals_forecast_model_component_current",
+      "fields": [
+        "horizon_months",
+        "model_name",
+        "model_forecast",
+        "model_weight"
+      ]
+    },
+    "commodity_regime_probabilities": {
+      "source": "metals_regime_probability_current",
+      "fields": [
+        "regime",
+        "probability"
+      ]
+    },
+    "vehicle_recommendation_explanation": {
+      "source": "metals_recommendation_change_current",
+      "fields": [
+        "previous_action",
+        "current_action",
+        "previous_confidence",
+        "current_confidence",
+        "confidence_change",
+        "explanation"
+      ]
+    },
+    "platform_and_data_health": {
+      "sources": [
+        "metals_data_freshness_current",
+        "metals_platform_health_current"
+      ]
+    }
+  },
+  "explicitly_rejected_false_mappings": {
+    "price_semantics_is_current_price": false,
+    "downside_penalty_is_forecast_lower_bound": false,
+    "uncertainty_penalty_is_risk_score": false,
+    "platform_health_explanation_is_asset_rationale": false,
+    "data_freshness_message_is_asset_rationale": false
+  },
+  "genuinely_unresolved_fields": {
+    "numeric_current_price": "REQUIRES_EXACT_EXISTING_PRICE_AUTHORITY_BINDING_OR_SEPARATE_DESIGN",
+    "forecast_upper_bound": "NO_SEMANTICALLY_EXACT_SOURCE_FOUND_IN_AUDITED_METALS_TABLES",
+    "forecast_lower_bound": "NO_SEMANTICALLY_EXACT_SOURCE_FOUND_IN_AUDITED_METALS_TABLES",
+    "generic_risk_level": "DO_NOT_INVENT_FROM_PENALTIES_WITHOUT_TYPED_RULE",
+    "commodity_tactical_state": "NOT_APPLICABLE_UNLESS_GOVERNED_COMMODITY_TACTICAL_AUTHORITY_IS_CREATED"
+  },
+  "presentation_strategy": {
+    "vehicle_records_receive_tactical_metrics": true,
+    "vehicle_records_receive_uncertainty_adjusted_forecast_context": true,
+    "vehicle_records_receive_recommendation_change_explanation": true,
+    "commodity_records_receive_model_component_context": true,
+    "commodity_records_receive_regime_probability_context": true,
+    "bil_remains_reference_control_only": true,
+    "missing_fields_remain_explicitly_unavailable": true,
+    "ui_must_distinguish_not_applicable_from_missing": true,
+    "no_cross_domain_rank": true,
+    "no_execution_authority": true
+  },
+  "candidate_implementation_files": [
+    "foundation/presentation/metals_tactical_projection.py",
+    "config/presentation/dash_read_1_metals_tactical_extension.json",
+    "foundation/production/dashboard_assets/recommendation_ui.js",
+    "foundation/production/dashboard_assets/metals_tactical_ui.js"
+  ],
+  "boundaries": {
+    "runtime_implementation_authorized": false,
+    "analytical_database_write_authorized": false,
+    "hosted_publication_write_authorized": false,
+    "model_refresh_authorized": false,
+    "forecast_refresh_authorized": false,
+    "network_collection_authorized": false,
+    "main_deployment_authorized": false,
+    "pull_request_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "design_decision": "APPROVE_EXISTING_EVIDENCE_PRESENTATION_REMEDIATION_FOR_IMPLEMENTATION_CONSIDERATION",
+  "next_decision": "AUTHORIZE_METALS_PRESENTATION_DATA_COMPLETENESS_REMEDIATION_IMPLEMENTATION"
+}
