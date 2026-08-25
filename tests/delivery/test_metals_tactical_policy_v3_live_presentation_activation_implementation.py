@@ -15,11 +15,18 @@ def test_dashboard_loads_metals_tactical_ui():
     assert '<script src="/dashboard/assets/metals_tactical_ui.js" defer></script>' in HTML
 
 
-def test_activation_cli_is_bound_to_certified_authorization():
-    assert "METALS-TACTICAL-POLICY-V3-LIVE-PRESENTATION-ACTIVATION-AUTHORIZATION-1" in CLI
-    assert "AUTHORIZE_ONE_BOUNDED_METALS_V3_LIVE_PRESENTATION_ACTIVATION" in CLI
+def test_activation_cli_is_bound_to_fresh_certified_authorization():
+    assert "METALS-TACTICAL-POLICY-V3-FRESH-LIVE-PRESENTATION-ACTIVATION-AUTHORIZATION-1" in CLI
+    assert "AUTHORIZE_ONE_FRESH_BOUNDED_METALS_V3_LIVE_PRESENTATION_ACTIVATION" in CLI
     assert "execution_limit" in CLI
     assert "execution_is_one_time" in CLI
+    assert "METALS-TACTICAL-POLICY-V3-LIVE-PRESENTATION-ACTIVATION-AUTHORIZATION-1" not in CLI
+
+
+def test_activation_cli_requires_fresh_target_publication_id():
+    assert 'EXPECTED_PUBLICATION_ID = "metals-v3-live-tactical-r2-20260825"' in CLI
+    assert "Unexpected fresh target publication ID." in CLI
+    assert 'default="metals-v3-live-tactical-20260825"' not in CLI
 
 
 def test_activation_cli_requires_exact_certified_publication():
@@ -27,6 +34,13 @@ def test_activation_cli_requires_exact_certified_publication():
     assert 'EXPECTED_FINGERPRINT = "21a3e3c8a1e73b7370d23f0704081f7ac01f28609bed22f94d00d4f4c2e7c126"' in CLI
     assert "EXPECTED_RECORD_COUNT = 4181" in CLI
     assert "EXPECTED_TACTICAL_COUNT = 10" in CLI
+
+
+def test_activation_cli_rejects_consumed_and_failed_lineage_reuse():
+    assert "consumed_prior_authorization_may_be_reused" in CLI
+    assert "Consumed prior authorization became reusable." in CLI
+    assert "failed_prior_publication_id_may_be_reused" in CLI
+    assert "Failed prior publication ID became reusable." in CLI
 
 
 def test_activation_cli_reads_duckdb_only():
