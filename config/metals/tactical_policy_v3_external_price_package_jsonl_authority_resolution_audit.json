@@ -1,0 +1,37 @@
+{
+  "audit_id": "METALS-TACTICAL-POLICY-V3-EXTERNAL-PRICE-PACKAGE-JSONL-AUTHORITY-RESOLUTION-AUDIT-1",
+  "source_recursive_audit_head": "110e926e84ad58307dd18d24c30f2dbe6793bdf8",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "objective": "RESOLVE_JSONL_CURRENT_PRICE_AND_DATED_HISTORY_AUTHORITIES_FROM_CERTIFIED_EXTERNAL_METALS_PRICE_PACKAGE",
+  "read_only": true,
+  "required_files": [
+    "metals_current_price.jsonl",
+    "metals_price_history.jsonl"
+  ],
+  "required_checks": {
+    "jsonl_rows_parsed": true,
+    "identity_columns_detected": true,
+    "date_columns_detected_when_present": true,
+    "numeric_price_columns_detected": true,
+    "row_counts_recorded": true,
+    "asset_identity_values_recorded": true,
+    "no_data_synthesized": true
+  },
+  "semantic_rules": {
+    "numeric_current_price_requires_identity_and_numeric_value": true,
+    "dated_history_requires_identity_date_and_numeric_value": true,
+    "jsonl_filename_alone_does_not_establish_authority": true,
+    "price_semantics_is_not_numeric_price": true
+  },
+  "controls": {
+    "analytical_database_write_authorized": false,
+    "hosted_publication_write_authorized": false,
+    "runtime_ui_change_authorized": false,
+    "network_collection_authorized": false,
+    "model_refresh_authorized": false,
+    "forecast_refresh_authorized": false,
+    "main_deployment_authorized": false
+  },
+  "decision": "AUTHORIZE_READ_ONLY_EXTERNAL_METALS_PRICE_PACKAGE_JSONL_AUTHORITY_RESOLUTION_AUDIT",
+  "next_decision": "DESIGN_METALS_DECISION_UTILITY_COMPLETION_FROM_RESOLVED_AUTHORITIES"
+}
