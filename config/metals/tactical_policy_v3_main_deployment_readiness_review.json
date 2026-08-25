@@ -1,0 +1,52 @@
+{
+  "review_id": "METALS-TACTICAL-POLICY-V3-MAIN-DEPLOYMENT-READINESS-REVIEW-1",
+  "source_activation_review_id": "METALS-TACTICAL-POLICY-V3-LIVE-PRESENTATION-ACTIVATION-REVIEW-1",
+  "source_activation_review_head": "17c7223b05c6f25d24ea3b66e493a8ef63f1a1ad",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "active_publication_id": "metals-v3-live-tactical-r2-20260825",
+  "active_content_fingerprint": "21a3e3c8a1e73b7370d23f0704081f7ac01f28609bed22f94d00d4f4c2e7c126",
+  "render_configured_branch": "main",
+  "main_head_at_review": "10f4f4c0e3e96194314a46c058432dd6d04553d7",
+  "research_branch_head_at_review": "17c7223b05c6f25d24ea3b66e493a8ef63f1a1ad",
+  "research_branch_commits_ahead_of_main": 257,
+  "backend_readiness": {
+    "asset_detail_returns_arbitrary_record_types": true,
+    "tactical_state_requires_new_read_api": false,
+    "hosted_tactical_state_data_active": true
+  },
+  "presentation_readiness": {
+    "metals_tactical_helper_exists_on_research_branch": true,
+    "metals_tactical_asset_route_exists_on_research_branch": true,
+    "metals_tactical_script_load_exists_on_research_branch": true,
+    "recommendation_ui_explicitly_invokes_tactical_panel": false,
+    "visual_tactical_panel_end_to_end_proven": false
+  },
+  "bounded_candidate_deployment_files": [
+    "foundation/production/http_service.py",
+    "foundation/production/dashboard_assets/dashboard.html",
+    "foundation/production/dashboard_assets/metals_tactical_ui.js",
+    "foundation/production/dashboard_assets/recommendation_ui.js"
+  ],
+  "whole_research_branch_merge_authorized": false,
+  "main_deployment_authorized": false,
+  "readiness_decision": "NOT_READY_REQUIRES_EXPLICIT_RECOMMENDATION_UI_TACTICAL_INTEGRATION",
+  "required_remediation": {
+    "recommendation_ui_must_invoke_window_UIPMetalsTactical_renderTacticalPanel_for_metals_asset_detail": true,
+    "long_term_recommendation_forecast_and_risk_must_remain_separate": true,
+    "missing_tactical_state_must_fail_closed": true,
+    "bil_must_remain_reference_only": true,
+    "bounded_deployment_package_must_be_regression_tested_against_main": true
+  },
+  "controls": {
+    "hosted_presentation_reactivation_authorized": false,
+    "analytical_database_write_authorized": false,
+    "second_metals_production_write_authorized": false,
+    "network_collection_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision": "IMPLEMENT_METALS_V3_RECOMMENDATION_UI_TACTICAL_INTEGRATION"
+}
