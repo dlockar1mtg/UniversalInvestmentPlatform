@@ -44,9 +44,14 @@ def main() -> int:
     for fragment in required_sql:
         if fragment not in sql:
             raise RuntimeError(f"migration missing required fragment: {fragment}")
-    forbidden_sql = ["INSERT OR REPLACE", "DELETE FROM metals_tactical_state_history", "UPDATE metals_tactical_state_history"]
+    sql_upper = sql.upper()
+    forbidden_sql = [
+        "INSERT OR REPLACE",
+        "DELETE FROM METALS_TACTICAL_STATE_HISTORY",
+        "UPDATE METALS_TACTICAL_STATE_HISTORY",
+    ]
     for fragment in forbidden_sql:
-        if fragment in sql.upper():
+        if fragment in sql_upper:
             raise RuntimeError(f"migration contains forbidden history mutation: {fragment}")
 
     importer_text = IMPORTER_PATH.read_text(encoding="utf-8")
@@ -80,8 +85,13 @@ def main() -> int:
     for fragment in required_importer_fragments:
         if fragment not in importer_text:
             raise RuntimeError(f"importer missing governed control: {fragment}")
-    for forbidden in ("INSERT OR REPLACE", "DELETE FROM metals_tactical_state_history", "UPDATE metals_tactical_state_history"):
-        if forbidden in importer_text.upper():
+    importer_upper = importer_text.upper()
+    for forbidden in (
+        "INSERT OR REPLACE",
+        "DELETE FROM METALS_TACTICAL_STATE_HISTORY",
+        "UPDATE METALS_TACTICAL_STATE_HISTORY",
+    ):
+        if forbidden in importer_upper:
             raise RuntimeError(f"importer contains forbidden history mutation: {forbidden}")
 
     print(json.dumps({
