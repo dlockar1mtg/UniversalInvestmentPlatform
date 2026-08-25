@@ -25,7 +25,8 @@ def main() -> int:
     require(auth["source_action_mapping_freeze_decision"] == "METALS-TACTICAL-POLICY-V3-ACTION-MAPPING-FREEZE-DECISION-1", "unexpected action mapping freeze")
     require(auth["source_action_mapping_version"] == "METALS-V3-ACTION-MAPPING-1", "unexpected action mapping version")
 
-    require(freeze["controls"]["action_mapping_frozen"] is True, "action mapping is not frozen")
+    require(freeze["scope_of_freeze"]["action_mapping_frozen"] is True, "action mapping is not frozen")
+    require(freeze["scope_of_freeze"]["new_validation_outcome_inspection_authorized"] is False, "source freeze unexpectedly authorized outcome inspection")
     require(regime["controls"]["v3_regime_definition_locked"] is True, "regime definition is not locked")
 
     interval = auth["unseen_validation_interval"]
