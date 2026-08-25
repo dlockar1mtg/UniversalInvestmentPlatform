@@ -1,0 +1,55 @@
+{
+  "review_id": "METALS-TACTICAL-POLICY-V3-LIVE-PRESENTATION-ACTIVATION-REVIEW-1",
+  "source_fresh_authorization_id": "METALS-TACTICAL-POLICY-V3-FRESH-LIVE-PRESENTATION-ACTIVATION-AUTHORIZATION-1",
+  "source_authorization_consumed": true,
+  "source_executable_binding_head": "46853f688e7f64c6fa38c7569e842b715ab37eba",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "active_publication": {
+    "publication_id": "metals-v3-live-tactical-r2-20260825",
+    "publication_status": "ACTIVE",
+    "content_fingerprint": "21a3e3c8a1e73b7370d23f0704081f7ac01f28609bed22f94d00d4f4c2e7c126",
+    "record_count": 4181,
+    "metals_tactical_state_count": 10,
+    "metals_recommendation_count": 12,
+    "metals_forecast_count": 16,
+    "metals_risk_count": 11,
+    "active_pointer_count": 1,
+    "active_status_count": 1
+  },
+  "previous_publication": {
+    "publication_id": "dash-read-1-metals-price-history-dff98e56d27c",
+    "publication_status": "SUPERSEDED"
+  },
+  "semantic_state": {
+    "bil_projected_as_opportunity": false,
+    "all_tactical_states": "NO_TACTICAL_OVERLAY",
+    "all_tactical_regimes": "NEUTRAL_OR_UNCERTAIN",
+    "tactical_tickers": ["COPX", "CPER", "GLD", "IAU", "PPLT", "SGOL", "SIVR", "SLV", "URA", "URNM"]
+  },
+  "activation_evidence_root": "C:\\Users\\DevonLockard\\UIP_Evidence\\metals_v3_live_presentation_activation_r2_20260825",
+  "analytical_database_unchanged": true,
+  "second_activation_forbidden": true,
+  "deployment_state": {
+    "render_configured_branch": "main",
+    "main_head_at_review": "10f4f4c0e3e96194314a46c058432dd6d04553d7",
+    "research_branch_head_at_review": "46853f688e7f64c6fa38c7569e842b715ab37eba",
+    "hosted_presentation_data_active": true,
+    "metals_tactical_ui_route_present_on_main": false,
+    "metals_tactical_ui_script_present_on_main": false,
+    "visual_dashboard_live_certified": false
+  },
+  "review_decision": "HOSTED_PRESENTATION_ACTIVATION_CERTIFIED_UI_DEPLOYMENT_TO_MAIN_REQUIRED",
+  "controls": {
+    "activation_may_be_reexecuted": false,
+    "analytical_database_write_authorized": false,
+    "second_metals_production_write_authorized": false,
+    "network_collection_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false,
+    "main_deployment_may_be_considered": true
+  },
+  "next_decision": "CERTIFY_METALS_V3_MAIN_DEPLOYMENT_READINESS"
+}
