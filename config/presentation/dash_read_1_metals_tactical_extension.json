@@ -1,6 +1,6 @@
 {
   "extension_id": "DASH-READ-1-METALS-TACTICAL-EVIDENCE",
-  "version": "1.2.0",
+  "version": "1.1.0",
   "status": "AUTHORIZED_FOR_PRESENTATION_PROJECTION",
   "base_contract": "DASH_READ_1_CERTIFIED_PRESENTATION_READ_MODEL_PUBLICATION_CONTRACT",
   "domain_id": "metals",
