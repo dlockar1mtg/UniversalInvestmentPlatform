@@ -1,0 +1,75 @@
+{
+  "implementation_id": "METALS-TACTICAL-POLICY-V3-DECISION-UTILITY-COMPLETION-IMPLEMENTATION-1",
+  "source_authorization_id": "METALS-TACTICAL-POLICY-V3-DECISION-UTILITY-COMPLETION-IMPLEMENTATION-AUTHORIZATION-1",
+  "source_authorization_head": "96b47cf19ff2d3c3bb5b64bb11e4d71956105185",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "implementation_strategy": "PROJECT_CERTIFIED_EXTERNAL_METALS_MARKET_DATA_AND_COMPLETE_DECISION_UTILITY_WITHOUT_MUTATING_ANALYTICAL_AUTHORITY",
+  "runtime_files_changed": [
+    "config/presentation/dash_read_1_metals_tactical_extension.json",
+    "foundation/presentation/metals_tactical_projection.py",
+    "foundation/production/dashboard_assets/metals_tactical_ui.js"
+  ],
+  "authorized_file_deliberately_unchanged": "foundation/production/dashboard_assets/recommendation_ui.js",
+  "implemented_behavior": {
+    "vehicle_current_price_projected": true,
+    "vehicle_price_as_of_date_projected": true,
+    "vehicle_price_history_projected": true,
+    "history_uses_unadjusted_close": true,
+    "external_package_files_hash_locked": true,
+    "vehicle_cards_receive_current_price": true,
+    "vehicle_cards_distinguish_adjusted_return": true,
+    "vehicle_research_hero_receives_current_price": true,
+    "vehicle_research_hero_receives_price_as_of_date": true,
+    "vehicle_research_hero_distinguishes_raw_and_adjusted_return": true,
+    "vehicle_research_receives_historical_price_chart": true,
+    "recommendation_change_evidence_promoted": true,
+    "contradictory_empty_forecast_message_removed_when_supporting_evidence_exists": true,
+    "uranium_missing_standard_forecast_explained": true,
+    "commodity_tactical_state_remains_not_applicable": true,
+    "bil_remains_reference_control_only": true
+  },
+  "semantic_guardrails": {
+    "commodity_price_not_inferred_from_vehicle_price": true,
+    "forecast_bounds_not_synthesized": true,
+    "forecast_point_price_not_synthesized": true,
+    "full_investment_rationale_not_fabricated": true,
+    "recommendation_change_explanation_not_relabelled_as_full_thesis": true,
+    "downside_penalty_not_relabelled_as_forecast_bound": true,
+    "uncertainty_penalty_not_relabelled_as_generic_risk_score": true,
+    "adjusted_close_not_used_for_presented_history": true
+  },
+  "external_authority": {
+    "package_id": "metals-price-history-20260824",
+    "current_price_record_type": "metals_current_price",
+    "price_history_record_type": "metals_price_history",
+    "current_price_value_field": "current_price_usd",
+    "history_value_field": "close_usd",
+    "date_field": "observation_date",
+    "price_semantics": "UNADJUSTED_CLOSE",
+    "current_price_expected_rows": 11,
+    "price_history_expected_rows": 8283
+  },
+  "unsupported_fields": [
+    "commodity_numeric_current_price",
+    "forecast_lower_bound",
+    "forecast_point_price",
+    "forecast_upper_bound",
+    "full_investment_rationale",
+    "recommendation_risk_summary",
+    "uranium_standard_commodity_forecast"
+  ],
+  "boundaries": {
+    "analytical_database_write_authorized": false,
+    "hosted_publication_write_authorized": false,
+    "hosted_publication_reactivation_authorized": false,
+    "main_deployment_authorized": false,
+    "pr_creation_authorized": false,
+    "network_collection_authorized": false,
+    "model_retraining_authorized": false,
+    "forecast_refresh_authorized": false,
+    "allocation_policy_change_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "implementation_status": "IMPLEMENTED_REQUIRES_LOCAL_REGRESSION_AND_LOCAL_PUBLICATION_PROJECTION_CERTIFICATION",
+  "next_decision": "CERTIFY_METALS_DECISION_UTILITY_COMPLETION_AND_LOCAL_PUBLICATION_PROJECTION"
+}
