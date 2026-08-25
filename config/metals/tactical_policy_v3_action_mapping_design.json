@@ -1,0 +1,82 @@
+{
+  "design_id": "METALS-TACTICAL-POLICY-V3-ACTION-MAPPING-DESIGN-1",
+  "version": "1.0.0",
+  "domain_id": "metals",
+  "source_regime_definition_lock_decision": "METALS-TACTICAL-POLICY-V3-REGIME-DEFINITION-LOCK-DECISION-1",
+  "source_regime_definition": "METALS-TACTICAL-POLICY-V3-REGIME-DEFINITION-1",
+  "source_classifier_rule_version": "METALS-V3-REGIME-CANDIDATE-RULES-1",
+  "source_label_ledger_sha256": "41f00a74c8116c59b5e36dc039db43a2481ffce9f1ce663da00c270d8c483dfd",
+  "purpose": "Define and freeze a simple ordinal candidate action mapping from the locked Metals V3 regime classifier before any genuinely new unseen validation outcomes are inspected.",
+  "design_principles": {
+    "regime_classifier_is_locked_and_may_not_be_changed_by_this_design": true,
+    "mapping_is_ordinal_not_position_sizing": true,
+    "mapping_does_not_authorize_buy_sell_or_trade_execution": true,
+    "mapping_uses_only_locked_regime_labels": true,
+    "no_current_only_recommendation_or_risk_field_is_an_input": true,
+    "no_future_return_or_excursion_is_an_input": true,
+    "neutral_or_uncertain_must_remain_fail_closed": true,
+    "bil_remains_reference_control_only": true,
+    "duplicate_exposure_families_are_not_independent_confirmation": true
+  },
+  "candidate_action_mapping": {
+    "mapping_version": "METALS-V3-ACTION-MAPPING-1",
+    "TREND_PERSISTENCE": {
+      "candidate_action_state": "TACTICAL_SUPPORTIVE",
+      "interpretation": "The locked regime evidence is directionally more supportive than the exhaustion regime; this is a validation hypothesis only and is not a live accumulation or buy instruction.",
+      "position_size_change_authorized": false,
+      "trade_execution_authorized": false
+    },
+    "MEAN_REVERSION_OR_EXHAUSTION": {
+      "candidate_action_state": "TACTICAL_DEFENSIVE",
+      "interpretation": "The locked regime evidence is directionally less supportive than trend persistence; this is a validation hypothesis only and is not a live reduce, sell, or avoid instruction.",
+      "position_size_change_authorized": false,
+      "trade_execution_authorized": false
+    },
+    "NEUTRAL_OR_UNCERTAIN": {
+      "candidate_action_state": "NO_TACTICAL_OVERLAY",
+      "interpretation": "Insufficient, conflicting, or non-separable evidence must not force a directional tactical state.",
+      "position_size_change_authorized": false,
+      "trade_execution_authorized": false
+    }
+  },
+  "unseen_validation_hypothesis": {
+    "primary_ordering": "TACTICAL_SUPPORTIVE should exhibit better subsequent risk-adjusted directional behavior than TACTICAL_DEFENSIVE on genuinely new unseen evidence.",
+    "supportive_median_return_should_exceed_defensive": true,
+    "supportive_positive_return_rate_should_exceed_defensive": true,
+    "supportive_mean_mae_should_be_less_negative_than_defensive": true,
+    "horizons_trading_days": [21, 63, 126],
+    "minimum_compared_group_support": 20,
+    "minimum_distinct_exposure_families_per_directional_state": 2,
+    "all_three_directional_checks_required_at_primary_horizon": true,
+    "primary_horizon_trading_days": 63,
+    "secondary_horizons_are_context_not_substitutes_for_primary_horizon": true
+  },
+  "validation_boundary": {
+    "new_unseen_validation_package_must_postdate_consumed_v1_v2_evidence": true,
+    "new_unseen_validation_data_collection_requires_separate_authorization": true,
+    "action_mapping_must_be_frozen_before_new_unseen_outcomes_are_inspected": true,
+    "validation_outcomes_may_not_be_used_to_edit_this_mapping_without_new_version_and_governance_decision": true,
+    "consumed_v1_v2_intervals_may_not_be_reused_as_unseen_validation": true,
+    "overlapping_forward_windows_must_be_disclosed": true,
+    "support_must_be_reported_by_vehicle_and_exposure_family": true
+  },
+  "controls": {
+    "v3_regime_definition_authorized": true,
+    "v3_regime_definition_locked": true,
+    "action_mapping_design_authorized": true,
+    "action_mapping_frozen": false,
+    "new_validation_data_collection_authorized": false,
+    "new_validation_outcome_inspection_authorized": false,
+    "candidate_tactical_posture_authorized": false,
+    "live_tactical_posture_authorized": false,
+    "presentation_activation_authorized": false,
+    "production_database_write_authorized": false,
+    "native_source_query_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision": "CONSIDER_FREEZING_METALS_TACTICAL_POLICY_V3_ACTION_MAPPING"
+}
