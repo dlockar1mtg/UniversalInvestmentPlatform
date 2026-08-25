@@ -82,7 +82,7 @@
     "action_mapping_may_not_be_changed_during_collection": true,
     "validation_thresholds_may_not_be_changed_during_collection": true,
     "validation_outcomes_may_not_be_calculated_or_inspected_during_collection": true,
-    "candidate_labels_may_not_be evaluated_for_performance_during_collection": true,
+    "candidate_labels_may_not_be_evaluated_for_performance_during_collection": true,
     "new_validation_package_must_be_frozen_and_hashed_before_outcome_inspection_authorization": true,
     "production_database_write_authorized": false,
     "presentation_activation_authorized": false,
