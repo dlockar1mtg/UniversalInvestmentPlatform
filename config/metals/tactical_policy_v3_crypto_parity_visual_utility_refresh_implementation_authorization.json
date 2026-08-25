@@ -1,0 +1,53 @@
+{
+  "authorization_id": "METALS-TACTICAL-POLICY-V3-CRYPTO-PARITY-VISUAL-UTILITY-REFRESH-IMPLEMENTATION-AUTHORIZATION-1",
+  "source_design_id": "METALS-TACTICAL-POLICY-V3-CRYPTO-PARITY-VISUAL-UTILITY-REFRESH-DESIGN-1",
+  "source_design_head": "aaf9278aa6d973a78663836174849bf78df7a447",
+  "production_main_baseline_head": "32668f5bcb73fc6b6f00c5b562e5f5433e6bf9cd",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "authorization_decision": "AUTHORIZE_BOUNDED_METALS_V3_CRYPTO_PARITY_VISUAL_UTILITY_REFRESH_IMPLEMENTATION",
+  "authorized_runtime_files": [
+    "foundation/production/dashboard_assets/recommendation_ui.js",
+    "foundation/production/dashboard_assets/metals_tactical_ui.js",
+    "foundation/production/dashboard_assets/dashboard.css"
+  ],
+  "required_behavior": {
+    "card_first_metals_overview": true,
+    "all_metals_table_retained_as_secondary_view": true,
+    "crypto_visual_patterns_reused_without_crypto_semantic_substitution": true,
+    "metals_native_recommendation_preserved": true,
+    "visible_rationale_and_risk": true,
+    "price_history_visual_when_supported": true,
+    "momentum_visual_when_supported": true,
+    "drawdown_visual_when_supported": true,
+    "forecast_or_scenario_visual_when_supported": true,
+    "dedicated_tactical_context_panel": true,
+    "tactical_context_separate_from_long_term_thesis": true,
+    "bil_reference_control_only": true,
+    "bil_excluded_from_featured_opportunities": true,
+    "no_tactical_overlay_not_sell": true
+  },
+  "implementation_boundaries": {
+    "runtime_implementation_authorized": true,
+    "main_deployment_authorized": false,
+    "pull_request_authorized": false,
+    "hosted_publication_reactivation_authorized": false,
+    "analytical_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "network_collection_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "implementation_strategy": {
+    "reuse_existing_recommendation_ui_architecture": true,
+    "reuse_existing_crypto_card_and_detail_visual_language": true,
+    "add_metals_specific_card_renderer": true,
+    "add_metals_specific_detail_renderer": true,
+    "extend_existing_metals_tactical_helper": true,
+    "add_only_required_css_for_visual_parity": true,
+    "preserve_crypto_behavior": true,
+    "preserve_mtg_behavior": true
+  },
+  "next_decision": "IMPLEMENT_AND_CERTIFY_METALS_V3_CRYPTO_PARITY_VISUAL_UTILITY_REFRESH"
+}
