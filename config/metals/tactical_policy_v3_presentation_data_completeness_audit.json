@@ -1,0 +1,47 @@
+{
+  "audit_id": "METALS-TACTICAL-POLICY-V3-PRESENTATION-DATA-COMPLETENESS-AUDIT-1",
+  "source_visual_preview_head": "e8a80f88e39b6d9dbfcc83400bc0c93d7335ec35",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "objective": "IDENTIFY_WHICH_BLANK_METALS_DASHBOARD_FIELDS_CAN_BE_POPULATED_FROM_EXISTING_CERTIFIED_AUTHORITY_AND_WHICH_REQUIRE_NEW_SOURCE_EVIDENCE",
+  "read_only": true,
+  "target_fields": [
+    "current_price",
+    "return_1m_pct",
+    "return_3m_pct",
+    "return_6m_pct",
+    "current_drawdown_pct",
+    "distance_ma50_pct",
+    "distance_ma200_pct",
+    "realized_volatility_3m_pct",
+    "candidate_regime",
+    "tactical_state",
+    "forecast_point",
+    "forecast_expected_return",
+    "forecast_lower_bound",
+    "forecast_upper_bound",
+    "rationale",
+    "risk"
+  ],
+  "known_certified_surfaces": [
+    "metals_forecast_model_component_current",
+    "metals_regime_probability_current",
+    "metals_uncertainty_adjusted_view_current",
+    "metals_recommendation_change_current",
+    "metals_data_freshness_current",
+    "metals_platform_health_current",
+    "metals_tactical_state_current"
+  ],
+  "controls": {
+    "analytical_database_write_authorized": false,
+    "hosted_publication_write_authorized": false,
+    "hosted_publication_reactivation_authorized": false,
+    "network_collection_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "missing_values_may_be_synthesized": false,
+    "runtime_ui_change_authorized": false,
+    "main_deployment_authorized": false
+  },
+  "decision": "AUTHORIZE_READ_ONLY_METALS_PRESENTATION_DATA_COMPLETENESS_AUDIT",
+  "next_decision": "DESIGN_METALS_PRESENTATION_DATA_COMPLETENESS_REMEDIATION"
+}
