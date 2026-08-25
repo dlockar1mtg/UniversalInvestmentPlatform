@@ -1,0 +1,59 @@
+{
+  "authorization_id": "METALS-TACTICAL-POLICY-V3-BOUNDED-MAIN-DEPLOYMENT-PR-AUTHORIZATION-1",
+  "source_package_review_id": "METALS-TACTICAL-POLICY-V3-BOUNDED-MAIN-DEPLOYMENT-PACKAGE-REVIEW-1",
+  "source_package_review_head": "4e662944b3f016306dff295be81688996dec737a",
+  "source_package_certification_status": "PASS",
+  "main_base_head": "10f4f4c0e3e96194314a46c058432dd6d04553d7",
+  "deployment_branch": "deploy/metals-v3-tactical-ui",
+  "deployment_head": "11c9f8909c63d42aee8b8a7324d172f551b17b37",
+  "deployment_commit_count": 1,
+  "deployment_file_count": 4,
+  "deployment_files": [
+    "foundation/production/dashboard_assets/dashboard.html",
+    "foundation/production/dashboard_assets/metals_tactical_ui.js",
+    "foundation/production/dashboard_assets/recommendation_ui.js",
+    "foundation/production/http_service.py"
+  ],
+  "local_regression_certification": {
+    "rec_ui_tests_passed": 10,
+    "production_tests_passed": 166,
+    "production_warning_count": 1,
+    "all_runtime_files_exactly_match_certified_metals_source": true,
+    "research_worktree_clean": true,
+    "disposable_certification_worktree_removed": true,
+    "analytical_database_unchanged": true
+  },
+  "authorization_decision": "AUTHORIZE_OPEN_AND_REVIEW_BOUNDED_METALS_V3_MAIN_DEPLOYMENT_PR",
+  "authorized_action": {
+    "open_pull_request": true,
+    "base_branch": "main",
+    "head_branch": "deploy/metals-v3-tactical-ui",
+    "inspect_exact_pr_diff": true,
+    "inspect_ci_checks": true
+  },
+  "boundaries": {
+    "merge_authorized": false,
+    "main_direct_push_authorized": false,
+    "render_deployment_certified": false,
+    "whole_research_branch_merge_authorized": false,
+    "hosted_presentation_reactivation_authorized": false,
+    "analytical_database_write_authorized": false,
+    "second_metals_production_write_authorized": false,
+    "network_collection_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "required_pr_review": {
+    "base_must_equal_main": true,
+    "head_must_equal_deployment_branch": true,
+    "head_sha_must_equal_certified_deployment_head": true,
+    "changed_file_count_must_equal_4": true,
+    "changed_files_must_exactly_match_certified_package": true,
+    "no_additional_commits_before_review": true,
+    "required_checks_must_be_reviewed_before_merge_consideration": true
+  },
+  "next_decision": "OPEN_AND_REVIEW_METALS_V3_BOUNDED_MAIN_DEPLOYMENT_PR"
+}
