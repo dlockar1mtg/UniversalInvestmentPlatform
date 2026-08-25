@@ -1,0 +1,28 @@
+{
+  "review_id": "METALS-TACTICAL-POLICY-V3-BOUNDED-MAIN-DEPLOYMENT-PACKAGE-REVIEW-1",
+  "source_ui_integration_head": "a641adb46b422bb550bbbb89f3c781efd5463c00",
+  "main_base_head": "10f4f4c0e3e96194314a46c058432dd6d04553d7",
+  "deployment_branch": "deploy/metals-v3-tactical-ui",
+  "deployment_head": "11c9f8909c63d42aee8b8a7324d172f551b17b37",
+  "deployment_commit_count": 1,
+  "deployment_files": [
+    "foundation/production/http_service.py",
+    "foundation/production/dashboard_assets/dashboard.html",
+    "foundation/production/dashboard_assets/metals_tactical_ui.js",
+    "foundation/production/dashboard_assets/recommendation_ui.js"
+  ],
+  "runtime_changes": {
+    "metals_tactical_asset_route_added": true,
+    "dashboard_metals_tactical_script_added": true,
+    "metals_tactical_helper_added": true,
+    "recommendation_ui_metals_tactical_integration_added": true
+  },
+  "whole_research_branch_merge_authorized": false,
+  "main_deployment_authorized": false,
+  "pull_request_authorized": false,
+  "hosted_presentation_reactivation_authorized": false,
+  "analytical_database_write_authorized": false,
+  "second_metals_production_write_authorized": false,
+  "review_decision": "BOUNDED_PACKAGE_CONSTRUCTED_REQUIRES_LOCAL_REGRESSION_CERTIFICATION_BEFORE_PR",
+  "next_decision": "CERTIFY_METALS_V3_BOUNDED_MAIN_DEPLOYMENT_PACKAGE"
+}
