@@ -83,10 +83,15 @@ def main() -> int:
     require(result["primary_support_gate_met"] is True, "persisted support gate failed")
     require(result["primary_exposure_family_gate_met"] is True, "persisted family gate failed")
     require(result["all_three_primary_directional_checks_met"] is True, "persisted directional checks failed")
-    require(result["supportive_63d_observation_count"] == 801, "persisted supportive count changed")
-    require(result["defensive_63d_observation_count"] == 1152, "persisted defensive count changed")
-    require(result["supportive_63d_exposure_family_count"] == 7, "persisted supportive family count changed")
-    require(result["defensive_63d_exposure_family_count"] == 7, "persisted defensive family count changed")
+
+    primary = result["outcomes_by_action_state"]["63d"]
+    supportive = primary["TACTICAL_SUPPORTIVE"]
+    defensive = primary["TACTICAL_DEFENSIVE"]
+    require(supportive["observation_count"] == 801, "persisted supportive count changed")
+    require(defensive["observation_count"] == 1152, "persisted defensive count changed")
+    require(supportive["exposure_family_count"] == 7, "persisted supportive family count changed")
+    require(defensive["exposure_family_count"] == 7, "persisted defensive family count changed")
+
     require(result["label_ledger_hashed_before_outcome_calculation"] is True, "label hash boundary failed")
     require(result["v2_history_used_only_for_point_in_time_warmup"] is True, "V2 warmup boundary failed")
     require(result["v2_rows_entered_new_validation_labels_or_outcomes"] is False, "consumed V2 rows entered unseen validation")
