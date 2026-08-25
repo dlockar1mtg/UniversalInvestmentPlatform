@@ -1,0 +1,65 @@
+{
+  "authorization_id": "METALS-TACTICAL-POLICY-V3-PRODUCTION-PERSISTENCE-AUTHORIZATION-1",
+  "source_design_id": "METALS-TACTICAL-POLICY-V3-PRODUCTION-PERSISTENCE-AUTHORIZATION-DESIGN-1",
+  "source_review_id": "METALS-TACTICAL-POLICY-V3-CURRENT-STATE-MATERIALIZATION-REVIEW-1",
+  "source_materialization_id": "METALS-TACTICAL-POLICY-V3-CURRENT-STATE-MATERIALIZATION-1",
+  "source_state_sha256": "00ea9954ead2eaa66085a38468972315b0414f0ad1039f833518d70d40882c3a",
+  "source_manifest_sha256": "f8bbeedfbfe16bea01bdf7bd6c53d5d5b9db22e197bec533c84daa9ae8bb5a75",
+  "source_as_of_date": "2026-08-21",
+  "authorization_decision": "AUTHORIZE_BOUNDED_METALS_V3_PRODUCTION_PERSISTENCE_IMPLEMENTATION",
+  "authorized_storage": {
+    "database_path": "data/universal/universal_investment.duckdb",
+    "history_table": "metals_tactical_state_history",
+    "current_view": "metals_tactical_state_current",
+    "history_is_append_only": true,
+    "current_state_is_view_derived": true,
+    "schema_migration_authorized": true,
+    "production_database_write_authorized": false,
+    "persistence_implementation_authorized": true,
+    "one_bounded_import_may_be_authorized_only_after_implementation_certification": true
+  },
+  "authorized_source_scope": {
+    "exact_state_sha256": "00ea9954ead2eaa66085a38468972315b0414f0ad1039f833518d70d40882c3a",
+    "exact_manifest_sha256": "f8bbeedfbfe16bea01bdf7bd6c53d5d5b9db22e197bec533c84daa9ae8bb5a75",
+    "exact_as_of_date": "2026-08-21",
+    "exact_row_count": 11,
+    "exact_opportunity_row_count": 10,
+    "exact_reference_control_row_count": 1,
+    "price_semantics": "UNADJUSTED_CLOSE",
+    "classifier_rule_version": "METALS-V3-REGIME-CANDIDATE-RULES-1",
+    "action_mapping_version": "METALS-V3-ACTION-MAPPING-1"
+  },
+  "required_transaction_controls": {
+    "single_duckdb_transaction_required": true,
+    "source_hashes_reverified_before_write": true,
+    "prewrite_database_sha256_recorded": true,
+    "postwrite_database_sha256_recorded": true,
+    "rollback_on_any_failure": true,
+    "postwrite_readback_exact_match_required": true,
+    "duplicate_exact_import_must_fail_closed": true,
+    "history_replacement_forbidden": true,
+    "history_deletion_forbidden": true,
+    "business_key_upsert_forbidden": true
+  },
+  "downstream_authorization_boundary": {
+    "production_database_write_authorized": false,
+    "production_database_write_executed": false,
+    "presentation_activation_authorized": false,
+    "presentation_activation_executed": false,
+    "native_source_query_authorized": false,
+    "network_collection_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "semantic_guardrails": {
+    "tactical_state_is_not_buy_sell_authority": true,
+    "tactical_state_is_not_position_sizing": true,
+    "tactical_state_is_not_expected_return_forecast": true,
+    "no_tactical_overlay_is_not_negative_long_term_thesis": true,
+    "bil_remains_reference_control_only": true
+  },
+  "next_decision": "IMPLEMENT_METALS_TACTICAL_POLICY_V3_PRODUCTION_PERSISTENCE"
+}
