@@ -22,6 +22,14 @@ EXPECTED_CHAIN = [
     "RISK_AND_DOWNSIDE",
     "WHY",
 ]
+EXPECTED_CHANGE_CONTROL_KEYS = {
+    "validated_classifier_and_mapping_are_immutable_for_v3_live_use",
+    "any_classifier_formula_change_requires_new_policy_version",
+    "any_threshold_logic_change_requires_new_policy_version",
+    "any_action_mapping_change_requires_new_policy_version",
+    "any_new_policy_version_requires_new_unseen_validation_before_live_use",
+    "consumed_v1_v2_and_v3_validation_intervals_may_not_be_reused_as_unseen_evidence",
+}
 
 
 def require(condition: bool, message: str) -> None:
@@ -62,7 +70,7 @@ def main() -> int:
         "not_medium_term_opportunity_score",
         "not_risk_override",
     ]:
-        require(role[key] is True, f"live-use role boundary missing: {key}")
+        require(role.get(key) is True, f"live-use role boundary missing: {key}")
 
     require(design["planned_uip_interpretation_chain"] == EXPECTED_CHAIN, "UIP interpretation chain changed")
 
@@ -77,7 +85,7 @@ def main() -> int:
         "neutral_state_may_not_be_forced_directional",
         "duplicate_exposure_families_may_not_be_treated_as_independent_confirmation",
     ]:
-        require(precedence[key] is True, f"precedence boundary missing: {key}")
+        require(precedence.get(key) is True, f"precedence boundary missing: {key}")
 
     live = design["live_calculation_design"]
     require(live["price_basis"] == "UNADJUSTED_CLOSE", "live price basis changed")
@@ -93,7 +101,7 @@ def main() -> int:
         "same_locked_action_mapping_as_validated_policy",
         "reference_control_bil_remains_non_opportunity",
     ]:
-        require(live[key] is True, f"live calculation boundary missing: {key}")
+        require(live.get(key) is True, f"live calculation boundary missing: {key}")
 
     freshness = design["freshness_and_fail_closed_design"]
     for key in [
@@ -108,7 +116,7 @@ def main() -> int:
         "price_semantics_mismatch_must_fail_closed",
         "classifier_or_mapping_version_mismatch_must_fail_closed",
     ]:
-        require(freshness[key] is True, f"freshness/fail-closed boundary missing: {key}")
+        require(freshness.get(key) is True, f"freshness/fail-closed boundary missing: {key}")
 
     output = design["planned_live_output_contract"]
     required_fields = set(output["required_fields"])
@@ -132,15 +140,9 @@ def main() -> int:
     require(presentation["must_not_display_as_position_size"] is True, "presentation could become position sizing")
 
     change = design["change_control_design"]
-    for key in [
-        "validated_classifier_and_mapping_are_immutable_for_v3_live_use",
-        "any_classifier_formula_change_requires_new_policy_version",
-        "any threshold_logic_change_requires_new_policy_version",
-        "any_action_mapping_change_requires_new_policy_version",
-        "any_new_policy_version_requires_new_unseen_validation_before_live_use",
-        "consumed_v1_v2_and_v3_validation_intervals_may_not_be_reused_as_unseen_evidence",
-    ]:
-        require(change[key] is True, f"change-control boundary missing: {key}")
+    require(set(change.keys()) == EXPECTED_CHANGE_CONTROL_KEYS, "change-control key set changed")
+    for key in sorted(EXPECTED_CHANGE_CONTROL_KEYS):
+        require(change.get(key) is True, f"change-control boundary missing: {key}")
 
     boundary = design["authorization_boundary"]
     require(boundary["design_complete"] is True, "live-use design is not complete")
@@ -158,7 +160,7 @@ def main() -> int:
         "allocation_policy_authorized",
         "automatic_execution_authorized",
     ]:
-        require(boundary[key] is False, f"downstream authority prematurely enabled: {key}")
+        require(boundary.get(key) is False, f"downstream authority prematurely enabled or missing: {key}")
 
     require(design["next_decision"] == "CONSIDER_METALS_TACTICAL_POLICY_V3_POST_VALIDATION_LIVE_USE_AUTHORIZATION", "unexpected next decision")
 
