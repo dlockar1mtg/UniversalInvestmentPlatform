@@ -119,9 +119,9 @@
   "change_control_design": {
     "validated_classifier_and_mapping_are_immutable_for_v3_live_use": true,
     "any_classifier_formula_change_requires_new_policy_version": true,
-    "any threshold_logic_change_requires_new_policy_version": true,
-    "any action_mapping_change_requires_new_policy_version": true,
-    "any new policy version_requires_new_unseen_validation_before_live_use": true,
+    "any_threshold_logic_change_requires_new_policy_version": true,
+    "any_action_mapping_change_requires_new_policy_version": true,
+    "any_new_policy_version_requires_new_unseen_validation_before_live_use": true,
     "consumed_v1_v2_and_v3_validation_intervals_may_not_be_reused_as_unseen_evidence": true
   },
   "authorization_boundary": {
