@@ -1,0 +1,115 @@
+{
+  "authorization_id": "METALS-TACTICAL-POLICY-V3-NEW-UNSEEN-VALIDATION-AUTHORIZATION-1",
+  "version": "1.0.0",
+  "domain_id": "metals",
+  "source_regime_definition": "METALS-TACTICAL-POLICY-V3-REGIME-DEFINITION-1",
+  "source_classifier_rule_version": "METALS-V3-REGIME-CANDIDATE-RULES-1",
+  "source_action_mapping_freeze_decision": "METALS-TACTICAL-POLICY-V3-ACTION-MAPPING-FREEZE-DECISION-1",
+  "source_action_mapping_version": "METALS-V3-ACTION-MAPPING-1",
+  "purpose": "Authorize outcome-blind collection of a genuinely new Metals V3 validation history package after classifier and action mapping freeze, without authorizing validation outcome inspection or live tactical use.",
+  "unseen_validation_interval": {
+    "consumed_interval_end_date": "2023-08-21",
+    "new_validation_history_start_date": "2023-08-22",
+    "new_validation_history_end_date": "2026-08-24",
+    "new_validation_label_interval_must_not_begin_before": "2023-08-22",
+    "consumed_v1_v2_label_or_outcome_rows_may_not_enter_new_validation_results": true,
+    "earlier_certified_history_may_be_used_only_as_point_in_time_feature_warmup": true,
+    "warmup_rows_do_not_become_unseen_validation_observations": true
+  },
+  "collection_authority": {
+    "source_provider": "yfinance",
+    "network_collection_authorized": true,
+    "required_auto_adjust": false,
+    "required_price_field": "close_usd",
+    "required_price_semantics": "UNADJUSTED_CLOSE",
+    "adjusted_close_may_be_collected_for_provenance_but_may_not_be_used_by_classifier_or_validation_outcomes": true,
+    "required_fields": [
+      "asset_id",
+      "ticker",
+      "observation_date",
+      "open_usd",
+      "high_usd",
+      "low_usd",
+      "close_usd",
+      "adjusted_close_usd",
+      "volume",
+      "source_provider",
+      "package_id"
+    ],
+    "history_package_must_be_immutable_after_collection": true,
+    "package_hashes_required_before_any_classifier_or_outcome_execution": true,
+    "outcome_blind_collection_required": true
+  },
+  "vehicle_universe": {
+    "opportunity_vehicles": [
+      "COPX",
+      "CPER",
+      "GLD",
+      "IAU",
+      "PPLT",
+      "SGOL",
+      "SIVR",
+      "SLV",
+      "URA",
+      "URNM"
+    ],
+    "reference_control_vehicle": "BIL",
+    "vehicle_count": 11,
+    "opportunity_vehicle_count": 10,
+    "reference_control_count": 1,
+    "bil_is_reference_control_only": true,
+    "duplicate_exposure_families_are_not_independent_confirmation": true,
+    "known_non_independent_groups": [
+      ["GLD", "IAU", "SGOL"],
+      ["SIVR", "SLV"]
+    ]
+  },
+  "locked_validation_protocol": {
+    "primary_horizon_trading_days": 63,
+    "secondary_horizons_trading_days": [21, 126],
+    "minimum_compared_group_support": 20,
+    "minimum_distinct_exposure_families_per_directional_state": 2,
+    "all_three_primary_directional_checks_required": true,
+    "supportive_median_return_should_exceed_defensive": true,
+    "supportive_positive_return_rate_should_exceed_defensive": true,
+    "supportive_mean_mae_should_be_less_negative_than_defensive": true,
+    "secondary_horizons_cannot_substitute_for_primary_failure": true,
+    "overlapping_forward_windows_must_be_disclosed": true,
+    "support_must_be_reported_by_vehicle_and_exposure_family": true
+  },
+  "governance_boundaries": {
+    "classifier_may_not_be_changed_during_collection": true,
+    "action_mapping_may_not_be_changed_during_collection": true,
+    "validation_thresholds_may_not_be_changed_during_collection": true,
+    "validation_outcomes_may_not_be_calculated_or_inspected_during_collection": true,
+    "candidate_labels_may_not_be evaluated_for_performance_during_collection": true,
+    "new_validation_package_must_be_frozen_and_hashed_before_outcome_inspection_authorization": true,
+    "production_database_write_authorized": false,
+    "presentation_activation_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false,
+    "tactical_posture_authorized": false
+  },
+  "controls": {
+    "v3_regime_definition_locked": true,
+    "action_mapping_frozen": true,
+    "new_validation_data_collection_authorized": true,
+    "new_validation_outcome_inspection_authorized": false,
+    "new_validation_result_authorized": false,
+    "candidate_tactical_posture_authorized": false,
+    "live_tactical_posture_authorized": false,
+    "production_database_write_authorized": false,
+    "presentation_activation_authorized": false,
+    "model_retraining_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "required_collection_outputs": [
+    "metals_v3_new_unseen_validation_history.jsonl",
+    "coverage.json",
+    "manifest.json"
+  ],
+  "next_decision": "COLLECT_AND_FREEZE_METALS_TACTICAL_POLICY_V3_NEW_UNSEEN_VALIDATION_PACKAGE"
+}
