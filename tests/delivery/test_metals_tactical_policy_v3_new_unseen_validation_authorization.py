@@ -5,10 +5,15 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 AUTH_PATH = ROOT / "config" / "metals" / "tactical_policy_v3_new_unseen_validation_authorization.json"
+FREEZE_PATH = ROOT / "config" / "metals" / "tactical_policy_v3_action_mapping_freeze_decision.json"
 
 
 def load_auth() -> dict:
     return json.loads(AUTH_PATH.read_text(encoding="utf-8"))
+
+
+def load_freeze() -> dict:
+    return json.loads(FREEZE_PATH.read_text(encoding="utf-8"))
 
 
 def test_authorization_identity_and_sources() -> None:
@@ -18,6 +23,15 @@ def test_authorization_identity_and_sources() -> None:
     assert auth["source_classifier_rule_version"] == "METALS-V3-REGIME-CANDIDATE-RULES-1"
     assert auth["source_action_mapping_freeze_decision"] == "METALS-TACTICAL-POLICY-V3-ACTION-MAPPING-FREEZE-DECISION-1"
     assert auth["source_action_mapping_version"] == "METALS-V3-ACTION-MAPPING-1"
+
+
+def test_source_freeze_schema_and_authority_are_bound() -> None:
+    freeze = load_freeze()
+    assert freeze["decision_id"] == "METALS-TACTICAL-POLICY-V3-ACTION-MAPPING-FREEZE-DECISION-1"
+    assert freeze["scope_of_freeze"]["action_mapping_frozen"] is True
+    assert freeze["scope_of_freeze"]["new_validation_data_collection_authorized"] is False
+    assert freeze["scope_of_freeze"]["new_validation_outcome_inspection_authorized"] is False
+    assert "controls" not in freeze
 
 
 def test_unseen_interval_starts_after_consumed_evidence() -> None:
