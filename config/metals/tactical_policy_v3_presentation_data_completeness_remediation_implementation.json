@@ -1,0 +1,65 @@
+{
+  "implementation_id": "METALS-TACTICAL-POLICY-V3-PRESENTATION-DATA-COMPLETENESS-REMEDIATION-IMPLEMENTATION-1",
+  "source_authorization_id": "METALS-TACTICAL-POLICY-V3-PRESENTATION-DATA-COMPLETENESS-REMEDIATION-IMPLEMENTATION-AUTHORIZATION-1",
+  "source_authorization_head": "416d70856774dbf3a10b9e1ca4b11a49608a199b",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "implementation_strategy": "CONSUME_ALREADY_PROJECTED_CERTIFIED_METALS_EVIDENCE_WITHOUT_CHANGING_ANALYTICAL_AUTHORITY",
+  "authorized_files": [
+    "config/presentation/dash_read_1_metals_tactical_extension.json",
+    "foundation/presentation/metals_tactical_projection.py",
+    "foundation/production/dashboard_assets/metals_tactical_ui.js",
+    "foundation/production/dashboard_assets/recommendation_ui.js"
+  ],
+  "runtime_files_changed": [
+    "foundation/production/dashboard_assets/metals_tactical_ui.js"
+  ],
+  "authorized_files_intentionally_unchanged": [
+    "config/presentation/dash_read_1_metals_tactical_extension.json",
+    "foundation/presentation/metals_tactical_projection.py",
+    "foundation/production/dashboard_assets/recommendation_ui.js"
+  ],
+  "reason_for_minimal_runtime_delta": "The certified projection already emits metals_uncertainty_adjusted, metals_recommendation_change, metals_model_component, metals_regime_probability, and tactical_state records; only UI consumption required remediation.",
+  "implemented_behavior": {
+    "vehicle_cards_use_uncertainty_adjusted_expected_return": true,
+    "vehicle_detail_renders_raw_and_adjusted_expected_returns": true,
+    "vehicle_detail_renders_uncertainty_penalty": true,
+    "vehicle_detail_renders_downside_penalty_as_penalty_not_bound": true,
+    "vehicle_detail_renders_recommendation_change_explanation": true,
+    "vehicle_detail_renders_previous_and_current_action": true,
+    "vehicle_detail_renders_previous_and_current_confidence": true,
+    "vehicle_tactical_metrics_remain_visible": true,
+    "commodity_detail_renders_model_components": true,
+    "commodity_detail_renders_regime_probabilities": true,
+    "commodity_tactical_state_is_not_synthesized": true,
+    "commodity_tactical_context_is_labeled_not_applicable": true,
+    "bil_remains_reference_control_only": true,
+    "unsupported_fields_remain_explicitly_unavailable": true
+  },
+  "semantic_guardrails": {
+    "price_semantics_not_current_price": true,
+    "downside_penalty_not_forecast_lower_bound": true,
+    "uncertainty_penalty_not_generic_risk_score": true,
+    "regime_probability_not_vehicle_tactical_state": true,
+    "tactical_state_not_buy_sell_or_sizing": true
+  },
+  "unresolved_fields": [
+    "numeric_current_price",
+    "forecast_upper_bound",
+    "forecast_lower_bound",
+    "generic_risk_level",
+    "commodity_tactical_state"
+  ],
+  "boundaries": {
+    "analytical_database_write_authorized": false,
+    "hosted_publication_write_authorized": false,
+    "main_deployment_authorized": false,
+    "pull_request_authorized": false,
+    "model_refresh_authorized": false,
+    "forecast_refresh_authorized": false,
+    "network_collection_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "implementation_status": "IMPLEMENTED_REQUIRES_LOCAL_REGRESSION_AND_DATA_RICH_PREVIEW_CERTIFICATION",
+  "next_decision": "CERTIFY_AND_PREVIEW_METALS_PRESENTATION_DATA_COMPLETENESS_REMEDIATION"
+}
