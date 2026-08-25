@@ -1,0 +1,61 @@
+{
+  "review_id": "METALS-TACTICAL-POLICY-V3-UNSEEN-VALIDATION-RESULT-REVIEW-1",
+  "version": "1.0.0",
+  "domain_id": "metals",
+  "source_execution_id": "METALS-TACTICAL-POLICY-V3-NEW-UNSEEN-VALIDATION-OUTCOME-INSPECTION-1",
+  "source_regime_definition": "METALS-TACTICAL-POLICY-V3-REGIME-DEFINITION-1",
+  "source_classifier_rule_version": "METALS-V3-REGIME-CANDIDATE-RULES-1",
+  "source_action_mapping_version": "METALS-V3-ACTION-MAPPING-1",
+  "source_unseen_package_id": "metals-v3-new-unseen-validation-20230822-20260824",
+  "source_execution_artifacts": {
+    "label_ledger_sha256": "1f543a8a4b570a042289a098fc8e4cae06b3c43a553fd7c1000bb6a50bed4ae9",
+    "outcome_ledger_sha256": "f687cf33d41d4235a1bd735b3c79fdf22fa7b0ce01c16e8c36c3714ac097e429",
+    "validation_result_sha256": "a4e0d27aa3e994f92570e6fccf7e88edde0f205da647ddd2d8a6d970173de663",
+    "execution_manifest_sha256": "aa698df5e191f91504608644e8be2f568f8f6f57c13b56a836c5d24311221965"
+  },
+  "governed_validation_result": {
+    "validation_result": "PASS",
+    "primary_horizon_trading_days": 63,
+    "primary_support_gate_met": true,
+    "primary_exposure_family_gate_met": true,
+    "all_three_primary_directional_checks_met": true,
+    "supportive_63d_observation_count": 801,
+    "defensive_63d_observation_count": 1152,
+    "supportive_63d_exposure_family_count": 7,
+    "defensive_63d_exposure_family_count": 7,
+    "minimum_compared_group_support": 20,
+    "minimum_distinct_exposure_families_per_directional_state": 2,
+    "secondary_horizons_cannot_substitute_for_primary_failure": true
+  },
+  "review_findings": {
+    "genuinely_unseen_validation_completed": true,
+    "locked_classifier_was_used": true,
+    "frozen_action_mapping_was_used": true,
+    "label_ledger_was_hashed_before_forward_outcome_calculation": true,
+    "consumed_v2_history_was_used_only_for_point_in_time_warmup": true,
+    "consumed_v2_rows_entered_new_validation_labels_or_outcomes": false,
+    "primary_validation_support_was_sufficient": true,
+    "primary_validation_exposure_family_breadth_was_sufficient": true,
+    "all_three_locked_primary_directional_checks_passed": true,
+    "v3_tactical_policy_cleared_unseen_validation": true,
+    "validation_pass_does_not_itself_authorize_live_tactical_posture": true,
+    "classifier_or_mapping_may_not_be_retuned_on_consumed_unseen_interval": true,
+    "unseen_interval_is_consumed_for_future_validation": true
+  },
+  "review_decision": "VALIDATION_PASS_CONFIRMED_FOR_POST_VALIDATION_LIVE_USE_CONSIDERATION",
+  "controls": {
+    "v3_unseen_validation_pass_certified": true,
+    "v3_tactical_policy_validated_for_live_use_consideration": true,
+    "candidate_tactical_posture_authorized": false,
+    "live_tactical_posture_authorized": false,
+    "presentation_activation_authorized": false,
+    "production_database_write_authorized": false,
+    "native_source_query_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision": "DESIGN_METALS_TACTICAL_POLICY_V3_POST_VALIDATION_LIVE_USE_AUTHORIZATION"
+}
