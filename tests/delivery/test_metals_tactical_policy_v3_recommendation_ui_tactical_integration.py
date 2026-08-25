@@ -35,10 +35,12 @@ def test_metals_detail_uses_existing_asset_detail_and_explicit_tactical_renderer
 def test_metals_detail_preserves_long_term_authority_and_tactical_separation():
     source = read("foundation/production/dashboard_assets/recommendation_ui.js")
     assert 'Long-term thesis' in source
-    assert 'native recommendation, forecast, and risk evidence remain the strategic authority' in source
-    assert 'Tactical state is shown separately and does not overwrite them.' in source
-    assert 'Tactical supportive, defensive, or no-overlay states are relative tactical interpretations only.' in source
-    assert 'They are not buy/sell instructions, position sizing, automatic execution authority' in source
+    assert 'strategic thesis remains the primary authority' in source
+    assert 'Risk remains independent of tactical state and forecast return' in source
+    assert 'No tactical overlay is not a sell signal' in source
+    assert 'buy/sell instructions' in source
+    assert 'position sizing' in source
+    assert 'automatic execution authority' in source
 
 
 def test_missing_tactical_renderer_fails_closed_without_reinterpreting_long_term_data():
