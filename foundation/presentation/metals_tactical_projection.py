@@ -115,7 +115,7 @@ def load_and_validate_extension(repository_root: Path, connection: Any, source_d
     payload = json.loads(path.read_text(encoding="utf-8"))
     if payload.get("extension_id") != "DASH-READ-1-METALS-TACTICAL-EVIDENCE":
         raise RuntimeError("Unexpected Metals tactical presentation extension ID.")
-    if payload.get("version") != "1.2.0":
+    if payload.get("version") != "1.1.0":
         raise RuntimeError("Unsupported Metals tactical presentation extension version.")
     if payload.get("source_database_sha256") != EXPECTED_SOURCE_SHA256:
         raise RuntimeError("Metals tactical extension source hash changed unexpectedly.")
