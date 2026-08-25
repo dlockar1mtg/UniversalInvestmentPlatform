@@ -1,0 +1,39 @@
+{
+  "audit_id": "METALS-TACTICAL-POLICY-V3-DECISION-UTILITY-ROW-LEVEL-AUTHORITY-RESOLUTION-AUDIT-1",
+  "source_schema_audit_id": "METALS-TACTICAL-POLICY-V3-DECISION-UTILITY-SOURCE-RESOLUTION-AUDIT-1",
+  "source_schema_audit_head": "13e68da8f7589a56dfe703a9a394fca7a679c89c",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "objective": "RESOLVE_ROW_LEVEL_METALS_COVERAGE_AND_CERTIFIED_EXTERNAL_PRICE_HISTORY_AUTHORITY",
+  "read_only": true,
+  "questions": [
+    "commodity_forecast_row_coverage",
+    "vehicle_forecast_row_coverage",
+    "commodity_forecast_bound_population",
+    "vehicle_forecast_bound_population",
+    "recommendation_rationale_population",
+    "recommendation_risk_summary_population",
+    "certified_external_numeric_current_price_schema",
+    "certified_external_dated_price_history_schema"
+  ],
+  "semantic_rules": {
+    "forecast_bounds_require_non_null_row_level_values": true,
+    "recommendation_rationale_requires_asset_identity_and_non_blank_text": true,
+    "external_price_requires_identity_date_and_numeric_value": true,
+    "price_semantics_is_not_numeric_price": true,
+    "downside_penalty_is_not_forecast_lower_bound": true,
+    "uncertainty_penalty_is_not_generic_risk_score": true,
+    "no_data_is_synthesized": true
+  },
+  "controls": {
+    "analytical_database_write_authorized": false,
+    "hosted_publication_write_authorized": false,
+    "runtime_ui_change_authorized": false,
+    "model_refresh_authorized": false,
+    "forecast_refresh_authorized": false,
+    "network_collection_authorized": false,
+    "main_deployment_authorized": false,
+    "pull_request_authorized": false
+  },
+  "decision": "AUTHORIZE_READ_ONLY_METALS_DECISION_UTILITY_ROW_LEVEL_AUTHORITY_RESOLUTION_AUDIT",
+  "next_decision": "DESIGN_METALS_DECISION_UTILITY_COMPLETION_FROM_RESOLVED_AUTHORITIES"
+}
