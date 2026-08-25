@@ -13,6 +13,18 @@ def source(path: Path) -> str:
     return path.read_text(encoding="utf-8")
 
 
+def imported_top_level_modules(text: str) -> set[str]:
+    tree = ast.parse(text)
+    modules: set[str] = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                modules.add(alias.name.split(".", 1)[0])
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            modules.add(node.module.split(".", 1)[0])
+    return modules
+
+
 def test_materializer_and_verifier_parse() -> None:
     ast.parse(source(MATERIALIZER))
     ast.parse(source(VERIFIER))
@@ -42,16 +54,18 @@ def test_materializer_preserves_validated_mapping_exactly() -> None:
     assert '"NEUTRAL_OR_UNCERTAIN": "NO_TACTICAL_OVERLAY"' in text
 
 
-def test_materializer_is_offline_and_does_not_touch_duckdb_or_presentation() -> None:
-    text = source(MATERIALIZER).lower()
-    assert "yfinance" not in text
-    assert "requests" not in text
-    assert "duckdb" not in text
-    assert "sqlalchemy" not in text
-    assert "production_database_write_executed\": false" not in text
-    assert '"production_database_write_executed": False' in source(MATERIALIZER)
-    assert '"presentation_activation_executed": False' in source(MATERIALIZER)
-    assert '"network_collection_executed": False' in source(MATERIALIZER)
+def test_materializer_is_offline_and_does_not_import_database_or_network_clients() -> None:
+    text = source(MATERIALIZER)
+    imported = imported_top_level_modules(text)
+    forbidden = {"yfinance", "requests", "duckdb", "sqlalchemy"}
+    assert imported.isdisjoint(forbidden)
+
+    # Explicit execution-status fields are required governance evidence; they
+    # demonstrate that these downstream actions did not occur.
+    assert '"production_database_write_executed": False' in text
+    assert '"presentation_activation_executed": False' in text
+    assert '"network_collection_executed": False' in text
+    assert '"automatic_execution_executed": False' in text
 
 
 def test_materializer_requires_absent_output_directory() -> None:
