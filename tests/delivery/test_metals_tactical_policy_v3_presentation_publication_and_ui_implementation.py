@@ -62,10 +62,23 @@ def test_ui_helper_fails_closed_for_missing_unknown_and_reference_control_state(
     assert "window.UIPMetalsTactical" in source
 
 
-def test_implementation_does_not_wire_live_dashboard_activation():
+def test_live_dashboard_wiring_requires_separate_bounded_activation_authorization_and_remains_unexecuted():
     dashboard = read("foundation/production/dashboard_assets/dashboard.html")
-    assert "/dashboard/assets/metals_tactical_ui.js" not in dashboard
-    authorization = json.loads(read("config/metals/tactical_policy_v3_presentation_activation_authorization.json"))
-    assert authorization["authorization_boundary"]["presentation_activation_authorized"] is False
-    assert authorization["authorization_boundary"]["presentation_activation_executed"] is False
-    assert authorization["authorization_boundary"]["analytical_database_write_authorized"] is False
+    assert "/dashboard/assets/metals_tactical_ui.js" in dashboard
+
+    implementation_authorization = json.loads(
+        read("config/metals/tactical_policy_v3_presentation_activation_authorization.json")
+    )
+    assert implementation_authorization["authorization_boundary"]["presentation_activation_authorized"] is False
+    assert implementation_authorization["authorization_boundary"]["presentation_activation_executed"] is False
+    assert implementation_authorization["authorization_boundary"]["analytical_database_write_authorized"] is False
+
+    live_authorization = json.loads(
+        read("config/metals/tactical_policy_v3_live_presentation_activation_authorization.json")
+    )
+    assert live_authorization["authorization_decision"] == "AUTHORIZE_ONE_BOUNDED_METALS_V3_LIVE_PRESENTATION_ACTIVATION"
+    assert live_authorization["execution_limit"] == 1
+    assert live_authorization["execution_is_one_time"] is True
+    assert live_authorization["authorization_boundary"]["live_presentation_activation_authorized"] is True
+    assert live_authorization["authorization_boundary"]["live_presentation_activation_executed"] is False
+    assert live_authorization["authorization_boundary"]["analytical_database_write_authorized"] is False
