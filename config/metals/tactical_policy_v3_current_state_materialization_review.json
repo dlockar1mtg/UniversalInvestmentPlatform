@@ -1,0 +1,76 @@
+{
+  "review_id": "METALS-TACTICAL-POLICY-V3-CURRENT-STATE-MATERIALIZATION-REVIEW-1",
+  "version": "1.0.0",
+  "domain_id": "metals",
+  "source_materialization_id": "METALS-TACTICAL-POLICY-V3-CURRENT-STATE-MATERIALIZATION-1",
+  "source_materialization_state_sha256": "00ea9954ead2eaa66085a38468972315b0414f0ad1039f833518d70d40882c3a",
+  "source_materialization_manifest_sha256": "f8bbeedfbfe16bea01bdf7bd6c53d5d5b9db22e197bec533c84daa9ae8bb5a75",
+  "source_materialization_as_of_date": "2026-08-21",
+  "source_package_id": "metals-price-history-20260824",
+  "source_live_use_authorization_id": "METALS-TACTICAL-POLICY-V3-POST-VALIDATION-LIVE-USE-AUTHORIZATION-1",
+  "source_classifier_rule_version": "METALS-V3-REGIME-CANDIDATE-RULES-1",
+  "source_action_mapping_version": "METALS-V3-ACTION-MAPPING-1",
+  "review_scope": {
+    "semantic_review": true,
+    "operational_review": true,
+    "production_persistence_consideration_only": true,
+    "presentation_activation_review": false,
+    "database_write_execution": false,
+    "network_collection": false,
+    "model_retraining": false
+  },
+  "observed_materialization": {
+    "row_count": 11,
+    "opportunity_row_count": 10,
+    "reference_control_row_count": 1,
+    "directional_opportunity_row_count": 0,
+    "state_counts": {
+      "NO_TACTICAL_OVERLAY": 11
+    },
+    "all_opportunity_rows_non_directional": true,
+    "bil_reference_control_only": true,
+    "point_in_time_state": true,
+    "price_basis": "UNADJUSTED_CLOSE"
+  },
+  "review_findings": {
+    "persisted_state_exactly_recomputes_from_certified_source": true,
+    "governed_vehicle_universe_complete": true,
+    "source_provenance_complete": true,
+    "locked_classifier_preserved": true,
+    "validated_action_mapping_preserved": true,
+    "bil_not_used_as_opportunity": true,
+    "neutral_state_not_forced_directional": true,
+    "current_all_neutral_result_is_semantically_valid": true,
+    "no_directional_state_is_not_a_failure_condition": true,
+    "no_database_write_occurred": true,
+    "no_presentation_activation_occurred": true,
+    "no_network_collection_occurred": true,
+    "materialization_is_suitable_for_bounded_production_persistence_consideration": true
+  },
+  "interpretation_guardrails": {
+    "no_tactical_overlay_does_not_mean_negative_long_term_thesis": true,
+    "no_tactical_overlay_does_not_mean_negative_medium_term_opportunity": true,
+    "no_tactical_overlay_does_not_mean_sell": true,
+    "no_tactical_overlay_does_not_mean_zero_expected_return": true,
+    "tactical_state_may_not_override_material_risk": true,
+    "tactical_state_may_not_be_used_as_position_sizing": true,
+    "tactical_state_may_not_be_used_as_portfolio_allocation": true
+  },
+  "review_decision": "CURRENT_STATE_MATERIALIZATION_APPROVED_FOR_PRODUCTION_PERSISTENCE_CONSIDERATION",
+  "controls": {
+    "current_state_materialization_review_passed": true,
+    "production_persistence_consideration_authorized": true,
+    "production_database_write_authorized": false,
+    "production_database_write_executed": false,
+    "presentation_activation_authorized": false,
+    "presentation_activation_executed": false,
+    "native_source_query_authorized": false,
+    "network_collection_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision": "DESIGN_METALS_TACTICAL_POLICY_V3_PRODUCTION_PERSISTENCE_AUTHORIZATION"
+}
