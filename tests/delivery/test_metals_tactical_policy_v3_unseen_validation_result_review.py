@@ -5,6 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 REVIEW_PATH = ROOT / "config" / "metals" / "tactical_policy_v3_unseen_validation_result_review.json"
+VERIFIER_PATH = ROOT / "scripts" / "verify_metals_tactical_policy_v3_unseen_validation_result_review.py"
 
 
 def load_review() -> dict:
@@ -45,6 +46,19 @@ def test_governed_validation_pass_is_preserved() -> None:
     assert governed["minimum_compared_group_support"] == 20
     assert governed["minimum_distinct_exposure_families_per_directional_state"] == 2
     assert governed["secondary_horizons_cannot_substitute_for_primary_failure"] is True
+
+
+def test_review_verifier_uses_persisted_nested_63d_schema() -> None:
+    source = VERIFIER_PATH.read_text(encoding="utf-8")
+    assert 'primary = result["outcomes_by_action_state"]["63d"]' in source
+    assert 'supportive = primary["TACTICAL_SUPPORTIVE"]' in source
+    assert 'defensive = primary["TACTICAL_DEFENSIVE"]' in source
+    assert 'supportive["observation_count"] == 801' in source
+    assert 'defensive["observation_count"] == 1152' in source
+    assert 'supportive["exposure_family_count"] == 7' in source
+    assert 'defensive["exposure_family_count"] == 7' in source
+    assert 'result["supportive_63d_observation_count"]' not in source
+    assert 'result["defensive_63d_observation_count"]' not in source
 
 
 def test_review_findings_confirm_unseen_validation_without_live_authority() -> None:
