@@ -1,0 +1,83 @@
+{
+  "decision_id": "METALS-TACTICAL-POLICY-V3-REGIME-DEFINITION-LOCK-DECISION-1",
+  "version": "1.0.0",
+  "domain_id": "metals",
+  "source_review_id": "METALS-TACTICAL-POLICY-V3-HISTORICAL-REGIME-RESEARCH-REVIEW-1",
+  "source_execution_id": "METALS-TACTICAL-POLICY-V3-HISTORICAL-REGIME-RESEARCH-EXECUTION-1",
+  "source_freeze_id": "METALS-TACTICAL-POLICY-V3-HISTORICAL-REGIME-RESEARCH-FREEZE-1",
+  "source_rule_version": "METALS-V3-REGIME-CANDIDATE-RULES-1",
+  "source_label_ledger_sha256": "41f00a74c8116c59b5e36dc039db43a2481ffce9f1ce663da00c270d8c483dfd",
+  "source_review_status": "SUFFICIENT_FOR_REGIME_DEFINITION_LOCK_CONSIDERATION",
+  "decision": "LOCK_METALS_TACTICAL_POLICY_V3_REGIME_DEFINITION",
+  "decision_rationale": {
+    "directional_support_gate_met": true,
+    "directional_exposure_family_gate_met": true,
+    "directional_return_separation_consistent_across_21d_63d_126d": true,
+    "neutral_or_uncertain_is_fail_closed_default": true,
+    "neutral_or_uncertain_rate": 0.8095435684647303,
+    "trend_persistence_observation_count": 550,
+    "mean_reversion_or_exhaustion_observation_count": 368,
+    "neutral_or_uncertain_observation_count": 3902,
+    "each_candidate_regime_exposure_family_count": 7,
+    "development_evidence_not_unseen_validation": true,
+    "observation_counts_are_not_independent_sample_counts": true,
+    "duplicate_exposure_families_are_not_independent_confirmation": true
+  },
+  "locked_regime_definition": {
+    "definition_id": "METALS-TACTICAL-POLICY-V3-REGIME-DEFINITION-1",
+    "classifier_rule_version": "METALS-V3-REGIME-CANDIDATE-RULES-1",
+    "classifier_definition_source": "METALS-TACTICAL-POLICY-V3-HISTORICAL-REGIME-RESEARCH-FREEZE-1",
+    "candidate_regime_families": [
+      "TREND_PERSISTENCE",
+      "MEAN_REVERSION_OR_EXHAUSTION",
+      "NEUTRAL_OR_UNCERTAIN"
+    ],
+    "candidate_input_definitions_locked_to_freeze": true,
+    "adaptive_threshold_definitions_locked_to_freeze": true,
+    "candidate_regime_assignment_logic_locked_to_freeze": true,
+    "neutral_or_uncertain_remains_fail_closed_default": true,
+    "future_returns_or_excursions_may_not_be_classifier_inputs": true,
+    "current_only_recommendation_or_risk_fields_may_not_be_backfilled_historically": true,
+    "missing_historical_vintage_authority_must_remain_missing": true
+  },
+  "scope_of_lock": {
+    "regime_definition_authorized": true,
+    "regime_definition_locked": true,
+    "classifier_definition_may_be_used_as_input_to_separately_governed_action_mapping_design": true,
+    "action_mapping_authorized": false,
+    "candidate_tactical_posture_authorized": false,
+    "live_tactical_posture_authorized": false,
+    "presentation_activation_authorized": false,
+    "production_database_write_authorized": false,
+    "native_source_query_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "validation_boundary": {
+    "development_evidence_may_support_classifier_lock": true,
+    "development_evidence_is_not_unseen_validation": true,
+    "v1_v2_intervals_remain_consumed": true,
+    "new_unseen_validation_authority_required_before_live_tactical_use": true,
+    "locked_classifier_may_not_be_changed_after_new_unseen_validation_outcomes_are_inspected_without_new_version_and_governance_decision": true,
+    "future_action_mapping_must_be_frozen_before_new_unseen_validation_outcomes_are_inspected": true
+  },
+  "controls": {
+    "v3_regime_definition_authorized": true,
+    "v3_regime_definition_locked": true,
+    "v3_candidate_rule_design_authorized": false,
+    "action_mapping_authorized": false,
+    "new_validation_data_collection_authorized": false,
+    "new_validation_outcome_inspection_authorized": false,
+    "tactical_posture_authorized": false,
+    "presentation_activation_authorized": false,
+    "production_database_write_authorized": false,
+    "model_retraining_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "next_decision": "DESIGN_METALS_TACTICAL_POLICY_V3_ACTION_MAPPING"
+}
