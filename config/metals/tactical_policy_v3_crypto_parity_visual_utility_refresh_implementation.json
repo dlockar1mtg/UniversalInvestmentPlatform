@@ -1,0 +1,57 @@
+{
+  "implementation_id": "METALS-TACTICAL-POLICY-V3-CRYPTO-PARITY-VISUAL-UTILITY-REFRESH-IMPLEMENTATION-1",
+  "source_authorization_id": "METALS-TACTICAL-POLICY-V3-CRYPTO-PARITY-VISUAL-UTILITY-REFRESH-IMPLEMENTATION-AUTHORIZATION-1",
+  "source_authorization_head": "187342ec1d4485df4aa6143f3232ffb5fc5d1bfb",
+  "production_main_baseline_head": "32668f5bcb73fc6b6f00c5b562e5f5433e6bf9cd",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "runtime_files_changed": [
+    "foundation/production/dashboard_assets/recommendation_ui.js",
+    "foundation/production/dashboard_assets/metals_tactical_ui.js"
+  ],
+  "authorized_runtime_file_not_changed": "foundation/production/dashboard_assets/dashboard.css",
+  "implementation": {
+    "card_first_metals_overview": true,
+    "featured_metals_cards_exclude_bil": true,
+    "secondary_all_metals_table_retained": true,
+    "crypto_visual_language_reused": true,
+    "metals_native_recommendation_preserved": true,
+    "domain_score_and_confidence_visible": true,
+    "forecast_return_visible_when_supported": true,
+    "one_three_six_month_momentum_visible_when_supported": true,
+    "drawdown_visible_when_supported": true,
+    "ma50_and_ma200_distance_visible_when_supported": true,
+    "regime_position_visual_present": true,
+    "long_term_detail_hero_present": true,
+    "forecast_and_model_evidence_panel_present": true,
+    "visible_rationale_panel_present": true,
+    "visible_risk_panel_present": true,
+    "enriched_tactical_panel_present": true,
+    "long_term_and_tactical_layers_separate": true,
+    "no_tactical_overlay_not_presented_as_sell": true,
+    "bil_retained_in_secondary_table_as_reference_control": true,
+    "crypto_behavior_intentionally_changed": false,
+    "mtg_behavior_intentionally_changed": false
+  },
+  "implementation_strategy": {
+    "reuse_existing_recommendation_visual_framework": true,
+    "inject_metals_scoped_styles_without_global_dashboard_css_change": true,
+    "reuse_existing_asset_detail_endpoint": true,
+    "reuse_existing_tactical_state_record": true,
+    "reuse_existing_forecast_and_risk_records": true,
+    "do_not_synthesize_missing_evidence": true
+  },
+  "boundaries": {
+    "main_deployment_authorized": false,
+    "pull_request_authorized": false,
+    "hosted_publication_reactivation_authorized": false,
+    "analytical_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_retraining_authorized": false,
+    "network_collection_authorized": false,
+    "cross_domain_rank_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "implementation_status": "IMPLEMENTED_REQUIRES_LOCAL_REGRESSION_AND_VISUAL_PREVIEW_CERTIFICATION",
+  "next_decision": "CERTIFY_AND_PREVIEW_METALS_V3_CRYPTO_PARITY_VISUAL_UTILITY_REFRESH"
+}
