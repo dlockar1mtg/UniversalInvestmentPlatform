@@ -44,7 +44,7 @@ function setCardPrice(card,detail){const value=currentPrice(detail);if(!value)re
 function setCommodityCardState(card,detail){if(!isCommodityDetail(detail))return false;card.classList.add("metals-card-commodity");const drawdown=findKpi(card,"Current drawdown");if(drawdown){const label=drawdown.querySelector("span"),strong=drawdown.querySelector("strong");if(label)label.textContent="Vehicle tactical";if(strong)strong.textContent="N/A";drawdown.dataset.evidenceSource="not_applicable";}const momentum=card.querySelector(".metals-momentum");if(momentum)momentum.outerHTML=`<div class="metals-card-na"><strong>Vehicle-level tactical only</strong><span>Commodity thesis records do not receive vehicle momentum or drawdown metrics.</span></div>`;const track=card.querySelector(".metals-regime-track");const trackContainer=track?.parentElement;if(trackContainer)trackContainer.outerHTML=`<div class="metals-na-callout"><strong>Tactical overlay not applicable</strong><span>Use commodity forecast and regime evidence in Research.</span></div>`;const mini=card.querySelector(".metals-tactical-mini");if(mini)mini.innerHTML="<span>Tactical context</span><strong>Not applicable</strong><span>Vehicle-level policy only</span>";return true;}
 function setMomentumMetric(card,label,value){const row=[...card.querySelectorAll(".metals-momentum div")].find(node=>node.querySelector("span")?.textContent?.trim()===label);const strong=row?.querySelector("strong");if(strong){strong.textContent=fmtPct(value);row.dataset.evidenceSource="tactical_state";}}
 function setVehicleCardState(card,detail){const tactical=firstTactical(detail);if(!tactical)return;setMomentumMetric(card,"1M momentum",tactical.return_1m_pct);setMomentumMetric(card,"3M momentum",tactical.return_3m_pct);setMomentumMetric(card,"6M momentum",tactical.return_6m_pct);const drawdown=findKpi(card,"Current drawdown");if(drawdown){const strong=drawdown.querySelector("strong");if(strong)strong.textContent=fmtPct(tactical.current_drawdown_pct);drawdown.dataset.evidenceSource="tactical_state";}const mini=card.querySelector(".metals-tactical-mini");if(tactical.tactical_state==="NO_TACTICAL_OVERLAY"){card.classList.add("metals-card-no-overlay");if(mini)mini.innerHTML=`<span>Current tactical state</span><strong>No current overlay</strong><span>${escapeHtml(clean(tactical.candidate_regime??"Neutral or uncertain"))}</span>`;const track=card.querySelector(".metals-regime-track");if(track){const container=track.parentElement;if(container&&!container.querySelector(".metals-overlay-badge")){container.insertAdjacentHTML("afterbegin",'<div class="metals-overlay-badge neutral">No current tactical overlay</div>');}}}}
-async function enrichCard(card){if(card.dataset.metalsEvidenceEnriched==="1")return;const button=card.querySelector(".rec-metals-detail[data-asset-id]");const assetId=button?.dataset?.assetId;if(!assetId)return;card.dataset.metalsEvidenceEnriched="pending";try{const detail=await detailRequest(assetId);if(detail){setCardForecast(card,detail);setCardPrice(card,detail);const commodity=setCommodityCardState(card,detail);if(commodity)promoteCommodityOverview(card,detail);else setVehicleCardState(card,detail)}card.dataset.metalsEvidenceEnriched="1";}catch(_error){card.dataset.metalsEvidenceEnriched="0";}}
+async function enrichCard(card){if(card.dataset.metalsEvidenceEnriched==="1")return;const button=card.querySelector(".rec-metals-detail[data-asset-id]");const assetId=button?.dataset?.assetId;if(!assetId)return;card.dataset.metalsEvidenceEnriched="pending";try{const detail=await detailRequest(assetId);if(detail){setCardForecast(card,detail);setCardPrice(card,detail);const commodity=setCommodityCardState(card,detail);if(commodity)promoteCommodityOverview(card,detail);else setVehicleCardState(card,detail);promoteUnifiedOverview(card,detail)}card.dataset.metalsEvidenceEnriched="1";}catch(_error){card.dataset.metalsEvidenceEnriched="0";}}
 function enrichVisibleCards(){document.querySelectorAll(".metals-card").forEach(card=>{void enrichCard(card)})}
 function chartMarkup(detail){const values=priceHistory(detail).filter(row=>Number.isFinite(Number(row.close_usd))&&row.observation_date);if(values.length<2)return "";const stride=Math.max(1,Math.ceil(values.length/180));const sampled=values.filter((_row,index)=>index%stride===0||index===values.length-1);const prices=sampled.map(row=>Number(row.close_usd));const low=Math.min(...prices),high=Math.max(...prices),span=high-low||1;const points=prices.map((value,index)=>`${(index/(prices.length-1))*1000},${190-((value-low)/span)*160}`).join(" ");const first=values[0],last=values[values.length-1];return `<article class="metals-panel metals-price-history-panel" data-evidence-source="metals_price_history"><h4>Historical market price</h4><p class="metals-panel-sub">Certified vehicle history · UNADJUSTED_CLOSE · ${escapeHtml(first.observation_date)} through ${escapeHtml(last.observation_date)} · ${values.length} observations.</p><div class="metals-price-chart-frame"><svg class="metals-price-chart" viewBox="0 0 1000 210" preserveAspectRatio="none"><polyline points="${points}"></polyline></svg></div><div class="metals-tactical-metrics metals-price-history-metrics"><div><span>Start</span><strong>${fmtMoney(first.close_usd)}</strong></div><div><span>Latest</span><strong>${fmtMoney(last.close_usd)}</strong></div><div><span>Period low</span><strong>${fmtMoney(low)}</strong></div><div><span>Period high</span><strong>${fmtMoney(high)}</strong></div></div></article>`}
 function addHeroMetric(container,label,value,title=""){const node=document.createElement("div");node.className="metals-hero-metric";node.innerHTML=`<span>${escapeHtml(label)}</span><strong title="${escapeHtml(title)}">${escapeHtml(value)}</strong>`;container.appendChild(node);return node}
@@ -223,8 +223,1161 @@ function promoteCommodityDetailHierarchy(detail){
     }
 }
 
+
+/* METALS UNIFIED DECISION TERMINAL 1 */
+
+function unifiedNativeRisk(detail){
+    return payloads(detail,"risk")[0]||null;
+}
+
+function unifiedRecommendation(detail){
+    return payloads(detail,"recommendation")[0]||{};
+}
+
+function unifiedLongestForecast(detail){
+    const rows=payloads(detail,"forecast")
+        .filter(row=>
+            Number.isFinite(
+                Number(row.expected_return)
+            )
+        )
+        .sort((a,b)=>
+            Number(a.forecast_horizon_months)-
+            Number(b.forecast_horizon_months)
+        );
+    return rows.length?rows.at(-1):null;
+}
+
+function unifiedTimingState(detail){
+    if(isCommodityDetail(detail)){
+        return {
+            state:"NOT_APPLICABLE",
+            label:"N/A",
+            note:"Commodity thesis"
+        };
+    }
+
+    const tactical=firstTactical(detail);
+
+    if(!tactical){
+        return {
+            state:"UNAVAILABLE",
+            label:"Unavailable",
+            note:"No certified tactical record"
+        };
+    }
+
+    if(tactical.tactical_state==="TACTICAL_SUPPORTIVE"){
+        return {
+            state:"TACTICAL_SUPPORTIVE",
+            label:"Supportive",
+            note:"Additional timing support"
+        };
+    }
+
+    if(tactical.tactical_state==="TACTICAL_DEFENSIVE"){
+        return {
+            state:"TACTICAL_DEFENSIVE",
+            label:"Defensive",
+            note:"Additional timing caution"
+        };
+    }
+
+    return {
+        state:"NO_TACTICAL_OVERLAY",
+        label:"Neutral",
+        note:"No additional tactical signal"
+    };
+}
+
+function unifiedRiskLabel(detail){
+    if(isGoldCommodity(detail)){
+        const explanation=
+            availableCommodityExplanation(detail);
+
+        if(explanation){
+            return {
+                label:
+                    "Forecast / regime risk",
+                value:
+                    explanation.risk_context_level||
+                    "Unavailable",
+                semantics:
+                    "derived"
+            };
+        }
+    }
+
+    if(isCommodityDetail(detail)){
+        return {
+            label:"Risk",
+            value:"Unavailable",
+            semantics:"unavailable"
+        };
+    }
+
+    const risk=unifiedNativeRisk(detail);
+
+    if(!risk){
+        return {
+            label:"Risk",
+            value:"Unavailable",
+            semantics:"unavailable"
+        };
+    }
+
+    return {
+        label:"Risk level",
+        value:clean(
+            risk.risk_level??
+            risk.risk_summary??
+            "Unavailable"
+        ),
+        semantics:"native"
+    };
+}
+
+function unifiedRemoveLargeTimingBar(card){
+    const track=
+        card.querySelector(".metals-regime-track");
+
+    if(!track)return;
+
+    const parent=track.parentElement;
+
+    track.remove();
+
+    if(parent){
+        const labels=
+            parent.querySelector(
+                ".metals-track-labels"
+            );
+
+        if(labels)labels.remove();
+
+        const badge=
+            parent.querySelector(
+                ".metals-overlay-badge"
+            );
+
+        if(badge)badge.remove();
+
+        if(parent.children.length===0){
+            parent.remove();
+        }
+    }
+}
+
+function unifiedCompactCardTiming(card,detail){
+    const timing=unifiedTimingState(detail);
+
+    if(
+        timing.state==="TACTICAL_SUPPORTIVE" ||
+        timing.state==="TACTICAL_DEFENSIVE"
+    ){
+        card.classList.add(
+            "metals-timing-exception"
+        );
+        return;
+    }
+
+    unifiedRemoveLargeTimingBar(card);
+
+    const na=
+        card.querySelector(".metals-card-na");
+
+    if(na)na.remove();
+
+    const callout=
+        card.querySelector(".metals-na-callout");
+
+    if(callout)callout.remove();
+
+    const mini=
+        card.querySelector(
+            ".metals-tactical-mini"
+        );
+
+    if(mini){
+        mini.classList.add(
+            "metals-unified-timing-mini"
+        );
+
+        mini.innerHTML=`
+            <span>Timing</span>
+            <strong>${escapeHtml(timing.label)}</strong>
+            <span>${escapeHtml(timing.note)}</span>
+        `;
+    }
+
+    card.classList.add(
+        "metals-timing-compact"
+    );
+}
+
+function unifiedPromoteCardRisk(card,detail){
+    const risk=unifiedRiskLabel(detail);
+
+    let target=
+        findKpi(card,"Risk context")||
+        findKpi(card,"Vehicle tactical")||
+        findKpi(card,"Current drawdown")||
+        findKpi(card,"Risk level")||
+        findKpi(card,"Risk");
+
+    if(!target){
+        const grid=
+            card.querySelector(".metals-kpis");
+
+        if(grid){
+            target=document.createElement("div");
+            target.className=
+                "metals-kpi metals-unified-risk-kpi";
+
+            target.innerHTML=
+                "<span>Risk</span><strong></strong>";
+
+            grid.appendChild(target);
+        }
+    }
+
+    if(!target)return;
+
+    const label=
+        target.querySelector("span");
+
+    const strong=
+        target.querySelector("strong");
+
+    if(label){
+        label.textContent=risk.label;
+    }
+
+    if(strong){
+        strong.textContent=risk.value;
+
+        if(risk.semantics==="native"){
+            const nativeRisk=
+                unifiedNativeRisk(detail);
+
+            const score=
+                Number(nativeRisk?.risk_score);
+
+            strong.title=
+                Number.isFinite(score)
+                ? `Native typed asset risk - score ${score.toFixed(3)}`
+                : "Native typed asset risk";
+        }
+
+        if(risk.semantics==="derived"){
+            strong.title=
+                "Derived Gold forecast / regime risk context; not native typed asset risk.";
+        }
+    }
+
+    target.dataset.evidenceSource=
+        risk.semantics==="native"
+        ? "risk"
+        : risk.semantics==="derived"
+        ? COMMODITY_EXPLANATION_RECORD_TYPE
+        : "unavailable";
+
+    target.classList.add(
+        "metals-unified-risk-kpi"
+    );
+}
+
+function unifiedUpdateSecondaryTable(detail){
+    const assetId=detailAssetId(detail);
+
+    const table=
+        document.querySelector(
+            ".metals-secondary-table table"
+        );
+
+    if(!table)return;
+
+    const headers=[
+        ...table.querySelectorAll("thead th")
+    ];
+
+    if(headers.length>=8){
+        headers[4].textContent="Horizon";
+        headers[5].textContent=
+            "Rationale / interpretation";
+        headers[6].textContent="Risk";
+    }
+
+    const row=[
+        ...table.querySelectorAll("tbody tr")
+    ].find(node=>
+        node.textContent?.includes(assetId)
+    );
+
+    if(!row)return;
+
+    const cells=[
+        ...row.querySelectorAll("td")
+    ];
+
+    if(cells.length<8)return;
+
+    const uncertainty=
+        bestUncertainty(detail);
+
+    const forecast=
+        unifiedLongestForecast(detail);
+
+    if(uncertainty){
+        cells[4].textContent=
+            `${fmtNumber(
+                uncertainty.horizon_months,
+                0
+            )} mo`;
+    }else if(forecast){
+        cells[4].textContent=
+            `${fmtNumber(
+                forecast.forecast_horizon_months,
+                0
+            )} mo`;
+    }
+
+    if(isGoldCommodity(detail)){
+        cells[5].textContent="Derived";
+    }else if(isCommodityDetail(detail)){
+        cells[5].textContent="Unavailable";
+    }else{
+        cells[5].textContent=
+            "Decision view";
+    }
+
+    const risk=unifiedRiskLabel(detail);
+
+    cells[6].textContent=
+        risk.semantics==="derived"
+        ? `${risk.value}*`
+        : risk.value;
+
+    cells[5].classList.add(
+        "metals-derived-table-value"
+    );
+
+    cells[6].classList.add(
+        "metals-derived-table-value"
+    );
+}
+
+function promoteUnifiedOverview(card,detail){
+    if(
+        card.dataset.unifiedTerminal==="1"
+    ){
+        return;
+    }
+
+    unifiedPromoteCardRisk(card,detail);
+    unifiedCompactCardTiming(card,detail);
+    unifiedUpdateSecondaryTable(detail);
+
+    card.classList.add(
+        "metals-unified-card"
+    );
+
+    card.dataset.unifiedTerminal="1";
+}
+
+function unifiedForecastInterpretation(detail){
+    const value=bestUncertainty(detail);
+
+    if(!value)return null;
+
+    const horizon=
+        Number(value.horizon_months);
+
+    const raw=
+        Number(value.raw_expected_return)*100;
+
+    const adjusted=
+        Number(value.adjusted_expected_return)*100;
+
+    const uncertainty=
+        Number(value.uncertainty_penalty)*100;
+
+    const downside=
+        Number(value.downside_penalty)*100;
+
+    const gap=adjusted-raw;
+
+    const reverses=
+        raw!==0 &&
+        adjusted!==0 &&
+        Math.sign(raw)!==Math.sign(adjusted);
+
+    let interpretation;
+
+    if(reverses){
+        interpretation=
+            `The uncertainty adjustment reverses the ${horizon}-month signal from ${fmtPct(raw)} raw to ${fmtPct(adjusted)} adjusted. Long-term upside exists in the raw model, but current uncertainty/downside penalties are large enough to overwhelm it.`;
+    }else if(Math.abs(gap)>=25){
+        interpretation=
+            `The ${horizon}-month adjusted forecast differs materially from the raw forecast: ${fmtPct(raw)} raw versus ${fmtPct(adjusted)} adjusted. Treat the raw upside as highly uncertainty-sensitive.`;
+    }else{
+        interpretation=
+            `The ${horizon}-month raw forecast is ${fmtPct(raw)} and the uncertainty-adjusted forecast is ${fmtPct(adjusted)}. The adjustment does not reverse the directional signal.`;
+    }
+
+    return {
+        horizon,
+        raw,
+        adjusted,
+        uncertainty,
+        downside,
+        gap,
+        reverses,
+        interpretation
+    };
+}
+
+function unifiedVehicleDecisionText(detail){
+    const rec=
+        unifiedRecommendation(detail);
+
+    const action=
+        clean(
+            rec.native_recommendation??
+            rec.recommendation??
+            "Unavailable"
+        );
+
+    const risk=
+        unifiedRiskLabel(detail);
+
+    const timing=
+        unifiedTimingState(detail);
+
+    const forecast=
+        unifiedForecastInterpretation(detail);
+
+    if(!forecast){
+        return `${action} remains the certified recommendation. Native risk is ${risk.value}. Current timing is ${timing.label}. No certified uncertainty-adjusted forecast interpretation is available.`;
+    }
+
+    return `${action} remains the certified recommendation. At ${forecast.horizon} months, the raw expected return is ${fmtPct(forecast.raw)} and the uncertainty-adjusted return is ${fmtPct(forecast.adjusted)}. Native risk is ${risk.value}. Current timing is ${timing.label.toLowerCase()} - ${timing.note.toLowerCase()}.`;
+}
+
+function unifiedFindSection(title){
+    return [
+        ...document.querySelectorAll(
+            "article,section,aside"
+        )
+    ].find(node=>
+        node.querySelector("h4")
+            ?.textContent
+            ?.trim()===title
+    )||null;
+}
+
+function unifiedForecastTensionMarkup(detail){
+    const value=
+        unifiedForecastInterpretation(detail);
+
+    if(!value)return "";
+
+    const state=
+        value.reverses
+        ? "SIGN REVERSAL"
+        : Math.abs(value.gap)>=25
+        ? "LARGE ADJUSTMENT"
+        : "ADJUSTED OUTLOOK";
+
+    return `
+        <section class="metals-forecast-interpretation">
+            <div class="metals-forecast-interpretation-head">
+                <span>Forecast interpretation</span>
+                <strong>${escapeHtml(state)}</strong>
+            </div>
+            <p>${escapeHtml(value.interpretation)}</p>
+            <div class="metals-forecast-interpretation-grid">
+                <div>
+                    <span>Raw ${fmtNumber(value.horizon,0)}mo</span>
+                    <strong>${fmtPct(value.raw)}</strong>
+                </div>
+                <div>
+                    <span>Adjusted ${fmtNumber(value.horizon,0)}mo</span>
+                    <strong>${fmtPct(value.adjusted)}</strong>
+                </div>
+                <div>
+                    <span>Uncertainty penalty</span>
+                    <strong>${fmtPct(value.uncertainty)}</strong>
+                </div>
+                <div>
+                    <span>Downside penalty</span>
+                    <strong>${fmtPct(value.downside)}</strong>
+                </div>
+            </div>
+        </section>
+    `;
+}
+
+function unifiedPromoteVehicleRecommendation(detail){
+    const panel=
+        unifiedFindSection(
+            "Why this recommendation"
+        );
+
+    if(!panel)return;
+
+    panel.classList.add(
+        "metals-unified-decision-panel"
+    );
+
+    const narrative=
+        panel.querySelector(
+            ".rec-narrative"
+        );
+
+    if(!narrative)return;
+
+    const blocks=[
+        ...narrative.children
+    ];
+
+    const rationale=
+        blocks.find(node=>
+            node.querySelector("span")
+                ?.textContent
+                ?.trim()==="Rationale"
+        );
+
+    if(rationale){
+        const label=
+            rationale.querySelector("span");
+
+        const paragraph=
+            rationale.querySelector("p");
+
+        if(label){
+            label.textContent=
+                "Decision interpretation";
+        }
+
+        if(paragraph){
+            paragraph.textContent=
+                unifiedVehicleDecisionText(detail);
+        }
+
+        rationale.dataset.evidenceSource=
+            "derived_vehicle_decision_interpretation";
+
+        if(
+            !rationale.querySelector(
+                ".metals-secondary-copy"
+            )
+        ){
+            rationale.insertAdjacentHTML(
+                "beforeend",
+                '<small class="metals-secondary-copy">Native recommendation rationale remains unpopulated. This decision interpretation is derived from certified recommendation, forecast, risk, and tactical evidence and is not written back to the native recommendation.</small>'
+            );
+        }
+    }
+
+    const riskBlock=
+        blocks.find(node=>
+            node.querySelector("span")
+                ?.textContent
+                ?.trim()==="Risk summary"
+        );
+
+    if(riskBlock){
+        const risk=
+            unifiedNativeRisk(detail);
+
+        const label=
+            riskBlock.querySelector("span");
+
+        const paragraph=
+            riskBlock.querySelector("p");
+
+        if(label){
+            label.textContent=
+                "Native risk assessment";
+        }
+
+        if(paragraph){
+            if(risk){
+                const level=
+                    clean(
+                        risk.risk_level??
+                        "Unavailable"
+                    );
+
+                const score=
+                    Number(risk.risk_score);
+
+                paragraph.textContent=
+                    Number.isFinite(score)
+                    ? `${level} - risk score ${score.toFixed(3)}. This is the native typed asset-risk authority and remains separate from forecast return and tactical timing.`
+                    : `${level}. This is the native typed asset-risk authority and remains separate from forecast return and tactical timing.`;
+            }else{
+                paragraph.textContent=
+                    "No native typed risk record is currently available.";
+            }
+        }
+    }
+}
+
+function unifiedCollapseNeutralTactical(detail){
+    if(isCommodityDetail(detail))return;
+
+    const tactical=
+        firstTactical(detail);
+
+    if(
+        !tactical ||
+        tactical.tactical_state!==
+            "NO_TACTICAL_OVERLAY"
+    ){
+        const aside=
+            document.querySelector(
+                ".rec-tactical-panel"
+            );
+
+        if(aside){
+            aside.classList.add(
+                "metals-tactical-exception"
+            );
+        }
+
+        return;
+    }
+
+    const aside=
+        document.querySelector(
+            ".rec-tactical-panel"
+        );
+
+    if(!aside)return;
+
+    const change=
+        recommendationChange(detail);
+
+    const changeMarkup=
+        change?.explanation
+        ? `
+          <details class="metals-unified-secondary-details">
+            <summary>Supporting recommendation-change evidence</summary>
+            <p>${escapeHtml(change.explanation)}</p>
+          </details>
+        `
+        : "";
+
+    aside.className=
+        "rec-tactical-panel metals-tactical-compact-detail";
+
+    aside.dataset.recordType=
+        RECORD_TYPE;
+
+    aside.innerHTML=`
+        <span class="eyebrow">CURRENT TIMING</span>
+        <div class="metals-unified-timing-detail">
+            <strong>Neutral - no additional tactical signal</strong>
+            <span>As of ${escapeHtml(tactical.as_of_date??"date unavailable")}</span>
+        </div>
+        <p>The tactical classifier has no additional timing opinion right now. The long-term recommendation, forecast, and native risk remain the primary decision authorities.</p>
+        <details class="metals-unified-secondary-details">
+            <summary>Timing metrics</summary>
+            <div class="metals-tactical-metrics">
+                <div><span>1M momentum</span><strong>${fmtPct(tactical.return_1m_pct)}</strong></div>
+                <div><span>3M momentum</span><strong>${fmtPct(tactical.return_3m_pct)}</strong></div>
+                <div><span>6M momentum</span><strong>${fmtPct(tactical.return_6m_pct)}</strong></div>
+                <div><span>Drawdown</span><strong>${fmtPct(tactical.current_drawdown_pct)}</strong></div>
+                <div><span>vs MA50</span><strong>${fmtPct(tactical.distance_ma50_pct)}</strong></div>
+                <div><span>vs MA200</span><strong>${fmtPct(tactical.distance_ma200_pct)}</strong></div>
+            </div>
+        </details>
+        ${changeMarkup}
+    `;
+}
+
+function unifiedPromoteVehicleResearch(detail){
+    const hero=
+        document.querySelector(
+            ".metals-hero"
+        );
+
+    if(hero){
+        hero.classList.add(
+            "metals-unified-hero"
+        );
+
+        const copy=
+            hero.querySelector(
+                ".metals-hero-copy"
+            );
+
+        if(
+            copy &&
+            (
+                copy.textContent.includes(
+                    "No narrative rationale"
+                ) ||
+                copy.textContent.trim()===""
+            )
+        ){
+            copy.textContent=
+                unifiedVehicleDecisionText(detail);
+
+            copy.dataset.evidenceSource=
+                "derived_vehicle_decision_interpretation";
+        }
+    }
+
+    const forecastPanel=
+        unifiedFindSection(
+            "Forecast & model evidence"
+        );
+
+    if(
+        forecastPanel &&
+        !forecastPanel.querySelector(
+            ".metals-forecast-interpretation"
+        )
+    ){
+        const markup=
+            unifiedForecastTensionMarkup(detail);
+
+        if(markup){
+            forecastPanel.insertAdjacentHTML(
+                "afterbegin",
+                markup
+            );
+        }
+    }
+
+    unifiedPromoteVehicleRecommendation(detail);
+    unifiedCollapseNeutralTactical(detail);
+}
+
+function unifiedGoldForecastVisual(detail){
+    const rows=
+        payloads(detail,"forecast")
+        .filter(row=>
+            Number.isFinite(
+                Number(row.expected_return)
+            ) &&
+            Number.isFinite(
+                Number(row.forecast_horizon_months)
+            )
+        )
+        .sort((a,b)=>
+            Number(a.forecast_horizon_months)-
+            Number(b.forecast_horizon_months)
+        );
+
+    if(rows.length<2)return "";
+
+    const values=
+        rows.map(row=>
+            Number(row.expected_return)*100
+        );
+
+    let low=Math.min(0,...values);
+    let high=Math.max(0,...values);
+
+    const span=(high-low)||1;
+
+    low-=span*.12;
+    high+=span*.12;
+
+    const plotSpan=(high-low)||1;
+
+    const points=
+        rows.map((row,index)=>{
+            const x=
+                54+
+                (
+                    index/
+                    (rows.length-1)
+                )*520;
+
+            const value=
+                Number(row.expected_return)*100;
+
+            const y=
+                176-
+                (
+                    (value-low)/
+                    plotSpan
+                )*128;
+
+            return {
+                x,
+                y,
+                value,
+                horizon:
+                    Number(
+                        row.forecast_horizon_months
+                    )
+            };
+        });
+
+    const zeroY=
+        176-
+        (
+            (0-low)/
+            plotSpan
+        )*128;
+
+    const polyline=
+        points
+        .map(point=>
+            `${point.x},${point.y}`
+        )
+        .join(" ");
+
+    const dots=
+        points.map(point=>`
+            <circle
+                cx="${point.x}"
+                cy="${point.y}"
+                r="5"
+                class="metals-forecast-dot"
+            ></circle>
+            <text
+                x="${point.x}"
+                y="${point.y-12}"
+                text-anchor="middle"
+                class="metals-svg-value"
+            >${escapeHtml(fmtPct(point.value))}</text>
+            <text
+                x="${point.x}"
+                y="202"
+                text-anchor="middle"
+                class="metals-svg-label"
+            >${point.horizon}mo</text>
+        `).join("");
+
+    return `
+        <article class="metals-panel metals-unified-chart-panel">
+            <div class="metals-unified-panel-head">
+                <div>
+                    <span>RETURN OUTLOOK</span>
+                    <h4>Gold forecast path</h4>
+                </div>
+                <strong>${fmtPct(values.at(-1))}</strong>
+            </div>
+            <p class="metals-panel-sub">Governed expected-return path across the certified 3, 6, 12, and 24-month horizons.</p>
+            <svg
+                class="metals-gold-forecast-chart"
+                viewBox="0 0 628 220"
+                preserveAspectRatio="none"
+                aria-label="Gold expected return by horizon"
+            >
+                <line
+                    x1="42"
+                    y1="${zeroY}"
+                    x2="594"
+                    y2="${zeroY}"
+                    class="metals-chart-zero"
+                ></line>
+                <polyline
+                    points="${polyline}"
+                    class="metals-forecast-line"
+                ></polyline>
+                ${dots}
+            </svg>
+        </article>
+    `;
+}
+
+function unifiedGoldRegimeVisual(detail){
+    const rows=
+        regimeProbabilities(detail);
+
+    if(!rows.length)return "";
+
+    const markup=
+        rows.map(row=>{
+            const probability=
+                Math.max(
+                    0,
+                    Math.min(
+                        100,
+                        Number(row.probability)*100
+                    )
+                );
+
+            return `
+                <div class="metals-regime-visual-row">
+                    <div>
+                        <span>${escapeHtml(clean(row.regime??"Regime"))}</span>
+                        <strong>${fmtPct(probability)}</strong>
+                    </div>
+                    <svg
+                        viewBox="0 0 100 8"
+                        preserveAspectRatio="none"
+                        aria-hidden="true"
+                    >
+                        <rect
+                            x="0"
+                            y="1"
+                            width="100"
+                            height="6"
+                            rx="3"
+                            class="metals-regime-bg"
+                        ></rect>
+                        <rect
+                            x="0"
+                            y="1"
+                            width="${probability}"
+                            height="6"
+                            rx="3"
+                            class="metals-regime-fill"
+                        ></rect>
+                    </svg>
+                </div>
+            `;
+        }).join("");
+
+    return `
+        <article class="metals-panel metals-unified-chart-panel">
+            <div class="metals-unified-panel-head">
+                <div>
+                    <span>RISK CONTEXT</span>
+                    <h4>Forecast regime probabilities</h4>
+                </div>
+            </div>
+            <p class="metals-panel-sub">Long-term forecast regimes. These are not vehicle tactical states.</p>
+            <div class="metals-regime-visual">
+                ${markup}
+            </div>
+        </article>
+    `;
+}
+
+function unifiedGoldModelVisual(detail){
+    const models=
+        modelComponents(detail);
+
+    if(!models.length)return "";
+
+    const horizons=[
+        ...new Set(
+            models.map(row=>
+                Number(row.horizon_months)
+            )
+        )
+    ].sort((a,b)=>a-b);
+
+    const markup=
+        horizons.map(horizon=>{
+            const rows=
+                models.filter(row=>
+                    Number(row.horizon_months)===
+                    horizon
+                );
+
+            const positive=
+                rows.filter(row=>
+                    Number(row.model_forecast)>0
+                ).length;
+
+            const negative=
+                rows.filter(row=>
+                    Number(row.model_forecast)<0
+                ).length;
+
+            return `
+                <div class="metals-model-balance-card">
+                    <span>${fmtNumber(horizon,0)} mo</span>
+                    <strong>${positive} positive - ${negative} negative</strong>
+                    <small>${rows.length} certified component models</small>
+                </div>
+            `;
+        }).join("");
+
+    return `
+        <article class="metals-panel metals-unified-chart-panel">
+            <div class="metals-unified-panel-head">
+                <div>
+                    <span>MODEL BALANCE</span>
+                    <h4>Component direction by horizon</h4>
+                </div>
+            </div>
+            <p class="metals-panel-sub">A compact directional summary of the certified Gold component models. Detailed model rows remain available below for inspection.</p>
+            <div class="metals-model-balance-grid">
+                ${markup}
+            </div>
+        </article>
+    `;
+}
+
+function unifiedGoldRiskAssessment(detail){
+    const value=
+        availableCommodityExplanation(detail);
+
+    if(!value)return;
+
+    const panel=
+        unifiedFindSection(
+            "Risk assessment"
+        );
+
+    if(!panel)return;
+
+    panel.classList.add(
+        "metals-unified-decision-panel"
+    );
+
+    panel.dataset.evidenceSource=
+        COMMODITY_EXPLANATION_RECORD_TYPE;
+
+    panel.innerHTML=`
+        <h4>Forecast / regime risk context</h4>
+        <div class="metals-derived-risk-summary">
+            <div>
+                <span>Current context</span>
+                <strong>${escapeHtml(value.risk_context_level??"Unavailable")}</strong>
+            </div>
+            <div>
+                <span>Dominant regime</span>
+                <strong>${escapeHtml(clean(value.dominant_regime??"Unavailable"))}</strong>
+            </div>
+            <div>
+                <span>Probability</span>
+                <strong>${fmtPct(Number(value.dominant_regime_probability)*100)}</strong>
+            </div>
+        </div>
+        <p class="metals-panel-sub">${escapeHtml(value.risk_context_explanation??"")}</p>
+        <small class="metals-secondary-copy">This is separately typed forecast / regime risk context. It is not a native asset-risk score and does not populate risk_metrics_current.</small>
+    `;
+}
+
+function unifiedGoldResearch(detail){
+    const hero=
+        document.querySelector(
+            ".metals-hero"
+        );
+
+    if(!hero)return;
+
+    hero.classList.add(
+        "metals-unified-hero",
+        "metals-unified-gold"
+    );
+
+    const existing=
+        document.querySelector(
+            ".metals-gold-visual-grid"
+        );
+
+    if(!existing){
+        const visuals=`
+            <section class="metals-gold-visual-grid">
+                ${unifiedGoldForecastVisual(detail)}
+                ${unifiedGoldRegimeVisual(detail)}
+                ${unifiedGoldModelVisual(detail)}
+            </section>
+        `;
+
+        hero.insertAdjacentHTML(
+            "afterend",
+            visuals
+        );
+    }
+
+    const timingPanel=
+        unifiedFindSection(
+            "Vehicle tactical timing context"
+        );
+
+    if(timingPanel){
+        timingPanel.classList.add(
+            "metals-unified-hidden"
+        );
+    }
+
+    const kpis=
+        document.querySelector(
+            ".metals-detail-kpis"
+        );
+
+    if(kpis){
+        kpis.classList.add(
+            "metals-unified-commodity-timing"
+        );
+
+        kpis.innerHTML=`
+            <article>
+                <span>Timing</span>
+                <strong>N/A - commodity thesis</strong>
+                <small>Vehicle tactical timing is intentionally not inferred into Gold.</small>
+            </article>
+        `;
+    }
+
+    const aside=
+        document.querySelector(
+            ".rec-tactical-panel.metals-tactical-na"
+        );
+
+    if(
+        aside &&
+        !aside.querySelector(
+            ".metals-unified-secondary-details"
+        )
+    ){
+        const original=
+            aside.innerHTML;
+
+        aside.classList.add(
+            "metals-unified-secondary-context"
+        );
+
+        aside.innerHTML=`
+            <span class="eyebrow">DETAILED EVIDENCE</span>
+            <details class="metals-unified-secondary-details">
+                <summary>Open model, regime, and governance evidence</summary>
+                <div class="metals-unified-secondary-detail-body">
+                    ${original}
+                </div>
+            </details>
+        `;
+    }
+
+    unifiedGoldRiskAssessment(detail);
+}
+
+function promoteUnifiedResearch(detail){
+    if(
+        document.body.dataset.metalsUnifiedAsset===
+        detailAssetId(detail)
+    ){
+        return;
+    }
+
+    if(isGoldCommodity(detail)){
+        unifiedGoldResearch(detail);
+    }else if(!isCommodityDetail(detail)){
+        unifiedPromoteVehicleResearch(detail);
+    }else{
+        const aside=
+            document.querySelector(
+                ".rec-tactical-panel"
+            );
+
+        if(aside){
+            aside.classList.add(
+                "metals-unified-secondary-context"
+            );
+        }
+    }
+
+    document.body.dataset.metalsUnifiedAsset=
+        detailAssetId(detail);
+}
+
 function enhancePriceHistory(detail){const markup=chartMarkup(detail);if(!markup)return;const panels=[...document.querySelectorAll("article.metals-panel")];if(panels.some(node=>node.classList.contains("metals-price-history-panel")))return;const momentum=panels.find(node=>node.querySelector("h4")?.textContent?.trim()==="Momentum & trend context");if(momentum)momentum.insertAdjacentHTML("afterend",markup);}
-function enhanceResearchDetail(detail){if(!document.querySelector(".metals-hero")){pendingDetail=detail;return}enhanceHero(detail);enhanceCommodityMomentumPanel(detail);enhanceForecastPanel(detail);enhanceRecommendationPanel(detail);promoteCommodityDetailHierarchy(detail);enhancePriceHistory(detail);pendingDetail=null;}
+function enhanceResearchDetail(detail){if(!document.querySelector(".metals-hero")){pendingDetail=detail;return}enhanceHero(detail);enhanceCommodityMomentumPanel(detail);enhanceForecastPanel(detail);enhanceRecommendationPanel(detail);promoteCommodityDetailHierarchy(detail);promoteUnifiedResearch(detail);enhancePriceHistory(detail);pendingDetail=null;}
 const observer=new MutationObserver(()=>{enrichVisibleCards();if(pendingDetail)enhanceResearchDetail(pendingDetail)});
 function startEnrichment(){if(!document.body)return;observer.observe(document.body,{childList:true,subtree:true});enrichVisibleCards();if(pendingDetail)enhanceResearchDetail(pendingDetail);}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",startEnrichment,{once:true});else startEnrichment();

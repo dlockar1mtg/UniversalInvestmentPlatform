@@ -87,3 +87,375 @@
     }
 }
 
+/* METALS UNIFIED DECISION TERMINAL 1 */
+
+.metals-unified-card {
+    min-height: 0;
+    gap: 11px;
+}
+
+.metals-unified-card .metals-kpis {
+    gap: 8px;
+}
+
+.metals-unified-card .metals-momentum {
+    margin-top: 2px;
+}
+
+.metals-unified-risk-kpi strong {
+    color: var(--warn);
+}
+
+.metals-timing-compact {
+    padding-bottom: 14px;
+}
+
+.metals-unified-timing-mini {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    border-top: 1px solid var(--line);
+    padding-top: 9px;
+}
+
+.metals-unified-timing-mini span,
+.metals-unified-timing-mini strong {
+    display: inline;
+    margin: 0;
+}
+
+.metals-unified-timing-mini strong {
+    font-size: 11px;
+    color: var(--text);
+}
+
+.metals-timing-exception {
+    border-color: rgba(255, 207, 102, .45);
+}
+
+.metals-unified-hero .metals-hero-copy {
+    color: var(--text);
+    font-size: 11px;
+    line-height: 1.65;
+}
+
+.metals-unified-decision-panel {
+    border-color: rgba(99, 230, 190, .28);
+}
+
+.metals-forecast-interpretation {
+    border: 1px solid rgba(255, 207, 102, .28);
+    border-radius: 12px;
+    padding: 14px;
+    margin-bottom: 16px;
+    background: rgba(255, 207, 102, .04);
+}
+
+.metals-forecast-interpretation-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+}
+
+.metals-forecast-interpretation-head span {
+    color: var(--muted);
+    font-size: 9px;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+}
+
+.metals-forecast-interpretation-head strong {
+    color: var(--warn);
+    font-size: 11px;
+}
+
+.metals-forecast-interpretation p {
+    margin: 10px 0 12px;
+    line-height: 1.6;
+    font-size: 10px;
+}
+
+.metals-forecast-interpretation-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0,1fr));
+    gap: 8px;
+}
+
+.metals-forecast-interpretation-grid > div {
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 9px;
+    background: rgba(7,19,16,.42);
+}
+
+.metals-forecast-interpretation-grid span {
+    display: block;
+    color: var(--muted);
+    font-size: 8px;
+}
+
+.metals-forecast-interpretation-grid strong {
+    display: block;
+    margin-top: 4px;
+    font-size: 12px;
+}
+
+.metals-tactical-compact-detail {
+    padding: 15px 18px;
+}
+
+.metals-tactical-compact-detail > p {
+    margin: 8px 0 0;
+    max-width: 900px;
+    color: var(--muted);
+    font-size: 10px;
+    line-height: 1.55;
+}
+
+.metals-unified-timing-detail {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    margin-top: 5px;
+}
+
+.metals-unified-timing-detail strong {
+    font-size: 14px;
+}
+
+.metals-unified-timing-detail span {
+    color: var(--muted);
+    font-size: 9px;
+}
+
+.metals-unified-secondary-details {
+    margin-top: 10px;
+    border-top: 1px solid var(--line);
+    padding-top: 9px;
+}
+
+.metals-unified-secondary-details summary {
+    cursor: pointer;
+    font-size: 9px;
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.metals-unified-secondary-details p {
+    color: var(--muted);
+    font-size: 9px;
+    line-height: 1.5;
+}
+
+.metals-gold-visual-grid {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 14px;
+    margin: 14px 0;
+}
+
+.metals-gold-visual-grid > article:first-child {
+    grid-column: span 2;
+}
+
+.metals-unified-chart-panel {
+    overflow: hidden;
+}
+
+.metals-unified-panel-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 14px;
+    align-items: start;
+}
+
+.metals-unified-panel-head span {
+    display: block;
+    color: var(--accent);
+    font-size: 8px;
+    letter-spacing: .1em;
+    font-weight: 800;
+}
+
+.metals-unified-panel-head h4 {
+    margin-top: 5px;
+}
+
+.metals-unified-panel-head > strong {
+    color: var(--warn);
+    font-size: 19px;
+}
+
+.metals-gold-forecast-chart {
+    width: 100%;
+    height: 230px;
+    margin-top: 4px;
+}
+
+.metals-chart-zero {
+    stroke: rgba(154,177,168,.30);
+    stroke-width: 1;
+    stroke-dasharray: 5 5;
+}
+
+.metals-forecast-line {
+    fill: none;
+    stroke: var(--warn);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+}
+
+.metals-forecast-dot {
+    fill: var(--warn);
+    stroke: #07100f;
+    stroke-width: 2;
+}
+
+.metals-svg-value {
+    fill: var(--text);
+    font-size: 10px;
+    font-weight: 800;
+}
+
+.metals-svg-label {
+    fill: var(--muted);
+    font-size: 9px;
+}
+
+.metals-regime-visual {
+    display: grid;
+    gap: 13px;
+    margin-top: 10px;
+}
+
+.metals-regime-visual-row > div {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.metals-regime-visual-row span {
+    color: var(--text);
+    font-size: 10px;
+}
+
+.metals-regime-visual-row strong {
+    font-size: 11px;
+}
+
+.metals-regime-visual-row svg {
+    width: 100%;
+    height: 8px;
+}
+
+.metals-regime-bg {
+    fill: rgba(154,177,168,.12);
+}
+
+.metals-regime-fill {
+    fill: var(--accent);
+}
+
+.metals-model-balance-grid {
+    display: grid;
+    grid-template-columns: repeat(2,minmax(0,1fr));
+    gap: 9px;
+    margin-top: 10px;
+}
+
+.metals-model-balance-card {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 11px;
+    background: rgba(7,19,16,.42);
+}
+
+.metals-model-balance-card span,
+.metals-model-balance-card small {
+    display: block;
+    color: var(--muted);
+    font-size: 8px;
+}
+
+.metals-model-balance-card strong {
+    display: block;
+    margin: 5px 0;
+    font-size: 12px;
+}
+
+.metals-unified-secondary-context {
+    opacity: .92;
+}
+
+.metals-unified-secondary-context >
+.metals-unified-secondary-details {
+    margin-top: 0;
+    border-top: 0;
+    padding-top: 0;
+}
+
+.metals-unified-secondary-detail-body {
+    margin-top: 14px;
+}
+
+.metals-unified-commodity-timing {
+    grid-template-columns: 1fr;
+}
+
+.metals-unified-commodity-timing article {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    gap: 10px;
+    align-items: center;
+    padding: 11px 14px;
+}
+
+.metals-unified-commodity-timing article strong {
+    font-size: 12px;
+    margin: 0;
+}
+
+.metals-unified-commodity-timing article small {
+    color: var(--muted);
+    font-size: 9px;
+}
+
+.metals-unified-hidden {
+    display: none !important;
+}
+
+@media (max-width: 900px) {
+    .metals-gold-visual-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .metals-gold-visual-grid > article:first-child {
+        grid-column: auto;
+    }
+
+    .metals-forecast-interpretation-grid {
+        grid-template-columns: repeat(2,minmax(0,1fr));
+    }
+}
+
+@media (max-width: 620px) {
+    .metals-forecast-interpretation-grid,
+    .metals-model-balance-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .metals-unified-timing-detail,
+    .metals-unified-timing-mini,
+    .metals-unified-commodity-timing article {
+        grid-template-columns: 1fr;
+        display: grid;
+    }
+}
+
