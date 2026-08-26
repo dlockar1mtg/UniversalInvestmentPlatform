@@ -1,0 +1,68 @@
+{
+  "authorization_id": "METALS-COMMODITY-DECISION-EXPLANATION-HOSTED-REFRESH-AUTHORIZATION-1",
+  "source_implementation_head": "5d11c2a8d1e660165a5c172c054fee39feb3c2a0",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "source_local_projection_record_count": 12477,
+  "source_local_projection_commodity_explanation_record_count": 2,
+  "source_local_projection_gold_risk_context_level": "ELEVATED",
+  "source_local_projection_gold_dominant_regime_probability": 0.65,
+  "active_hosted_publication_before_refresh": {
+    "publication_id": "metals-v3-decision-utility-r3-20260826",
+    "content_fingerprint": "e5f0bce3eb0181983e990e3de5795867dc53bf41c0d038b0d7302e722434b3ee",
+    "record_count": 12475,
+    "commodity_explanation_record_count": 0,
+    "status": "ACTIVE"
+  },
+  "authorized_hosted_publication_after_refresh": {
+    "publication_id": "metals-v3-commodity-explanation-r4-20260826",
+    "record_count": 12477,
+    "commodity_explanation_record_count": 2,
+    "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+    "gold_explanation_state": "AVAILABLE",
+    "gold_risk_context_level": "ELEVATED",
+    "uranium_explanation_state": "UNAVAILABLE"
+  },
+  "required_refresh_behavior": {
+    "build_from_certified_implementation_head": true,
+    "build_from_certified_analytical_database_sha": true,
+    "use_certified_external_metals_price_package": true,
+    "validate_full_publication_before_hosted_write": true,
+    "hosted_refresh_must_be_single_bounded_execution": true,
+    "existing_r3_publication_must_be_verified_before_write": true,
+    "new_publication_record_count_must_equal_12477": true,
+    "new_commodity_explanation_record_count_must_equal_2": true,
+    "gold_derived_rationale_must_be_available": true,
+    "gold_forecast_regime_risk_context_must_equal_ELEVATED": true,
+    "gold_native_rationale_must_remain_absent": true,
+    "gold_native_typed_risk_must_remain_absent": true,
+    "uranium_derived_explanation_must_remain_unavailable": true,
+    "analytical_database_sha_must_remain_unchanged": true,
+    "main_branch_must_remain_unchanged": true
+  },
+  "semantic_guardrails": {
+    "do_not_mutate_analytical_database": true,
+    "do_not_refresh_forecasts_or_models": true,
+    "do_not_collect_network_market_data": true,
+    "do_not_copy_vehicle_risk_to_commodity": true,
+    "do_not_populate_native_recommendation_rationale_or_risk_summary": true,
+    "do_not_populate_risk_metrics_current": true,
+    "do_not_infer_uranium_from_URA_or_URNM": true,
+    "do_not_deploy_main": true,
+    "do_not_create_or_merge_pr": true,
+    "do_not_rerun_after_success": true
+  },
+  "authorization_boundary": {
+    "hosted_publication_write_authorized": true,
+    "analytical_database_write_authorized": false,
+    "runtime_code_change_authorized": false,
+    "main_deployment_authorized": false,
+    "pr_creation_authorized": false,
+    "model_retraining_authorized": false,
+    "forecast_refresh_authorized": false,
+    "network_collection_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "authorization_decision": "AUTHORIZE_ONE_BOUNDED_METALS_COMMODITY_EXPLANATION_HOSTED_PRESENTATION_REFRESH",
+  "next_decision": "EXECUTE_AND_CERTIFY_METALS_COMMODITY_EXPLANATION_HOSTED_PRESENTATION_REFRESH"
+}
