@@ -1,6 +1,6 @@
 {
   "extension_id": "DASH-READ-1-METALS-TACTICAL-EVIDENCE",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "status": "AUTHORIZED_FOR_PRESENTATION_PROJECTION",
   "base_contract": "DASH_READ_1_CERTIFIED_PRESENTATION_READ_MODEL_PUBLICATION_CONTRACT",
   "domain_id": "metals",
@@ -12,7 +12,8 @@
     "cross_domain_rank_authorized": false,
     "allocation_policy_authorized": false,
     "automatic_execution_authorized": false,
-    "tactical_posture_authorized": true
+    "tactical_posture_authorized": true,
+    "derived_explanatory_surface_authorized": true
   },
   "external_price_package": {
     "package_id": "metals-price-history-20260824",
@@ -62,6 +63,30 @@
       "source": "metals_tactical_state_current",
       "asset_identity": "universal_asset_id",
       "required_fields": ["universal_asset_id", "ticker", "as_of_date", "candidate_regime", "tactical_state", "classifier_rule_version", "action_mapping_version", "price_semantics", "source_package_id", "state_available", "state_reason", "is_reference_control", "return_1m_pct", "return_3m_pct", "return_6m_pct", "distance_ma50_pct", "distance_ma200_pct", "current_drawdown_pct", "realized_volatility_3m_pct", "trend_slope", "return_dispersion", "volatility_change", "drawdown_recovery_rate", "distance_from_recent_extreme", "short_vs_long_momentum_spread", "source_state_sha256", "source_materialization_manifest_sha256"]
+    }
+  },
+  "derived_surfaces": {
+    "metals_commodity_decision_explanation": {
+      "asset_identity": "universal_asset_id",
+      "eligible_assets": ["metals:commodity:gold"],
+      "unavailable_assets": {
+        "metals:commodity:uranium": "NO_CURRENT_COMMODITY_FORECAST_MODEL_OR_REGIME_AUTHORITY"
+      },
+      "required_sources": {
+        "recommendation": "recommendations_current",
+        "forecast": "forecasts_current",
+        "metals_model_component": "metals_forecast_model_component_current",
+        "metals_regime_probability": "metals_regime_probability_current"
+      },
+      "required_forecast_horizons_months": [3, 6, 12, 24],
+      "source_record_types": ["recommendation", "forecast", "metals_model_component", "metals_regime_probability"],
+      "derived_rationale_semantic_label": "Derived decision rationale",
+      "risk_context_semantic_label": "Forecast / regime risk context",
+      "risk_context_levels": ["ELEVATED", "MODERATE", "LOWER_REGIME_STRESS"],
+      "vehicle_risk_inheritance_allowed": false,
+      "vehicle_forecast_or_tactical_inheritance_allowed": false,
+      "native_recommendation_fields_mutable": false,
+      "native_risk_metrics_mutable": false
     }
   }
 }
