@@ -1,0 +1,155 @@
+﻿{
+  "design_id": "UIP_MTG_PREMIUM_SIDECAR_BRIDGE_V1",
+  "design_version": "1.0.0",
+  "status": "DESIGN_ONLY_NOT_IMPLEMENTATION_AUTHORIZATION",
+  "domain_id": "mtg",
+  "purpose": "Transport certified lane-native MTG premium research into the versioned UIP presentation publication without widening the governed 23-field MTG common authority interface, without creating a second analytical authority, and without relabeling scenario evidence as direct forecast evidence.",
+
+  "governed_baseline": {
+    "existing_native_authority_interface": "mtg_native_authority_current",
+    "existing_native_authority_field_count": 23,
+    "existing_native_authority_row_count": 968,
+    "existing_secret_lair_row_count": 787,
+    "existing_interface_must_remain_unchanged": true,
+    "existing_native_authority_remains_authoritative": true
+  },
+
+  "source_authority": {
+    "owner": "MTG_SOURCE_REPOSITORY",
+    "lane": "SECRET_LAIR_V1_1",
+    "source_artifact": "secret_lair_v1_purchase_analysis.csv",
+    "governed_population": 787,
+    "identity_key": "secret_lair_id",
+    "uip_asset_id_mapping": "SECRET_LAIR_V1_1|{secret_lair_id}",
+    "source_values_must_be_copied_without_recalculation": true,
+    "missing_source_values_must_remain_missing": true
+  },
+
+  "proposed_delivery_sidecar": {
+    "dataset_name": "mtg_secret_lair_premium_research",
+    "filename": "mtg_secret_lair_premium_research.csv",
+    "row_grain": "ONE_ROW_PER_GOVERNED_SECRET_LAIR_PRODUCT_PER_CERTIFIED_PREMIUM_AUTHORITY_SNAPSHOT",
+    "expected_initial_rows": 787,
+    "dynamic_population": true,
+    "portable_identity_fields": [
+      "mtg_asset_id",
+      "secret_lair_id",
+      "product_name"
+    ],
+    "semantic_groups": {
+      "certified_one_year_forecast": [
+        "current_tcg_market_price_usd",
+        "certified_1y_point_forecast_usd",
+        "certified_1y_point_return"
+      ],
+      "governed_entry_context": [
+        "y1_q10_break_even_entry_price_usd",
+        "current_price_margin_to_q10_break_even",
+        "current_price_vs_q10_break_even_state"
+      ],
+      "one_year_empirical_risk": [
+        "y1_probability_of_loss",
+        "y1_probability_of_positive_return",
+        "y1_downside_tail_mean_total_return",
+        "y1_upside_tail_mean_total_return",
+        "y1_q10_terminal_value_usd",
+        "y1_q50_terminal_value_usd",
+        "y1_q90_terminal_value_usd"
+      ],
+      "three_year_scenario_distribution": [
+        "y3_median_total_return_scenario",
+        "y3_probability_of_loss_scenario",
+        "y3_q10_terminal_value_scenario_usd",
+        "y3_q50_terminal_value_scenario_usd",
+        "y3_q90_terminal_value_scenario_usd"
+      ],
+      "five_year_scenario_distribution": [
+        "y5_median_total_return_scenario",
+        "y5_probability_of_loss_scenario",
+        "y5_q10_terminal_value_scenario_usd",
+        "y5_q50_terminal_value_scenario_usd",
+        "y5_q90_terminal_value_scenario_usd"
+      ],
+      "evidence_and_comparables": [
+        "own_history_evidence_class",
+        "history_span_days",
+        "historical_observation_count",
+        "exact_structural_comparable_support",
+        "exact_structural_comparable_product_count",
+        "global_comparable_product_count",
+        "exact_structural_comparable_event_count",
+        "global_comparable_event_count"
+      ]
+    }
+  },
+
+  "presentation_projection": {
+    "new_record_type": "mtg_premium_research",
+    "domain_id": "mtg",
+    "record_key": "mtg_asset_id",
+    "payload_storage": "presentation_records.payload_json",
+    "analytical_database_schema_change_required": false,
+    "mtg_native_authority_schema_change_required": false,
+    "existing_asset_detail_supports_arbitrary_record_types": true,
+    "existing_postgres_presentation_table_supports_json_payloads": true
+  },
+
+  "semantic_rules": {
+    "one_year_is_certified_forecast": true,
+    "three_year_is_direct_forecast": false,
+    "five_year_is_direct_forecast": false,
+    "three_year_semantic": "SCENARIO_DISTRIBUTION_NOT_DIRECTLY_VALIDATED",
+    "five_year_semantic": "SCENARIO_DISTRIBUTION_NOT_DIRECTLY_VALIDATED",
+    "q10_is_secret_lair_governed_entry_threshold": true,
+    "q25_or_q50_may_replace_q10_entry_policy": false,
+    "three_or_five_year_scenario_may_trigger_buy": false,
+    "native_rank_may_override_purchase_policy": false,
+    "cross_lane_rank_created": false,
+    "cross_domain_rank_created": false,
+    "universal_purchase_policy_created": false,
+    "automatic_purchase_execution_authorized": false
+  },
+
+  "publication_boundary": {
+    "postgres_is_presentation_copy_not_analytical_authority": true,
+    "source_model_recomputation_in_uip": false,
+    "scenario_recomputation_in_uip": false,
+    "risk_recomputation_in_uip": false,
+    "q10_recalculation_in_uip": false,
+    "source_values_preserved_losslessly": true,
+    "source_lineage_required": true,
+    "source_sha256_required": true
+  },
+
+  "initial_scope": {
+    "secret_lair_full_research_rows": 787,
+    "secret_lair_partial_population_206_promoted_in_this_step": false,
+    "collector_premium_bridge_implemented_in_this_step": false,
+    "precollector_premium_bridge_implemented_in_this_step": false
+  },
+
+  "implementation_sequence": [
+    "MTG_SOURCE_SIDECAR_EXPORT_CONTRACT",
+    "MTG_SOURCE_SIDECAR_BUILD_AND_CERTIFICATION",
+    "UIP_CERTIFIED_SIDECAR_ACCEPTANCE_CONTRACT",
+    "UIP_PRESENTATION_PROJECTION_REHEARSAL",
+    "UIP_HOSTED_PRESENTATION_ACTIVATION",
+    "MTG_PREMIUM_READ_API_LIVE_VERIFICATION",
+    "FRONTEND_IMPLEMENTATION_ONLY_AFTER_DATA_IS_LIVE"
+  ],
+
+  "authorization": {
+    "design_creation_authorized": true,
+    "source_sidecar_implementation_authorized": false,
+    "source_copy_or_ingestion_authorized": false,
+    "uip_import_engine_schema_change_authorized": false,
+    "analytical_database_schema_change_authorized": false,
+    "presentation_projection_write_authorized": false,
+    "hosted_database_activation_authorized": false,
+    "frontend_change_authorized": false,
+    "model_rerun_authorized": false,
+    "automatic_purchase_execution_authorized": false
+  },
+
+  "next_gate": "REVIEW_AND_AUTHORIZE_MTG_SOURCE_PREMIUM_SIDECAR_EXPORT_CONTRACT"
+}
