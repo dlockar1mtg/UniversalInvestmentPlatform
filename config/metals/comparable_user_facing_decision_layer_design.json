@@ -1,0 +1,205 @@
+{
+  "design_id": "METALS-COMPARABLE-USER-FACING-DECISION-LAYER-DESIGN-1",
+  "source_semantic_audit_head": "c103f15a38462e8a3ecbfab24cc87634cd97278e",
+  "source_semantic_audit_id": "METALS-DECISION-SEMANTICS-AUDIT-EXECUTION-1",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "source_hosted_publication_id": "metals-v3-commodity-explanation-r4-20260826",
+  "source_hosted_fingerprint": "aa6d2fa0cd575cedaceb8c2a10dd10c19b15c31e59dce35cec7a0199ed69b5d5",
+  "source_hosted_record_count": 12477,
+  "certified_semantic_audit_counts": {
+    "asset_count": 12,
+    "safe_primary_status_count": 5,
+    "blocked_primary_status_count": 7,
+    "raw_adjusted_sign_conflict_count": 8,
+    "contradiction_count": 17
+  },
+  "objective": "DEFINE_ONE_CONSISTENT_USER_FACING_METALS_DECISION_LAYER_WITHOUT_REWRITING_NATIVE_RECOMMENDATION_FORECAST_RISK_OR_TACTICAL_AUTHORITIES",
+  "primary_decision_taxonomy": [
+    "STRONG_BUY",
+    "BUY",
+    "WATCH",
+    "HOLD",
+    "SELL",
+    "STRONG_SELL",
+    "DECISION_CONFLICT",
+    "REFERENCE_CONTROL"
+  ],
+  "asset_decision_design": {
+    "metals:commodity:gold": {
+      "native_recommendation": "RANKED_OPPORTUNITY",
+      "governed_uip_normalized_decision": "HOLD",
+      "primary_user_facing_status": "HOLD",
+      "status_surface_state": "AUTHORIZED_FROM_CERTIFIED_SEMANTIC_AUDIT",
+      "secondary_disclosure_required": true,
+      "secondary_disclosure": "Native Metals status: RANKED_OPPORTUNITY",
+      "risk_semantic": "DERIVED_COMMODITY_FORECAST_REGIME_RISK_CONTEXT",
+      "timing_semantic": "NOT_APPLICABLE_COMMODITY_THESIS"
+    },
+    "metals:commodity:uranium": {
+      "native_recommendation": "RANKED_OPPORTUNITY",
+      "governed_uip_normalized_decision": "HOLD",
+      "primary_user_facing_status": "HOLD",
+      "status_surface_state": "AUTHORIZED_FROM_CERTIFIED_SEMANTIC_AUDIT",
+      "secondary_disclosure_required": true,
+      "secondary_disclosure": "Native Metals status: RANKED_OPPORTUNITY",
+      "risk_semantic": "UNAVAILABLE",
+      "timing_semantic": "NOT_APPLICABLE_COMMODITY_THESIS"
+    },
+    "metals:vehicle:BIL": {
+      "native_recommendation": "RESERVE_BUY",
+      "governed_uip_normalized_decision": null,
+      "primary_user_facing_status": "REFERENCE_CONTROL",
+      "status_surface_state": "REFERENCE_CONTROL_NOT_OPPORTUNITY",
+      "secondary_disclosure_required": true,
+      "secondary_disclosure": "Native Metals status: RESERVE_BUY",
+      "risk_semantic": "NATIVE_TYPED_VEHICLE_RISK",
+      "timing_semantic": "REFERENCE_CONTROL_ONLY"
+    },
+    "metals:vehicle:COPX": {
+      "native_recommendation": "HOLD",
+      "governed_uip_normalized_decision": "HOLD",
+      "primary_user_facing_status": "HOLD",
+      "status_surface_state": "AUTHORIZED_FROM_CERTIFIED_SEMANTIC_AUDIT",
+      "secondary_disclosure_required": false,
+      "risk_semantic": "NATIVE_TYPED_VEHICLE_RISK",
+      "timing_semantic": "NEUTRAL_NO_ADDITIONAL_SIGNAL"
+    },
+    "metals:vehicle:CPER": {
+      "native_recommendation": "HOLD",
+      "governed_uip_normalized_decision": "HOLD",
+      "primary_user_facing_status": "HOLD",
+      "status_surface_state": "AUTHORIZED_FROM_CERTIFIED_SEMANTIC_AUDIT",
+      "secondary_disclosure_required": false,
+      "risk_semantic": "NATIVE_TYPED_VEHICLE_RISK",
+      "timing_semantic": "NEUTRAL_NO_ADDITIONAL_SIGNAL"
+    },
+    "metals:vehicle:GLD": {
+      "native_recommendation": "BUY",
+      "governed_uip_normalized_decision": "BUY",
+      "primary_user_facing_status": "DECISION_CONFLICT",
+      "status_surface_state": "BLOCKED_BY_NEGATIVE_UNCERTAINTY_ADJUSTED_RETURN",
+      "secondary_disclosure_required": true,
+      "secondary_disclosure": "Native recommendation: BUY; raw long-horizon outlook is positive; uncertainty-adjusted outlook is negative.",
+      "risk_semantic": "NATIVE_TYPED_VEHICLE_RISK",
+      "timing_semantic": "NEUTRAL_NO_ADDITIONAL_SIGNAL"
+    },
+    "metals:vehicle:IAU": {
+      "native_recommendation": "BUY",
+      "governed_uip_normalized_decision": "BUY",
+      "primary_user_facing_status": "DECISION_CONFLICT",
+      "status_surface_state": "BLOCKED_BY_NEGATIVE_UNCERTAINTY_ADJUSTED_RETURN",
+      "secondary_disclosure_required": true,
+      "secondary_disclosure": "Native recommendation: BUY; raw long-horizon outlook is positive; uncertainty-adjusted outlook is negative.",
+      "risk_semantic": "NATIVE_TYPED_VEHICLE_RISK",
+      "timing_semantic": "NEUTRAL_NO_ADDITIONAL_SIGNAL"
+    },
+    "metals:vehicle:PPLT": {
+      "native_recommendation": "BUY",
+      "governed_uip_normalized_decision": "BUY",
+      "primary_user_facing_status": "DECISION_CONFLICT",
+      "status_surface_state": "BLOCKED_BY_NEGATIVE_UNCERTAINTY_ADJUSTED_RETURN",
+      "secondary_disclosure_required": true,
+      "secondary_disclosure": "Native recommendation: BUY; raw long-horizon outlook is positive; uncertainty-adjusted outlook is negative.",
+      "risk_semantic": "NATIVE_TYPED_VEHICLE_RISK",
+      "timing_semantic": "NEUTRAL_NO_ADDITIONAL_SIGNAL"
+    },
+    "metals:vehicle:SGOL": {
+      "native_recommendation": "BUY",
+      "governed_uip_normalized_decision": "BUY",
+      "primary_user_facing_status": "DECISION_CONFLICT",
+      "status_surface_state": "BLOCKED_BY_NEGATIVE_UNCERTAINTY_ADJUSTED_RETURN",
+      "secondary_disclosure_required": true,
+      "secondary_disclosure": "Native recommendation: BUY; raw long-horizon outlook is positive; uncertainty-adjusted outlook is negative.",
+      "risk_semantic": "NATIVE_TYPED_VEHICLE_RISK",
+      "timing_semantic": "NEUTRAL_NO_ADDITIONAL_SIGNAL"
+    },
+    "metals:vehicle:SIVR": {
+      "native_recommendation": "BUY",
+      "governed_uip_normalized_decision": "BUY",
+      "primary_user_facing_status": "DECISION_CONFLICT",
+      "status_surface_state": "BLOCKED_BY_NEGATIVE_UNCERTAINTY_ADJUSTED_RETURN",
+      "secondary_disclosure_required": true,
+      "secondary_disclosure": "Native recommendation: BUY; raw long-horizon outlook is positive; uncertainty-adjusted outlook is negative.",
+      "risk_semantic": "NATIVE_TYPED_VEHICLE_RISK",
+      "timing_semantic": "NEUTRAL_NO_ADDITIONAL_SIGNAL"
+    },
+    "metals:vehicle:SLV": {
+      "native_recommendation": "BUY",
+      "governed_uip_normalized_decision": "BUY",
+      "primary_user_facing_status": "DECISION_CONFLICT",
+      "status_surface_state": "BLOCKED_BY_NEGATIVE_UNCERTAINTY_ADJUSTED_RETURN",
+      "secondary_disclosure_required": true,
+      "secondary_disclosure": "Native recommendation: BUY; raw long-horizon outlook is positive; uncertainty-adjusted outlook is negative.",
+      "risk_semantic": "NATIVE_TYPED_VEHICLE_RISK",
+      "timing_semantic": "NEUTRAL_NO_ADDITIONAL_SIGNAL"
+    },
+    "metals:vehicle:URA": {
+      "native_recommendation": "HOLD",
+      "governed_uip_normalized_decision": "HOLD",
+      "primary_user_facing_status": "HOLD",
+      "status_surface_state": "AUTHORIZED_FROM_CERTIFIED_SEMANTIC_AUDIT",
+      "secondary_disclosure_required": false,
+      "risk_semantic": "NATIVE_TYPED_VEHICLE_RISK",
+      "timing_semantic": "NEUTRAL_NO_ADDITIONAL_SIGNAL"
+    }
+  },
+  "presentation_rules": {
+    "one_primary_status_vocabulary_across_metals": true,
+    "native_status_never_used_as_primary_when_not_comparable": true,
+    "decision_conflict_is_not_buy_hold_watch_or_sell": true,
+    "decision_conflict_requires_raw_and_adjusted_outlook_both_visible": true,
+    "decision_conflict_requires_native_recommendation_disclosure": true,
+    "reference_control_never_ranked_as_opportunity": true,
+    "risk_semantics_labeled_by_authority_type": true,
+    "vehicle_native_risk_not_equated_with_gold_derived_risk_context": true,
+    "neutral_timing_compact_secondary_only": true,
+    "commodity_timing_compact_not_applicable": true,
+    "supportive_or_defensive_timing_may_be_prominent_but_never_primary_decision": true,
+    "native_recommendation_preserved_in_research_evidence": true,
+    "raw_forecast_preserved": true,
+    "adjusted_forecast_preserved": true
+  },
+  "research_terminal_rules": {
+    "decision_summary_first": true,
+    "decision_status_explanation_required": true,
+    "native_authority_section_required": true,
+    "forecast_conflict_section_required_for_conflicted_assets": true,
+    "risk_authority_section_required": true,
+    "timing_section_secondary": true,
+    "historical_price_visual_preserved_for_vehicles": true,
+    "gold_forecast_regime_model_visuals_preserved": true,
+    "uranium_unavailable_semantics_preserved": true,
+    "raw_model_tables_secondary_to_decision_summary": true
+  },
+  "fail_closed_rules": {
+    "do_not_convert_conflicted_buy_to_hold_without_new_authority": true,
+    "do_not_surface_conflicted_buy_as_primary_buy": true,
+    "do_not_surface_ranked_opportunity_as_primary_status": true,
+    "do_not_surface_reserve_buy_as_opportunity_status": true,
+    "do_not_infer_uranium_from_ura_or_urnm": true,
+    "do_not_inherit_vehicle_risk_or_tactical_state_into_commodity": true,
+    "do_not_relabel_adjusted_return_as_native_recommendation": true,
+    "do_not_relabel_uncertainty_penalty_as_native_risk": true,
+    "do_not_promote_neutral_timing_to_primary_decision": true
+  },
+  "candidate_runtime_files": [
+    "foundation/production/dashboard_assets/recommendation_ui.js",
+    "foundation/production/dashboard_assets/metals_tactical_ui.js",
+    "foundation/production/dashboard_assets/recommendation_visual.css"
+  ],
+  "boundaries": {
+    "runtime_implementation_authorized": false,
+    "hosted_write_authorized": false,
+    "database_write_authorized": false,
+    "normalized_status_persistence_authorized": false,
+    "recommendation_recompute_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_refresh_authorized": false,
+    "csp_cleanup_authorized": false,
+    "pr_authorized": false,
+    "main_deploy_authorized": false,
+    "allocation_or_execution_authorized": false
+  },
+  "design_decision": "APPROVE_METALS_COMPARABLE_USER_FACING_DECISION_LAYER_DESIGN_FOR_IMPLEMENTATION_AUTHORIZATION_CONSIDERATION",
+  "next_decision": "AUTHORIZE_BOUNDED_METALS_COMPARABLE_USER_FACING_DECISION_LAYER_IMPLEMENTATION"
+}
