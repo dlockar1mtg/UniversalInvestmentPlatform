@@ -12,6 +12,16 @@ behavior = auth["required_execution_behavior"]
 outputs = auth["required_outputs"]
 boundary = auth["authorization_boundary"]
 
+expected_outputs = {
+    "realized_return_rows_csv",
+    "realized_return_rows_json",
+    "derivation_lineage_json",
+    "coverage_summary_json",
+    "missing_future_price_register_json",
+    "consumed_interval_annotation_json",
+    "derivation_summary_json",
+}
+
 checks = {
     "read_only_inputs": True,
     "authorization_id_bound": auth["authorization_id"] == "METALS-BOUNDED-REALIZED-RETURN-DERIVATION-EXECUTION-AUTHORIZATION-1",
@@ -22,8 +32,9 @@ checks = {
     "readiness_bound": findings["readiness_finding"] == "READY_AFTER_REALIZED_RETURN_DERIVATION",
     "joinability_bound": findings["joinable_asset_horizon_row_count"] == 48 and findings["history_join_recovery_row_count"] == 0,
     "realized_outcome_missing_bound": findings["existing_realized_outcome_present"] is False and findings["realized_return_derivation_required"] is True,
-    "execution_behavior_all_true": all(value is True for value in behavior.values()),
-    "required_outputs_all_true": all(value is True for value in outputs.values()),
+    "execution_behavior_all_true": len(behavior) == 16 and all(value is True for value in behavior.values()),
+    "required_outputs_exact": set(outputs) == expected_outputs and len(outputs) == 7,
+    "required_outputs_all_true": set(outputs) == expected_outputs and all(value is True for value in outputs.values()),
     "derivation_authorized": boundary["bounded_realized_return_derivation_authorized"] is True,
     "local_evidence_write_authorized": boundary["local_evidence_artifact_write_authorized"] is True,
     "all_other_execution_boundaries_closed": all(
