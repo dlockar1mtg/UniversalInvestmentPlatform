@@ -1,0 +1,59 @@
+{
+  "authorization_id": "METALS-UNIFIED-DECISION-TERMINAL-IMPLEMENTATION-AUTHORIZATION-1",
+  "source_design_id": "METALS-UNIFIED-DECISION-TERMINAL-REDESIGN-DESIGN-1",
+  "source_design_head": "f1cfb0f3d48b08751d3abc092b3b15c8c2a6bce5",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "active_hosted_publication": {
+    "publication_id": "metals-v3-commodity-explanation-r4-20260826",
+    "content_fingerprint": "aa6d2fa0cd575cedaceb8c2a10dd10c19b15c31e59dce35cec7a0199ed69b5d5",
+    "record_count": 12477
+  },
+  "authorized_runtime_files": [
+    "foundation/production/dashboard_assets/recommendation_ui.js",
+    "foundation/production/dashboard_assets/metals_tactical_ui.js",
+    "foundation/production/dashboard_assets/recommendation_visual.css"
+  ],
+  "required_implementation_behavior": {
+    "unified_overview_card_architecture": true,
+    "vehicle_native_risk_promoted_when_available": true,
+    "gold_derived_risk_context_remains_distinct": true,
+    "neutral_tactical_state_compact_only": true,
+    "supportive_tactical_state_prominent_exception": true,
+    "defensive_tactical_state_prominent_exception": true,
+    "commodity_tactical_state_compact_not_applicable": true,
+    "shared_research_terminal_shell": true,
+    "vehicle_price_history_visual_preserved": true,
+    "gold_forecast_path_visual_required": true,
+    "gold_regime_probability_visual_required": true,
+    "gold_model_component_visual_required": true,
+    "raw_vs_adjusted_return_interpretation_required": true,
+    "recommendation_change_evidence_secondary_only": true,
+    "uranium_unavailable_semantics_preserved": true,
+    "session_stability_anchor_preserved": true
+  },
+  "semantic_guardrails": {
+    "native_vehicle_risk_not_relabelled_as_gold_context": true,
+    "gold_forecast_regime_context_not_relabelled_native_risk": true,
+    "commodity_price_not_inferred_from_vehicle_price": true,
+    "vehicle_tactical_evidence_not_inherited_by_commodities": true,
+    "adjusted_return_not_relabelled_price_forecast": true,
+    "uncertainty_penalties_not_relabelled_native_risk": true,
+    "no_tactical_overlay_not_sell_signal": true,
+    "tactical_state_not_execution_authority": true,
+    "unsupported_fields_remain_unavailable": true
+  },
+  "authorization_boundary": {
+    "runtime_implementation_authorized": true,
+    "hosted_publication_write_authorized": false,
+    "analytical_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_refresh_authorized": false,
+    "network_collection_authorized": false,
+    "csp_cleanup_authorized": false,
+    "pull_request_authorized": false,
+    "main_deployment_authorized": false,
+    "execution_or_allocation_authorized": false
+  },
+  "authorization_decision": "AUTHORIZE_BOUNDED_METALS_UNIFIED_DECISION_TERMINAL_IMPLEMENTATION",
+  "next_decision": "IMPLEMENT_AND_CERTIFY_METALS_UNIFIED_DECISION_TERMINAL"
+}
