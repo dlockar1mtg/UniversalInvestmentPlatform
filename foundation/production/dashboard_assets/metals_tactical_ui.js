@@ -44,7 +44,7 @@ function setCardPrice(card,detail){const value=currentPrice(detail);if(!value)re
 function setCommodityCardState(card,detail){if(!isCommodityDetail(detail))return false;card.classList.add("metals-card-commodity");const drawdown=findKpi(card,"Current drawdown");if(drawdown){const label=drawdown.querySelector("span"),strong=drawdown.querySelector("strong");if(label)label.textContent="Vehicle tactical";if(strong)strong.textContent="N/A";drawdown.dataset.evidenceSource="not_applicable";}const momentum=card.querySelector(".metals-momentum");if(momentum)momentum.outerHTML=`<div class="metals-card-na"><strong>Vehicle-level tactical only</strong><span>Commodity thesis records do not receive vehicle momentum or drawdown metrics.</span></div>`;const track=card.querySelector(".metals-regime-track");const trackContainer=track?.parentElement;if(trackContainer)trackContainer.outerHTML=`<div class="metals-na-callout"><strong>Tactical overlay not applicable</strong><span>Use commodity forecast and regime evidence in Research.</span></div>`;const mini=card.querySelector(".metals-tactical-mini");if(mini)mini.innerHTML="<span>Tactical context</span><strong>Not applicable</strong><span>Vehicle-level policy only</span>";return true;}
 function setMomentumMetric(card,label,value){const row=[...card.querySelectorAll(".metals-momentum div")].find(node=>node.querySelector("span")?.textContent?.trim()===label);const strong=row?.querySelector("strong");if(strong){strong.textContent=fmtPct(value);row.dataset.evidenceSource="tactical_state";}}
 function setVehicleCardState(card,detail){const tactical=firstTactical(detail);if(!tactical)return;setMomentumMetric(card,"1M momentum",tactical.return_1m_pct);setMomentumMetric(card,"3M momentum",tactical.return_3m_pct);setMomentumMetric(card,"6M momentum",tactical.return_6m_pct);const drawdown=findKpi(card,"Current drawdown");if(drawdown){const strong=drawdown.querySelector("strong");if(strong)strong.textContent=fmtPct(tactical.current_drawdown_pct);drawdown.dataset.evidenceSource="tactical_state";}const mini=card.querySelector(".metals-tactical-mini");if(tactical.tactical_state==="NO_TACTICAL_OVERLAY"){card.classList.add("metals-card-no-overlay");if(mini)mini.innerHTML=`<span>Current tactical state</span><strong>No current overlay</strong><span>${escapeHtml(clean(tactical.candidate_regime??"Neutral or uncertain"))}</span>`;const track=card.querySelector(".metals-regime-track");if(track){const container=track.parentElement;if(container&&!container.querySelector(".metals-overlay-badge")){container.insertAdjacentHTML("afterbegin",'<div class="metals-overlay-badge neutral">No current tactical overlay</div>');}}}}
-async function enrichCard(card){if(card.dataset.metalsEvidenceEnriched==="1")return;const button=card.querySelector(".rec-metals-detail[data-asset-id]");const assetId=button?.dataset?.assetId;if(!assetId)return;card.dataset.metalsEvidenceEnriched="pending";try{const detail=await detailRequest(assetId);if(detail){setCardForecast(card,detail);setCardPrice(card,detail);if(!setCommodityCardState(card,detail))setVehicleCardState(card,detail)}card.dataset.metalsEvidenceEnriched="1";}catch(_error){card.dataset.metalsEvidenceEnriched="0";}}
+async function enrichCard(card){if(card.dataset.metalsEvidenceEnriched==="1")return;const button=card.querySelector(".rec-metals-detail[data-asset-id]");const assetId=button?.dataset?.assetId;if(!assetId)return;card.dataset.metalsEvidenceEnriched="pending";try{const detail=await detailRequest(assetId);if(detail){setCardForecast(card,detail);setCardPrice(card,detail);const commodity=setCommodityCardState(card,detail);if(commodity)promoteCommodityOverview(card,detail);else setVehicleCardState(card,detail)}card.dataset.metalsEvidenceEnriched="1";}catch(_error){card.dataset.metalsEvidenceEnriched="0";}}
 function enrichVisibleCards(){document.querySelectorAll(".metals-card").forEach(card=>{void enrichCard(card)})}
 function chartMarkup(detail){const values=priceHistory(detail).filter(row=>Number.isFinite(Number(row.close_usd))&&row.observation_date);if(values.length<2)return "";const stride=Math.max(1,Math.ceil(values.length/180));const sampled=values.filter((_row,index)=>index%stride===0||index===values.length-1);const prices=sampled.map(row=>Number(row.close_usd));const low=Math.min(...prices),high=Math.max(...prices),span=high-low||1;const points=prices.map((value,index)=>`${(index/(prices.length-1))*1000},${190-((value-low)/span)*160}`).join(" ");const first=values[0],last=values[values.length-1];return `<article class="metals-panel metals-price-history-panel" data-evidence-source="metals_price_history"><h4>Historical market price</h4><p class="metals-panel-sub">Certified vehicle history · UNADJUSTED_CLOSE · ${escapeHtml(first.observation_date)} through ${escapeHtml(last.observation_date)} · ${values.length} observations.</p><div class="metals-price-chart-frame"><svg class="metals-price-chart" viewBox="0 0 1000 210" preserveAspectRatio="none"><polyline points="${points}"></polyline></svg></div><div class="metals-tactical-metrics metals-price-history-metrics"><div><span>Start</span><strong>${fmtMoney(first.close_usd)}</strong></div><div><span>Latest</span><strong>${fmtMoney(last.close_usd)}</strong></div><div><span>Period low</span><strong>${fmtMoney(low)}</strong></div><div><span>Period high</span><strong>${fmtMoney(high)}</strong></div></div></article>`}
 function addHeroMetric(container,label,value,title=""){const node=document.createElement("div");node.className="metals-hero-metric";node.innerHTML=`<span>${escapeHtml(label)}</span><strong title="${escapeHtml(title)}">${escapeHtml(value)}</strong>`;container.appendChild(node);return node}
@@ -55,8 +55,176 @@ function enhanceCommodityMomentumPanel(detail){if(!isCommodityDetail(detail))ret
 function enhanceForecastPanel(detail){const panels=[...document.querySelectorAll("article.metals-panel")];const panel=panels.find(node=>node.querySelector("h4")?.textContent?.trim()==="Forecast & model evidence");if(!panel)return;const uncertainty=uncertaintyRows(detail);const models=modelComponents(detail);const assetId=detailAssetId(detail);const empty=panel.querySelector(".empty");if(uncertainty.length){if(empty)empty.remove();if(!panel.querySelector(".metals-forecast-return-context"))panel.insertAdjacentHTML("beforeend",uncertaintyTable(detail));panel.dataset.evidenceSource="metals_uncertainty_adjusted";return}if(models.length){if(empty){empty.textContent="Certified commodity model-component and expected-return evidence is available in Supporting Context. Price-point and forecast bounds are not populated.";empty.dataset.evidenceSource="metals_model_component";}return}if(assetId==="metals:commodity:uranium"&&empty){empty.textContent=URANIUM_FORECAST_UNAVAILABLE_NOTE;empty.dataset.evidenceSource="unavailable";}}
 function enhanceRecommendationPanel(detail){const panels=[...document.querySelectorAll("article.metals-panel")];const panel=panels.find(node=>node.querySelector("h4")?.textContent?.trim()==="Why this recommendation");if(!panel)return;const narrative=panel.querySelector(".rec-narrative");if(!narrative)return;const blocks=[...narrative.children];const rationale=blocks.find(node=>node.querySelector("span")?.textContent?.trim()==="Rationale");if(!rationale)return;const paragraph=rationale.querySelector("p");if(!paragraph)return;const explanation=commodityDecisionExplanation(detail);if(explanation){if(explanation.explanation_state==="AVAILABLE"&&explanation.derived_rationale){paragraph.textContent=`${explanation.derived_rationale_semantic_label||"Derived decision rationale"}: ${explanation.derived_rationale}`;rationale.dataset.evidenceSource=COMMODITY_EXPLANATION_RECORD_TYPE;if(!rationale.querySelector(".metals-secondary-copy"))rationale.insertAdjacentHTML("beforeend",'<small class="metals-secondary-copy">Native recommendation rationale remains unpopulated; the text above is a separately typed deterministic explanation from governed Gold evidence.</small>');return}if(explanation.explanation_state==="UNAVAILABLE"){paragraph.textContent=explanation.availability_explanation||"Derived commodity decision explanation is unavailable.";rationale.dataset.evidenceSource="unavailable";if(!rationale.querySelector(".metals-secondary-copy"))rationale.insertAdjacentHTML("beforeend",'<small class="metals-secondary-copy">UIP does not infer commodity rationale or risk context from vehicle evidence.</small>');return}}
 const change=recommendationChange(detail);if(!change?.explanation)return;paragraph.textContent=`${RECOMMENDATION_CHANGE_SUPPORTING_EVIDENCE_LABEL} ${change.explanation}`;rationale.dataset.evidenceSource="metals_recommendation_change";if(!rationale.querySelector(".metals-secondary-copy"))rationale.insertAdjacentHTML("beforeend",'<small class="metals-secondary-copy">Full investment-thesis narrative is not populated in the current recommendation authority.</small>');}
+
+function isGoldCommodity(detail){
+    return detailAssetId(detail)==="metals:commodity:gold";
+}
+function availableCommodityExplanation(detail){
+    const value=commodityDecisionExplanation(detail);
+    return value&&value.explanation_state==="AVAILABLE"?value:null;
+}
+function conciseGoldThesis(value){
+    if(!value)return "";
+    const horizon=fmtNumber(value.longest_horizon_months,0);
+    const expected=fmtPct(Number(value.longest_horizon_expected_return)*100);
+    const regime=clean(value.dominant_regime??"unavailable");
+    const probability=fmtPct(Number(value.dominant_regime_probability)*100);
+    return `Governed Gold evidence supports a ${horizon}-month expected return of ${expected}. Current forecast / regime risk context is ${value.risk_context_level??"Unavailable"}, with ${regime} at ${probability}.`;
+}
+function promoteCommodityOverview(card,detail){
+    if(!isGoldCommodity(detail))return;
+    const value=availableCommodityExplanation(detail);
+    if(!value)return;
+
+    const tactical=findKpi(card,"Vehicle tactical");
+    if(tactical){
+        const label=tactical.querySelector("span");
+        const strong=tactical.querySelector("strong");
+        if(label)label.textContent="Risk context";
+        if(strong){
+            strong.textContent=value.risk_context_level??"Unavailable";
+            strong.title="Forecast / regime risk context from Gold commodity authority; not a native typed asset-risk score.";
+        }
+        tactical.dataset.evidenceSource=COMMODITY_EXPLANATION_RECORD_TYPE;
+        tactical.classList.add("metals-primary-derived-risk");
+    }
+
+    const tableRows=[...document.querySelectorAll(".metals-secondary-table tbody tr")];
+    const row=tableRows.find(node=>
+        node.textContent?.includes("metals:commodity:gold")
+    );
+
+    if(row){
+        const cells=[...row.querySelectorAll("td")];
+        if(cells.length>=8){
+            cells[5].textContent="Derived";
+            cells[5].title="Derived decision rationale from governed Gold evidence; native rationale remains unpopulated.";
+            cells[5].classList.add("metals-derived-table-value");
+
+            cells[6].textContent=`${value.risk_context_level??"Unavailable"}*`;
+            cells[6].title="Forecast / regime risk context; not a native typed asset-risk rating.";
+            cells[6].classList.add("metals-derived-table-value");
+        }
+    }
+}
+function promoteCommodityDetailHierarchy(detail){
+    if(!isGoldCommodity(detail))return;
+
+    const value=availableCommodityExplanation(detail);
+    if(!value)return;
+
+    const hero=document.querySelector(".metals-hero");
+    if(hero){
+        hero.classList.add("metals-derived-gold-hero");
+
+        const copy=hero.querySelector(".metals-hero-copy");
+        if(copy){
+            copy.textContent=conciseGoldThesis(value);
+            copy.dataset.evidenceSource=COMMODITY_EXPLANATION_RECORD_TYPE;
+        }
+
+        const side=hero.querySelector(".metals-hero-side");
+        if(side){
+            const tactical=findKpi(side,"Vehicle tactical");
+            if(tactical){
+                const label=tactical.querySelector("span");
+                const strong=tactical.querySelector("strong");
+                if(label)label.textContent="Dominant regime";
+                if(strong){
+                    strong.textContent=`${clean(value.dominant_regime??"unavailable")} ? ${fmtPct(Number(value.dominant_regime_probability)*100)}`;
+                    strong.title="Long-term forecast-regime probability; not vehicle tactical state.";
+                }
+                tactical.dataset.evidenceSource=COMMODITY_EXPLANATION_RECORD_TYPE;
+            }
+        }
+    }
+
+    const panels=[...document.querySelectorAll("article.metals-panel")];
+
+    const recommendationPanel=panels.find(node=>
+        node.querySelector("h4")?.textContent?.trim()==="Why this recommendation"
+    );
+
+    if(recommendationPanel){
+        recommendationPanel.classList.add("metals-derived-primary-panel");
+
+        const narrative=recommendationPanel.querySelector(".rec-narrative");
+        const blocks=narrative?[...narrative.children]:[];
+
+        const rationale=blocks.find(node=>
+            node.querySelector("span")?.textContent?.trim()==="Rationale" ||
+            node.querySelector("span")?.textContent?.trim()==="Derived decision rationale"
+        );
+
+        if(rationale){
+            const label=rationale.querySelector("span");
+            const paragraph=rationale.querySelector("p");
+
+            if(label)label.textContent="Derived decision rationale";
+            if(paragraph)paragraph.textContent=value.derived_rationale??conciseGoldThesis(value);
+
+            rationale.dataset.evidenceSource=COMMODITY_EXPLANATION_RECORD_TYPE;
+            rationale.classList.add("metals-derived-rationale-primary");
+        }
+
+        const risk=blocks.find(node=>
+            node.querySelector("span")?.textContent?.trim()==="Risk summary" ||
+            node.querySelector("span")?.textContent?.trim()==="Forecast / regime risk context"
+        );
+
+        if(risk){
+            const label=risk.querySelector("span");
+            const paragraph=risk.querySelector("p");
+
+            if(label)label.textContent="Forecast / regime risk context";
+
+            if(paragraph){
+                paragraph.innerHTML=`<strong>${escapeHtml(value.risk_context_level??"Unavailable")}</strong> ? ${escapeHtml(value.risk_context_explanation??"")}`;
+            }
+
+            risk.dataset.evidenceSource=COMMODITY_EXPLANATION_RECORD_TYPE;
+            risk.classList.add("metals-derived-risk-primary");
+
+            if(!risk.querySelector(".metals-secondary-copy")){
+                risk.insertAdjacentHTML(
+                    "beforeend",
+                    '<small class="metals-secondary-copy">No native recommendation risk_summary or typed risk_metrics_current record is populated for Gold; this is separately typed forecast / regime risk context.</small>'
+                );
+            }
+        }
+    }
+
+    const riskPanel=panels.find(node=>
+        node.querySelector("h4")?.textContent?.trim()==="Risk assessment"
+    );
+
+    if(riskPanel){
+        riskPanel.dataset.evidenceSource=COMMODITY_EXPLANATION_RECORD_TYPE;
+        riskPanel.classList.add("metals-derived-primary-panel");
+        riskPanel.innerHTML=`
+            <h4>Forecast / regime risk context</h4>
+            <div class="metals-derived-risk-summary">
+                <div>
+                    <span>Current context</span>
+                    <strong>${escapeHtml(value.risk_context_level??"Unavailable")}</strong>
+                </div>
+                <div>
+                    <span>Dominant regime</span>
+                    <strong>${escapeHtml(clean(value.dominant_regime??"unavailable"))}</strong>
+                </div>
+                <div>
+                    <span>Regime probability</span>
+                    <strong>${fmtPct(Number(value.dominant_regime_probability)*100)}</strong>
+                </div>
+            </div>
+            <p class="metals-panel-sub">${escapeHtml(value.risk_context_explanation??"")}</p>
+            <small class="metals-secondary-copy">This is forecast / regime risk context from governed Gold commodity evidence. It is not a native LOW / MEDIUM / HIGH typed asset-risk score and does not populate risk_metrics_current.</small>
+        `;
+    }
+}
+
 function enhancePriceHistory(detail){const markup=chartMarkup(detail);if(!markup)return;const panels=[...document.querySelectorAll("article.metals-panel")];if(panels.some(node=>node.classList.contains("metals-price-history-panel")))return;const momentum=panels.find(node=>node.querySelector("h4")?.textContent?.trim()==="Momentum & trend context");if(momentum)momentum.insertAdjacentHTML("afterend",markup);}
-function enhanceResearchDetail(detail){if(!document.querySelector(".metals-hero")){pendingDetail=detail;return}enhanceHero(detail);enhanceCommodityMomentumPanel(detail);enhanceForecastPanel(detail);enhanceRecommendationPanel(detail);enhancePriceHistory(detail);pendingDetail=null;}
+function enhanceResearchDetail(detail){if(!document.querySelector(".metals-hero")){pendingDetail=detail;return}enhanceHero(detail);enhanceCommodityMomentumPanel(detail);enhanceForecastPanel(detail);enhanceRecommendationPanel(detail);promoteCommodityDetailHierarchy(detail);enhancePriceHistory(detail);pendingDetail=null;}
 const observer=new MutationObserver(()=>{enrichVisibleCards();if(pendingDetail)enhanceResearchDetail(pendingDetail)});
 function startEnrichment(){if(!document.body)return;observer.observe(document.body,{childList:true,subtree:true});enrichVisibleCards();if(pendingDetail)enhanceResearchDetail(pendingDetail);}
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",startEnrichment,{once:true});else startEnrichment();

@@ -8,3 +8,82 @@
 @media(max-width:1280px){.metals-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.metals-layout{grid-template-columns:minmax(0,1fr) 260px}.metals-hero{grid-template-columns:1fr}.metals-detail-grid{grid-template-columns:1fr}.metals-explainer{position:static}}
 @media(max-width:900px){.metals-layout{grid-template-columns:1fr}.metals-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.metals-explainer{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.metals-explainer h4,.metals-reference-note{grid-column:1/-1}.metals-explainer-item{margin:0}.metals-hero-side{grid-template-columns:repeat(2,minmax(0,1fr))}.metals-detail-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:640px){.metals-card-grid,.metals-hero-side,.metals-detail-kpis,.metals-explainer{grid-template-columns:1fr}.metals-explainer h4,.metals-reference-note{grid-column:auto}.metals-card{min-height:0}.metals-panel .rec-narrative{grid-template-columns:1fr}.metals-tactical-metrics{grid-template-columns:1fr}.metals-bar-row{grid-template-columns:70px minmax(0,1fr) 58px}}
+
+/* METALS r4 PRIMARY HIERARCHY RECOVERY */
+.metals-derived-gold-hero .metals-hero-copy {
+    color: var(--text);
+    font-size: 12px;
+    line-height: 1.65;
+    max-width: 760px;
+}
+
+.metals-primary-derived-risk strong,
+.metals-derived-risk-primary > p > strong,
+.metals-derived-risk-summary strong {
+    color: var(--warn);
+}
+
+.metals-derived-primary-panel {
+    border-color: rgba(255, 207, 102, .34);
+    background:
+        linear-gradient(
+            145deg,
+            rgba(23, 38, 30, .97),
+            rgba(10, 25, 22, .97)
+        );
+}
+
+.metals-derived-rationale-primary {
+    grid-column: span 2;
+}
+
+.metals-derived-rationale-primary > p {
+    font-size: 11px;
+    line-height: 1.65;
+}
+
+.metals-derived-risk-primary {
+    border-color: rgba(255, 207, 102, .28);
+}
+
+.metals-derived-risk-summary {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+    margin: 12px 0;
+}
+
+.metals-derived-risk-summary > div {
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    padding: 12px;
+    background: rgba(7, 19, 16, .42);
+}
+
+.metals-derived-risk-summary span {
+    display: block;
+    color: var(--muted);
+    font-size: 9px;
+}
+
+.metals-derived-risk-summary strong {
+    display: block;
+    margin-top: 5px;
+    font-size: 16px;
+}
+
+.metals-derived-table-value {
+    color: var(--warn);
+    font-weight: 800;
+}
+
+@media (max-width: 720px) {
+    .metals-derived-risk-summary {
+        grid-template-columns: 1fr;
+    }
+
+    .metals-derived-rationale-primary {
+        grid-column: auto;
+    }
+}
+
