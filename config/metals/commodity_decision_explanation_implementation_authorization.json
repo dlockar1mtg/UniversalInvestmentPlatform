@@ -1,0 +1,60 @@
+{
+  "authorization_id": "METALS-COMMODITY-DECISION-EXPLANATION-IMPLEMENTATION-AUTHORIZATION-1",
+  "source_design_id": "METALS-COMMODITY-DECISION-EXPLANATION-DESIGN-1",
+  "source_design_head": "327e72e4eb9ac7abff9d636bdaf3489b428abef3",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "authorized_record_type": "metals_commodity_decision_explanation",
+  "authorized_runtime_files": [
+    "foundation/presentation/metals_tactical_projection.py",
+    "config/presentation/dash_read_1_metals_tactical_extension.json",
+    "foundation/production/dashboard_assets/metals_tactical_ui.js"
+  ],
+  "required_implementation_behavior": {
+    "gold_derived_rationale_created_only_from_bound_gold_authorities": true,
+    "gold_derived_rationale_labeled_derived_not_native": true,
+    "gold_forecast_regime_risk_context_created_only_from_gold_regime_authority": true,
+    "gold_forecast_regime_risk_context_not_labeled_generic_risk_level": true,
+    "gold_native_rationale_remains_unmodified": true,
+    "gold_native_risk_summary_remains_unmodified": true,
+    "gold_typed_risk_record_remains_absent": true,
+    "gld_risk_not_inherited_by_gold": true,
+    "vehicle_forecast_or_tactical_evidence_not_inherited_by_gold": true,
+    "uranium_derived_rationale_remains_unavailable": true,
+    "uranium_forecast_regime_risk_context_remains_unavailable": true,
+    "ura_urnm_evidence_not_inherited_by_uranium": true,
+    "derived_outputs_include_source_record_types": true,
+    "secondary_evidence_table_does_not_present_derived_values_as_native": true
+  },
+  "gold_risk_context_mapping": {
+    "semantic_label": "Forecast / regime risk context",
+    "high_vol_stress_probability_gte_0_50": "ELEVATED",
+    "normal_probability_largest_and_high_vol_stress_lt_0_50": "MODERATE",
+    "low_vol_growth_probability_largest": "LOWER_REGIME_STRESS"
+  },
+  "semantic_guardrails": {
+    "do_not_populate_recommendations_current_rationale": true,
+    "do_not_populate_recommendations_current_risk_summary": true,
+    "do_not_populate_risk_metrics_current": true,
+    "do_not_copy_gld_risk_level_or_score_to_gold": true,
+    "do_not_copy_ura_or_urnm_evidence_to_uranium": true,
+    "do_not_recompute_or_refresh_forecasts": true,
+    "do_not_synthesize_point_lower_or_upper_forecast_bounds": true,
+    "do_not_convert_confidence_raw_to_probability_of_success": true,
+    "do_not_treat_forecast_regime_risk_context_as_native_asset_risk": true,
+    "do_not_authorize_execution_or_allocation": true
+  },
+  "authorization_boundary": {
+    "runtime_implementation_authorized": true,
+    "analytical_database_write_authorized": false,
+    "hosted_publication_write_authorized": false,
+    "main_deployment_authorized": false,
+    "pr_creation_authorized": false,
+    "model_retraining_authorized": false,
+    "forecast_refresh_authorized": false,
+    "network_collection_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "authorization_decision": "AUTHORIZE_BOUNDED_METALS_COMMODITY_DECISION_EXPLANATION_IMPLEMENTATION",
+  "next_decision": "IMPLEMENT_AND_CERTIFY_METALS_COMMODITY_DECISION_EXPLANATION"
+}
