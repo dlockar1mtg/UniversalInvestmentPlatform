@@ -41,6 +41,16 @@ def test_required_execution_behavior_is_exact_and_true():
 
 def test_required_outputs_are_exact_and_true():
     outputs = AUTH["required_outputs"]
+    expected = {
+        "realized_return_rows_csv",
+        "realized_return_rows_json",
+        "derivation_lineage_json",
+        "coverage_summary_json",
+        "missing_future_price_register_json",
+        "consumed_interval_annotation_json",
+        "derivation_summary_json",
+    }
+    assert set(outputs) == expected
     assert len(outputs) == 7
     assert all(value is True for value in outputs.values())
 
