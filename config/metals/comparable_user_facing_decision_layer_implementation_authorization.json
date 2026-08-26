@@ -1,0 +1,88 @@
+{
+  "authorization_id": "METALS-COMPARABLE-USER-FACING-DECISION-LAYER-IMPLEMENTATION-AUTHORIZATION-1",
+  "source_design_id": "METALS-COMPARABLE-USER-FACING-DECISION-LAYER-DESIGN-1",
+  "source_design_head": "3aac888df4f7e92a3d7fa11992b4ccda87644526",
+  "source_semantic_audit_id": "METALS-DECISION-SEMANTICS-AUDIT-EXECUTION-1",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "active_hosted_publication_id": "metals-v3-commodity-explanation-r4-20260826",
+  "active_hosted_publication_fingerprint": "aa6d2fa0cd575cedaceb8c2a10dd10c19b15c31e59dce35cec7a0199ed69b5d5",
+  "active_hosted_record_count": 12477,
+  "certified_primary_status_partition": {
+    "HOLD": [
+      "metals:commodity:gold",
+      "metals:commodity:uranium",
+      "metals:vehicle:COPX",
+      "metals:vehicle:CPER",
+      "metals:vehicle:URA"
+    ],
+    "DECISION_CONFLICT": [
+      "metals:vehicle:GLD",
+      "metals:vehicle:IAU",
+      "metals:vehicle:PPLT",
+      "metals:vehicle:SGOL",
+      "metals:vehicle:SIVR",
+      "metals:vehicle:SLV"
+    ],
+    "REFERENCE_CONTROL": [
+      "metals:vehicle:BIL"
+    ]
+  },
+  "authorized_runtime_files": [
+    "foundation/production/dashboard_assets/recommendation_ui.js",
+    "foundation/production/dashboard_assets/metals_tactical_ui.js",
+    "foundation/production/dashboard_assets/recommendation_visual.css"
+  ],
+  "required_implementation_behavior": {
+    "overview_primary_badge_uses_comparable_uip_status": true,
+    "gold_primary_badge_is_hold": true,
+    "uranium_primary_badge_is_hold": true,
+    "copx_cper_ura_primary_badge_is_hold": true,
+    "bil_primary_badge_is_reference_control": true,
+    "six_conflicted_buy_vehicles_primary_badge_is_decision_conflict": true,
+    "native_recommendation_remains_visible_as_secondary_provenance": true,
+    "decision_conflict_explains_native_buy_raw_return_and_negative_adjusted_return": true,
+    "conflicted_buy_not_silently_relabelled_hold": true,
+    "conflicted_buy_not_surfaced_as_unqualified_primary_buy": true,
+    "raw_and_adjusted_returns_remain_distinct": true,
+    "vehicle_native_risk_remains_distinct_from_gold_derived_risk_context": true,
+    "neutral_timing_remains_secondary_compact": true,
+    "commodity_timing_remains_not_applicable_without_vehicle_inference": true,
+    "reference_control_not_ranked_as_investment_opportunity": true,
+    "research_terminal_uses_same_primary_status_taxonomy_as_overview": true,
+    "session_stability_anchor_preserved": true,
+    "current_vehicle_price_history_visuals_preserved": true,
+    "gold_forecast_regime_model_visuals_preserved": true,
+    "uranium_unavailable_evidence_semantics_preserved": true,
+    "ascii_safe_user_visible_status_copy": true
+  },
+  "semantic_guardrails": {
+    "do_not_modify_native_recommendation_records": true,
+    "do_not_persist_comparable_status": true,
+    "do_not_recompute_recommendations": true,
+    "do_not_override_buy_with_hold_due_only_to_adjusted_return": true,
+    "do_not_equate_decision_conflict_with_sell": true,
+    "do_not_equate_reference_control_with_buy": true,
+    "do_not_infer_commodity_price_from_vehicle_price": true,
+    "do_not_inherit_vehicle_risk_into_commodity": true,
+    "do_not_inherit_vehicle_tactical_state_into_commodity": true,
+    "do_not_relabel_adjusted_return_as_raw_forecast": true,
+    "do_not_relabel_uncertainty_penalties_as_native_risk": true,
+    "do_not_promote_neutral_timing_to_primary_decision": true
+  },
+  "authorization_boundary": {
+    "runtime_implementation_authorized": true,
+    "normalized_status_persistence_authorized": false,
+    "hosted_publication_write_authorized": false,
+    "analytical_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_refresh_authorized": false,
+    "recommendation_recompute_authorized": false,
+    "network_collection_authorized": false,
+    "csp_cleanup_authorized": false,
+    "pr_authorized": false,
+    "main_deployment_authorized": false,
+    "allocation_or_execution_authorized": false
+  },
+  "authorization_decision": "AUTHORIZE_BOUNDED_METALS_COMPARABLE_USER_FACING_DECISION_LAYER_IMPLEMENTATION",
+  "next_decision": "IMPLEMENT_AND_CERTIFY_METALS_COMPARABLE_USER_FACING_DECISION_LAYER"
+}
