@@ -1,0 +1,143 @@
+{
+  "design_id": "METALS-UNIFIED-DECISION-TERMINAL-REDESIGN-DESIGN-1",
+  "source_governed_head": "293f149b163f0d9e0f9915f17048eed324b8a6cf",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "active_hosted_publication": {
+    "publication_id": "metals-v3-commodity-explanation-r4-20260826",
+    "content_fingerprint": "aa6d2fa0cd575cedaceb8c2a10dd10c19b15c31e59dce35cec7a0199ed69b5d5",
+    "record_count": 12477
+  },
+  "objective": "UNIFY_METALS_DECISION_PRESENTATION_AROUND_ACTIONABLE_EVIDENCE_WITHOUT_FABRICATING_MISSING_AUTHORITY",
+  "current_visual_acceptance": "REJECTED",
+  "problems_to_resolve": {
+    "neutral_tactical_overlay_repetition_wastes_primary_card_space": true,
+    "gold_risk_context_is_visually_inconsistent_with_vehicle_native_risk": true,
+    "vehicle_native_risk_exists_but_is_not_prominent_on_overview_cards": true,
+    "gold_research_is_text_heavy_and_visually_lackluster": true,
+    "silver_visual_shell_is_stronger_but_decision_hierarchy_is_incomplete": true,
+    "recommendation_change_evidence_is_not_a_substitute_for_investment_thesis": true,
+    "raw_vs_adjusted_return_divergence_requires_interpretation": true,
+    "detailed_model_evidence_is_overweighted_in_primary_visual_hierarchy": true
+  },
+  "unified_overview_card_requirements": {
+    "recommendation_primary": true,
+    "domain_score_primary": true,
+    "confidence_primary": true,
+    "long_horizon_expected_return_primary_when_supported": true,
+    "risk_or_risk_context_primary_when_supported": true,
+    "vehicle_current_price_primary_when_supported": true,
+    "neutral_tactical_state_compact_only": true,
+    "supportive_or_defensive_tactical_state_prominent_only_when_present": true,
+    "remove_full_defensive_neutral_supportive_bar_for_no_overlay_cards": true,
+    "commodity_vehicle_semantic_distinction_preserved": true
+  },
+  "tactical_presentation_policy": {
+    "NO_TACTICAL_OVERLAY": {
+      "display": "compact_status",
+      "preferred_copy": "Timing: Neutral - no tactical signal",
+      "large_bar_allowed": false
+    },
+    "TACTICAL_SUPPORTIVE": {
+      "display": "prominent_exception",
+      "preferred_copy": "Timing opportunity - SUPPORTIVE",
+      "large_bar_allowed": true
+    },
+    "TACTICAL_DEFENSIVE": {
+      "display": "prominent_exception",
+      "preferred_copy": "Timing caution - DEFENSIVE",
+      "large_bar_allowed": true
+    },
+    "commodity_records": {
+      "display": "compact_not_applicable",
+      "preferred_copy": "Timing: N/A - vehicle-level policy",
+      "large_bar_allowed": false
+    }
+  },
+  "unified_research_terminal_sections": [
+    "decision_summary",
+    "decision_rationale",
+    "market_or_forecast_visual",
+    "return_outlook",
+    "risk_and_uncertainty",
+    "current_timing",
+    "model_evidence_secondary"
+  ],
+  "decision_summary_requirements": {
+    "same_shell_for_commodity_and_vehicle": true,
+    "recommendation_visible": true,
+    "expected_return_visible_when_supported": true,
+    "risk_visible_when_supported": true,
+    "confidence_visible": true,
+    "timing_compact_when_neutral_or_not_applicable": true
+  },
+  "vehicle_terminal_requirements": {
+    "retain_historical_price_chart": true,
+    "retain_current_price_and_observation_date": true,
+    "retain_momentum_drawdown_and_ma_context": true,
+    "surface_native_typed_risk_near_top": true,
+    "explain_raw_vs_adjusted_return_divergence": true,
+    "recommendation_change_evidence_secondary_only": true,
+    "derive_no_new_native_rationale_field": true,
+    "allow_separately_labeled_presentation_decision_summary_from_existing_certified_evidence": true
+  },
+  "gold_terminal_requirements": {
+    "retain_derived_decision_rationale_semantics": true,
+    "retain_forecast_regime_risk_context_semantics": true,
+    "forecast_path_visual_required": true,
+    "regime_probability_visual_required": true,
+    "model_component_visual_summary_required": true,
+    "raw_component_table_secondary_or_collapsible": true,
+    "must_not_use_vehicle_price_as_commodity_price": true,
+    "must_not_inherit_GLD_IAU_SGOL_risk_or_tactical_state": true,
+    "vehicle_proxy_links_may_be_presented_as_explicitly_separate_context": true
+  },
+  "uranium_requirements": {
+    "missing_commodity_forecast_remains_explicit": true,
+    "missing_commodity_risk_context_remains_explicit": true,
+    "must_not_infer_from_URA_or_URNM": true,
+    "same_terminal_shell_still_required": true
+  },
+  "risk_semantic_policy": {
+    "vehicle_native_risk_label": "Risk level",
+    "gold_derived_risk_label": "Forecast / regime risk context",
+    "derived_risk_must_not_be_presented_as_native_typed_risk": true,
+    "unavailable_risk_must_remain_unavailable": true
+  },
+  "forecast_interpretation_policy": {
+    "raw_and_adjusted_returns_must_remain_distinct": true,
+    "uncertainty_and_downside_penalties_must_not_be_called_risk_scores": true,
+    "large_raw_adjusted_divergence_requires_plain_language_explanation": true,
+    "price_targets_must_not_be_invented_when_point_forecast_is_absent": true
+  },
+  "candidate_runtime_files": [
+    "foundation/production/dashboard_assets/recommendation_ui.js",
+    "foundation/production/dashboard_assets/metals_tactical_ui.js",
+    "foundation/production/dashboard_assets/recommendation_visual.css"
+  ],
+  "acceptance_requirements": {
+    "overview_materially_less_tactical_clutter": true,
+    "native_vehicle_risk_visible_on_vehicle_cards": true,
+    "gold_and_silver_share_same_information_architecture": true,
+    "gold_visually_rich_without_vehicle_evidence_inference": true,
+    "silver_retains_price_history_visual_strength": true,
+    "neutral_tactical_state_does_not_dominate_cards_or_detail_pages": true,
+    "supportive_or_defensive_tactical_state_can_be_promoted_when_present": true,
+    "decision_rationale_more_useful_than_buy_to_buy_change_copy": true,
+    "risk_and_return_divergence_explained_in_plain_language": true,
+    "session_stability_anchor_preserved": true
+  },
+  "boundaries": {
+    "runtime_implementation_authorized": false,
+    "analytical_database_write_authorized": false,
+    "hosted_publication_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_refresh_authorized": false,
+    "network_data_collection_authorized": false,
+    "csp_cleanup_authorized": false,
+    "pull_request_authorized": false,
+    "main_deployment_authorized": false,
+    "allocation_or_execution_authorized": false
+  },
+  "design_decision": "APPROVE_METALS_UNIFIED_DECISION_TERMINAL_REDESIGN_FOR_IMPLEMENTATION_AUTHORIZATION_CONSIDERATION",
+  "next_decision": "AUTHORIZE_BOUNDED_METALS_UNIFIED_DECISION_TERMINAL_IMPLEMENTATION"
+}
