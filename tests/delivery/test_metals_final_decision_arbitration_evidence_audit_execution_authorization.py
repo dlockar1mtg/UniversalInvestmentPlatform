@@ -49,7 +49,7 @@ def test_asset_scope_is_exact() -> None:
 
 def test_execution_behavior_is_read_only_and_complete() -> None:
     behavior = load_config()["required_execution_behavior"]
-    assert len(behavior) == 16
+    assert len(behavior) == 17
     assert all(value is True for value in behavior.values())
     assert behavior["no_final_action_may_be_selected_during_this_audit"] is True
     assert behavior["no_unvalidated_threshold_may_be_created"] is True
