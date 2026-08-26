@@ -67,6 +67,7 @@
   },
   "boundaries": {
     "native_uranium_realized_outcome_derivation_authorized": false,
+    "hosted_read_only_access_authorized": false,
     "local_evidence_artifact_write_authorized": false,
     "historical_backtest_authorized": false,
     "candidate_policy_backtest_authorized": false,
