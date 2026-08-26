@@ -1,0 +1,120 @@
+{
+  "design_id": "METALS-FINAL-DECISION-ARBITRATION-EVIDENCE-AUDIT-DESIGN-1",
+  "source_governed_head": "9a4f009cc7d4080b4ff142c8c67793bd31b51768",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "active_hosted_publication_id": "metals-v3-commodity-explanation-r4-20260826",
+  "active_hosted_publication_fingerprint": "aa6d2fa0cd575cedaceb8c2a10dd10c19b15c31e59dce35cec7a0199ed69b5d5",
+  "active_hosted_record_count": 12477,
+  "source_semantic_audit_id": "METALS-DECISION-SEMANTICS-AUDIT-EXECUTION-1",
+  "certified_semantic_audit_counts": {
+    "asset_count": 12,
+    "safe_primary_status_count": 5,
+    "blocked_primary_status_count": 7,
+    "raw_adjusted_sign_conflict_count": 8,
+    "contradiction_count": 17
+  },
+  "superseded_runtime_authorization": {
+    "authorization_id": "METALS-COMPARABLE-USER-FACING-DECISION-LAYER-IMPLEMENTATION-AUTHORIZATION-1",
+    "head": "9a4f009cc7d4080b4ff142c8c67793bd31b51768",
+    "state": "SUPERSEDED_BY_FINAL_DECISION_REQUIREMENT",
+    "runtime_execution_allowed": false,
+    "reason": "DECISION_CONFLICT is an internal diagnostic state and is not an acceptable final user-facing investment action."
+  },
+  "final_decision_requirement": {
+    "one_final_uip_action_per_investable_asset": true,
+    "internal_evidence_disagreement_may_be_preserved": true,
+    "internal_conflict_must_not_be_final_action": true,
+    "final_action_must_be_evidence_based": true,
+    "final_action_must_be_explainable": true,
+    "final_action_must_be_backtestable_before_production_activation": true,
+    "final_action_must_not_be_invented_from_unvalidated_thresholds": true
+  },
+  "documented_pipeline_facts": {
+    "uncertainty_adjusted_views_precede_decision_support_in_native_data_flow": true,
+    "uncertainty_adjusted_views_are_documented_as_forecast_and_recommendation_evidence": true,
+    "phase_6_1_uses_12_month_raw_forecast_for_signal_mapping": true,
+    "phase_6_1_caps_bullish_action_with_missing_or_nonpositive_linked_raw_forecast_at_watch": true,
+    "uip_adapter_copies_vehicle_recommendation_history_action": true,
+    "uip_adapter_does_not_arbitrate_vehicle_action_against_uncertainty_adjusted_view": true,
+    "uip_owns_canonical_portfolio_integration_and_allocation": true
+  },
+  "required_asset_scope": [
+    "metals:commodity:gold",
+    "metals:commodity:uranium",
+    "metals:vehicle:BIL",
+    "metals:vehicle:COPX",
+    "metals:vehicle:CPER",
+    "metals:vehicle:GLD",
+    "metals:vehicle:IAU",
+    "metals:vehicle:PPLT",
+    "metals:vehicle:SGOL",
+    "metals:vehicle:SIVR",
+    "metals:vehicle:SLV",
+    "metals:vehicle:URA"
+  ],
+  "required_audit_questions": {
+    "identify_exact_native_source_of_vehicle_recommendation_action": true,
+    "identify_exact_formula_and_thresholds_that_create_vehicle_action": true,
+    "identify_exact_raw_expected_return_formula_and_horizon_authority": true,
+    "identify_exact_uncertainty_penalty_formula": true,
+    "identify_exact_downside_penalty_formula": true,
+    "identify_exact_adjusted_expected_return_formula": true,
+    "determine_whether_adjusted_return_is_intended_to_gate_or_modify_native_recommendation": true,
+    "determine_recommendation_and_adjusted_view_run_id_timestamp_alignment": true,
+    "determine_whether_recommendation_is_stale_relative_to_adjusted_view": true,
+    "validate_penalty_ranges_caps_units_and_calibration_semantics": true,
+    "explain_large_positive_to_negative_sign_reversals": true,
+    "determine_whether_native_commodity_opportunity_ranking_consumes_adjusted_view": true,
+    "determine_whether_vehicle_recommendation_path_bypasses_adjusted_decision_support": true,
+    "identify_correct_uip_final_arbitration_architectural_boundary": true,
+    "identify_evidence_precedence_that_is_supported_without_inventing_thresholds": true,
+    "identify_historical_or_backtest_evidence_available_for_final_arbiter_validation": true
+  },
+  "required_outputs": {
+    "pipeline_dependency_graph": true,
+    "formula_threshold_register": true,
+    "twelve_asset_run_id_timestamp_alignment_matrix": true,
+    "penalty_calibration_summary": true,
+    "recommendation_adjusted_integration_finding": true,
+    "candidate_final_action_evidence_hierarchy": true,
+    "backtest_readiness_finding": true,
+    "bounded_next_decision": true
+  },
+  "allowed_integration_findings": [
+    "LEGITIMATE_SEPARATION",
+    "PIPELINE_BYPASS",
+    "STALE_AUTHORITY",
+    "CALIBRATION_DEFECT",
+    "MULTIPLE_CONTRIBUTING_CAUSES",
+    "UNRESOLVED"
+  ],
+  "fail_closed_rules": {
+    "do_not_execute_superseded_decision_conflict_runtime_authorization": true,
+    "do_not_change_user_facing_final_actions_during_audit": true,
+    "do_not_recompute_native_recommendations": true,
+    "do_not_create_final_action_thresholds_during_evidence_audit": true,
+    "do_not_treat_adjusted_return_as_automatically_controlling_without_validation": true,
+    "do_not_discard_native_recommendation_evidence": true,
+    "do_not_relabel_uncertainty_or_downside_penalties_as_native_risk": true,
+    "do_not_promote_tactical_timing_to_final_long_term_action": true,
+    "do_not_infer_commodity_evidence_from_vehicle_proxy": true
+  },
+  "boundaries": {
+    "read_only_audit_execution_authorized": false,
+    "runtime_implementation_authorized": false,
+    "final_action_policy_authorized": false,
+    "final_action_persistence_authorized": false,
+    "recommendation_recompute_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_refresh_authorized": false,
+    "hosted_publication_write_authorized": false,
+    "analytical_database_write_authorized": false,
+    "network_collection_authorized": false,
+    "csp_cleanup_authorized": false,
+    "pr_authorized": false,
+    "main_deployment_authorized": false,
+    "allocation_or_execution_authorized": false
+  },
+  "design_decision": "APPROVE_METALS_FINAL_DECISION_ARBITRATION_EVIDENCE_AUDIT_DESIGN_FOR_READ_ONLY_EXECUTION_AUTHORIZATION_CONSIDERATION",
+  "next_decision": "AUTHORIZE_READ_ONLY_METALS_FINAL_DECISION_ARBITRATION_EVIDENCE_AUDIT"
+}
