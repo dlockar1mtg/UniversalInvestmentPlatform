@@ -10,6 +10,7 @@ PROJECTION_PATH = ROOT / "foundation/presentation/metals_tactical_projection.py"
 EXTENSION_PATH = ROOT / "config/presentation/dash_read_1_metals_tactical_extension.json"
 TACTICAL_UI_PATH = ROOT / "foundation/production/dashboard_assets/metals_tactical_ui.js"
 RECOMMENDATION_UI_PATH = ROOT / "foundation/production/dashboard_assets/recommendation_ui.js"
+VERIFIER_PATH = ROOT / "scripts/verify_metals_tactical_policy_v3_decision_utility_completion_implementation.py"
 
 
 def _implementation() -> dict:
@@ -45,6 +46,28 @@ def test_external_market_authority_is_hash_locked_and_unadjusted() -> None:
     assert 'records.append(_record("metals_current_price"' in projection
     assert 'records.append(_record("metals_price_history"' in projection
     assert 'payload["price_semantics"] = "UNADJUSTED_CLOSE"' in projection
+
+
+def test_projection_field_contract_is_declared_in_extension_and_validated_generically() -> None:
+    projection = PROJECTION_PATH.read_text(encoding="utf-8")
+    extension = json.loads(EXTENSION_PATH.read_text(encoding="utf-8"))
+    external = extension["external_price_package"]
+    assert "current_price_usd" in external["current_price_required_fields"]
+    assert "close_usd" in external["price_history_required_fields"]
+    assert 'current_required = {str(value) for value in external["current_price_required_fields"]}' in projection
+    assert 'history_required = {str(value) for value in external["price_history_required_fields"]}' in projection
+    assert "missing = sorted(current_required - set(row))" in projection
+    assert "missing = sorted(history_required - set(row))" in projection
+
+
+def test_verifier_uses_declared_required_fields_not_payload_literal_search() -> None:
+    source = VERIFIER_PATH.read_text(encoding="utf-8")
+    assert '"current_price_usd" in current_required' in source
+    assert '"close_usd" in history_required' in source
+    assert 'records.append(_record("metals_current_price"' in source
+    assert 'records.append(_record("metals_price_history"' in source
+    assert '"metals_current_price" in projection and "current_price_usd" in projection' not in source
+    assert '"metals_price_history" in projection and "close_usd" in projection' not in source
 
 
 def test_projection_keeps_missing_external_package_non_synthetic() -> None:
