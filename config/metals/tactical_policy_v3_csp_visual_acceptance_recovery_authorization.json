@@ -1,0 +1,54 @@
+{
+  "authorization_id": "METALS-TACTICAL-POLICY-V3-CSP-VISUAL-ACCEPTANCE-RECOVERY-AUTHORIZATION-1",
+  "source_visual_acceptance_result": "FAIL",
+  "source_visual_acceptance_reason": "Metals presentation CSS is dynamically injected from JavaScript while the governed browser runtime enforces style-src self; the result is collapsed card, hero, grid, and chart presentation despite valid hosted data.",
+  "source_governed_head": "2cc7fc1a0fd4f1394daf81d1631b010560e0927b",
+  "source_active_publication_id": "metals-v3-decision-utility-r3-20260826",
+  "source_active_publication_fingerprint": "e5f0bce3eb0181983e990e3de5795867dc53bf41c0d038b0d7302e722434b3ee",
+  "source_active_publication_record_count": 12475,
+  "authorized_runtime_files": [
+    "foundation/production/dashboard_assets/recommendation_visual.css",
+    "foundation/production/dashboard_assets/recommendation_ui.js",
+    "foundation/production/dashboard_assets/metals_tactical_ui.js"
+  ],
+  "required_recovery_behavior": {
+    "move_metals_visual_rules_to_external_recommendation_stylesheet": true,
+    "remove_dynamic_metals_style_element_injection": true,
+    "replace_metals_specific_inline_style_attributes_with_css_classes": true,
+    "restore_three_column_desktop_metals_card_grid": true,
+    "restore_structured_metals_card_kpis_and_tactical_visual_track": true,
+    "restore_structured_metals_research_hero_and_two_column_detail_layout": true,
+    "restore_vehicle_history_chart_presentation": true,
+    "preserve_current_price_and_price_as_of_evidence": true,
+    "preserve_raw_vs_adjusted_return_distinction": true,
+    "preserve_commodity_forecast_and_regime_evidence": true,
+    "demote_commodity_tactical_not_applicable_from_primary_hero_emphasis": true,
+    "reduce_governance_copy_visual_dominance_without_removing_semantic_guardrails": true
+  },
+  "data_and_semantic_invariants": {
+    "active_hosted_publication_unchanged": true,
+    "analytical_database_unchanged": true,
+    "market_data_package_unchanged": true,
+    "recommendation_semantics_unchanged": true,
+    "forecast_semantics_unchanged": true,
+    "tactical_semantics_unchanged": true,
+    "risk_semantics_unchanged": true,
+    "bil_remains_reference_control_only": true,
+    "commodity_price_not_inferred_from_vehicle_data": true,
+    "unsupported_forecast_bounds_not_synthesized": true,
+    "unsupported_rationale_not_fabricated": true
+  },
+  "authorization_boundary": {
+    "csp_visual_recovery_authorized": true,
+    "hosted_publication_write_authorized": false,
+    "analytical_database_write_authorized": false,
+    "market_data_refresh_authorized": false,
+    "model_refresh_authorized": false,
+    "forecast_refresh_authorized": false,
+    "main_deployment_authorized": false,
+    "pull_request_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "authorization_decision": "AUTHORIZE_BOUNDED_CSP_COMPATIBLE_METALS_VISUAL_ACCEPTANCE_RECOVERY",
+  "next_decision": "IMPLEMENT_AND_CERTIFY_CSP_COMPATIBLE_METALS_VISUAL_ACCEPTANCE_RECOVERY"
+}
