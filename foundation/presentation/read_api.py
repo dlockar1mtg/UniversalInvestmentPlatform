@@ -197,6 +197,10 @@ class PresentationReadRepository:
             "recommendation",
             [],
         )
+        native_authority_records = records.get(
+            "native_authority",
+            [],
+        )
         forecast_records = records.get(
             "forecast",
             [],
@@ -215,6 +219,9 @@ class PresentationReadRepository:
         assets = payloads(asset_records)
         recommendations = payloads(
             recommendation_records
+        )
+        native_authorities = payloads(
+            native_authority_records
         )
         forecasts = payloads(forecast_records)
         risks = payloads(risk_records)
@@ -235,8 +242,8 @@ class PresentationReadRepository:
 
         native_authority: dict[str, object] = {}
 
-        if recommendations:
-            native_authority = recommendations[0]
+        if native_authorities:
+            native_authority = native_authorities[0]
 
         native_rank = native_authority.get(
             "native_rank"
@@ -255,18 +262,65 @@ class PresentationReadRepository:
             )
         )
 
-        execution_ready = bool(
-            native_authority.get(
-                "execution_ready_purchase_certified",
-                False,
+        def strict_boolean(
+            value: object,
+            *,
+            field_name: str,
+        ) -> bool:
+            if value is None:
+                return False
+
+            if isinstance(value, bool):
+                return value
+
+            if (
+                isinstance(value, int)
+                and not isinstance(value, bool)
+                and value in (0, 1)
+            ):
+                return bool(value)
+
+            if isinstance(value, str):
+                normalized = value.strip().lower()
+
+                if normalized in {
+                    "true",
+                    "yes",
+                    "y",
+                    "1",
+                }:
+                    return True
+
+                if normalized in {
+                    "false",
+                    "no",
+                    "n",
+                    "0",
+                    "",
+                }:
+                    return False
+
+            raise ValueError(
+                "Unsupported MTG boolean authority value "
+                f"for {field_name}: {value!r}"
             )
+
+        execution_ready = strict_boolean(
+            native_authority.get(
+                "execution_ready_purchase_certified"
+            ),
+            field_name=(
+                "execution_ready_purchase_certified"
+            ),
         )
 
-        automatic_execution = bool(
+        automatic_execution = strict_boolean(
             native_authority.get(
-                "automatic_purchase_execution",
-                False,
-            )
+                "automatic_purchase_execution"
+            ),
+            field_name=(
+                "automatic_purchase_execution"
+            ),
         )
 
         if automatic_execution:
@@ -360,6 +414,12 @@ class PresentationReadRepository:
                 "automatic_purchase_execution": False,
             },
             "authority_availability": {
+                "native_authority_record_count": len(
+                    native_authorities
+                ),
+                "recommendation_record_count": len(
+                    recommendations
+                ),
                 "forecast_record_count": len(
                     forecasts
                 ),
@@ -372,6 +432,7 @@ class PresentationReadRepository:
             "forecasts": forecasts,
             "risk_metrics": risks,
             "recommendations": recommendations,
+            "native_authorities": native_authorities,
             "presentation_semantics": {
                 "cross_domain_rank_created": False,
                 "universal_mtg_rank_created": False,

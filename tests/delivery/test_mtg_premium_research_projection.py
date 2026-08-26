@@ -1,4 +1,4 @@
-﻿from __future__ import annotations
+from __future__ import annotations
 
 from contextlib import contextmanager
 from dataclasses import dataclass
@@ -123,8 +123,8 @@ def test_secret_lair_full_research_projection_preserves_native_semantics():
                 },
             ),
             (
-                "recommendation",
-                "recommendation",
+                "native_authority",
+                "native_authority",
                 {
                     "native_rank": 4,
                     "native_rank_type": "COMPETITION_RANK",
@@ -135,6 +135,14 @@ def test_secret_lair_full_research_projection_preserves_native_semantics():
                     "manual_execution_price_check_required": True,
                     "execution_ready_purchase_certified": False,
                     "automatic_purchase_execution": False,
+                },
+            ),
+            (
+                "recommendation",
+                "recommendation",
+                {
+                    "evidence_state": "CERTIFIED",
+                    "actionability_state": "ACTIONABLE",
                 },
             ),
         ]
@@ -202,13 +210,18 @@ def test_secret_lair_partial_research_does_not_synthesize_rank():
                 },
             ),
             (
-                "recommendation",
-                "recommendation",
+                "native_authority",
+                "native_authority",
                 {
                     "native_rank": None,
                     "native_purchase_status": None,
                     "automatic_purchase_execution": False,
                 },
+            ),
+            (
+                "recommendation",
+                "recommendation",
+                {},
             ),
         ]
     })
@@ -251,12 +264,17 @@ def test_precollector_is_fail_closed_for_premium_promotion():
                 },
             ),
             (
-                "recommendation",
-                "recommendation",
+                "native_authority",
+                "native_authority",
                 {
                     "native_purchase_status": "WATCH",
                     "automatic_purchase_execution": False,
                 },
+            ),
+            (
+                "recommendation",
+                "recommendation",
+                {},
             ),
         ]
     })
@@ -298,14 +316,19 @@ def test_collector_core_exposes_native_core_but_not_rank_bridge():
                 },
             ),
             (
-                "recommendation",
-                "recommendation",
+                "native_authority",
+                "native_authority",
                 {
                     "native_purchase_status": "PURCHASE_CANDIDATE",
                     "purchase_semantic": "NATIVE_COLLECTOR_PURCHASE",
                     "native_rank": None,
                     "automatic_purchase_execution": False,
                 },
+            ),
+            (
+                "recommendation",
+                "recommendation",
+                {},
             ),
         ]
     })
@@ -344,11 +367,16 @@ def test_projection_rejects_automatic_purchase_execution():
                 },
             ),
             (
-                "recommendation",
-                "recommendation",
+                "native_authority",
+                "native_authority",
                 {
                     "automatic_purchase_execution": True
                 },
+            ),
+            (
+                "recommendation",
+                "recommendation",
+                {},
             ),
         ]
     })
@@ -391,13 +419,18 @@ def test_authenticated_mtg_research_endpoint():
                 },
             ),
             (
-                "recommendation",
-                "recommendation",
+                "native_authority",
+                "native_authority",
                 {
                     "native_rank": 7,
                     "native_purchase_status": "WAIT_FOR_Q10_ENTRY",
                     "automatic_purchase_execution": False,
                 },
+            ),
+            (
+                "recommendation",
+                "recommendation",
+                {},
             ),
         ]
     }
@@ -466,3 +499,273 @@ def test_mtg_research_endpoint_returns_404_for_missing_asset():
     )
 
     assert response.status_code == 404
+
+
+def test_mtg_projection_uses_explicit_native_authority_record():
+    repo = repository({
+        ("mtg", "collector-example"): [
+            (
+                "asset",
+                "asset",
+                {
+                    "asset_name": "Example Collector",
+                    "mtg_lane": "COLLECTOR_V1",
+                    "current_price_usd": 100.0,
+                },
+            ),
+            (
+                "recommendation",
+                "recommendation",
+                {
+                    "evidence_state": "RANKING_ELIGIBLE_WITH_LIMITATIONS",
+                    "actionability_state": "STRONG_PURCHASE_CANDIDATE",
+                },
+            ),
+            (
+                "native_authority",
+                "native_authority",
+                {
+                    "native_purchase_status": "STRONG_PURCHASE_CANDIDATE",
+                    "native_rank": 3,
+                    "native_rank_type": "COLLECTOR_FINAL_GOVERNED_RANK",
+                    "purchase_semantic": "NATIVE_COLLECTOR_PURCHASE_STATUS",
+                    "manual_execution_price_check_required": True,
+                    "execution_ready_purchase_certified": False,
+                    "automatic_purchase_execution": False,
+                    "evidence_state": "RANKING_ELIGIBLE_WITH_LIMITATIONS",
+                    "actionability_state": "STRONG_PURCHASE_CANDIDATE",
+                },
+            ),
+            (
+                "forecast",
+                "forecast",
+                {
+                    "forecast_horizon_months": 12,
+                    "forecast_1y_price_usd": 150.0,
+                    "forecast_1y_return": 0.5,
+                    "point_forecast": 150.0,
+                    "expected_return": 0.5,
+                },
+            ),
+        ]
+    })
+
+    result = repo.mtg_premium_research(
+        "collector-example"
+    )
+
+    assert result is not None
+
+    authority = result["native_authority"]
+
+    assert authority["native_rank"] == 3
+    assert (
+        authority["native_purchase_status"]
+        == "STRONG_PURCHASE_CANDIDATE"
+    )
+
+    availability = result["authority_availability"]
+
+    assert (
+        availability["native_authority_record_count"]
+        == 1
+    )
+    assert (
+        availability["recommendation_record_count"]
+        == 1
+    )
+    assert availability["forecast_record_count"] == 1
+
+    assert len(result["native_authorities"]) == 1
+    assert len(result["recommendations"]) == 1
+    assert len(result["forecasts"]) == 1
+
+
+def test_recommendation_payload_cannot_impersonate_native_authority():
+    repo = repository({
+        ("mtg", "collector-no-native-authority"): [
+            (
+                "asset",
+                "asset",
+                {
+                    "asset_name": "Example Collector",
+                    "mtg_lane": "COLLECTOR_V1",
+                },
+            ),
+            (
+                "recommendation",
+                "recommendation",
+                {
+                    "native_purchase_status": "SHOULD_NOT_BE_USED",
+                    "native_rank": 999,
+                },
+            ),
+        ]
+    })
+
+    result = repo.mtg_premium_research(
+        "collector-no-native-authority"
+    )
+
+    assert result is not None
+
+    authority = result["native_authority"]
+
+    assert authority["native_rank"] is None
+    assert authority["native_purchase_status"] is None
+
+    availability = result["authority_availability"]
+
+    assert (
+        availability["native_authority_record_count"]
+        == 0
+    )
+    assert (
+        availability["native_rank_state"]
+        == "MISSING"
+    )
+    assert (
+        availability["native_purchase_state"]
+        == "MISSING"
+    )
+
+
+def test_string_false_execution_values_are_fail_safe():
+    repo = repository({
+        ("mtg", "bool-false"): [
+            (
+                "asset",
+                "asset",
+                {
+                    "mtg_lane": "SECRET_LAIR_V1_1",
+                },
+            ),
+            (
+                "native_authority",
+                "native_authority",
+                {
+                    "native_rank": 1,
+                    "native_purchase_status": "BUY_CANDIDATE_NOW",
+                    "execution_ready_purchase_certified": "NO",
+                    "automatic_purchase_execution": "false",
+                },
+            ),
+            (
+                "recommendation",
+                "recommendation",
+                {},
+            ),
+        ]
+    })
+
+    result = repo.mtg_premium_research(
+        "bool-false"
+    )
+
+    assert result is not None
+
+    authority = result["native_authority"]
+
+    assert (
+        authority["execution_ready_purchase_certified"]
+        is False
+    )
+    assert (
+        authority["automatic_purchase_execution"]
+        is False
+    )
+
+
+def test_string_true_automatic_execution_is_rejected():
+    for raw_value in (
+        "YES",
+        "true",
+        "1",
+    ):
+        repo = repository({
+            ("mtg", f"bool-true-{raw_value}"): [
+                (
+                    "asset",
+                    "asset",
+                    {
+                        "mtg_lane": "SECRET_LAIR_V1_1",
+                    },
+                ),
+                (
+                    "native_authority",
+                    "native_authority",
+                    {
+                        "automatic_purchase_execution": raw_value,
+                    },
+                ),
+                (
+                    "recommendation",
+                    "recommendation",
+                    {},
+                ),
+            ]
+        })
+
+        try:
+            repo.mtg_premium_research(
+                f"bool-true-{raw_value}"
+            )
+        except ValueError as exc:
+            assert (
+                "automatic purchase execution"
+                in str(exc).lower()
+            )
+        else:
+            raise AssertionError(
+                "Expected automatic execution rejection "
+                f"for value {raw_value!r}."
+            )
+
+
+def test_unknown_boolean_authority_value_fails_closed():
+    repo = repository({
+        ("mtg", "bool-unknown"): [
+            (
+                "asset",
+                "asset",
+                {
+                    "mtg_lane": "COLLECTOR_V1",
+                },
+            ),
+            (
+                "native_authority",
+                "native_authority",
+                {
+                    "execution_ready_purchase_certified": "MAYBE",
+                    "automatic_purchase_execution": False,
+                },
+            ),
+            (
+                "recommendation",
+                "recommendation",
+                {},
+            ),
+        ]
+    })
+
+    try:
+        repo.mtg_premium_research(
+            "bool-unknown"
+        )
+    except ValueError as exc:
+        message = str(exc).lower()
+
+        assert (
+            "unsupported mtg boolean authority value"
+            in message
+        )
+        assert (
+            "execution_ready_purchase_certified"
+            in message
+        )
+    else:
+        raise AssertionError(
+            "Expected unsupported boolean authority "
+            "value to fail closed."
+        )
+
