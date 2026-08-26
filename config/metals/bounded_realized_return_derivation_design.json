@@ -1,0 +1,79 @@
+{
+  "design_id": "METALS-BOUNDED-REALIZED-RETURN-DERIVATION-DESIGN-1",
+  "source_governed_head": "0baa85e6c1a7ade3f9f8d7ea7c880e51e6a7552b",
+  "source_readiness_audit_id": "METALS-FINAL-DECISION-HISTORICAL-VALIDATION-READINESS-RECOVERY-AUDIT-1",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "certified_readiness_findings": {
+    "readiness_finding": "READY_AFTER_REALIZED_RETURN_DERIVATION",
+    "historical_surface_count": 61,
+    "historical_recommendation_present": true,
+    "historical_forecast_present": true,
+    "historical_adjusted_view_present": true,
+    "certified_price_history_present": true,
+    "existing_realized_outcome_present": false,
+    "joinability_row_count": 48,
+    "joinable_asset_horizon_row_count": 48,
+    "history_join_recovery_row_count": 0,
+    "realized_return_derivation_required": true,
+    "consumed_holdout_evidence_present": true
+  },
+  "derivation_objective": "DERIVE_A_BOUNDED_LOCAL_REALIZED_RETURN_EVIDENCE_SURFACE_FROM_CERTIFIED_UNADJUSTED_PRICE_HISTORY_FOR_JOINABLE_HISTORICAL_DECISION_AND_FORECAST_ROWS_WITHOUT_LOOKAHEAD_LEAKAGE_OR_REUSE_OF_CONSUMED_VALIDATION_INTERVALS",
+  "required_method": {
+    "anchor_to_historical_as_of_date": true,
+    "same_asset_required": true,
+    "same_horizon_required": true,
+    "price_field_must_be_unadjusted_close": true,
+    "future_price_must_be_first_governed_observation_at_or_after_target_horizon_end_date": true,
+    "realized_return_formula_must_equal_future_close_divided_by_as_of_close_minus_one": true,
+    "no_future_information_may_enter_decision_features": true,
+    "commodity_vehicle_proxy_inference_prohibited": true,
+    "bil_must_remain_reference_control_only": true,
+    "source_run_id_and_as_of_lineage_required": true,
+    "source_price_date_and_future_price_date_required": true,
+    "missing_future_price_must_fail_closed_for_that_row": true
+  },
+  "required_scope": {
+    "target_horizons_months": [3, 6, 12, 24],
+    "commodity_assets": ["gold", "uranium"],
+    "vehicle_assets": ["COPX", "CPER", "GLD", "IAU", "PPLT", "SGOL", "SIVR", "SLV", "URA"],
+    "reference_control_assets": ["BIL"],
+    "expected_joinability_rows": 48
+  },
+  "consumed_holdout_rules": {
+    "previously_consumed_holdouts_must_not_be_reused_for_tuning": true,
+    "previously_consumed_holdouts_must_not_be_reclassified_as_fresh_holdout": true,
+    "derivation_may_create_outcomes_for_consumed_dates_as_historical_evidence_only": true,
+    "future_policy_thresholds_must_be_locked_before_any_new_holdout": true,
+    "new_holdout_consumption_not_authorized_by_this_design": true
+  },
+  "required_outputs": {
+    "realized_return_rows_csv": true,
+    "realized_return_rows_json": true,
+    "derivation_lineage_json": true,
+    "coverage_summary_json": true,
+    "missing_future_price_register_json": true,
+    "consumed_interval_annotation_json": true,
+    "derivation_summary_json": true
+  },
+  "boundaries": {
+    "realized_return_derivation_execution_authorized": false,
+    "local_evidence_artifact_write_authorized": false,
+    "historical_validation_execution_authorized": false,
+    "candidate_policy_backtest_authorized": false,
+    "final_action_policy_authorized": false,
+    "final_action_selection_authorized": false,
+    "final_action_persistence_authorized": false,
+    "recommendation_recompute_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_refresh_authorized": false,
+    "database_write_authorized": false,
+    "hosted_write_authorized": false,
+    "runtime_change_authorized": false,
+    "network_collection_authorized": false,
+    "pr_authorized": false,
+    "main_deploy_authorized": false,
+    "allocation_or_execution_authorized": false
+  },
+  "design_decision": "APPROVE_BOUNDED_METALS_REALIZED_RETURN_DERIVATION_DESIGN_FOR_EXECUTION_AUTHORIZATION_CONSIDERATION",
+  "next_decision": "AUTHORIZE_BOUNDED_METALS_REALIZED_RETURN_DERIVATION"
+}
