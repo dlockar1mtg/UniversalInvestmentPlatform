@@ -1,0 +1,55 @@
+{
+  "authorization_id": "METALS-r4-PRESENTATION-HIERARCHY-RECOVERY-IMPLEMENTATION-AUTHORIZATION-1",
+  "source_design_id": "METALS-r4-PRESENTATION-HIERARCHY-RECOVERY-DESIGN-1",
+  "source_design_head": "b5ba7586a341dd75f5f335c28cf4fd75fc2f597d",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "active_hosted_publication": {
+    "publication_id": "metals-v3-commodity-explanation-r4-20260826",
+    "content_fingerprint": "aa6d2fa0cd575cedaceb8c2a10dd10c19b15c31e59dce35cec7a0199ed69b5d5",
+    "record_count": 12477
+  },
+  "authorized_runtime_files": [
+    "foundation/production/dashboard_assets/recommendation_ui.js",
+    "foundation/production/dashboard_assets/metals_tactical_ui.js",
+    "foundation/production/dashboard_assets/recommendation_visual.css"
+  ],
+  "required_implementation_behavior": {
+    "gold_hero_derived_thesis_primary": true,
+    "gold_hero_risk_context_primary": true,
+    "gold_high_vol_stress_probability_visible_near_primary_risk_context": true,
+    "gold_why_recommendation_derived_rationale_primary": true,
+    "gold_native_rationale_absence_secondary_disclosure": true,
+    "gold_risk_summary_uses_forecast_regime_context": true,
+    "gold_native_risk_absence_secondary_disclosure": true,
+    "gold_risk_assessment_leads_with_derived_context": true,
+    "gold_overview_card_surfaces_risk_context": true,
+    "gold_secondary_table_surfaces_derived_rationale_and_risk_context": true,
+    "uranium_unavailable_state_preserved": true,
+    "uranium_no_ura_urnm_inference": true,
+    "existing_vehicle_cards_preserved": true,
+    "existing_vehicle_detail_semantics_preserved": true,
+    "session_stability_anchor_preserved": true
+  },
+  "semantic_guardrails": {
+    "derived_rationale_must_not_be_represented_as_native_rationale": true,
+    "forecast_regime_risk_context_must_not_be_represented_as_native_typed_risk": true,
+    "gold_native_rationale_field_must_not_be_mutated": true,
+    "gold_native_risk_summary_field_must_not_be_mutated": true,
+    "gold_typed_risk_record_must_not_be_fabricated": true,
+    "gld_risk_must_not_be_inherited_by_gold": true,
+    "ura_or_urnm_evidence_must_not_be_inherited_by_uranium": true,
+    "hosted_r4_data_must_not_be_republished": true
+  },
+  "authorization_boundary": {
+    "runtime_implementation_authorized": true,
+    "hosted_publication_write_authorized": false,
+    "analytical_database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_refresh_authorized": false,
+    "csp_cleanup_authorized": false,
+    "pr_authorized": false,
+    "main_deployment_authorized": false
+  },
+  "authorization_decision": "AUTHORIZE_BOUNDED_METALS_r4_PRESENTATION_HIERARCHY_RECOVERY_IMPLEMENTATION",
+  "next_decision": "IMPLEMENT_AND_CERTIFY_METALS_r4_PRESENTATION_HIERARCHY_RECOVERY"
+}
