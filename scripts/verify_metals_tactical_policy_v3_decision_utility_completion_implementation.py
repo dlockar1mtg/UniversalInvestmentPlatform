@@ -22,6 +22,28 @@ def main() -> None:
     behavior = implementation.get("implemented_behavior") or {}
     guardrails = implementation.get("semantic_guardrails") or {}
     boundaries = implementation.get("boundaries") or {}
+    external = extension.get("external_price_package") or {}
+    current_required = set(external.get("current_price_required_fields") or [])
+    history_required = set(external.get("price_history_required_fields") or [])
+
+    current_projection_contract = all(
+        (
+            "current_price_usd" in current_required,
+            "asset_id" in current_required,
+            "observation_date" in current_required,
+            'current_required = {str(value) for value in external["current_price_required_fields"]}' in projection,
+            'records.append(_record("metals_current_price"' in projection,
+        )
+    )
+    history_projection_contract = all(
+        (
+            "close_usd" in history_required,
+            "asset_id" in history_required,
+            "observation_date" in history_required,
+            'history_required = {str(value) for value in external["price_history_required_fields"]}' in projection,
+            'records.append(_record("metals_price_history"' in projection,
+        )
+    )
 
     result = {
         "status": "PASS",
@@ -29,8 +51,8 @@ def main() -> None:
         "implementation_id": implementation.get("implementation_id"),
         "runtime_file_count": len(runtime_files),
         "shared_recommendation_ui_unchanged_by_design": implementation.get("authorized_file_deliberately_unchanged") == "foundation/production/dashboard_assets/recommendation_ui.js",
-        "current_price_projection_present": "metals_current_price" in projection and "current_price_usd" in projection,
-        "price_history_projection_present": "metals_price_history" in projection and "close_usd" in projection,
+        "current_price_projection_present": current_projection_contract,
+        "price_history_projection_present": history_projection_contract,
         "external_hash_lock_present": "EXPECTED_CURRENT_PRICE_SHA256" in projection and "EXPECTED_PRICE_HISTORY_SHA256" in projection and "EXPECTED_MANIFEST_SHA256" in projection,
         "unadjusted_close_locked": extension.get("external_price_package", {}).get("price_semantics") == "UNADJUSTED_CLOSE" and "UNADJUSTED_CLOSE" in tactical_ui,
         "current_price_ui_present": "Current price" in tactical_ui and "Price as of" in tactical_ui,
