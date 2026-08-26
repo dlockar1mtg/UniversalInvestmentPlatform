@@ -1,0 +1,100 @@
+{
+  "design_id": "METALS-DECISION-SEMANTICS-AUDIT-DESIGN-1",
+  "source_governed_head": "6fdc0a38fda452d291b74da62d96b41703d99f52",
+  "current_visual_acceptance": "REJECTED",
+  "objective": "ESTABLISH_ONE_GOVERNED_USER_FACING_DECISION_SEMANTIC_FOR_EACH_METALS_ASSET_BEFORE_FURTHER_UI_CHANGES",
+  "authoritative_semantic_layers": {
+    "native_recommendation": "Literal recommendation/action emitted by the certified Metals source authority; preserved for auditability and not assumed comparable across commodity and vehicle record types.",
+    "uip_normalized_decision": "User-facing comparable decision derived only through an already-governed mapping or a separately authorized deterministic mapping.",
+    "forecast_authority": "Certified raw expected-return evidence and forecast horizon.",
+    "uncertainty_adjusted_forecast": "Separately typed vehicle uncertainty-adjusted return evidence; not interchangeable with the native recommendation.",
+    "risk_authority": "Native typed vehicle risk where present, or separately typed commodity forecast/regime risk context where authorized; semantics must remain distinct.",
+    "timing_state": "Bounded tactical interpretation only; supportive, neutral/no-overlay, defensive, unavailable, or not-applicable; never the primary long-term decision."
+  },
+  "required_asset_scope": [
+    "metals:commodity:gold",
+    "metals:commodity:uranium",
+    "metals:vehicle:BIL",
+    "metals:vehicle:COPX",
+    "metals:vehicle:CPER",
+    "metals:vehicle:GLD",
+    "metals:vehicle:IAU",
+    "metals:vehicle:PPLT",
+    "metals:vehicle:SGOL",
+    "metals:vehicle:SIVR",
+    "metals:vehicle:SLV",
+    "metals:vehicle:URA"
+  ],
+  "required_audit_columns": [
+    "asset_id",
+    "asset_kind",
+    "native_recommendation",
+    "native_recommendation_semantics",
+    "uip_normalized_decision",
+    "uip_normalization_authority",
+    "raw_forecast_horizon_months",
+    "raw_expected_return",
+    "uncertainty_adjusted_horizon_months",
+    "uncertainty_adjusted_expected_return",
+    "forecast_conflict_state",
+    "risk_semantic_type",
+    "risk_value",
+    "timing_state",
+    "decision_consistency_state",
+    "user_facing_primary_status_authorized",
+    "user_facing_explanation_required"
+  ],
+  "governed_existing_normalization": {
+    "ranked_opportunity_mapping": {
+      "score_gte_75_and_positive_expected_return": "STRONG_BUY",
+      "score_gte_60_and_positive_expected_return": "BUY",
+      "score_gte_50": "WATCH",
+      "otherwise": "HOLD"
+    },
+    "bullish_native_action_nonpositive_or_missing_forecast_cap": "WATCH",
+    "source": "docs/phase_6/PHASE_6_1_CERTIFIED_METALS_DOMAIN_ADAPTER.md"
+  },
+  "audit_questions": {
+    "ranked_opportunity_vs_buy_hold": true,
+    "reserve_buy_semantics": true,
+    "vehicle_buy_vs_negative_adjusted_return": true,
+    "commodity_vs_vehicle_risk_semantics": true,
+    "commodity_vs_vehicle_forecast_semantics": true,
+    "neutral_tactical_display_semantics": true,
+    "stale_or_differently_scoped_native_recommendation_possible": true,
+    "whether_existing_phase_6_normalized_signal_is_available_in_current_presentation_authority": true,
+    "whether_primary_user_facing_status_can_be_derived_without_new_model_or_database_write": true
+  },
+  "fail_closed_rules": {
+    "do_not_equate_ranked_opportunity_with_buy_without_governed_mapping": true,
+    "do_not_equate_raw_and_adjusted_forecast": true,
+    "do_not_override_native_recommendation_due_only_to_adjusted_return_without_authority": true,
+    "do_not_infer_uranium_commodity_decision_from_URA_or_URNM": true,
+    "do_not_inherit_vehicle_risk_into_commodity": true,
+    "do_not_promote_neutral_timing_to_primary_decision": true,
+    "do_not_change_user_facing_badges_until_audit_is_certified": true
+  },
+  "required_outputs": {
+    "row_level_semantic_matrix": true,
+    "status_taxonomy_findings": true,
+    "forecast_conflict_findings": true,
+    "risk_semantic_findings": true,
+    "timing_semantic_findings": true,
+    "presentation_authority_gap_findings": true,
+    "bounded_next_decision": true
+  },
+  "boundaries": {
+    "runtime_implementation_authorized": false,
+    "hosted_write_authorized": false,
+    "database_write_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_refresh_authorized": false,
+    "recommendation_recompute_authorized": false,
+    "csp_cleanup_authorized": false,
+    "pr_authorized": false,
+    "main_deploy_authorized": false,
+    "allocation_or_execution_authorized": false
+  },
+  "design_decision": "APPROVE_METALS_DECISION_SEMANTICS_AUDIT_DESIGN_FOR_READ_ONLY_EXECUTION_AUTHORIZATION_CONSIDERATION",
+  "next_decision": "AUTHORIZE_READ_ONLY_METALS_DECISION_SEMANTICS_AUDIT"
+}
