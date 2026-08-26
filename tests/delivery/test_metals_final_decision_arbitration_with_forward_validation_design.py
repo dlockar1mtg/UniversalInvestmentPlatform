@@ -76,8 +76,10 @@ def test_no_new_numeric_thresholds_or_uranium_overreach():
 
 def test_tactical_and_risk_do_not_become_ungoverned_action_overrides():
     d = load_design()
-    assert "may not change" in d["arbitration_policy"]["risk_rule"].lower()
-    assert "may not change" in d["arbitration_policy"]["tactical_rule"].lower()
+    risk_rule = d["arbitration_policy"]["risk_rule"].lower().replace("_", " ")
+    tactical_rule = d["arbitration_policy"]["tactical_rule"].lower().replace("_", " ")
+    assert "may not change" in risk_rule
+    assert "may not change" in tactical_rule
 
 
 def test_forward_validation_contract_all_true():
