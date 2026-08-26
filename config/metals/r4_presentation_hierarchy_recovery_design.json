@@ -1,0 +1,75 @@
+{
+  "design_id": "METALS-r4-PRESENTATION-HIERARCHY-RECOVERY-DESIGN-1",
+  "design_status": "APPROVED_FOR_IMPLEMENTATION_AUTHORIZATION_CONSIDERATION",
+  "source_governed_head": "84241cf16c452c58e35e64cbcb811057d11ec060",
+  "active_hosted_publication": {
+    "publication_id": "metals-v3-commodity-explanation-r4-20260826",
+    "content_fingerprint": "aa6d2fa0cd575cedaceb8c2a10dd10c19b15c31e59dce35cec7a0199ed69b5d5",
+    "record_count": 12477,
+    "status": "ACTIVE"
+  },
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "problem_statement": "Hosted r4 contains the certified Gold commodity decision explanation, but the Recommendations UI still gives primary visual priority to absent native rationale and native typed risk fields. The result is materially similar to the rejected r3 presentation even though the new authority is present.",
+  "recovery_objective": "Promote the existing hosted r4 Gold commodity decision explanation into the primary recommendation and risk presentation hierarchy without changing analytical authority, hosted publication content, native fields, forecast/model evidence, or Uranium semantics.",
+  "gold_required_primary_surfaces": {
+    "hero_summary": "Lead with a concise derived Gold thesis from metals_commodity_decision_explanation instead of the missing-native-rationale sentence.",
+    "hero_risk_context": "Display Forecast / regime risk context and ELEVATED prominently, with High Vol Stress 65.0% available as nearby context.",
+    "why_this_recommendation": "Use Derived decision rationale as the primary rationale content; native rationale absence becomes a subordinate disclosure.",
+    "risk_summary": "Use the available forecast/regime risk explanation as the primary risk-context content; native risk-summary absence becomes a subordinate disclosure.",
+    "risk_assessment": "Lead with ELEVATED forecast/regime risk context and its governed explanation before disclosing that no native typed asset-risk record exists.",
+    "overview_card": "Surface Gold forecast/regime risk context on the featured Gold card.",
+    "secondary_table": "Represent Gold derived rationale availability and ELEVATED forecast/regime risk context instead of dash/dash while preserving semantic labeling or disclosure."
+  },
+  "gold_semantic_guardrails": {
+    "derived_rationale_must_remain_labeled_derived": true,
+    "forecast_regime_risk_context_must_not_be_relabelled_native_risk": true,
+    "native_rationale_must_not_be_mutated_or_fabricated": true,
+    "native_risk_summary_must_not_be_mutated_or_fabricated": true,
+    "risk_metrics_current_must_not_be_populated_or_implied_populated": true,
+    "gld_risk_must_not_be_inherited_by_gold": true,
+    "vehicle_tactical_metrics_must_not_be_inferred_into_gold": true,
+    "gold_forecast_model_regime_evidence_must_remain_source_authority": true
+  },
+  "uranium_required_behavior": {
+    "derived_rationale_must_remain_unavailable": true,
+    "forecast_regime_risk_context_must_remain_unavailable": true,
+    "ura_urnm_evidence_must_not_be_inherited": true,
+    "overview_and_detail_must_explain_unavailability_without_fabrication": true
+  },
+  "visual_hierarchy_requirements": {
+    "absence_disclosures_must_not_be_primary_headlines_when_derived_gold_authority_is_available": true,
+    "supporting_context_block_may_remain_for_auditability_but_must_not_be_the_only_place_new_authority_is_visible": true,
+    "overview_and_detail_must_visibly_differ_from_rejected_r4_visual_acceptance": true,
+    "existing_polished_metals_visual_language_must_be_preserved": true,
+    "no_new_generic_no_data_state_for_gold": true
+  },
+  "candidate_runtime_files": [
+    "foundation/production/dashboard_assets/recommendation_ui.js",
+    "foundation/production/dashboard_assets/metals_tactical_ui.js",
+    "foundation/production/dashboard_assets/recommendation_visual.css"
+  ],
+  "boundaries": {
+    "runtime_implementation_authorized": false,
+    "hosted_publication_write_authorized": false,
+    "analytical_database_write_authorized": false,
+    "model_or_forecast_refresh_authorized": false,
+    "main_deployment_authorized": false,
+    "pull_request_authorized": false,
+    "csp_cleanup_authorized_by_this_design": false
+  },
+  "acceptance_requirements": {
+    "gold_hero_missing_rationale_sentence_not_primary": true,
+    "gold_hero_elevated_risk_context_visible": true,
+    "gold_why_recommendation_derived_rationale_primary": true,
+    "gold_risk_summary_derived_context_primary": true,
+    "gold_risk_assessment_elevated_context_primary": true,
+    "gold_overview_card_risk_context_visible": true,
+    "gold_secondary_table_no_longer_dash_dash": true,
+    "uranium_semantics_unchanged": true,
+    "hosted_r4_unchanged": true,
+    "analytical_database_unchanged": true,
+    "session_stability_preserved": true
+  },
+  "design_decision": "APPROVE_METALS_r4_PRESENTATION_HIERARCHY_RECOVERY_DESIGN_FOR_IMPLEMENTATION_AUTHORIZATION_CONSIDERATION",
+  "next_decision": "AUTHORIZE_BOUNDED_METALS_r4_PRESENTATION_HIERARCHY_RECOVERY_IMPLEMENTATION"
+}
