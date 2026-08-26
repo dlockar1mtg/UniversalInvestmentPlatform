@@ -1,0 +1,71 @@
+{
+  "authorization_id": "METALS-POINT-IN-TIME-HISTORICAL-RECONSTRUCTION-EXECUTION-AUTHORIZATION-1",
+  "source_design_id": "METALS-POINT-IN-TIME-HISTORICAL-RECONSTRUCTION-DESIGN-1",
+  "source_design_head": "c03eb42e42a295fcbcf9155c6e3fd5aee8c54987",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "authorized_scope": {
+    "candidate_cutoffs": [
+      "2024-12-31",
+      "2025-01-31",
+      "2025-02-28",
+      "2025-03-31",
+      "2025-04-30",
+      "2025-05-31",
+      "2025-06-30",
+      "2025-07-31"
+    ],
+    "horizons_months": [12],
+    "benchmark_cohort": ["METALS:COMMODITY:URANIUM"],
+    "vehicle_context_series_count": 11,
+    "bil_role": "REFERENCE_CONTROL_ONLY"
+  },
+  "required_execution_behavior": {
+    "hosted_source_connection_must_be_read_only": true,
+    "filter_every_benchmark_observation_to_observation_date_lte_cutoff": true,
+    "filter_every_vehicle_observation_to_observation_date_lte_cutoff": true,
+    "derive_each_feature_only_from_cutoff_filtered_inputs": true,
+    "fail_if_any_input_observation_date_exceeds_cutoff": true,
+    "preserve_registered_model_id_uip_metals_native_trend_v1": true,
+    "preserve_methodology_version_1_0_0": true,
+    "preserve_registered_component_weights": true,
+    "preserve_registered_recommendation_thresholds": true,
+    "preserve_registered_forecast_bounds": true,
+    "preserve_registered_confidence_policy": true,
+    "record_collected_at_utc_and_run_id_as_lineage_only": true,
+    "record_max_input_observation_date_for_every_reconstruction": true,
+    "do_not_use_collected_at_utc_as_historical_availability_proof": true,
+    "do_not_substitute_vehicle_price_history_for_commodity_outcomes": true,
+    "do_not_treat_backfilled_archive_forecasts_as_validation_truth": true
+  },
+  "required_outputs": {
+    "reconstructed_forecast_rows_json": true,
+    "reconstructed_forecast_rows_csv": true,
+    "cutoff_input_lineage_json": true,
+    "point_in_time_invariant_checks_json": true,
+    "reconstruction_coverage_json": true,
+    "unavailable_cutoff_register_json": true,
+    "reconstruction_summary_json": true
+  },
+  "authorization_boundary": {
+    "point_in_time_reconstruction_execution_authorized": true,
+    "hosted_read_only_access_authorized": true,
+    "local_evidence_artifact_write_authorized": true,
+    "realized_return_derivation_authorized": false,
+    "historical_backtest_authorized": false,
+    "candidate_policy_backtest_authorized": false,
+    "final_action_policy_authorized": false,
+    "final_action_selection_authorized": false,
+    "recommendation_recompute_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_refresh_authorized": false,
+    "hosted_write_authorized": false,
+    "database_write_authorized": false,
+    "runtime_change_authorized": false,
+    "network_collection_authorized": false,
+    "pr_authorized": false,
+    "main_deploy_authorized": false,
+    "allocation_or_execution_authorized": false
+  },
+  "authorization_decision": "AUTHORIZE_READ_ONLY_METALS_POINT_IN_TIME_HISTORICAL_RECONSTRUCTION",
+  "next_decision": "EXECUTE_AND_CERTIFY_METALS_POINT_IN_TIME_HISTORICAL_RECONSTRUCTION"
+}
