@@ -37,10 +37,10 @@
     "realized_return_rows_csv": true,
     "realized_return_rows_json": true,
     "derivation_lineage_json": true,
-    "derivation_gap_register_json": true,
-    "derivation_summary_json": true,
-    "post_derivation_validation_readiness_json": true,
-    "evidence_manifest_json": true
+    "coverage_summary_json": true,
+    "missing_future_price_register_json": true,
+    "consumed_interval_annotation_json": true,
+    "derivation_summary_json": true
   },
   "authorization_boundary": {
     "bounded_realized_return_derivation_authorized": true,
