@@ -1,0 +1,58 @@
+{
+  "authorization_id": "METALS-TERMINAL-FINAL-ACTION-DISPLAY-MERGE-READINESS-COPY-CORRECTION-AUTHORIZATION-1",
+  "source_governed_head": "1af3ee531565d4f01134fac5ca3720c90f377ebd",
+  "source_pull_request_number": 61,
+  "source_pull_request_head": "deploy/metals-final-action-display-fix",
+  "source_pull_request_head_sha": "00943fc7c67afe002ad4de0eda859162467aa46b",
+  "source_pull_request_base": "main",
+  "source_main_base_sha": "32668f5bcb73fc6b6f00c5b562e5f5433e6bf9cd",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "source_pr_state": {
+    "mergeable": true,
+    "commit_count": 2,
+    "changed_file_count": 2,
+    "ci_workflow_success": true,
+    "container_delivery_success": true
+  },
+  "review_finding": {
+    "status": "ONE_COPY_CORRECTION_REQUIRED_BEFORE_MERGE_AUTHORIZATION",
+    "issue": "METALS_DETAIL_STILL_CALLS_NATIVE_RECOMMENDATION_THE_STRATEGIC_AUTHORITY",
+    "conflicting_copy": "The native recommendation, forecast, and risk evidence remain the strategic authority. Tactical state is shown separately and does not overwrite them.",
+    "required_semantic": "The governed final decision is the primary user-facing decision; native recommendation, forecast, and risk remain explanatory evidence; tactical state remains separate timing context.",
+    "merge_blocked_until_corrected": true
+  },
+  "authorized_files": [
+    "foundation/production/dashboard_assets/recommendation_ui.js",
+    "tests/delivery/test_rec_ui_1.py"
+  ],
+  "required_correction_behavior": {
+    "metals_final_decision_remains_primary": true,
+    "native_recommendation_remains_separate_explanatory_evidence": true,
+    "forecast_and_risk_remain_explanatory_evidence": true,
+    "tactical_state_remains_separate_timing_context": true,
+    "strategic_authority_copy_must_not_assign_authority_to_native_recommendation": true,
+    "crypto_semantics_preserved": true,
+    "mtg_semantics_preserved": true,
+    "exact_two_file_cumulative_pr_diff_required": true,
+    "local_rec_ui_regression_required": true,
+    "git_diff_check_required": true
+  },
+  "authorization_scope": {
+    "deployment_branch_ui_copy_correction_authorized": true,
+    "deployment_branch_test_correction_authorized": true,
+    "local_test_execution_authorized": true,
+    "pull_request_update_by_existing_head_commit_authorized": true,
+    "additional_non_ui_code_change_authorized": false,
+    "hosted_database_write_authorized": false,
+    "analytical_database_write_authorized": false,
+    "read_api_change_authorized": false,
+    "recommendation_recompute_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_refresh_authorized": false,
+    "main_merge_authorized": false,
+    "render_deployment_authorized": false,
+    "allocation_or_execution_authorized": false
+  },
+  "authorization_decision": "AUTHORIZE_BOUNDED_METALS_FINAL_ACTION_DISPLAY_MERGE_READINESS_COPY_CORRECTION",
+  "next_decision": "IMPLEMENT_AND_CERTIFY_BOUNDED_METALS_FINAL_ACTION_DISPLAY_MERGE_READINESS_COPY_CORRECTION"
+}
