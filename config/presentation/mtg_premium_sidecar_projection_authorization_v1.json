@@ -1,0 +1,121 @@
+﻿{
+  "authorization_id": "UIP_MTG_PREMIUM_SIDECAR_PROJECTION_AUTHORIZATION_V1",
+  "authorization_version": "1.0.0",
+  "status": "AUTHORIZED_FOR_BOUNDED_ACCEPTANCE_AND_PROJECTION_IMPLEMENTATION",
+  "domain_id": "mtg",
+  "lane": "SECRET_LAIR_V1_1",
+
+  "governing_uip_checkpoint": {
+    "repository": "dlockar1mtg/UniversalInvestmentPlatform",
+    "branch": "phase-uip-rec-utility-mtg-premium-research",
+    "required_parent_head": "660a39f4502ca0f3bdd4ebcee2acac50d3aef7dd"
+  },
+
+  "certified_mtg_source_checkpoint": {
+    "repository": "dlockar1mtg/mtg-investment-terminal",
+    "branch": "phase-9.1-mtg-to-uip-export-contract",
+    "head": "6b610b208549bec4be2c0ec7f7f3c2f69b154302",
+    "parent_head": "f7dea3e2611f27de4ff6541da3b1d6a60dc6d695",
+    "commit_scope_file_count": 4
+  },
+
+  "certified_source_authority": {
+    "path": "docs/phase_8/secret_lair/secret_lair_v1_purchase_analysis.csv",
+    "sha256": "eb5efced959116eb7b174d4aff27c06d321e774eda39b3f8572d958499441cdb",
+    "row_count": 787,
+    "field_count": 58
+  },
+
+  "certified_premium_sidecar": {
+    "path": "docs/phase_9/uip_export/premium_research/mtg_secret_lair_premium_research.csv",
+    "summary_path": "docs/phase_9/uip_export/premium_research/mtg_secret_lair_premium_research_summary.json",
+    "sha256": "296ccbb9ba96812b99dacd771f1ad311496b4997fa0ac7103e68a1d4aaa03333",
+    "row_count": 787,
+    "field_count": 36,
+    "unique_secret_lair_id_count": 787,
+    "unique_mtg_asset_id_count": 787,
+    "identity_rule": "SECRET_LAIR_V1_1|{secret_lair_id}"
+  },
+
+  "existing_native_authority": {
+    "interface": "mtg_native_authority_current",
+    "required_field_count": 23,
+    "mutation_authorized": false,
+    "replacement_authorized": false
+  },
+
+  "authorized_acceptance_behavior": {
+    "accept_exact_certified_sidecar": true,
+    "require_exact_mtg_commit": true,
+    "require_exact_sidecar_sha256": true,
+    "require_exact_initial_row_count": true,
+    "require_exact_initial_field_count": true,
+    "require_unique_mtg_asset_id": true,
+    "require_unique_secret_lair_id": true,
+    "copy_without_recalculation": true,
+    "copy_without_missing_value_synthesis": true,
+    "copy_without_semantic_relabeling": true
+  },
+
+  "authorized_projection": {
+    "presentation_record_type": "mtg_premium_research",
+    "storage_surface": "presentation_records.payload_json",
+    "one_record_per_sidecar_row": true,
+    "expected_initial_record_count": 787,
+    "record_asset_id_field": "mtg_asset_id",
+    "payload_may_preserve_full_sidecar_row": true,
+    "analytical_table_schema_change_required": false,
+    "generic_forecast_record_replacement_authorized": false,
+    "generic_risk_record_replacement_authorized": false,
+    "native_authority_replacement_authorized": false
+  },
+
+  "semantic_contract": {
+    "one_year_semantic": "CERTIFIED_FORECAST_AND_EMPIRICAL_RISK",
+    "three_year_semantic": "SCENARIO_DISTRIBUTION_NOT_DIRECTLY_VALIDATED",
+    "five_year_semantic": "SCENARIO_DISTRIBUTION_NOT_DIRECTLY_VALIDATED",
+    "q10_is_governed_purchase_entry_threshold": true,
+    "q25_or_q50_may_replace_q10": false,
+    "three_or_five_year_scenario_may_trigger_purchase": false,
+    "rank_may_override_purchase_policy": false,
+    "automatic_purchase_execution_authorized": false
+  },
+
+  "implementation_scope": {
+    "bounded_uip_sidecar_acceptance_code_authorized": true,
+    "bounded_presentation_projection_code_authorized": true,
+    "bounded_projection_tests_authorized": true,
+
+    "copy_sidecar_into_certified_uip_delivery_package_authorized": false,
+    "analytical_database_schema_change_authorized": false,
+    "analytical_database_ingestion_authorized": false,
+    "hosted_postgres_write_authorized": false,
+    "live_publication_activation_authorized": false,
+    "frontend_change_authorized": false,
+
+    "collector_premium_projection_authorized": false,
+    "precollector_premium_projection_authorized": false,
+    "secret_lair_partial_206_promotion_authorized": false,
+
+    "model_execution_authorized": false,
+    "model_retraining_authorized": false,
+    "automatic_purchase_execution_authorized": false
+  },
+
+  "required_implementation_controls": {
+    "fail_if_mtg_head_differs": true,
+    "fail_if_sidecar_sha256_differs": true,
+    "fail_if_sidecar_row_count_differs": true,
+    "fail_if_sidecar_field_count_differs": true,
+    "fail_if_duplicate_mtg_asset_id_exists": true,
+    "fail_if_duplicate_secret_lair_id_exists": true,
+    "fail_if_existing_23_field_interface_changes": true,
+    "fail_if_projection_recalculates_values": true,
+    "fail_if_projection_synthesizes_missing_values": true,
+    "fail_if_3y_or_5y_is_labeled_direct_forecast": true,
+    "fail_if_q25_or_q50_replaces_q10_policy": true,
+    "fail_if_automatic_execution_is_enabled": true
+  },
+
+  "next_gate": "IMPLEMENT_BOUNDED_UIP_PREMIUM_SIDECAR_ACCEPTANCE_AND_PRESENTATION_PROJECTION"
+}
