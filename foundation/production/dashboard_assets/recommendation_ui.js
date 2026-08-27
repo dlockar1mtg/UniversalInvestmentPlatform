@@ -631,6 +631,7 @@ function mtgNativeCard(item){
     <div class="rec-card-foot">
       <div class="mtg-native-policy">
         Missing authority remains missing.
+        Secret Lair premium fields are not synthesized for this lane.
         Recommendation does not authorize execution.
       </div>
 
