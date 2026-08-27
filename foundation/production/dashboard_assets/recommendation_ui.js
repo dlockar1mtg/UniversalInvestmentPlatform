@@ -288,6 +288,17 @@ function mtgDistanceToQ10(premium){
   return q10-current;
 }
 
+function mtgGovernedQ10State(premium){
+  const raw=
+    premium?.current_price_vs_q10_break_even_state;
+
+  if(raw==null||raw===""){
+    return "MISSING";
+  }
+
+  return cleanStatus(raw);
+}
+
 function mtgEntryPercent(premium){
   const current=Number(
     premium?.current_tcg_market_price_usd
@@ -364,6 +375,9 @@ function mtgPremiumCard(item){
   const distance=
     mtgDistanceToQ10(premium);
 
+  const governedQ10State=
+    mtgGovernedQ10State(premium);
+
   const q10Class=
     buy
       ?"buy"
@@ -409,7 +423,8 @@ function mtgPremiumCard(item){
         <strong>${escapeHtml(fmtMoney(premium.y1_q10_break_even_entry_price_usd))}</strong>
       </div>
       <div class="mtg-q10-distance ${q10Class}">
-        ${escapeHtml(distanceLabel)}
+        <strong>${escapeHtml(governedQ10State)}</strong>
+        <span>${escapeHtml(distanceLabel)}</span>
       </div>
     </div>
 
@@ -928,6 +943,9 @@ async function openMtgPremiumDetail(page,item){
         ?`${fmtMoney(distance)} below Q10`
         :`${fmtMoney(Math.abs(distance))} above Q10`;
 
+  const governedQ10State=
+    mtgGovernedQ10State(premium);
+
   const buy=
     mtgIsBuyCandidate(item);
 
@@ -1021,7 +1039,8 @@ async function openMtgPremiumDetail(page,item){
           </div>
 
           <div class="mtg-entry-caption">
-            ${escapeHtml(distanceLabel)}
+            ${escapeHtml(governedQ10State)}
+            ? ${escapeHtml(distanceLabel)}
           </div>
         </div>
       </article>
