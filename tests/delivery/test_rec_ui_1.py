@@ -132,3 +132,106 @@ def test_dashboard_serves_and_loads_rec_ui_assets_after_core_dashboard_styles_an
     assert core < rec < picker
     assert "REC-UI-1" in html
     assert "universal score or cross-domain rank" in html
+
+def test_rec_ui_metals_final_action_is_primary_while_native_domain_semantics_remain():
+    javascript = read("foundation/production/dashboard_assets/recommendation_ui.js")
+
+    assert "function displayStatus(item)" in javascript
+    assert (
+        'item.domain_id==="metals"?(payload.final_action??payload.recommendation??payload.native_recommendation??null):nativeStatus(item)'
+        in javascript
+    )
+
+    # Only the native helper declaration and the non-Metals delegation
+    # may directly use nativeStatus after deployment.
+    assert javascript.count("nativeStatus(") == 2
+    assert javascript.count("displayStatus(") >= 4
+
+    # Existing domain-native contracts are retained.
+    assert (
+        'item.domain_id==="mtg"?(payload.native_purchase_status??null):(payload.native_recommendation??payload.recommendation??null)'
+        in javascript
+    )
+
+    def displayed_status(domain_id, payload):
+        if domain_id == "metals":
+            return (
+                payload.get("final_action")
+                or payload.get("recommendation")
+                or payload.get("native_recommendation")
+            )
+
+        if domain_id == "mtg":
+            return payload.get("native_purchase_status")
+
+        return (
+            payload.get("native_recommendation")
+            or payload.get("recommendation")
+        )
+
+    metals_cases = {
+        "metals:commodity:gold":
+            ("HOLD", "RANKED_OPPORTUNITY"),
+        "metals:commodity:uranium":
+            ("HOLD", "RANKED_OPPORTUNITY"),
+        "metals:vehicle:BIL":
+            ("REFERENCE_CONTROL", "RESERVE_BUY"),
+        "metals:vehicle:COPX":
+            ("HOLD", "HOLD"),
+        "metals:vehicle:CPER":
+            ("HOLD", "HOLD"),
+        "metals:vehicle:GLD":
+            ("WATCH", "BUY"),
+        "metals:vehicle:IAU":
+            ("WATCH", "BUY"),
+        "metals:vehicle:PPLT":
+            ("WATCH", "BUY"),
+        "metals:vehicle:SGOL":
+            ("WATCH", "BUY"),
+        "metals:vehicle:SIVR":
+            ("WATCH", "BUY"),
+        "metals:vehicle:SLV":
+            ("WATCH", "BUY"),
+        "metals:vehicle:URA":
+            ("HOLD", "HOLD"),
+    }
+
+    for asset_id, (
+        final_action,
+        native_recommendation,
+    ) in metals_cases.items():
+        payload = {
+            "final_action":
+                final_action,
+            "recommendation":
+                final_action,
+            "native_recommendation":
+                native_recommendation,
+        }
+
+        assert (
+            displayed_status(
+                "metals",
+                payload,
+            )
+            == final_action
+        ), asset_id
+
+    assert displayed_status(
+        "crypto",
+        {
+            "final_action": "WATCH",
+            "recommendation": "WATCH",
+            "native_recommendation": "BUY",
+        },
+    ) == "BUY"
+
+    assert displayed_status(
+        "mtg",
+        {
+            "final_action": "HOLD",
+            "recommendation": "HOLD",
+            "native_purchase_status":
+                "PURCHASE_CANDIDATE",
+        },
+    ) == "PURCHASE_CANDIDATE"
