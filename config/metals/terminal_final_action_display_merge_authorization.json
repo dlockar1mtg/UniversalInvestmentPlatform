@@ -1,0 +1,65 @@
+{
+  "authorization_id": "METALS-TERMINAL-FINAL-ACTION-DISPLAY-MERGE-AUTHORIZATION-1",
+  "source_governed_head": "530bbe6d5f6a09e2037e1a763f1077d2ea5d003d",
+  "source_pull_request_number": 61,
+  "source_pull_request_base": "main",
+  "source_main_base_sha": "32668f5bcb73fc6b6f00c5b562e5f5433e6bf9cd",
+  "source_pull_request_head": "deploy/metals-final-action-display-fix",
+  "source_pull_request_head_sha": "29a428de098977661421d9350436f1ffa6596d62",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "source_pr_state": {
+    "open": true,
+    "mergeable": true,
+    "commit_count": 3,
+    "changed_file_count": 2,
+    "universal_investment_platform_ci_success": true,
+    "container_delivery_success": true
+  },
+  "required_changed_files": [
+    "foundation/production/dashboard_assets/recommendation_ui.js",
+    "tests/delivery/test_rec_ui_1.py"
+  ],
+  "certified_semantics": {
+    "metals_display_precedence": "FINAL_ACTION_THEN_RECOMMENDATION_THEN_NATIVE_RECOMMENDATION",
+    "metals_final_decision_primary": true,
+    "metals_native_recommendation_supporting_evidence": true,
+    "metals_forecast_risk_supporting_evidence": true,
+    "metals_tactical_state_separate_timing_context": true,
+    "metals_decision_status_copy": true,
+    "crypto_native_semantics_preserved": true,
+    "mtg_native_purchase_status_preserved": true
+  },
+  "authorization_scope": {
+    "main_merge_authorized": true,
+    "pull_request_merge_authorized": true,
+    "post_merge_main_verification_authorized": true,
+    "post_merge_ci_inspection_authorized": true,
+    "render_deployment_inspection_authorized": true,
+    "manual_render_deployment_authorized": false,
+    "deployment_branch_mutation_authorized": false,
+    "additional_code_change_authorized": false,
+    "hosted_database_write_authorized": false,
+    "analytical_database_write_authorized": false,
+    "read_api_change_authorized": false,
+    "recommendation_recompute_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_refresh_authorized": false,
+    "allocation_or_execution_authorized": false
+  },
+  "merge_contract": {
+    "pull_request_number": 61,
+    "required_expected_head_sha": "29a428de098977661421d9350436f1ffa6596d62",
+    "required_base_branch": "main",
+    "required_head_branch": "deploy/metals-final-action-display-fix",
+    "required_changed_file_count": 2,
+    "required_commit_count": 3,
+    "merge_only_if_pr_still_open": true,
+    "merge_only_if_mergeable": true,
+    "merge_only_if_ci_green": true,
+    "merge_only_if_container_delivery_green": true,
+    "merge_only_if_main_base_unchanged": true,
+    "merge_only_if_head_unchanged": true
+  },
+  "authorization_decision": "AUTHORIZE_BOUNDED_METALS_FINAL_ACTION_DISPLAY_MAIN_MERGE",
+  "next_decision": "MERGE_AND_CERTIFY_BOUNDED_METALS_FINAL_ACTION_DISPLAY_PR_61"
+}
