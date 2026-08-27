@@ -337,3 +337,44 @@ def test_rec_ui_metals_detail_identifies_final_decision_as_primary_authority():
         'nativeStatus(item)'
         in javascript
     )
+
+def test_dashboard_domain_health_tolerates_premium_recommendations_dom_ownership():
+    dashboard = read(
+        "foundation/production/dashboard_assets/dashboard.js"
+    )
+    recommendations = read(
+        "foundation/production/dashboard_assets/recommendation_ui.js"
+    )
+
+    direct_write = (
+        '$("recommendation-domain-summary").innerHTML='
+    )
+
+    guarded_write = (
+        'const recommendationSummary=$("recommendation-domain-summary");'
+        'if(recommendationSummary)'
+        'recommendationSummary.innerHTML='
+    )
+
+    assert direct_write not in dashboard
+    assert guarded_write in dashboard
+
+    assert '$("domain-cards").innerHTML=html' in dashboard
+    assert '$("refresh-domain-cards").innerHTML=html' in dashboard
+
+    assert 'const page=node("recommendations")' in recommendations
+    assert 'page.innerHTML=' in recommendations
+
+    assert (
+        'if(location.hash==="#recommendations"'
+        '&&sessionStorage.getItem("uiip-dashboard-key"))'
+        'loadCatalog(false)'
+        in recommendations
+    )
+
+    assert (
+        'item.domain_id==="metals"?'
+        '(payload.final_action??payload.recommendation??payload.native_recommendation??null):'
+        'nativeStatus(item)'
+        in recommendations
+    )
