@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 import hashlib
 import json
+import os
 from pathlib import Path
 from typing import Any, Iterable, Mapping
 from uuid import uuid4
@@ -218,6 +219,42 @@ def _mtg_records(connection: Any) -> list[PresentationRecord]:
     return records
 
 
+
+def _mtg_premium_records_from_environment() -> list[PresentationRecord]:
+    """
+    Add certified MTG premium research only when an explicit
+    external sidecar path is supplied.
+
+    No filesystem discovery, repository search, sidecar copy,
+    database ingestion, or publication activation occurs here.
+    """
+    raw_path = str(
+        os.environ.get(
+            "UIP_MTG_PREMIUM_SIDECAR_PATH",
+            "",
+        )
+    ).strip()
+
+    if not raw_path:
+        return []
+
+    sidecar_path = Path(raw_path)
+
+    if not sidecar_path.is_file():
+        raise RuntimeError(
+            f"Explicit MTG premium sidecar is missing: {sidecar_path}"
+        )
+
+    from .mtg_premium_projection import (
+        EXPECTED_MTG_HEAD,
+        build_mtg_premium_records,
+    )
+
+    return build_mtg_premium_records(
+        sidecar_path,
+        mtg_head=EXPECTED_MTG_HEAD,
+    )
+
 def _domain_health_records(connection: Any) -> list[PresentationRecord]:
     rows = _rows(connection, """
         SELECT domain_id, domain_name, platform_id, ownership_type,
@@ -258,6 +295,7 @@ def build_presentation_publication(
     from .metals_tactical_projection import build_metals_tactical_records
     records.extend(build_metals_tactical_records(repository_root, connection, source_sha256))
     records.extend(_mtg_records(connection))
+    records.extend(_mtg_premium_records_from_environment())
     records.sort(key=lambda item: (item.record_type, item.domain_id, item.asset_id or "", item.record_key))
     return PresentationPublication(
         publication_id=publication_id or str(uuid4()),
