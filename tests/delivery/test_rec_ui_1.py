@@ -298,3 +298,42 @@ def test_rec_ui_metals_final_action_labels_distinguish_governed_and_native_seman
         'item.domain_id==="mtg"?(payload.native_purchase_status??null):(payload.native_recommendation??payload.recommendation??null)'
         in javascript
     )
+
+def test_rec_ui_metals_detail_identifies_final_decision_as_primary_authority():
+    javascript = read(
+        "foundation/production/dashboard_assets/recommendation_ui.js"
+    )
+
+    old_copy = (
+        "The native recommendation, forecast, and risk evidence remain "
+        "the strategic authority. Tactical state is shown separately "
+        "and does not overwrite them."
+    )
+
+    corrected_copy = (
+        "The governed final decision is primary. Native recommendation, "
+        "forecast, and risk remain supporting evidence. Tactical state is "
+        "separate timing context and does not replace the final decision."
+    )
+
+    assert old_copy not in javascript
+    assert corrected_copy in javascript
+
+    assert (
+        '<div><span>Final decision</span>'
+        '<p>${escapeHtml(cleanStatus(displayStatus(item)))}</p></div>'
+        in javascript
+    )
+
+    assert (
+        '<div><span>Native recommendation</span>'
+        '<p>${escapeHtml(cleanStatus(recommendation.native_recommendation??"MISSING"))}</p></div>'
+        in javascript
+    )
+
+    assert (
+        'item.domain_id==="metals"?'
+        '(payload.final_action??payload.recommendation??payload.native_recommendation??null):'
+        'nativeStatus(item)'
+        in javascript
+    )
