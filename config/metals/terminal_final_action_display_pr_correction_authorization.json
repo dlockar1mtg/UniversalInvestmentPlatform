@@ -1,0 +1,66 @@
+{
+  "authorization_id": "METALS-TERMINAL-FINAL-ACTION-DISPLAY-PR-CORRECTION-AUTHORIZATION-1",
+  "source_governed_head": "a6aedbeb56ea9f28762e617a64f66146534130fe",
+  "source_pull_request_number": 61,
+  "source_pull_request_head": "deploy/metals-final-action-display-fix",
+  "source_pull_request_head_sha": "23a0719c8bf6bc26ca7cc8c24b48c3ef581b8c18",
+  "source_pull_request_base": "main",
+  "source_main_base_sha": "32668f5bcb73fc6b6f00c5b562e5f5433e6bf9cd",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "review_finding": {
+    "status": "CORRECTION_REQUIRED_BEFORE_MERGE_CONSIDERATION",
+    "primary_issue": "METALS_FINAL_ACTION_IS_DISPLAYED_UNDER_NATIVE_RECOMMENDATION_LABEL",
+    "secondary_issue": "METALS_FINAL_ACTION_FILTER_VALUES_ARE_DESCRIBED_AS_NATIVE_STATUSES",
+    "analytical_semantics_correct": true,
+    "hosted_data_correct": true,
+    "merge_blocked_until_corrected": true
+  },
+  "authorized_files": [
+    "foundation/production/dashboard_assets/recommendation_ui.js",
+    "tests/delivery/test_rec_ui_1.py"
+  ],
+  "required_correction_behavior": {
+    "metals_primary_visible_decision_remains_final_action_first": true,
+    "metals_detail_primary_label_must_not_call_final_action_native_recommendation": true,
+    "metals_detail_primary_label_must_identify_governed_final_decision": true,
+    "preserved_native_recommendation_must_remain_separately_visible_for_metals": true,
+    "metals_status_filter_copy_must_not_describe_final_action_values_as_native": true,
+    "crypto_native_recommendation_semantics_preserved": true,
+    "mtg_native_purchase_status_semantics_preserved": true,
+    "search_filter_semantics_unchanged": true,
+    "no_hosted_payload_change": true,
+    "no_read_api_change": true,
+    "no_analytical_recommendation_change": true,
+    "no_model_or_forecast_change": true
+  },
+  "authorization_scope": {
+    "deployment_branch_ui_copy_correction_authorized": true,
+    "deployment_branch_test_correction_authorized": true,
+    "local_test_execution_authorized": true,
+    "pull_request_update_by_existing_head_commit_authorized": true,
+    "additional_non_ui_code_change_authorized": false,
+    "hosted_database_write_authorized": false,
+    "analytical_database_write_authorized": false,
+    "read_api_change_authorized": false,
+    "recommendation_recompute_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_refresh_authorized": false,
+    "main_merge_authorized": false,
+    "render_deployment_authorized": false,
+    "allocation_or_execution_authorized": false
+  },
+  "required_post_correction_proof": {
+    "pr_remains_number_61": true,
+    "pr_base_remains_main": true,
+    "pr_head_remains_deploy_metals_final_action_display_fix": true,
+    "changed_file_set_remains_exact_two_files": true,
+    "metals_final_action_display_precedence_preserved": true,
+    "metals_native_recommendation_shown_separately": true,
+    "metals_status_copy_is_not_native_mislabeling": true,
+    "crypto_semantics_preserved": true,
+    "mtg_semantics_preserved": true,
+    "ci_must_be_rechecked_after_push": true
+  },
+  "authorization_decision": "AUTHORIZE_BOUNDED_METALS_FINAL_ACTION_DISPLAY_PR_LABEL_CORRECTION",
+  "next_decision": "IMPLEMENT_AND_CERTIFY_BOUNDED_METALS_FINAL_ACTION_DISPLAY_PR_LABEL_CORRECTION"
+}
