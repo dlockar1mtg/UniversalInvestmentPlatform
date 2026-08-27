@@ -42,7 +42,7 @@ def test_mtg_domain_has_premium_card_and_detail_surface() -> None:
     assert "mtgPremiumCard" in javascript
     assert "openMtgPremiumDetail" in javascript
 
-    assert "Secret Lair premium research" in javascript
+    assert "SECRET LAIR PREMIUM RESEARCH" in javascript
     assert "Open investment research" in javascript
 
 
@@ -158,3 +158,4 @@ def test_existing_crypto_and_metals_renderers_remain_present() -> None:
 
     assert "3-YEAR GROWTH OUTLOOK" in javascript
     assert "Long-term thesis + tactical opportunity" in javascript
+
