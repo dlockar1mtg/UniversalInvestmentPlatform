@@ -1,0 +1,53 @@
+{
+  "authorization_id": "METALS-TERMINAL-FINAL-ACTION-DISPLAY-LIVE-AUTH-RACE-HOTFIX-AUTHORIZATION-1",
+  "source_governed_head": "0e5e9f94ed830e4ec1b435a347540019fadc52b6",
+  "source_main_head": "d43993ca49f9494517374ae08d745706f65aac25",
+  "live_failure": {
+    "observed": true,
+    "message": "Cannot set properties of null (setting 'innerHTML')",
+    "render_deploy_live": true,
+    "main_ci_success": true,
+    "container_delivery_success": true
+  },
+  "diagnosis": {
+    "recommendation_ui_replaces_recommendations_inner_html": true,
+    "dashboard_render_domain_cards_unconditionally_writes_removed_summary_node": true,
+    "stale_recommendations_hash_and_existing_session_key_can_trigger_concurrent_loads": true,
+    "failure_can_clear_valid_session_key_and_return_user_to_auth": true,
+    "metals_final_action_data_or_policy_defect": false
+  },
+  "authorized_branch": "hotfix/metals-recommendations-auth-race",
+  "required_base_sha": "d43993ca49f9494517374ae08d745706f65aac25",
+  "authorized_files": [
+    "foundation/production/dashboard_assets/dashboard.js",
+    "tests/delivery/test_rec_ui_1.py"
+  ],
+  "required_hotfix_behavior": {
+    "render_domain_cards_must_tolerate_missing_recommendation_domain_summary": true,
+    "domain_cards_must_continue_rendering": true,
+    "refresh_domain_cards_must_continue_rendering": true,
+    "recommendation_ui_ownership_of_recommendations_page_preserved": true,
+    "authentication_failure_behavior_otherwise_unchanged": true,
+    "metals_final_action_display_semantics_unchanged": true,
+    "crypto_semantics_unchanged": true,
+    "mtg_semantics_unchanged": true
+  },
+  "authorization_scope": {
+    "fresh_main_based_hotfix_branch_creation_authorized": true,
+    "dashboard_js_hotfix_authorized": true,
+    "regression_test_change_authorized": true,
+    "local_test_execution_authorized": true,
+    "pull_request_creation_authorized_after_local_certification": false,
+    "main_merge_authorized": false,
+    "manual_render_deployment_authorized": false,
+    "hosted_database_write_authorized": false,
+    "analytical_database_write_authorized": false,
+    "read_api_change_authorized": false,
+    "recommendation_recompute_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_refresh_authorized": false,
+    "allocation_or_execution_authorized": false
+  },
+  "authorization_decision": "AUTHORIZE_BOUNDED_LIVE_RECOMMENDATIONS_AUTH_RACE_HOTFIX_IMPLEMENTATION",
+  "next_decision": "IMPLEMENT_AND_CERTIFY_BOUNDED_LIVE_RECOMMENDATIONS_AUTH_RACE_HOTFIX"
+}
