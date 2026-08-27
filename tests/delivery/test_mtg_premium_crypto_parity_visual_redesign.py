@@ -1,4 +1,4 @@
-﻿from pathlib import Path
+from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -81,7 +81,7 @@ def test_secret_lair_cards_are_investment_first() -> None:
     assert "3Y scenario" in source
     assert "5Y scenario" in source
 
-    assert "Open research →" in source
+    assert "Open investment research" in source
 
 
 def test_q10_has_real_price_comparison_visualization() -> None:

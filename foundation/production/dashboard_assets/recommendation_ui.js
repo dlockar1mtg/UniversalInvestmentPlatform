@@ -258,6 +258,18 @@ function mtgEvidenceLabel(premium){
 }
 
 function mtgDistanceToQ10(premium){
+  const governedRaw=
+    premium?.current_price_margin_to_q10_break_even;
+
+  const governed=
+    governedRaw==null||governedRaw===""
+      ?NaN
+      :Number(governedRaw);
+
+  if(Number.isFinite(governed)){
+    return governed;
+  }
+
   const current=Number(
     premium?.current_tcg_market_price_usd
   );
@@ -441,7 +453,7 @@ function mtgPremiumCard(item){
         class="rec-research-button rec-mtg-premium-detail"
         data-asset-id="${escapeHtml(item.asset_id)}"
       >
-        Open research ?
+        Open investment research &rarr;
       </button>
     </div>
   </article>`;
@@ -969,7 +981,7 @@ async function openMtgPremiumDetail(page,item){
 
           <p class="rec-strategic-copy">
             The governed one-year Q10 threshold determines entry eligibility.
-            Native MTG rank adds lane context but cannot override the Q10 purchase policy.
+            Native MTG rank adds lane context but cannot override the governed Q10 purchase policy.
           </p>
 
           <div class="rec-chips">
@@ -1198,6 +1210,11 @@ async function openMtgPremiumDetail(page,item){
                 <span>Exact comparable events</span>
                 <strong>${escapeHtml(fmtNumber(premium.exact_structural_comparable_event_count,0))}</strong>
               </div>
+
+              <div>
+                <span>Source authority</span>
+                <strong class="mtg-source-authority">${escapeHtml(premium.source_authority_path||"?")}</strong>
+              </div>
             </div>
           </article>
 
@@ -1212,7 +1229,7 @@ async function openMtgPremiumDetail(page,item){
             </p>
 
             <p>
-              3Y and 5Y remain scenario distributions, not direct certified forecasts.
+              3Y and 5Y are scenarios only. They remain scenario distributions, not direct certified forecasts.
             </p>
 
             <p>
