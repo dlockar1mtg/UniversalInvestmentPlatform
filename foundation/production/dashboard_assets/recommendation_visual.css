@@ -458,4 +458,665 @@
         display: grid;
     }
 }
+/* MTG_CRYPTO_PARITY_REDESIGN_V1 */
 
+.mtg-research-shell{
+  gap:16px
+}
+
+.mtg-lane-tabs{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:10px
+}
+
+.mtg-lane-tab{
+  border:1px solid var(--line);
+  border-radius:11px;
+  background:linear-gradient(145deg,rgba(18,37,34,.94),rgba(10,24,22,.96));
+  color:var(--text);
+  padding:12px 14px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:10px;
+  cursor:pointer
+}
+
+.mtg-lane-tab span{
+  font-size:11px;
+  font-weight:800
+}
+
+.mtg-lane-tab strong{
+  font-size:10px;
+  color:var(--muted)
+}
+
+.mtg-lane-tab.active{
+  border-color:rgba(138,125,255,.55);
+  box-shadow:inset 0 0 24px rgba(138,125,255,.08);
+  background:linear-gradient(145deg,rgba(31,29,54,.95),rgba(11,26,25,.97))
+}
+
+.mtg-lane-tab.active span{
+  color:#c6bcff
+}
+
+.mtg-research-hero{
+  border-color:rgba(138,125,255,.28);
+  background:
+    radial-gradient(circle at 78% 18%,rgba(138,125,255,.13),transparent 36%),
+    linear-gradient(145deg,rgba(26,28,43,.98),rgba(8,22,20,.98))
+}
+
+.mtg-hero-kpis{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  align-content:center
+}
+
+.mtg-hero-kpis article{
+  padding:13px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:11px;
+  background:rgba(7,19,17,.58)
+}
+
+.mtg-hero-kpis span,
+.mtg-hero-kpis small{
+  display:block;
+  color:var(--muted);
+  font-size:9px
+}
+
+.mtg-hero-kpis strong{
+  display:block;
+  margin:5px 0 3px;
+  font-size:22px
+}
+
+.mtg-research-toolbar{
+  grid-template-columns:minmax(0,1fr) 260px
+}
+
+.mtg-compact-governance{
+  border:1px solid var(--line);
+  border-radius:9px;
+  padding:9px 11px;
+  color:var(--muted);
+  font-size:9px;
+  line-height:1.5;
+  background:rgba(6,17,15,.5)
+}
+
+.mtg-compact-governance strong{
+  color:var(--text)
+}
+
+.mtg-research-grid{
+  grid-template-columns:repeat(3,minmax(0,1fr))
+}
+
+.mtg-investment-card{
+  min-height:315px;
+  display:flex;
+  flex-direction:column
+}
+
+.mtg-investment-card.buy{
+  border-color:rgba(99,230,190,.36);
+  box-shadow:0 18px 42px rgba(0,0,0,.22),inset 0 0 28px rgba(99,230,190,.025)
+}
+
+.mtg-investment-card.wait{
+  border-color:rgba(255,207,102,.28)
+}
+
+.mtg-product-icon{
+  width:40px;
+  height:40px;
+  border-radius:10px;
+  color:#c8beff;
+  background:linear-gradient(135deg,rgba(138,125,255,.20),rgba(138,125,255,.05));
+  border-color:rgba(138,125,255,.22);
+  font-size:9px;
+  letter-spacing:.04em
+}
+
+.mtg-decision{
+  max-width:150px;
+  white-space:normal;
+  text-align:center;
+  line-height:1.25
+}
+
+.mtg-decision.buy{
+  color:var(--accent);
+  border-color:rgba(99,230,190,.28);
+  background:rgba(99,230,190,.07)
+}
+
+.mtg-decision.wait{
+  color:var(--warn);
+  border-color:rgba(255,207,102,.28);
+  background:rgba(255,207,102,.07)
+}
+
+.mtg-primary-kpis{
+  margin-bottom:11px
+}
+
+.mtg-q10-summary{
+  display:flex;
+  justify-content:space-between;
+  align-items:end;
+  gap:10px;
+  padding:10px 0 5px;
+  border-top:1px solid rgba(255,255,255,.06)
+}
+
+.mtg-q10-summary span{
+  display:block;
+  color:var(--muted);
+  font-size:9px
+}
+
+.mtg-q10-summary strong{
+  display:block;
+  margin-top:3px;
+  font-size:15px
+}
+
+.mtg-q10-distance{
+  font-size:9px;
+  font-weight:800;
+  text-align:right
+}
+
+.mtg-q10-distance.buy{
+  color:var(--accent)
+}
+
+.mtg-q10-distance.wait{
+  color:var(--warn)
+}
+
+.mtg-entry-scale{
+  position:relative;
+  height:22px;
+  margin:3px 2px 10px
+}
+
+.mtg-entry-scale-track{
+  position:absolute;
+  left:0;
+  right:0;
+  top:9px;
+  height:4px;
+  border-radius:999px;
+  background:linear-gradient(90deg,rgba(99,230,190,.55),rgba(255,207,102,.55))
+}
+
+.mtg-entry-scale-q10{
+  position:absolute;
+  left:50%;
+  top:3px;
+  width:2px;
+  height:16px;
+  background:#f4fbf8;
+  opacity:.72
+}
+
+.mtg-entry-scale-current{
+  position:absolute;
+  top:5px;
+  width:12px;
+  height:12px;
+  border-radius:50%;
+  transform:translateX(-50%);
+  border:2px solid #091513;
+  background:var(--warn);
+  box-shadow:0 1px 8px rgba(0,0,0,.45)
+}
+
+.mtg-entry-scale-current.buy{
+  background:var(--accent)
+}
+
+.mtg-card-risk-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:3px
+}
+
+.mtg-card-risk-row div,
+.mtg-scenario-preview div{
+  padding:8px 9px;
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:8px;
+  background:rgba(6,17,15,.35)
+}
+
+.mtg-card-risk-row span,
+.mtg-scenario-preview span{
+  display:block;
+  color:var(--muted);
+  font-size:8.5px
+}
+
+.mtg-card-risk-row strong,
+.mtg-scenario-preview strong{
+  display:block;
+  margin-top:3px;
+  font-size:11px
+}
+
+.mtg-scenario-preview{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:8px;
+  margin-top:8px
+}
+
+.mtg-card-policy{
+  color:var(--muted);
+  font-size:8.5px;
+  max-width:135px;
+  line-height:1.4
+}
+
+.mtg-native-card{
+  min-height:205px
+}
+
+.mtg-native-kpis{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  margin:18px 0 12px
+}
+
+.mtg-native-kpis div{
+  padding:10px;
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:9px
+}
+
+.mtg-native-kpis span{
+  display:block;
+  color:var(--muted);
+  font-size:8px
+}
+
+.mtg-native-kpis strong{
+  display:block;
+  margin-top:4px;
+  font-size:10px
+}
+
+.mtg-native-context{
+  color:var(--text);
+  font-size:9px;
+  line-height:1.45
+}
+
+.mtg-native-policy{
+  color:var(--muted);
+  font-size:8.5px;
+  line-height:1.45;
+  margin-top:8px
+}
+
+.mtg-native-lane-hero{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:24px;
+  padding:20px;
+  border:1px solid var(--line);
+  border-radius:14px;
+  background:linear-gradient(145deg,rgba(18,37,34,.95),rgba(10,24,22,.96))
+}
+
+.mtg-native-lane-hero h3{
+  font-size:22px;
+  margin:5px 0
+}
+
+.mtg-native-lane-hero p{
+  color:var(--muted);
+  font-size:10px;
+  line-height:1.55;
+  max-width:700px;
+  margin:0
+}
+
+.mtg-native-lane-count{
+  min-width:130px;
+  text-align:center;
+  border-left:1px solid var(--line);
+  padding-left:20px
+}
+
+.mtg-native-lane-count strong{
+  display:block;
+  font-size:28px
+}
+
+.mtg-native-lane-count span{
+  color:var(--muted);
+  font-size:9px
+}
+
+.mtg-pagination{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px
+}
+
+.mtg-pagination>div{
+  display:flex;
+  gap:8px
+}
+
+.mtg-detail-strategic-hero{
+  border-color:rgba(138,125,255,.28);
+  background:
+    radial-gradient(circle at 77% 22%,rgba(138,125,255,.12),transparent 36%),
+    linear-gradient(145deg,rgba(26,28,43,.98),rgba(8,22,20,.98))
+}
+
+.mtg-detail-status-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  flex-wrap:wrap
+}
+
+.mtg-price-decision{
+  display:grid;
+  align-content:center;
+  gap:16px
+}
+
+.mtg-price-pair{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px
+}
+
+.mtg-price-pair article{
+  padding:13px;
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:11px;
+  background:rgba(5,15,17,.45)
+}
+
+.mtg-price-pair span{
+  color:var(--muted);
+  font-size:9px
+}
+
+.mtg-price-pair strong{
+  display:block;
+  font-size:20px;
+  margin-top:5px
+}
+
+.mtg-detail-entry-scale{
+  position:relative;
+  height:54px;
+  margin:0 16px
+}
+
+.mtg-detail-entry-scale .track{
+  position:absolute;
+  left:0;
+  right:0;
+  top:18px;
+  height:5px;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--accent),var(--warn))
+}
+
+.mtg-detail-entry-scale .q10,
+.mtg-detail-entry-scale .current{
+  position:absolute;
+  top:11px
+}
+
+.mtg-detail-entry-scale .q10{
+  left:50%
+}
+
+.mtg-detail-entry-scale .q10 i,
+.mtg-detail-entry-scale .current i{
+  display:block;
+  width:15px;
+  height:15px;
+  border-radius:50%;
+  transform:translateX(-50%);
+  border:3px solid #091513
+}
+
+.mtg-detail-entry-scale .q10 i{
+  background:#f4fbf8
+}
+
+.mtg-detail-entry-scale .current i{
+  background:var(--warn)
+}
+
+.mtg-detail-entry-scale .current.buy i{
+  background:var(--accent)
+}
+
+.mtg-detail-entry-scale small{
+  display:block;
+  transform:translateX(-50%);
+  color:var(--muted);
+  font-size:8px;
+  margin-top:5px
+}
+
+.mtg-entry-caption{
+  text-align:center;
+  font-size:10px;
+  font-weight:800;
+  color:var(--text)
+}
+
+.mtg-detail-kpis .rec-kpi-card span{
+  color:var(--muted);
+  font-size:9px
+}
+
+.mtg-detail-main,
+.mtg-detail-side{
+  display:grid;
+  gap:14px;
+  align-content:start
+}
+
+.mtg-distribution-cards{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:9px;
+  margin-top:15px
+}
+
+.mtg-distribution-cards article{
+  padding:13px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#091715
+}
+
+.mtg-distribution-cards span{
+  display:block;
+  color:var(--muted);
+  font-size:9px
+}
+
+.mtg-distribution-cards strong{
+  display:block;
+  margin-top:5px;
+  font-size:16px
+}
+
+.mtg-distribution-cards .bear strong{
+  color:var(--bad)
+}
+
+.mtg-distribution-cards .base strong{
+  color:var(--warn)
+}
+
+.mtg-distribution-cards .bull strong{
+  color:var(--accent)
+}
+
+.mtg-distribution-line{
+  position:relative;
+  height:28px;
+  margin:14px 10px 0
+}
+
+.mtg-distribution-line:before{
+  content:"";
+  position:absolute;
+  left:0;
+  right:0;
+  top:10px;
+  height:5px;
+  border-radius:999px;
+  background:linear-gradient(90deg,var(--bad),var(--warn),var(--accent))
+}
+
+.mtg-distribution-line span{
+  position:absolute;
+  top:5px;
+  width:14px;
+  height:14px;
+  border-radius:50%;
+  border:3px solid #091513
+}
+
+.mtg-distribution-line .bear{
+  left:0;
+  background:var(--bad)
+}
+
+.mtg-distribution-line .base{
+  left:50%;
+  transform:translateX(-50%);
+  background:var(--warn)
+}
+
+.mtg-distribution-line .bull{
+  right:0;
+  background:var(--accent)
+}
+
+.mtg-scenario-kpis{
+  display:grid;
+  grid-template-columns:repeat(5,minmax(0,1fr));
+  gap:8px;
+  margin-top:14px
+}
+
+.mtg-scenario-kpis article{
+  padding:10px;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:9px;
+  background:#091715
+}
+
+.mtg-scenario-kpis span{
+  display:block;
+  color:var(--muted);
+  font-size:8px
+}
+
+.mtg-scenario-kpis strong{
+  display:block;
+  margin-top:4px;
+  font-size:12px
+}
+
+.mtg-evidence-list{
+  display:grid;
+  gap:0;
+  margin-top:12px
+}
+
+.mtg-evidence-list>div{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  padding:9px 0;
+  border-bottom:1px solid rgba(255,255,255,.06);
+  font-size:9px
+}
+
+.mtg-evidence-list span{
+  color:var(--muted)
+}
+
+.mtg-evidence-list strong{
+  text-align:right
+}
+
+.mtg-governance-panel p{
+  color:var(--muted);
+  font-size:9px;
+  line-height:1.55;
+  margin:10px 0 0
+}
+
+.mtg-detail-loading{
+  border:1px solid var(--line);
+  border-radius:14px;
+  padding:30px;
+  color:var(--muted);
+  text-align:center
+}
+
+@media(max-width:1100px){
+  .mtg-research-grid{
+    grid-template-columns:repeat(2,minmax(0,1fr))
+  }
+
+  .mtg-scenario-kpis{
+    grid-template-columns:repeat(3,minmax(0,1fr))
+  }
+}
+
+@media(max-width:760px){
+  .mtg-lane-tabs,
+  .mtg-research-grid,
+  .mtg-hero-kpis,
+  .mtg-price-pair,
+  .mtg-distribution-cards,
+  .mtg-scenario-kpis{
+    grid-template-columns:1fr
+  }
+
+  .mtg-native-lane-hero,
+  .mtg-pagination{
+    align-items:stretch;
+    flex-direction:column
+  }
+
+  .mtg-native-lane-count{
+    border-left:0;
+    border-top:1px solid var(--line);
+    padding:12px 0 0;
+    text-align:left
+  }
+}
