@@ -1,0 +1,55 @@
+{
+  "authorization_id": "METALS-TERMINAL-FINAL-ACTION-DISPLAY-PR-AUTHORIZATION-1",
+  "source_deployment_review_head": "f0679dfe89e5e99cbc8e232d5e5ea4c53fd550b6",
+  "source_deployment_branch": "deploy/metals-final-action-display-fix",
+  "source_deployment_head": "23a0719c8bf6bc26ca7cc8c24b48c3ef581b8c18",
+  "main_base_head": "32668f5bcb73fc6b6f00c5b562e5f5433e6bf9cd",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "deployment_compare": {
+    "status": "ahead",
+    "ahead_by": 1,
+    "behind_by": 0,
+    "total_commits": 1
+  },
+  "authorized_pr": {
+    "base": "main",
+    "head": "deploy/metals-final-action-display-fix",
+    "required_changed_files": [
+      "foundation/production/dashboard_assets/recommendation_ui.js",
+      "tests/delivery/test_rec_ui_1.py"
+    ],
+    "required_commit_count": 1,
+    "title": "Deploy Metals final-action display precedence"
+  },
+  "authorization_scope": {
+    "pull_request_creation_authorized": true,
+    "pull_request_review_authorized": true,
+    "pull_request_check_inspection_authorized": true,
+    "main_merge_authorized": false,
+    "render_deployment_authorized": false,
+    "additional_code_change_authorized": false,
+    "deployment_branch_mutation_authorized": false,
+    "hosted_database_write_authorized": false,
+    "analytical_database_write_authorized": false,
+    "recommendation_recompute_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_refresh_authorized": false,
+    "allocation_or_execution_authorized": false
+  },
+  "required_pr_behavior": {
+    "require_main_unchanged_before_pr": true,
+    "require_deployment_head_exact": true,
+    "require_one_commit_over_main": true,
+    "require_exact_two_file_diff": true,
+    "require_no_research_branch_pr": true,
+    "require_no_whole_research_branch_merge": true,
+    "require_no_additional_commits_before_pr": true,
+    "require_pr_base_main": true,
+    "require_pr_head_deployment_branch": true,
+    "require_ci_and_checks_before_merge_consideration": true,
+    "require_merge_separate_authorization": true,
+    "require_render_deployment_separate_verification": true
+  },
+  "authorization_decision": "AUTHORIZE_BOUNDED_METALS_FINAL_ACTION_DISPLAY_PR_CREATION",
+  "next_decision": "CREATE_AND_CERTIFY_BOUNDED_METALS_FINAL_ACTION_DISPLAY_PR"
+}
