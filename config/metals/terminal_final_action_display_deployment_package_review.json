@@ -1,0 +1,47 @@
+{
+  "review_id": "METALS-TERMINAL-FINAL-ACTION-DISPLAY-DEPLOYMENT-PACKAGE-REVIEW-1",
+  "source_implementation_head": "3c85d3d74d45b4b027bfff6d22d57fb326594d38",
+  "source_implementation_commit_count": 1,
+  "source_implementation_files": [
+    "foundation/production/dashboard_assets/recommendation_ui.js",
+    "tests/delivery/test_metals_terminal_final_action_display_fix.py",
+    "tests/delivery/test_rec_ui_1.py"
+  ],
+  "main_base_head": "32668f5bcb73fc6b6f00c5b562e5f5433e6bf9cd",
+  "research_to_main_compare": {
+    "status": "diverged",
+    "research_ahead_by": 442,
+    "research_behind_by": 2,
+    "whole_research_branch_merge_safe": false,
+    "direct_research_branch_pr_safe": false
+  },
+  "deployment_strategy": "RECONSTRUCT_EXACT_DISPLAY_SEMANTIC_FIX_ON_FRESH_BRANCH_FROM_CURRENT_MAIN",
+  "deployment_branch": "deploy/metals-final-action-display-fix",
+  "deployment_package_files": [
+    "foundation/production/dashboard_assets/recommendation_ui.js",
+    "tests/delivery/test_rec_ui_1.py"
+  ],
+  "deployment_semantics": {
+    "metals_display_priority": "final_action_then_recommendation_then_native_recommendation",
+    "crypto_native_status_semantics_preserved": true,
+    "mtg_native_purchase_status_semantics_preserved": true,
+    "search_and_status_filter_use_display_status": true,
+    "bil_reference_control_visible": true,
+    "hosted_payload_change_required": false,
+    "read_api_change_required": false,
+    "analytical_change_required": false
+  },
+  "package_constraints": {
+    "whole_research_branch_merge_authorized": false,
+    "direct_research_branch_pr_authorized": false,
+    "cherry_pick_entire_implementation_commit_authorized": false,
+    "fresh_main_based_deployment_branch_required": true,
+    "exact_two_file_package_required": true,
+    "local_regression_certification_required_before_pr": true,
+    "pull_request_authorized": false,
+    "main_merge_authorized": false,
+    "render_deployment_authorized": false
+  },
+  "review_decision": "BOUNDED_MAIN_BASED_DEPLOYMENT_PACKAGE_REQUIRED_BEFORE_PR_AUTHORIZATION",
+  "next_decision": "CONSTRUCT_AND_CERTIFY_BOUNDED_METALS_TERMINAL_FINAL_ACTION_DISPLAY_DEPLOYMENT_PACKAGE"
+}
