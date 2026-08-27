@@ -1,0 +1,58 @@
+{
+  "authorization_id": "METALS-TERMINAL-FINAL-ACTION-DISPLAY-LIVE-AUTH-RACE-HOTFIX-PR-AUTHORIZATION-1",
+  "source_governed_head": "563a664144ecb3c9a1d2c066713b1b44ad036202",
+  "source_main_head": "d43993ca49f9494517374ae08d745706f65aac25",
+  "source_hotfix_branch": "hotfix/metals-recommendations-auth-race",
+  "source_hotfix_head": "47366660dd7e426c0dbed4ec262fdc8ac5736a39",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "hotfix_state": {
+    "status": "ahead",
+    "ahead_by": 1,
+    "behind_by": 0,
+    "commit_count": 1,
+    "changed_file_count": 2,
+    "local_rec_ui_tests_passed": 14,
+    "git_diff_check_passed": true,
+    "remote_head_matches_certified_local_head": true,
+    "production_main_unchanged": true,
+    "research_and_hotfix_worktrees_clean": true
+  },
+  "authorized_pr": {
+    "base": "main",
+    "head": "hotfix/metals-recommendations-auth-race",
+    "required_expected_head_sha": "47366660dd7e426c0dbed4ec262fdc8ac5736a39",
+    "required_commit_count": 1,
+    "required_changed_files": [
+      "foundation/production/dashboard_assets/dashboard.js",
+      "tests/delivery/test_rec_ui_1.py"
+    ],
+    "title": "Fix recommendations dashboard DOM ownership race"
+  },
+  "certified_behavior": {
+    "dashboard_recommendation_summary_write_is_null_safe": true,
+    "premium_recommendations_dom_ownership_preserved": true,
+    "core_domain_health_rendering_preserved": true,
+    "metals_final_action_semantics_unchanged": true,
+    "crypto_semantics_unchanged": true,
+    "mtg_semantics_unchanged": true,
+    "no_database_or_model_change": true
+  },
+  "authorization_scope": {
+    "pull_request_creation_authorized": true,
+    "pull_request_review_authorized": true,
+    "pull_request_check_inspection_authorized": true,
+    "main_merge_authorized": false,
+    "manual_render_deployment_authorized": false,
+    "hotfix_branch_mutation_authorized": false,
+    "additional_code_change_authorized": false,
+    "hosted_database_write_authorized": false,
+    "analytical_database_write_authorized": false,
+    "read_api_change_authorized": false,
+    "recommendation_recompute_authorized": false,
+    "forecast_refresh_authorized": false,
+    "model_refresh_authorized": false,
+    "allocation_or_execution_authorized": false
+  },
+  "authorization_decision": "AUTHORIZE_BOUNDED_LIVE_RECOMMENDATIONS_AUTH_RACE_HOTFIX_PULL_REQUEST_CREATION",
+  "next_decision": "CREATE_AND_CERTIFY_BOUNDED_LIVE_RECOMMENDATIONS_AUTH_RACE_HOTFIX_PULL_REQUEST"
+}
