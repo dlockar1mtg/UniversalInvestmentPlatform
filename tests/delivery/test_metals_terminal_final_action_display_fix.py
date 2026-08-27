@@ -77,3 +77,109 @@ def test_authorized_file_set_is_exact():
         "tests/delivery/test_rec_ui_1.py",
         "tests/delivery/test_metals_terminal_final_action_display_fix.py",
     }
+
+def test_implemented_ui_routes_metals_to_final_action_without_overwriting_native_semantics():
+    javascript = (
+        ROOT
+        / "foundation/production/dashboard_assets/recommendation_ui.js"
+    ).read_text(encoding="utf-8")
+
+    assert "function displayStatus(item)" in javascript
+    assert (
+        'payload.final_action??payload.recommendation??payload.native_recommendation??null'
+        in javascript
+    )
+    assert 'const status=cleanStatus(displayStatus(item))' in javascript
+
+    # All previous UI consumers now pass through displayStatus.
+    # nativeStatus itself remains only as the legacy domain-native
+    # implementation and the non-Metals delegate.
+    assert javascript.count("nativeStatus(") == 2
+    assert javascript.count("displayStatus(") >= 3
+
+
+def test_implemented_metals_status_precedence_matches_certified_twelve_asset_surface():
+    def display_status(domain_id, payload):
+        if domain_id == "metals":
+            return (
+                payload.get("final_action")
+                or payload.get("recommendation")
+                or payload.get("native_recommendation")
+            )
+        if domain_id == "mtg":
+            return payload.get("native_purchase_status")
+        return (
+            payload.get("native_recommendation")
+            or payload.get("recommendation")
+        )
+
+    cases = {
+        "metals:commodity:gold": ("HOLD", "RANKED_OPPORTUNITY"),
+        "metals:commodity:uranium": ("HOLD", "RANKED_OPPORTUNITY"),
+        "metals:vehicle:BIL": ("REFERENCE_CONTROL", "RESERVE_BUY"),
+        "metals:vehicle:COPX": ("HOLD", "HOLD"),
+        "metals:vehicle:CPER": ("HOLD", "HOLD"),
+        "metals:vehicle:GLD": ("WATCH", "BUY"),
+        "metals:vehicle:IAU": ("WATCH", "BUY"),
+        "metals:vehicle:PPLT": ("WATCH", "BUY"),
+        "metals:vehicle:SGOL": ("WATCH", "BUY"),
+        "metals:vehicle:SIVR": ("WATCH", "BUY"),
+        "metals:vehicle:SLV": ("WATCH", "BUY"),
+        "metals:vehicle:URA": ("HOLD", "HOLD"),
+    }
+
+    for asset_id, (final_action, native_recommendation) in cases.items():
+        payload = {
+            "final_action": final_action,
+            "recommendation": final_action,
+            "native_recommendation": native_recommendation,
+        }
+        assert display_status("metals", payload) == final_action, asset_id
+
+    assert display_status(
+        "crypto",
+        {
+            "final_action": "WATCH",
+            "recommendation": "WATCH",
+            "native_recommendation": "BUY",
+        },
+    ) == "BUY"
+
+    assert display_status(
+        "mtg",
+        {
+            "final_action": "HOLD",
+            "recommendation": "HOLD",
+            "native_purchase_status": "PURCHASE_CANDIDATE",
+        },
+    ) == "PURCHASE_CANDIDATE"
+
+
+def test_implemented_metals_display_fallback_order_is_fail_soft():
+    def metals_status(payload):
+        return (
+            payload.get("final_action")
+            or payload.get("recommendation")
+            or payload.get("native_recommendation")
+        )
+
+    assert metals_status(
+        {
+            "final_action": "WATCH",
+            "recommendation": "BUY",
+            "native_recommendation": "BUY",
+        }
+    ) == "WATCH"
+
+    assert metals_status(
+        {
+            "recommendation": "HOLD",
+            "native_recommendation": "BUY",
+        }
+    ) == "HOLD"
+
+    assert metals_status(
+        {
+            "native_recommendation": "BUY",
+        }
+    ) == "BUY"

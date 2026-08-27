@@ -132,3 +132,19 @@ def test_dashboard_serves_and_loads_rec_ui_assets_after_core_dashboard_styles_an
     assert core < rec < picker
     assert "REC-UI-1" in html
     assert "universal score or cross-domain rank" in html
+
+def test_rec_ui_metals_final_action_is_primary_while_native_domain_semantics_remain():
+    javascript = read("foundation/production/dashboard_assets/recommendation_ui.js")
+    assert "function displayStatus(item)" in javascript
+    assert (
+        'item.domain_id==="metals"?(payload.final_action??payload.recommendation??payload.native_recommendation??null):nativeStatus(item)'
+        in javascript
+    )
+    assert 'const status=cleanStatus(displayStatus(item))' in javascript
+    assert "function nativeStatus(item)" in javascript
+    assert (
+        'item.domain_id==="mtg"?(payload.native_purchase_status??null):(payload.native_recommendation??payload.recommendation??null)'
+        in javascript
+    )
+    assert javascript.count("nativeStatus(") == 2
+    assert javascript.count("displayStatus(") >= 3
