@@ -209,6 +209,10 @@ class PresentationReadRepository:
             "risk_metric",
             [],
         )
+        premium_research_records = records.get(
+            "mtg_premium_research",
+            [],
+        )
 
         def payloads(items):
             return [
@@ -225,6 +229,33 @@ class PresentationReadRepository:
         )
         forecasts = payloads(forecast_records)
         risks = payloads(risk_records)
+        premium_research_payloads = payloads(
+            premium_research_records
+        )
+
+        if len(premium_research_payloads) > 1:
+            raise ValueError(
+                "MTG premium projection refuses duplicate "
+                "premium research authority"
+            )
+
+        premium_research = (
+            premium_research_payloads[0]
+            if premium_research_payloads
+            else None
+        )
+
+        if premium_research is not None:
+            for forbidden_field in (
+                "automatic_purchase_execution",
+                "execution_ready_purchase_certified",
+            ):
+                if forbidden_field in premium_research:
+                    raise ValueError(
+                        "MTG premium projection refuses "
+                        "execution authority surface in "
+                        f"{forbidden_field}"
+                    )
 
         identity: dict[str, object] = {}
 
@@ -426,11 +457,15 @@ class PresentationReadRepository:
                 "risk_record_count": len(
                     risks
                 ),
+                "premium_research_record_count": len(
+                    premium_research_payloads
+                ),
                 "native_rank_state": rank_state,
                 "native_purchase_state": purchase_state,
             },
             "forecasts": forecasts,
             "risk_metrics": risks,
+            "premium_research": premium_research,
             "recommendations": recommendations,
             "native_authorities": native_authorities,
             "presentation_semantics": {
