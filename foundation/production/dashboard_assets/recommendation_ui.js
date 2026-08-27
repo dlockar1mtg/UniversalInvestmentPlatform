@@ -1,4 +1,4 @@
-﻿(()=>{
+(()=>{
 const REC_DOMAINS=["crypto","metals","mtg"];
 const REC_PAGE_SIZE=50;
 let catalog=null;
@@ -41,6 +41,51 @@ async function readDomain(domain){const items=[];let offset=0;while(true){const 
 async function readAssetDetail(item){const key=detailKey(item);if(detailCache.has(key))return detailCache.get(key);const detail=await recRequest(`/v1/presentation/assets/${encodeURIComponent(item.domain_id)}/${encodeURIComponent(item.asset_id)}`);detailCache.set(key,detail);return detail}
 async function hydrateCryptoResearch(){const items=catalog?.crypto||[];await Promise.all(items.map(readAssetDetail))}
 async function hydrateMetalsResearch(){const items=(catalog?.metals||[]).filter(item=>!isBil(item));await Promise.all(items.map(readAssetDetail))}
+
+const mtgResearchCache=new Map();
+
+function isSecretLairPremiumCandidate(item){
+  return String(item?.asset_id||"").startsWith("SECRET_LAIR_V1_1|");
+}
+
+async function readMtgPremiumResearch(item){
+  const key=detailKey(item);
+  if(mtgResearchCache.has(key))return mtgResearchCache.get(key);
+  const detail=await recRequest(`/v1/presentation/mtg-research/${encodeURIComponent(item.asset_id)}`);
+  mtgResearchCache.set(key,detail);
+  return detail;
+}
+
+async function hydrateMtgPremiumResearch(items){
+  const candidates=items.filter(isSecretLairPremiumCandidate);
+  await Promise.all(candidates.map(async item=>{
+    try{
+      await readMtgPremiumResearch(item);
+    }catch(error){
+      mtgResearchCache.set(detailKey(item),{
+        premium_research:null,
+        premium_research_error:String(error?.message||error||"Unavailable")
+      });
+    }
+  }));
+}
+
+function mtgPremiumDetail(item){
+  return mtgResearchCache.get(detailKey(item))||null;
+}
+
+function mtgPremiumPayload(item){
+  const detail=mtgPremiumDetail(item);
+  return detail&&typeof detail.premium_research==="object"&&detail.premium_research!==null
+    ?detail.premium_research
+    :null;
+}
+
+function mtgPremiumValue(item,key){
+  const premium=mtgPremiumPayload(item);
+  return premium?premium[key]:null;
+}
+
 
 function ensureMetalsVisualStyles(){
   if(document.getElementById("metals-v3-visual-styles"))return;
@@ -86,13 +131,364 @@ function renderMetalsExplainer(){return `<aside class="metals-explainer"><h4>Why
 function bindDomainButtons(page){page.querySelectorAll(".rec-open-domain").forEach(button=>button.addEventListener("click",()=>openDomain(button.dataset.recDomain)));page.querySelectorAll(".rec-crypto-detail").forEach(button=>button.addEventListener("click",()=>openCryptoDetail(button.dataset.assetId)));page.querySelectorAll(".rec-metals-detail").forEach(button=>button.addEventListener("click",()=>openMetalsDetail(button.dataset.assetId)))}
 function renderAll(){const page=node("recommendations");const crypto=catalog?.crypto||[];page.innerHTML=`${recommendationDomainSummaryAnchor()}<div class="rec-shell"><section class="rec-hero"><div class="rec-intro"><span class="eyebrow">RECOMMENDATIONS</span><h2>Investment research ✦</h2><p>Domain-native research, long-term thesis first. Current entry context second.</p><span class="rec-intro-link">How we research ↗</span></div><div class="rec-domain-grid">${REC_DOMAINS.map(domain=>renderDomainSummary(domain,catalog[domain]||[])).join("")}</div></section><section><div class="rec-section-head"><div><span class="eyebrow">FEATURED DOMAIN</span><h3>Crypto research <span class="rec-count-chip">${crypto.length} assets</span></h3></div><div class="rec-section-head-actions"><button type="button" class="secondary rec-open-domain" data-rec-domain="crypto">View all crypto research</button></div></div><div class="rec-crypto-layout" style="margin-top:14px"><div class="rec-asset-grid">${crypto.map(cryptoCard).join("")}</div>${renderExplainer()}</div></section><p class="governance-note">UIP keeps Crypto, Metals, and MTG as separate decision systems. This surface exposes certified investment evidence without manufacturing a universal score, cross-domain ranking, or automatic purchase decision.</p></div>`;bindDomainButtons(page)}
 
+
+function ensureMtgPremiumVisualStyles(){
+  if(document.getElementById("mtg-premium-visual-styles"))return;
+  const style=document.createElement("style");
+  style.id="mtg-premium-visual-styles";
+  style.textContent=`
+  .mtg-premium-shell{display:grid;gap:16px}
+  .mtg-premium-hero{border:1px solid var(--line);border-radius:16px;padding:24px;background:linear-gradient(135deg,rgba(35,25,48,.98),rgba(12,22,28,.98));box-shadow:var(--shadow);display:grid;grid-template-columns:minmax(0,1.2fr) minmax(280px,.8fr);gap:22px}
+  .mtg-premium-hero h3{font-size:28px;margin:8px 0}
+  .mtg-premium-hero p{font-size:10px;line-height:1.6;color:var(--muted);max-width:780px}
+  .mtg-premium-hero-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .mtg-premium-hero-stat{border:1px solid rgba(186,153,255,.24);background:rgba(20,14,31,.5);border-radius:11px;padding:13px}
+  .mtg-premium-hero-stat span{display:block;color:var(--muted);font-size:8px;text-transform:uppercase;letter-spacing:.08em}
+  .mtg-premium-hero-stat strong{display:block;margin-top:5px;font-size:16px}
+  .mtg-premium-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .mtg-premium-card{border:1px solid rgba(186,153,255,.22);border-radius:14px;background:linear-gradient(145deg,rgba(28,22,39,.96),rgba(10,22,25,.98));padding:17px;display:grid;gap:13px;min-height:290px;box-shadow:var(--shadow)}
+  .mtg-premium-card.native-only{border-color:var(--line);background:rgba(13,27,25,.94)}
+  .mtg-premium-card-head{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+  .mtg-premium-name{display:grid;gap:4px}
+  .mtg-premium-name strong{font-size:13px;line-height:1.35}
+  .mtg-premium-name small{font-size:8px;color:var(--muted);word-break:break-all}
+  .mtg-rank-chip,.mtg-state-chip{border:1px solid rgba(186,153,255,.28);border-radius:999px;padding:4px 8px;font-size:8px;white-space:nowrap;color:#d8c5ff;background:rgba(128,87,187,.12)}
+  .mtg-state-chip.entry{border-color:rgba(99,230,190,.35);color:var(--accent);background:rgba(99,230,190,.08)}
+  .mtg-state-chip.wait{border-color:rgba(255,207,102,.35);color:#ffcf66;background:rgba(255,207,102,.06)}
+  .mtg-premium-kpis{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+  .mtg-premium-kpi{border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:9px;background:rgba(4,12,14,.28)}
+  .mtg-premium-kpi span{display:block;color:var(--muted);font-size:8px}
+  .mtg-premium-kpi strong{display:block;margin-top:4px;font-size:14px}
+  .mtg-entry-panel{border:1px solid rgba(255,207,102,.28);background:rgba(255,207,102,.055);border-radius:10px;padding:11px}
+  .mtg-entry-panel .label{font-size:8px;color:#ffcf66;text-transform:uppercase;letter-spacing:.08em}
+  .mtg-entry-panel strong{font-size:18px;display:block;margin-top:4px}
+  .mtg-entry-panel small{display:block;color:var(--muted);font-size:8px;margin-top:4px;line-height:1.45}
+  .mtg-scenario-strip{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .mtg-scenario-strip div{border:1px solid rgba(255,255,255,.07);border-radius:9px;padding:9px}
+  .mtg-scenario-strip span{display:block;color:var(--muted);font-size:8px}
+  .mtg-scenario-strip strong{font-size:12px;display:block;margin-top:4px}
+  .mtg-native-note{font-size:8px;line-height:1.5;color:var(--muted)}
+  .mtg-premium-toolbar{display:grid;grid-template-columns:minmax(0,1fr) 220px;gap:10px}
+  .mtg-detail-hero{border:1px solid rgba(186,153,255,.26);border-radius:16px;padding:24px;background:linear-gradient(135deg,rgba(34,25,47,.98),rgba(8,25,24,.98));display:grid;grid-template-columns:minmax(0,1.25fr) minmax(300px,.75fr);gap:20px;box-shadow:var(--shadow)}
+  .mtg-detail-title h3{font-size:29px;margin:7px 0}
+  .mtg-detail-title p{font-size:9px;color:var(--muted);line-height:1.6}
+  .mtg-detail-price{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+  .mtg-detail-price article{border:1px solid rgba(255,255,255,.08);border-radius:11px;padding:13px;background:rgba(5,15,17,.42)}
+  .mtg-detail-price span{font-size:8px;color:var(--muted)}
+  .mtg-detail-price strong{font-size:19px;display:block;margin-top:5px}
+  .mtg-detail-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(280px,.65fr);gap:14px}
+  .mtg-research-panel{border:1px solid var(--line);border-radius:14px;background:rgba(13,27,25,.94);padding:18px}
+  .mtg-research-panel h4{margin:0 0 5px}
+  .mtg-research-sub{font-size:9px;color:var(--muted);line-height:1.55;margin-bottom:14px}
+  .mtg-q10-callout{border:1px solid rgba(255,207,102,.30);border-radius:12px;padding:16px;background:rgba(255,207,102,.06)}
+  .mtg-q10-callout strong{display:block;font-size:24px;margin:5px 0}
+  .mtg-q10-callout span{font-size:8px;color:#ffcf66;text-transform:uppercase;letter-spacing:.08em}
+  .mtg-q10-callout p{font-size:9px;color:var(--muted);line-height:1.55;margin:7px 0 0}
+  .mtg-range-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+  .mtg-range-grid article{border:1px solid rgba(255,255,255,.07);border-radius:10px;padding:11px;background:rgba(5,15,17,.34)}
+  .mtg-range-grid span{font-size:8px;color:var(--muted)}
+  .mtg-range-grid strong{display:block;font-size:14px;margin-top:4px}
+  .mtg-scenario-table{width:100%;border-collapse:collapse}
+  .mtg-scenario-table th,.mtg-scenario-table td{padding:9px;border-bottom:1px solid rgba(255,255,255,.06);font-size:9px;text-align:right}
+  .mtg-scenario-table th:first-child,.mtg-scenario-table td:first-child{text-align:left}
+  .mtg-evidence-list{display:grid;gap:9px}
+  .mtg-evidence-list div{display:flex;justify-content:space-between;gap:12px;border-bottom:1px solid rgba(255,255,255,.06);padding-bottom:8px;font-size:9px}
+  .mtg-evidence-list span{color:var(--muted)}
+  .mtg-scenario-warning{border:1px dashed rgba(186,153,255,.35);border-radius:10px;padding:11px;color:var(--muted);font-size:9px;line-height:1.55;background:rgba(128,87,187,.055)}
+  @media(max-width:1100px){.mtg-premium-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.mtg-premium-hero,.mtg-detail-hero,.mtg-detail-grid{grid-template-columns:1fr}}
+  @media(max-width:720px){.mtg-premium-grid,.mtg-premium-toolbar,.mtg-detail-price{grid-template-columns:1fr}}
+  `;
+  document.head.appendChild(style);
+}
+
+function mtgEntryStateClass(value){
+  const state=String(value||"").toUpperCase();
+  if(state.includes("BELOW")||state.includes("AT_Q10")||state.includes("BUY"))return "entry";
+  return "wait";
+}
+
+function mtgPremiumCard(item){
+  const p=item.payload||{};
+  const premium=mtgPremiumPayload(item);
+  const rank=p.native_rank==null?"?":fmtNumber(p.native_rank,0);
+  const status=cleanStatus(nativeStatus(item));
+
+  if(!premium){
+    return `<article class="mtg-premium-card native-only">
+      <div class="mtg-premium-card-head">
+        <div class="mtg-premium-name">
+          <strong>${escapeHtml(displayName(item))}</strong>
+          <small>${escapeHtml(item.asset_id||"")}</small>
+        </div>
+        <span class="mtg-rank-chip">Native rank ${escapeHtml(rank)}</span>
+      </div>
+      <div>
+        <span class="mtg-state-chip">${escapeHtml(status)}</span>
+      </div>
+      <div class="mtg-native-note">
+        Premium research unavailable for this lane. UIP does not synthesize Secret Lair price or forecast authority for Collector or Pre-Collector records.
+      </div>
+      <div class="mtg-premium-kpis">
+        <div class="mtg-premium-kpi"><span>Evidence</span><strong>${escapeHtml(cleanStatus(p.evidence_state))}</strong></div>
+        <div class="mtg-premium-kpi"><span>Actionability</span><strong>${escapeHtml(cleanStatus(p.actionability_state))}</strong></div>
+      </div>
+      <div class="mtg-native-note">Recommendation does not authorize execution.</div>
+    </article>`;
+  }
+
+  const q10State=premium.current_price_vs_q10_break_even_state;
+  return `<article class="mtg-premium-card">
+    <div class="mtg-premium-card-head">
+      <div class="mtg-premium-name">
+        <strong>${escapeHtml(premium.product_name||displayName(item))}</strong>
+        <small>${escapeHtml(item.asset_id||"")}</small>
+      </div>
+      <span class="mtg-rank-chip">Native rank ${escapeHtml(rank)}</span>
+    </div>
+    <div style="display:flex;gap:7px;flex-wrap:wrap">
+      <span class="mtg-state-chip">${escapeHtml(status)}</span>
+      <span class="mtg-state-chip ${mtgEntryStateClass(q10State)}">${escapeHtml(cleanStatus(q10State))}</span>
+    </div>
+    <div class="mtg-premium-kpis">
+      <div class="mtg-premium-kpi"><span>Current market</span><strong>${escapeHtml(fmtMoney(premium.current_tcg_market_price_usd))}</strong></div>
+      <div class="mtg-premium-kpi"><span>Certified 1Y outlook</span><strong>${escapeHtml(fmtPercent(premium.certified_1y_point_return))}</strong></div>
+    </div>
+    <div class="mtg-entry-panel">
+      <span class="label">Governed Q10 entry</span>
+      <strong>${escapeHtml(fmtMoney(premium.y1_q10_break_even_entry_price_usd))}</strong>
+      <small>Current margin to governed Q10: ${escapeHtml(fmtMoney(premium.current_price_margin_to_q10_break_even))}. Q25/Q50 do not replace this purchase threshold.</small>
+    </div>
+    <div class="mtg-scenario-strip">
+      <div><span>3Y scenario median</span><strong>${escapeHtml(fmtPercent(premium.y3_median_total_return_scenario))}</strong></div>
+      <div><span>5Y scenario median</span><strong>${escapeHtml(fmtPercent(premium.y5_median_total_return_scenario))}</strong></div>
+    </div>
+    <button type="button" class="secondary rec-mtg-premium-detail" data-asset-id="${escapeHtml(item.asset_id)}">Open investment research ?</button>
+  </article>`;
+}
+
+function bindMtgPremiumButtons(page,items){
+  const byId=new Map(items.map(item=>[String(item.asset_id),item]));
+  page.querySelectorAll(".rec-mtg-premium-detail").forEach(button=>{
+    button.addEventListener("click",()=>{
+      const item=byId.get(String(button.dataset.assetId));
+      if(item)openMtgPremiumDetail(page,item);
+    });
+  });
+}
+
+async function renderMtgDomain(page,all,filtered,statusOptions,start,maxPage){
+  ensureMtgPremiumVisualStyles();
+
+  const visible=filtered.slice(start,start+REC_PAGE_SIZE);
+
+  page.innerHTML=`${recommendationDomainSummaryAnchor()}
+    <div class="rec-shell mtg-premium-shell">
+      <div class="rec-section-head">
+        <div>
+          <span class="eyebrow">MTG INVESTMENT RESEARCH</span>
+          <h3>Sealed-product opportunity <span class="rec-count-chip">${filtered.length} matching ? ${all.length} total</span></h3>
+        </div>
+        <button type="button" id="rec-all-domains" class="secondary">All domains</button>
+      </div>
+      <p class="governance-note">Native MTG rank remains MTG-only. Secret Lair premium authority is loaded from the certified MTG research endpoint; missing premium authority remains missing. Recommendation does not authorize execution.</p>
+      <div class="mtg-premium-toolbar">
+        <input id="rec-search" value="${escapeHtml(searchText)}" placeholder="Search sealed product, ID, lane, or native status...">
+        <select id="rec-status">${statusOptions}</select>
+      </div>
+      <article class="mtg-premium-hero">
+        <div>
+          <span class="eyebrow">SECRET LAIR PREMIUM RESEARCH</span>
+          <h3>Price discipline first. Long-term scenario context second.</h3>
+          <p>UIP shows the governed Q10 entry threshold beside the certified one-year outlook. Three- and five-year values remain scenario distributions and never become direct certified forecasts or purchase triggers.</p>
+        </div>
+        <div class="mtg-premium-hero-stats">
+          <div class="mtg-premium-hero-stat"><span>Visible assets</span><strong>${visible.length}</strong></div>
+          <div class="mtg-premium-hero-stat"><span>Premium lane</span><strong>Secret Lair</strong></div>
+          <div class="mtg-premium-hero-stat"><span>Purchase gate</span><strong>1Y Q10</strong></div>
+          <div class="mtg-premium-hero-stat"><span>Execution</span><strong>Manual only</strong></div>
+        </div>
+      </article>
+      <div id="mtg-premium-card-grid" class="mtg-premium-grid">
+        ${visible.map(item=>`<article class="mtg-premium-card native-only"><div class="mtg-premium-name"><strong>${escapeHtml(displayName(item))}</strong><small>${escapeHtml(item.asset_id||"")}</small></div><div class="mtg-native-note">${isSecretLairPremiumCandidate(item)?"Loading certified premium research?":"Native MTG authority ? premium research unavailable for this lane."}</div></article>`).join("")}
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px">
+        <span class="page-note">Rows ${filtered.length?start+1:0}-${Math.min(start+REC_PAGE_SIZE,filtered.length)} of ${filtered.length}</span>
+        <div style="display:flex;gap:8px">
+          <button type="button" id="rec-prev" class="secondary" ${pageIndex===0?"disabled":""}>Previous</button>
+          <button type="button" id="rec-next" class="secondary" ${pageIndex>=maxPage?"disabled":""}>Next</button>
+        </div>
+      </div>
+    </div>`;
+
+  bindDomainControls(page,maxPage);
+
+  await hydrateMtgPremiumResearch(visible);
+
+  if(selectedDomain!=="mtg")return;
+
+  const grid=page.querySelector("#mtg-premium-card-grid");
+  if(!grid)return;
+
+  grid.innerHTML=visible.map(mtgPremiumCard).join("");
+  bindMtgPremiumButtons(page,visible);
+}
+
+async function openMtgPremiumDetail(page,item){
+  ensureMtgPremiumVisualStyles();
+
+  let detail=mtgPremiumDetail(item);
+
+  if(!detail){
+    page.innerHTML=`<div class="rec-shell"><p class="governance-note">Loading certified MTG premium research?</p></div>`;
+    detail=await readMtgPremiumResearch(item);
+  }
+
+  const premium=detail?.premium_research||null;
+  const p=item.payload||{};
+
+  if(!premium){
+    page.innerHTML=`${recommendationDomainSummaryAnchor()}
+      <div class="rec-shell">
+        <div class="rec-section-head">
+          <div><span class="eyebrow">MTG RESEARCH</span><h3>${escapeHtml(displayName(item))}</h3></div>
+          <button type="button" id="mtg-premium-back" class="secondary">Back to MTG research</button>
+        </div>
+        <article class="mtg-research-panel">
+          <h4>Premium research unavailable for this lane</h4>
+          <p class="mtg-research-sub">UIP does not synthesize Secret Lair premium authority for this MTG asset. Collector and Pre-Collector governance remains unchanged.</p>
+          <div class="mtg-evidence-list">
+            <div><span>Native status</span><strong>${escapeHtml(cleanStatus(nativeStatus(item)))}</strong></div>
+            <div><span>Native rank</span><strong>${escapeHtml(p.native_rank==null?"?":fmtNumber(p.native_rank,0))}</strong></div>
+            <div><span>Evidence</span><strong>${escapeHtml(cleanStatus(p.evidence_state))}</strong></div>
+            <div><span>Actionability</span><strong>${escapeHtml(cleanStatus(p.actionability_state))}</strong></div>
+          </div>
+        </article>
+      </div>`;
+    const back=page.querySelector("#mtg-premium-back");
+    if(back)back.addEventListener("click",()=>renderDomain());
+    return;
+  }
+
+  const nativeRank=p.native_rank==null?"?":fmtNumber(p.native_rank,0);
+  const q10State=cleanStatus(premium.current_price_vs_q10_break_even_state);
+
+  page.innerHTML=`${recommendationDomainSummaryAnchor()}
+    <div class="rec-shell mtg-premium-shell">
+      <div class="rec-section-head">
+        <div><span class="eyebrow">MTG ? SECRET LAIR PREMIUM RESEARCH</span><h3>Investment research</h3></div>
+        <button type="button" id="mtg-premium-back" class="secondary">Back to MTG research</button>
+      </div>
+
+      <article class="mtg-detail-hero">
+        <div class="mtg-detail-title">
+          <span class="eyebrow">${escapeHtml(cleanStatus(nativeStatus(item)))}</span>
+          <h3>${escapeHtml(premium.product_name||displayName(item))}</h3>
+          <p>${escapeHtml(item.asset_id||"")} ? Native rank ${escapeHtml(nativeRank)}. MTG native rank is used only inside MTG and cannot override the governed Q10 purchase policy.</p>
+        </div>
+        <div class="mtg-detail-price">
+          <article><span>Current market price</span><strong>${escapeHtml(fmtMoney(premium.current_tcg_market_price_usd))}</strong></article>
+          <article><span>Governed Q10 entry</span><strong>${escapeHtml(fmtMoney(premium.y1_q10_break_even_entry_price_usd))}</strong></article>
+          <article><span>Certified 1Y forecast</span><strong>${escapeHtml(fmtMoney(premium.certified_1y_point_forecast_usd))}</strong></article>
+          <article><span>Certified 1Y return</span><strong>${escapeHtml(fmtPercent(premium.certified_1y_point_return))}</strong></article>
+        </div>
+      </article>
+
+      <div class="mtg-detail-grid">
+        <div style="display:grid;gap:14px">
+          <article class="mtg-research-panel">
+            <h4>Governed Q10 entry discipline</h4>
+            <p class="mtg-research-sub">Secret Lair BUY eligibility remains tied to the governed one-year Q10 break-even threshold. Q25 and Q50 are diagnostic context only.</p>
+            <div class="mtg-q10-callout">
+              <span>Current price vs Q10 state</span>
+              <strong>${escapeHtml(q10State)}</strong>
+              <p>Current market ${escapeHtml(fmtMoney(premium.current_tcg_market_price_usd))} ? Q10 break-even entry ${escapeHtml(fmtMoney(premium.y1_q10_break_even_entry_price_usd))} ? margin ${escapeHtml(fmtMoney(premium.current_price_margin_to_q10_break_even))}</p>
+            </div>
+          </article>
+
+          <article class="mtg-research-panel">
+            <h4>Certified 1Y outlook</h4>
+            <p class="mtg-research-sub">Direct certified one-year forecast and modeled distribution.</p>
+            <div class="mtg-range-grid">
+              <article><span>Q10 terminal</span><strong>${escapeHtml(fmtMoney(premium.y1_q10_terminal_value_usd))}</strong></article>
+              <article><span>Q50 terminal</span><strong>${escapeHtml(fmtMoney(premium.y1_q50_terminal_value_usd))}</strong></article>
+              <article><span>Q90 terminal</span><strong>${escapeHtml(fmtMoney(premium.y1_q90_terminal_value_usd))}</strong></article>
+            </div>
+            <div class="mtg-range-grid" style="margin-top:9px">
+              <article><span>Probability of loss</span><strong>${escapeHtml(fmtPercent(premium.y1_probability_of_loss))}</strong></article>
+              <article><span>Positive return probability</span><strong>${escapeHtml(fmtPercent(premium.y1_probability_of_positive_return))}</strong></article>
+              <article><span>Upside tail mean</span><strong>${escapeHtml(fmtPercent(premium.y1_upside_tail_mean_total_return))}</strong></article>
+            </div>
+          </article>
+
+          <article class="mtg-research-panel">
+            <h4>Longer-horizon scenarios</h4>
+            <p class="mtg-research-sub">Three- and five-year outputs are scenario distributions, not direct certified forecasts and not purchase triggers.</p>
+            <table class="mtg-scenario-table">
+              <thead><tr><th>Scenario horizon</th><th>Q10 terminal</th><th>Q50 terminal</th><th>Q90 terminal</th><th>Median return</th><th>Loss probability</th></tr></thead>
+              <tbody>
+                <tr>
+                  <td>3Y scenario</td>
+                  <td>${escapeHtml(fmtMoney(premium.y3_q10_terminal_value_scenario_usd))}</td>
+                  <td>${escapeHtml(fmtMoney(premium.y3_q50_terminal_value_scenario_usd))}</td>
+                  <td>${escapeHtml(fmtMoney(premium.y3_q90_terminal_value_scenario_usd))}</td>
+                  <td>${escapeHtml(fmtPercent(premium.y3_median_total_return_scenario))}</td>
+                  <td>${escapeHtml(fmtPercent(premium.y3_probability_of_loss_scenario))}</td>
+                </tr>
+                <tr>
+                  <td>5Y scenario</td>
+                  <td>${escapeHtml(fmtMoney(premium.y5_q10_terminal_value_scenario_usd))}</td>
+                  <td>${escapeHtml(fmtMoney(premium.y5_q50_terminal_value_scenario_usd))}</td>
+                  <td>${escapeHtml(fmtMoney(premium.y5_q90_terminal_value_scenario_usd))}</td>
+                  <td>${escapeHtml(fmtPercent(premium.y5_median_total_return_scenario))}</td>
+                  <td>${escapeHtml(fmtPercent(premium.y5_probability_of_loss_scenario))}</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="mtg-scenario-warning" style="margin-top:12px">
+              3Y and 5Y are scenarios only. UIP does not present these values as direct certified forecasts, does not use them to replace Q10, and does not authorize purchase execution from them.
+            </div>
+          </article>
+        </div>
+
+        <div style="display:grid;gap:14px;align-content:start">
+          <article class="mtg-research-panel">
+            <h4>Evidence strength</h4>
+            <p class="mtg-research-sub">Historical depth and structural comparable support behind the premium analysis.</p>
+            <div class="mtg-evidence-list">
+              <div><span>Own-history evidence</span><strong>${escapeHtml(cleanStatus(premium.own_history_evidence_class))}</strong></div>
+              <div><span>History span</span><strong>${escapeHtml(fmtNumber(premium.history_span_days,0))} days</strong></div>
+              <div><span>Historical observations</span><strong>${escapeHtml(fmtNumber(premium.historical_observation_count,0))}</strong></div>
+              <div><span>Exact structural products</span><strong>${escapeHtml(fmtNumber(premium.exact_structural_comparable_product_count,0))}</strong></div>
+              <div><span>Global comparable products</span><strong>${escapeHtml(fmtNumber(premium.global_comparable_product_count,0))}</strong></div>
+              <div><span>Exact comparable events</span><strong>${escapeHtml(fmtNumber(premium.exact_structural_comparable_event_count,0))}</strong></div>
+              <div><span>Global comparable events</span><strong>${escapeHtml(fmtNumber(premium.global_comparable_event_count,0))}</strong></div>
+            </div>
+          </article>
+
+          <article class="mtg-research-panel">
+            <h4>Authority & governance</h4>
+            <div class="mtg-evidence-list">
+              <div><span>Native rank</span><strong>${escapeHtml(nativeRank)}</strong></div>
+              <div><span>Native purchase status</span><strong>${escapeHtml(cleanStatus(nativeStatus(item)))}</strong></div>
+              <div><span>Source authority</span><strong style="text-align:right;max-width:220px;word-break:break-word">${escapeHtml(premium.source_authority_path||"?")}</strong></div>
+            </div>
+            <p class="mtg-research-sub" style="margin-top:12px">No universal MTG rank or cross-domain rank is created. Recommendation does not authorize execution.</p>
+          </article>
+        </div>
+      </div>
+    </div>`;
+
+  const back=page.querySelector("#mtg-premium-back");
+  if(back)back.addEventListener("click",()=>renderDomain());
+}
+
 function filteredDomainItems(){let items=[...(catalog[selectedDomain]||[])];if(selectedDomain==="mtg"){items.sort((a,b)=>{const ar=Number(a.payload?.native_rank);const br=Number(b.payload?.native_rank);const aRank=Number.isFinite(ar);const bRank=Number.isFinite(br);if(aRank&&bRank&&ar!==br)return ar-br;if(aRank!==bRank)return aRank?-1:1;return String(a.record_key||"").localeCompare(String(b.record_key||""))})}if(selectedStatus!=="all")items=items.filter(item=>(nativeStatus(item)||"MISSING")===selectedStatus);if(searchText)items=items.filter(item=>searchKey(item).includes(searchText));return items}
 function genericRows(items){return items.map(item=>{const p=item.payload||{};const horizon=p.time_horizon_months==null?"—":`${fmtNumber(p.time_horizon_months,0)} mo`;return `<tr><td><span class="position-name"><strong>${escapeHtml(displayName(item))}</strong><small>${escapeHtml(item.asset_symbol||item.asset_id||"")}</small></span></td><td>${escapeHtml(cleanStatus(nativeStatus(item)))}</td><td>${escapeHtml(fmtNumber(p.normalized_score))}</td><td>${escapeHtml(fmtNumber(p.confidence_score))}</td><td>${escapeHtml(horizon)}</td><td style="text-align:left;max-width:320px">${escapeHtml(p.rationale??"—")}</td><td style="text-align:left;max-width:260px">${escapeHtml(p.risk_summary??"—")}</td><td><button type="button" class="secondary rec-metals-detail" data-asset-id="${escapeHtml(item.asset_id)}">Research ↗</button></td></tr>`}).join("")}
 function mtgRows(items){return items.map(item=>{const p=item.payload||{};const rank=p.native_rank==null?"—":`${fmtNumber(p.native_rank,0)}${p.native_rank_type?` · ${p.native_rank_type}`:""}`;return `<tr><td><span class="position-name"><strong>${escapeHtml(displayName(item))}</strong><small>${escapeHtml(item.asset_subclass||item.asset_id||"")}</small></span></td><td>${escapeHtml(cleanStatus(nativeStatus(item)))}</td><td>${escapeHtml(rank)}</td><td>${escapeHtml(p.evidence_state??"—")}</td><td>${escapeHtml(p.actionability_state??"—")}</td><td>${p.manual_execution_price_check_required===true?"Required":p.manual_execution_price_check_required===false?"No":"—"}</td><td>${p.execution_ready_purchase_certified===true?"Yes":p.execution_ready_purchase_certified===false?"No":"—"}</td><td>${p.automatic_purchase_execution===true?"Yes":p.automatic_purchase_execution===false?"No":"—"}</td></tr>`}).join("")}
 function bindDomainControls(page,maxPage){node("rec-all-domains")?.addEventListener("click",()=>{selectedDomain="all";selectedStatus="all";searchText="";pageIndex=0;renderAll()});node("rec-search")?.addEventListener("input",event=>{searchText=event.target.value.trim().toLowerCase();pageIndex=0;renderDomain()});node("rec-status")?.addEventListener("change",event=>{selectedStatus=event.target.value;pageIndex=0;renderDomain()});node("rec-prev")?.addEventListener("click",()=>{if(pageIndex>0){pageIndex-=1;renderDomain()}});node("rec-next")?.addEventListener("click",()=>{if(pageIndex<maxPage){pageIndex+=1;renderDomain()}});page.querySelectorAll(".rec-crypto-detail").forEach(button=>button.addEventListener("click",()=>openCryptoDetail(button.dataset.assetId)));page.querySelectorAll(".rec-metals-detail").forEach(button=>button.addEventListener("click",()=>openMetalsDetail(button.dataset.assetId)))}
 function renderCryptoDomain(page,all,filtered,statusOptions){page.innerHTML=`${recommendationDomainSummaryAnchor()}<div class="rec-shell"><div class="rec-section-head"><div><span class="eyebrow">RECOMMENDATIONS</span><h3>Crypto research <span class="rec-count-chip">${filtered.length} matching · ${all.length} total</span></h3></div><button type="button" id="rec-all-domains" class="secondary">All domains</button></div><p class="governance-note">Crypto is presented 3-year first. Rows are not a UIP-created rank; shorter horizons are entry context only. Recommendation does not authorize execution.</p><div class="rec-toolbar"><input id="rec-search" value="${escapeHtml(searchText)}" placeholder="Search asset, symbol, or status..."><select id="rec-status">${statusOptions}</select><button type="button" class="secondary" disabled>36-month strategic outlook</button></div><div class="rec-crypto-layout"><div class="rec-asset-grid">${filtered.map(cryptoCard).join("")}</div>${renderExplainer()}</div></div>`;bindDomainControls(page,0)}
 function renderMetalsDomain(page,all,filtered,statusOptions,start,maxPage){ensureMetalsVisualStyles();const featured=filtered.filter(item=>!isBil(item));const visibleTable=filtered.slice(start,start+REC_PAGE_SIZE);const table=`<table style="min-width:1380px"><thead><tr><th>Asset</th><th>Native recommendation</th><th>Domain score</th><th>Confidence</th><th>Horizon</th><th>Rationale</th><th>Risk</th><th>Detail</th></tr></thead><tbody>${genericRows(visibleTable)}</tbody></table>`;page.innerHTML=`${recommendationDomainSummaryAnchor()}<div class="rec-shell"><div class="rec-section-head"><div><span class="eyebrow">METALS RESEARCH</span><h3>Long-term thesis + tactical opportunity <span class="rec-count-chip">${featured.length} featured · ${all.length} total</span></h3></div><button type="button" id="rec-all-domains" class="secondary">All domains</button></div><p class="governance-note">Metals is long-term thesis first, tactical context second. Featured cards exclude BIL. Tactical states do not authorize execution.</p><div class="rec-toolbar"><input id="rec-search" value="${escapeHtml(searchText)}" placeholder="Search metal, vehicle, or status..."><select id="rec-status">${statusOptions}</select><button type="button" class="secondary" disabled>Long-term + tactical</button></div><div class="metals-layout"><div class="metals-card-grid">${featured.map(metalsCard).join("")}</div>${renderMetalsExplainer()}</div><details class="metals-secondary-table" open><summary>All Metals research · secondary evidence table</summary><div class="table-wrap">${table}</div><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px"><span class="page-note">Rows ${filtered.length?start+1:0}-${Math.min(start+REC_PAGE_SIZE,filtered.length)} of ${filtered.length}</span><div style="display:flex;gap:8px"><button type="button" id="rec-prev" class="secondary" ${pageIndex===0?"disabled":""}>Previous</button><button type="button" id="rec-next" class="secondary" ${pageIndex>=maxPage?"disabled":""}>Next</button></div></div></details></div>`;bindDomainControls(page,maxPage)}
-function renderDomain(){const page=node("recommendations");const all=catalog[selectedDomain]||[];const statuses=[...new Set(all.map(item=>nativeStatus(item)||"MISSING"))].sort();const filtered=filteredDomainItems();const maxPage=Math.max(0,Math.ceil(filtered.length/REC_PAGE_SIZE)-1);if(pageIndex>maxPage)pageIndex=maxPage;const start=pageIndex*REC_PAGE_SIZE;const visible=filtered.slice(start,start+REC_PAGE_SIZE);const statusOptions=[`<option value="all">All native statuses</option>`,...statuses.map(status=>`<option value="${escapeHtml(status)}"${selectedStatus===status?" selected":""}>${escapeHtml(cleanStatus(status))}</option>`)].join("");if(selectedDomain==="crypto"){renderCryptoDomain(page,all,filtered,statusOptions);return}if(selectedDomain==="metals"){renderMetalsDomain(page,all,filtered,statusOptions,start,maxPage);return}let orderNote="Catalog order is presentation order; UIP does not manufacture a rank for this domain.";let utilityNote="Certified recommendation, rationale, and risk evidence.";let table=`<table style="min-width:1380px"><thead><tr><th>Asset</th><th>Native recommendation</th><th>Domain score</th><th>Confidence</th><th>Horizon</th><th>Rationale</th><th>Risk</th><th>Detail</th></tr></thead><tbody>${genericRows(visible)}</tbody></table>`;if(selectedDomain==="mtg"){table=`<table style="min-width:1450px"><thead><tr><th>Asset</th><th>Native status</th><th>Native rank</th><th>Evidence</th><th>Actionability</th><th>Manual price check</th><th>Execution ready</th><th>Automatic execution</th></tr></thead><tbody>${mtgRows(visible)}</tbody></table>`;orderNote="MTG native rank is used only inside MTG where provided. Unranked native records remain visible.";utilityNote="Native MTG authority remains unchanged; richer price and forecast presentation follows in the MTG utility pass."}page.innerHTML=`${recommendationDomainSummaryAnchor()}<div class="rec-shell"><div class="rec-section-head"><div><span class="eyebrow">RECOMMENDATIONS</span><h3>${escapeHtml(selectedDomain.toUpperCase())} research</h3></div><button type="button" id="rec-all-domains" class="secondary">All domains</button></div><article class="rec-domain-table panel"><div class="section-title"><div><h3>${escapeHtml(utilityNote)}</h3><span>${escapeHtml(filtered.length)} matching · ${escapeHtml(all.length)} total</span></div></div><p class="governance-note">${escapeHtml(orderNote)} Recommendation does not authorize execution.</p><div class="transaction-form" style="grid-template-columns:1fr 1fr;margin:16px 0"><label>Search<input id="rec-search" value="${escapeHtml(searchText)}" placeholder="Asset, ID, lane, status..."></label><label>Native status<select id="rec-status">${statusOptions}</select></label></div><div class="table-wrap">${table}</div><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px"><span class="page-note">Rows ${filtered.length?start+1:0}-${Math.min(start+REC_PAGE_SIZE,filtered.length)} of ${filtered.length}</span><div style="display:flex;gap:8px"><button type="button" id="rec-prev" class="secondary" ${pageIndex===0?"disabled":""}>Previous</button><button type="button" id="rec-next" class="secondary" ${pageIndex>=maxPage?"disabled":""}>Next</button></div></div></article></div>`;bindDomainControls(page,maxPage)}
+function renderDomain(){const page=node("recommendations");const all=catalog[selectedDomain]||[];const statuses=[...new Set(all.map(item=>nativeStatus(item)||"MISSING"))].sort();const filtered=filteredDomainItems();const maxPage=Math.max(0,Math.ceil(filtered.length/REC_PAGE_SIZE)-1);if(pageIndex>maxPage)pageIndex=maxPage;const start=pageIndex*REC_PAGE_SIZE;const visible=filtered.slice(start,start+REC_PAGE_SIZE);const statusOptions=[`<option value="all">All native statuses</option>`,...statuses.map(status=>`<option value="${escapeHtml(status)}"${selectedStatus===status?" selected":""}>${escapeHtml(cleanStatus(status))}</option>`)].join("");if(selectedDomain==="crypto"){renderCryptoDomain(page,all,filtered,statusOptions);return}if(selectedDomain==="metals"){renderMetalsDomain(page,all,filtered,statusOptions,start,maxPage);return}if(selectedDomain==="mtg"){renderMtgDomain(page,all,filtered,statusOptions,start,maxPage);return}let orderNote="Catalog order is presentation order; UIP does not manufacture a rank for this domain.";let utilityNote="Certified recommendation, rationale, and risk evidence.";let table=`<table style="min-width:1380px"><thead><tr><th>Asset</th><th>Native recommendation</th><th>Domain score</th><th>Confidence</th><th>Horizon</th><th>Rationale</th><th>Risk</th><th>Detail</th></tr></thead><tbody>${genericRows(visible)}</tbody></table>`;if(selectedDomain==="mtg"){table=`<table style="min-width:1450px"><thead><tr><th>Asset</th><th>Native status</th><th>Native rank</th><th>Evidence</th><th>Actionability</th><th>Manual price check</th><th>Execution ready</th><th>Automatic execution</th></tr></thead><tbody>${mtgRows(visible)}</tbody></table>`;orderNote="MTG native rank is used only inside MTG where provided. Unranked native records remain visible.";utilityNote="Native MTG authority remains unchanged; richer price and forecast presentation follows in the MTG utility pass."}page.innerHTML=`${recommendationDomainSummaryAnchor()}<div class="rec-shell"><div class="rec-section-head"><div><span class="eyebrow">RECOMMENDATIONS</span><h3>${escapeHtml(selectedDomain.toUpperCase())} research</h3></div><button type="button" id="rec-all-domains" class="secondary">All domains</button></div><article class="rec-domain-table panel"><div class="section-title"><div><h3>${escapeHtml(utilityNote)}</h3><span>${escapeHtml(filtered.length)} matching · ${escapeHtml(all.length)} total</span></div></div><p class="governance-note">${escapeHtml(orderNote)} Recommendation does not authorize execution.</p><div class="transaction-form" style="grid-template-columns:1fr 1fr;margin:16px 0"><label>Search<input id="rec-search" value="${escapeHtml(searchText)}" placeholder="Asset, ID, lane, status..."></label><label>Native status<select id="rec-status">${statusOptions}</select></label></div><div class="table-wrap">${table}</div><div style="display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px"><span class="page-note">Rows ${filtered.length?start+1:0}-${Math.min(start+REC_PAGE_SIZE,filtered.length)} of ${filtered.length}</span><div style="display:flex;gap:8px"><button type="button" id="rec-prev" class="secondary" ${pageIndex===0?"disabled":""}>Previous</button><button type="button" id="rec-next" class="secondary" ${pageIndex>=maxPage?"disabled":""}>Next</button></div></div></article></div>`;bindDomainControls(page,maxPage)}
 
 function forecastRows(detail){const rows=allForecasts(detail);return rows.map(f=>`<tr class="${Number(f.forecast_horizon_months)===36&&f.forecast_method==="LONG_RANGE_SCENARIO_MODEL"?"strategic":""}"><td>${escapeHtml(`${fmtNumber(f.forecast_horizon_months,0)} mo`)}</td><td style="text-align:left">${escapeHtml(f.forecast_method??"—")}</td><td>${escapeHtml(fmtMoney(f.point_forecast))}</td><td>${escapeHtml(fmtPercent(f.expected_return))}</td><td>${escapeHtml(fmtMoney(f.lower_bound))}</td><td>${escapeHtml(fmtMoney(f.upper_bound))}</td><td>${escapeHtml(fmtNumber(f.confidence_score,3))}</td></tr>`).join("")}
 function riskMetrics(detail){const risk=firstPayload(detail,"risk")||{};const candidates=[["Risk level",risk.risk_level],["Risk score",risk.risk_score],["Volatility",risk.volatility],["Downside",risk.downside_risk],["Max drawdown",risk.max_drawdown],["VaR",risk.var],["Expected shortfall",risk.expected_shortfall],["Beta",risk.beta],["Liquidity",risk.liquidity],["Concentration",risk.concentration]];const rows=candidates.filter(([,value])=>value!==null&&value!==undefined&&value!=="");if(!rows.length)return `<p class="governance-note">No separately populated risk metrics are available in this presentation record.</p>`;return rows.map(([label,value])=>`<div class="history-row"><strong>${escapeHtml(label)}</strong><span>${escapeHtml(typeof value==="number"?fmtNumber(value,3):value)}</span></div>`).join("")}
