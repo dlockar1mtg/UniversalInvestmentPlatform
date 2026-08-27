@@ -474,6 +474,47 @@ function mtgPremiumCard(item){
   </article>`;
 }
 
+
+function mtgNativeBoolean(value){
+  return value===true||String(value).toLowerCase()==="true";
+}
+
+function mtgNativeHasValue(value){
+  return !(
+    value===null||
+    value===undefined||
+    value===""
+  );
+}
+
+function mtgNativeAvailability(value){
+  return mtgNativeBoolean(value)
+    ?"Available"
+    :"Unavailable";
+}
+
+function mtgNativeCardState(item){
+  const p=item.payload||{};
+
+  if(
+    mtgNativeBoolean(p.current_price_authority_available)&&
+    mtgNativeBoolean(p.forecast_authority_available)&&
+    mtgNativeHasValue(p.native_rank)
+  ){
+    return "research-ready";
+  }
+
+  if(
+    mtgNativeBoolean(p.current_price_authority_available)||
+    mtgNativeBoolean(p.forecast_authority_available)||
+    mtgNativeHasValue(p.native_rank)
+  ){
+    return "partial";
+  }
+
+  return "blocked";
+}
+
 function mtgNativeCard(item){
   const p=item.payload||{};
 
@@ -487,18 +528,67 @@ function mtgNativeCard(item){
       mtgLaneForItem(item)
     );
 
-  return `<article class="rec-asset-card mtg-native-card">
+  const state=
+    mtgNativeCardState(item);
+
+  const currentPrice=
+    mtgNativeBoolean(
+      p.current_price_authority_available
+    )
+      ?fmtMoney(p.current_price_usd)
+      :"Missing";
+
+  const oneYear=
+    mtgNativeBoolean(
+      p.forecast_authority_available
+    )
+      ?fmtPercent(p.forecast_1y_return)
+      :"Missing";
+
+  return `<article class="rec-asset-card mtg-native-card mtg-native-${state}">
     <div class="rec-asset-head">
       <div class="rec-asset-id">
         <div class="rec-coin mtg-product-icon">MTG</div>
+
         <div class="rec-asset-name">
           <strong>${escapeHtml(displayName(item))}</strong>
-          <small>${escapeHtml(lane)} ? Native rank ${escapeHtml(rank)}</small>
+          <small>
+            ${escapeHtml(lane)}
+            &middot;
+            Native rank ${escapeHtml(rank)}
+          </small>
         </div>
       </div>
+
       <span class="rec-status">
         ${escapeHtml(cleanStatus(nativeStatus(item)))}
       </span>
+    </div>
+
+    <div class="mtg-native-investment-kpis">
+      <div>
+        <span>Current price</span>
+        <strong>${escapeHtml(currentPrice)}</strong>
+        <small>
+          ${escapeHtml(
+            mtgNativeAvailability(
+              p.current_price_authority_available
+            )
+          )} authority
+        </small>
+      </div>
+
+      <div>
+        <span>Native 1Y outlook</span>
+        <strong>${escapeHtml(oneYear)}</strong>
+        <small>
+          ${escapeHtml(
+            mtgNativeAvailability(
+              p.forecast_authority_available
+            )
+          )} authority
+        </small>
+      </div>
     </div>
 
     <div class="mtg-native-kpis">
@@ -506,23 +596,90 @@ function mtgNativeCard(item){
         <span>Evidence</span>
         <strong>${escapeHtml(cleanStatus(p.evidence_state))}</strong>
       </div>
+
       <div>
         <span>Actionability</span>
         <strong>${escapeHtml(cleanStatus(p.actionability_state))}</strong>
       </div>
     </div>
 
-    <div class="mtg-native-context">
-      ${mtgLaneForItem(item)==="collector"
-        ?"Collector authority remains native to the certified Collector lane."
-        :"Pre-Collector authority remains native and certification-gated."}
+    <div class="mtg-native-authority-strip">
+      <span>
+        Price
+        <strong>${mtgNativeBoolean(p.current_price_authority_available)?"YES":"NO"}</strong>
+      </span>
+
+      <span>
+        Forecast
+        <strong>${mtgNativeBoolean(p.forecast_authority_available)?"YES":"NO"}</strong>
+      </span>
+
+      <span>
+        Risk
+        <strong>${mtgNativeBoolean(p.risk_authority_available)?"YES":"NO"}</strong>
+      </span>
     </div>
 
-    <div class="mtg-native-policy">
-      Secret Lair premium fields are not synthesized for this lane.
-      Recommendation does not authorize execution.
+    <div class="mtg-native-context">
+      ${
+        mtgLaneForItem(item)==="collector"
+          ?"Collector authority remains native to the certified Collector lane."
+          :"Pre-Collector authority remains native and certification-gated."
+      }
+    </div>
+
+    <div class="rec-card-foot">
+      <div class="mtg-native-policy">
+        Missing authority remains missing.
+        Recommendation does not authorize execution.
+      </div>
+
+      <button
+        type="button"
+        class="rec-research-button rec-mtg-native-detail"
+        data-asset-id="${escapeHtml(item.asset_id)}"
+      >
+        Open research &rarr;
+      </button>
     </div>
   </article>`;
+}
+
+function bindMtgNativeButtons(page,items){
+  const byId=
+    new Map(
+      items.map(
+        item=>[
+          String(item.asset_id),
+          item
+        ]
+      )
+    );
+
+  page.querySelectorAll(
+    ".rec-mtg-native-detail"
+  ).forEach(
+    button=>{
+      button.addEventListener(
+        "click",
+        ()=>{
+          const item=
+            byId.get(
+              String(
+                button.dataset.assetId
+              )
+            );
+
+          if(item){
+            openMtgNativeDetail(
+              page,
+              item
+            );
+          }
+        }
+      );
+    }
+  );
 }
 
 function bindMtgPremiumButtons(page,items){
@@ -535,6 +692,611 @@ function bindMtgPremiumButtons(page,items){
   });
 }
 
+
+
+function mtgNativeDetailRecordGroups(detail){
+  const records=
+    detail&&typeof detail.records==="object"
+      ?detail.records
+      :{};
+
+  return Object.entries(records)
+    .filter(
+      ([,rows])=>
+        Array.isArray(rows)&&
+        rows.length>0
+    );
+}
+
+function mtgNativeDisplayValue(value){
+  if(
+    value===null||
+    value===undefined||
+    value===""
+  ){
+    return "Missing";
+  }
+
+  if(typeof value==="boolean"){
+    return value
+      ?"Yes"
+      :"No";
+  }
+
+  if(typeof value==="object"){
+    try{
+      return JSON.stringify(value);
+    }catch{
+      return String(value);
+    }
+  }
+
+  return String(value);
+}
+
+function mtgNativeObservedRecordPanel(detail){
+  const groups=
+    mtgNativeDetailRecordGroups(detail);
+
+  if(!groups.length){
+    return `<article class="rec-side-panel mtg-native-observed-panel">
+      <div class="rec-panel-head">
+        <h4>Additional presentation records</h4>
+        <p>
+          No additional generic presentation records were returned for this asset.
+          Native authority above remains the controlling source.
+        </p>
+      </div>
+    </article>`;
+  }
+
+  return `<article class="rec-side-panel mtg-native-observed-panel">
+    <div class="rec-panel-head">
+      <h4>Observed presentation records</h4>
+      <p>
+        Read directly from the existing generic UIP asset-detail endpoint.
+      </p>
+    </div>
+
+    <div class="mtg-native-record-groups">
+      ${groups.map(
+        ([type,rows])=>`
+          <details>
+            <summary>
+              ${escapeHtml(cleanStatus(type))}
+              <span>${rows.length}</span>
+            </summary>
+
+            <div class="mtg-native-record-grid">
+              ${rows.slice(0,6).map(
+                record=>{
+                  const payload=
+                    record&&typeof record.payload==="object"
+                      ?record.payload
+                      :{};
+
+                  const entries=
+                    Object.entries(payload)
+                      .filter(
+                        ([,value])=>
+                          value!==null&&
+                          value!==undefined&&
+                          value!==""
+                      )
+                      .slice(0,12);
+
+                  return `<div class="mtg-native-record">
+                    ${entries.length
+                      ?entries.map(
+                          ([key,value])=>`
+                            <div>
+                              <span>${escapeHtml(cleanStatus(key))}</span>
+                              <strong>${escapeHtml(mtgNativeDisplayValue(value))}</strong>
+                            </div>`
+                        ).join("")
+                      :`<div>
+                          <span>Record</span>
+                          <strong>No populated payload fields</strong>
+                        </div>`
+                    }
+                  </div>`;
+                }
+              ).join("")}
+            </div>
+          </details>`
+      ).join("")}
+    </div>
+  </article>`;
+}
+
+function mtgNativeMissingReasons(item){
+  const p=item.payload||{};
+  const reasons=[];
+
+  if(
+    !mtgNativeBoolean(
+      p.current_price_authority_available
+    )
+  ){
+    reasons.push(
+      "No governed current-price authority is available."
+    );
+  }
+
+  if(
+    !mtgNativeBoolean(
+      p.forecast_authority_available
+    )
+  ){
+    reasons.push(
+      "No governed one-year forecast authority is available."
+    );
+  }
+
+  if(
+    !mtgNativeBoolean(
+      p.risk_authority_available
+    )
+  ){
+    reasons.push(
+      "No governed risk authority is available."
+    );
+  }
+
+  if(!mtgNativeHasValue(p.native_rank)){
+    reasons.push(
+      "No native lane rank is available for this asset."
+    );
+  }
+
+  return reasons;
+}
+
+async function openMtgNativeDetail(page,item){
+  const lane=
+    mtgLaneForItem(item);
+
+  if(
+    lane!=="collector"&&
+    lane!=="pre_collector"
+  ){
+    throw new Error(
+      "Native MTG detail renderer received a non-native-lane asset."
+    );
+  }
+
+  const p=
+    item.payload||{};
+
+  page.innerHTML=`
+    <div class="rec-shell">
+      <div class="mtg-detail-loading">
+        Loading native MTG research...
+      </div>
+    </div>`;
+
+  let detail=null;
+  let detailError=null;
+
+  try{
+    detail=
+      await readAssetDetail(item);
+  }catch(error){
+    detailError=
+      String(
+        error?.message||
+        error||
+        "Generic asset-detail request failed."
+      );
+  }
+
+  const rank=
+    p.native_rank==null
+      ?"?"
+      :fmtNumber(
+          p.native_rank,
+          0
+        );
+
+  const laneLabel=
+    mtgLaneLabel(lane);
+
+  const status=
+    cleanStatus(
+      nativeStatus(item)
+    );
+
+  const currentPriceAvailable=
+    mtgNativeBoolean(
+      p.current_price_authority_available
+    );
+
+  const forecastAvailable=
+    mtgNativeBoolean(
+      p.forecast_authority_available
+    );
+
+  const riskAvailable=
+    mtgNativeBoolean(
+      p.risk_authority_available
+    );
+
+  const missing=
+    mtgNativeMissingReasons(item);
+
+  const currentPrice=
+    currentPriceAvailable
+      ?fmtMoney(p.current_price_usd)
+      :"Missing";
+
+  const forecastPrice=
+    forecastAvailable
+      ?fmtMoney(p.forecast_1y_price_usd)
+      :"Missing";
+
+  const forecastReturn=
+    forecastAvailable
+      ?fmtPercent(p.forecast_1y_return)
+      :"Missing";
+
+  const authorityClass=
+    missing.length===0
+      ?"research-ready"
+      :(
+          missing.length>=3
+            ?"blocked"
+            :"partial"
+        );
+
+  page.innerHTML=`
+    ${recommendationDomainSummaryAnchor()}
+
+    <div class="rec-shell rec-detail mtg-native-detail">
+
+      <div class="rec-detail-head">
+        <div class="rec-detail-title">
+          <span class="eyebrow">
+            MTG &middot; ${escapeHtml(laneLabel.toUpperCase())} RESEARCH
+          </span>
+
+          <h2>${escapeHtml(displayName(item))}</h2>
+
+          <p>
+            Native rank ${escapeHtml(rank)}
+            &middot;
+            ${escapeHtml(status)}
+          </p>
+        </div>
+
+        <button
+          type="button"
+          id="mtg-native-back"
+          class="secondary"
+        >
+          Back to ${escapeHtml(laneLabel)}
+        </button>
+      </div>
+
+      <article class="rec-strategic-hero mtg-native-detail-hero mtg-native-detail-${authorityClass}">
+        <div>
+          <div class="mtg-detail-status-row">
+            <span class="rec-status">
+              ${escapeHtml(status)}
+            </span>
+
+            <span class="rec-chip">
+              ${escapeHtml(cleanStatus(p.evidence_state))}
+            </span>
+
+            <span class="rec-chip">
+              ${escapeHtml(cleanStatus(p.actionability_state))}
+            </span>
+          </div>
+
+          <h3>
+            Native MTG authority,
+            <span class="return">
+              lane-specific.
+            </span>
+          </h3>
+
+          <p class="rec-strategic-copy">
+            This page presents only the authority certified for this
+            ${escapeHtml(laneLabel)} product.
+            Missing price, forecast, or risk authority is not synthesized.
+          </p>
+
+          <div class="rec-chips">
+            <span class="rec-chip">
+              ${escapeHtml(cleanStatus(p.native_rank_type))}
+            </span>
+
+            <span class="rec-chip">
+              ${escapeHtml(cleanStatus(p.purchase_semantic))}
+            </span>
+
+            <span class="rec-chip">
+              Manual execution only
+            </span>
+          </div>
+        </div>
+
+        <div class="mtg-native-detail-authority-grid">
+          <article>
+            <span>Current price</span>
+            <strong>${escapeHtml(currentPrice)}</strong>
+            <small>
+              ${currentPriceAvailable
+                ?"Governed current-price authority"
+                :"Current-price authority unavailable"}
+            </small>
+          </article>
+
+          <article>
+            <span>Native 1Y forecast</span>
+            <strong>${escapeHtml(forecastPrice)}</strong>
+            <small>
+              ${forecastAvailable
+                ?`${escapeHtml(forecastReturn)} governed return`
+                :"Forecast authority unavailable"}
+            </small>
+          </article>
+
+          <article>
+            <span>Native rank</span>
+            <strong>${escapeHtml(rank)}</strong>
+            <small>
+              ${escapeHtml(cleanStatus(p.native_rank_type))}
+            </small>
+          </article>
+
+          <article>
+            <span>Risk authority</span>
+            <strong>${riskAvailable?"AVAILABLE":"UNAVAILABLE"}</strong>
+            <small>
+              Authority availability only; no risk value is fabricated.
+            </small>
+          </article>
+        </div>
+      </article>
+
+      <div class="rec-kpi-row mtg-native-detail-kpis">
+        <article class="rec-kpi-card">
+          <div class="rec-kpi-label">
+            Evidence
+          </div>
+          <strong>${escapeHtml(cleanStatus(p.evidence_state))}</strong>
+          <span>Native evidence state</span>
+        </article>
+
+        <article class="rec-kpi-card">
+          <div class="rec-kpi-label">
+            Actionability
+          </div>
+          <strong>${escapeHtml(cleanStatus(p.actionability_state))}</strong>
+          <span>Native actionability state</span>
+        </article>
+
+        <article class="rec-kpi-card">
+          <div class="rec-kpi-label">
+            Price check
+          </div>
+          <strong>
+            ${mtgNativeBoolean(p.manual_execution_price_check_required)
+              ?"REQUIRED"
+              :"NOT REQUIRED"}
+          </strong>
+          <span>Governed manual execution control</span>
+        </article>
+
+        <article class="rec-kpi-card">
+          <div class="rec-kpi-label">
+            Execution authority
+          </div>
+          <strong>
+            ${mtgNativeBoolean(p.execution_ready_purchase_certified)
+              ?"CERTIFIED"
+              :"NOT CERTIFIED"}
+          </strong>
+          <span>Recommendation does not authorize purchase execution</span>
+        </article>
+      </div>
+
+      <div class="rec-detail-grid">
+
+        <div class="mtg-detail-main">
+
+          <article class="rec-forecast-panel">
+            <div class="rec-panel-head">
+              <h4>Native investment authority</h4>
+              <p>
+                Direct fields from the certified MTG native-authority contract.
+              </p>
+            </div>
+
+            <div class="mtg-native-authority-table">
+              <div>
+                <span>Lane authority</span>
+                <strong>${escapeHtml(cleanStatus(p.lane_authority_state))}</strong>
+              </div>
+
+              <div>
+                <span>Native purchase status</span>
+                <strong>${escapeHtml(status)}</strong>
+              </div>
+
+              <div>
+                <span>Purchase semantic</span>
+                <strong>${escapeHtml(cleanStatus(p.purchase_semantic))}</strong>
+              </div>
+
+              <div>
+                <span>Current price authority</span>
+                <strong>${currentPriceAvailable?"AVAILABLE":"UNAVAILABLE"}</strong>
+              </div>
+
+              <div>
+                <span>Current price</span>
+                <strong>${escapeHtml(currentPrice)}</strong>
+              </div>
+
+              <div>
+                <span>Forecast authority</span>
+                <strong>${forecastAvailable?"AVAILABLE":"UNAVAILABLE"}</strong>
+              </div>
+
+              <div>
+                <span>1Y forecast price</span>
+                <strong>${escapeHtml(forecastPrice)}</strong>
+              </div>
+
+              <div>
+                <span>1Y forecast return</span>
+                <strong>${escapeHtml(forecastReturn)}</strong>
+              </div>
+
+              <div>
+                <span>Risk authority</span>
+                <strong>${riskAvailable?"AVAILABLE":"UNAVAILABLE"}</strong>
+              </div>
+
+              <div>
+                <span>Population permanent</span>
+                <strong>
+                  ${mtgNativeBoolean(p.snapshot_population_is_permanent)
+                    ?"YES"
+                    :"NO"}
+                </strong>
+              </div>
+            </div>
+          </article>
+
+          ${mtgNativeObservedRecordPanel(detail)}
+
+        </div>
+
+        <aside class="mtg-detail-side">
+
+          <article class="rec-side-panel">
+            <div class="rec-panel-head">
+              <h4>Authority gaps</h4>
+              <p>
+                Fail-closed explanation of unavailable native authority.
+              </p>
+            </div>
+
+            <div class="mtg-native-missing-list">
+              ${missing.length
+                ?missing.map(
+                    reason=>`
+                      <div>
+                        <span>UNAVAILABLE</span>
+                        <p>${escapeHtml(reason)}</p>
+                      </div>`
+                  ).join("")
+                :`
+                  <div class="available">
+                    <span>AVAILABLE</span>
+                    <p>
+                      Price, forecast, risk-authority flag, and native rank are all present.
+                    </p>
+                  </div>`
+              }
+            </div>
+          </article>
+
+          <article class="rec-side-panel">
+            <div class="rec-panel-head">
+              <h4>Authority lineage</h4>
+              <p>
+                Native certified source identity.
+              </p>
+            </div>
+
+            <div class="mtg-evidence-list">
+              <div>
+                <span>Native asset ID</span>
+                <strong>${escapeHtml(p.native_asset_id||"Missing")}</strong>
+              </div>
+
+              <div>
+                <span>Authority pointer</span>
+                <strong class="mtg-source-authority">
+                  ${escapeHtml(p.native_authority_pointer||"Missing")}
+                </strong>
+              </div>
+
+              <div>
+                <span>Authority SHA-256</span>
+                <strong class="mtg-source-authority">
+                  ${escapeHtml(p.native_authority_sha256||"Missing")}
+                </strong>
+              </div>
+
+              <div>
+                <span>Generic detail endpoint</span>
+                <strong>
+                  ${detailError
+                    ?"REQUEST FAILED"
+                    :"READ ATTEMPT COMPLETE"}
+                </strong>
+              </div>
+            </div>
+
+            ${detailError
+              ?`<div class="mtg-native-detail-error">
+                  Generic presentation detail could not be loaded:
+                  ${escapeHtml(detailError)}
+                </div>`
+              :""
+            }
+          </article>
+
+          <article class="rec-side-panel mtg-governance-panel">
+            <div class="rec-panel-head">
+              <h4>Lane governance</h4>
+            </div>
+
+            <p>
+              ${
+                lane==="collector"
+                  ?"Collector ranking remains native to the Collector lane. The separate ranking identity bridge remains fail-closed where required."
+                  :"Pre-Collector certification remains fail-closed where authority is unavailable."
+              }
+            </p>
+
+            <p>
+              Secret Lair premium fields and Q10 purchase policy do not apply to this lane.
+            </p>
+
+            <p>
+              No universal MTG rank or cross-domain rank is created.
+            </p>
+
+            <p>
+              Recommendation does not authorize execution.
+            </p>
+          </article>
+        </aside>
+
+      </div>
+    </div>`;
+
+  const back=
+    page.querySelector(
+      "#mtg-native-back"
+    );
+
+  if(back){
+    back.addEventListener(
+      "click",
+      ()=>{
+        mtgLane=lane;
+        renderDomain();
+      }
+    );
+  }
+}
 
 async function renderMtgDomain(page,all,filtered,statusOptions,start,maxPage){
   ensureMtgPremiumVisualStyles();
@@ -844,6 +1606,16 @@ async function renderMtgDomain(page,all,filtered,statusOptions,start,maxPage){
 
   if(mtgLane==="secret_lair"){
     bindMtgPremiumButtons(
+      page,
+      visible
+    );
+  }
+
+  if(
+    mtgLane==="collector"||
+    mtgLane==="pre_collector"
+  ){
+    bindMtgNativeButtons(
       page,
       visible
     );
