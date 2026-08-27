@@ -235,3 +235,66 @@ def test_rec_ui_metals_final_action_is_primary_while_native_domain_semantics_rem
                 "PURCHASE_CANDIDATE",
         },
     ) == "PURCHASE_CANDIDATE"
+
+def test_rec_ui_metals_final_action_labels_distinguish_governed_and_native_semantics():
+    javascript = read("foundation/production/dashboard_assets/recommendation_ui.js")
+
+    assert (
+        'function statusFilterLabel(domain){return domain==="metals"?"Decision status":"Native status"}'
+        in javascript
+    )
+    assert (
+        'function statusFilterAllLabel(domain){return domain==="metals"?"All decision statuses":"All native statuses"}'
+        in javascript
+    )
+    assert (
+        'function recommendationColumnLabel(domain){return domain==="metals"?"Final decision":"Native recommendation"}'
+        in javascript
+    )
+
+    assert (
+        'item.domain_id==="metals"?(payload.final_action??payload.recommendation??payload.native_recommendation??null):nativeStatus(item)'
+        in javascript
+    )
+
+    old_metals_sequence = (
+        '<div class="rec-narrative">'
+        '<div><span>Native recommendation</span>'
+        '<p>${escapeHtml(cleanStatus(displayStatus(item)))}</p></div>'
+        '<div><span>Rationale</span>'
+        '<p>${escapeHtml(recommendation.rationale??"No rationale is populated.")}</p></div>'
+        '<div><span>Risk summary</span>'
+    )
+
+    corrected_metals_sequence = (
+        '<div class="rec-narrative">'
+        '<div><span>Final decision</span>'
+        '<p>${escapeHtml(cleanStatus(displayStatus(item)))}</p></div>'
+        '<div><span>Native recommendation</span>'
+        '<p>${escapeHtml(cleanStatus(recommendation.native_recommendation??"MISSING"))}</p></div>'
+        '<div><span>Rationale</span>'
+        '<p>${escapeHtml(recommendation.rationale??"No rationale is populated.")}</p></div>'
+        '<div><span>Risk summary</span>'
+    )
+
+    assert old_metals_sequence not in javascript
+    assert corrected_metals_sequence in javascript
+
+    assert (
+        '${escapeHtml(statusFilterAllLabel(selectedDomain))}'
+        in javascript
+    )
+    assert (
+        '${escapeHtml(statusFilterLabel(selectedDomain))}'
+        in javascript
+    )
+    assert (
+        '${escapeHtml(recommendationColumnLabel(selectedDomain))}'
+        in javascript
+    )
+
+    # Non-Metals native semantics remain unchanged.
+    assert (
+        'item.domain_id==="mtg"?(payload.native_purchase_status??null):(payload.native_recommendation??payload.recommendation??null)'
+        in javascript
+    )
