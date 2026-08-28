@@ -1,0 +1,248 @@
+{
+  "authorization_id": "UIP_MTG_CRYPTO_QUALITY_VISUAL_PARITY_AUTHORIZATION_V1",
+  "authorization_version": "1.0.0",
+
+  "status": "AUTHORIZED_FOR_BOUNDED_MTG_CRYPTO_QUALITY_VISUAL_PARITY",
+
+  "domain_id": "mtg",
+
+  "governing_uip_checkpoint": {
+    "repository": "dlockar1mtg/UniversalInvestmentPlatform",
+    "branch": "phase-uip-rec-utility-mtg-premium-research",
+    "required_parent_head": "fe73e531a00f9d1182c12133e2a511178277b730"
+  },
+
+  "governing_mtg_checkpoint": {
+    "repository": "dlockar1mtg/mtg-investment-terminal",
+    "branch": "phase-9.1-mtg-to-uip-export-contract",
+    "required_head": "6b610b208549bec4be2c0ec7f7f3c2f69b154302"
+  },
+
+  "visual_reference": {
+    "domain": "crypto",
+    "reference_head": "ed082dc83dff20db20df27eff495fbca00872e83",
+
+    "patterns_authorized_for_reuse": [
+      "investment-first card hierarchy",
+      "strong expected-return emphasis",
+      "forecast relationship visualization",
+      "compact status and risk-style indicators",
+      "hover and depth treatment",
+      "strategic detail hero",
+      "large KPI cards",
+      "visual forecast panel",
+      "side-panel research rationale pattern"
+    ],
+
+    "model_semantics_may_not_be_copied": true
+  },
+
+  "authorized_lanes": [
+    "collector",
+    "pre_collector"
+  ],
+
+  "card_design_contract": {
+    "primary_fields": [
+      "native purchase status",
+      "native lane rank",
+      "expected 1Y return",
+      "current market price",
+      "1Y modeled target"
+    ],
+
+    "required_visual_relationship":
+      "current market to governed 1Y modeled target",
+
+    "bear_base_bull_may_not_be_synthesized": true,
+
+    "expected_return_should_receive_primary_visual_emphasis": true,
+
+    "native_rank_should_be_visually_prominent": true,
+
+    "authority_state_should_be_compact": true,
+
+    "governance_copy_should_be_secondary": true,
+
+    "research_action_should_be_prominent": true
+  },
+
+  "detail_design_contract": {
+    "strategic_hero_required": true,
+
+    "hero_primary_statement":
+      "governed expected 1Y return when available",
+
+    "hero_price_relationship_required": true,
+
+    "hero_native_rank_required": true,
+
+    "hero_native_status_required": true,
+
+    "large_primary_metric_cards_required": true,
+
+    "investment_thesis_panel_authorized": true,
+
+    "authority_and_provenance_secondary": true,
+
+    "technical_provenance_remains_collapsible": true
+  },
+
+  "visualization_contract": {
+    "current_to_target_range_visual_authorized": true,
+
+    "return_direction_visual_authorized": true,
+
+    "authority_completeness_visual_authorized": true,
+
+    "rank_badge_visual_authorized": true,
+
+    "status_badge_visual_authorized": true,
+
+    "evidence_badge_visual_authorized": true,
+
+    "synthetic_price_history_forbidden": true,
+
+    "synthetic_forecast_distribution_forbidden": true,
+
+    "synthetic_risk_score_forbidden": true,
+
+    "synthetic_bear_base_bull_forbidden": true
+  },
+
+  "lane_authority_semantic_repair": {
+    "observed_asset_lane_authority_may_be_promoted": true,
+
+    "promotion_requires_actual_observed_asset_field": true,
+
+    "synthetic_lane_authority_forbidden": true,
+
+    "recommendation_lane_authority_may_still_be_used_when_present": true,
+
+    "observed_asset_authority_should_not_be_overwritten_by_missing_recommendation_field": true
+  },
+
+  "precollector_semantic_separation": {
+    "native_purchase_status_preserved": true,
+    "purchase_semantic_preserved": true,
+    "native_rank_type_preserved": true,
+    "evidence_state_preserved": true,
+    "actionability_state_preserved": true,
+
+    "fields_may_not_be_silently_reconciled": true,
+
+    "recommended_visual_labels": {
+      "native_purchase_status": "Native purchase tier",
+      "evidence_state": "Ranking evidence state",
+      "actionability_state": "Actionability"
+    },
+
+    "tier_and_evidence_must_not_be_presented_as_same_concept": true
+  },
+
+  "missing_authority_contract": {
+    "missing_current_price_remains_missing": true,
+    "missing_forecast_remains_missing": true,
+    "missing_risk_remains_missing": true,
+    "missing_rank_remains_missing": true,
+
+    "fake_zero_forbidden": true,
+    "visual_chart_for_missing_data_forbidden": true
+  },
+
+  "secret_lair_contract": {
+    "existing_design_preserved": true,
+    "q10_purchase_policy_unchanged": true,
+    "certified_1y_unchanged": true,
+    "three_year_scenarios_unchanged": true,
+    "five_year_scenarios_unchanged": true,
+
+    "this_authorization_does_not_redesign_secret_lair": true
+  },
+
+  "governance_preservation": {
+    "collector_rank_remains_lane_native": true,
+    "precollector_rank_remains_lane_native": true,
+
+    "universal_mtg_rank_forbidden": true,
+    "cross_domain_rank_forbidden": true,
+
+    "recommendation_does_not_authorize_execution": true,
+    "manual_execution_semantics_preserved": true
+  },
+
+  "authorized_frontend_files": [
+    "foundation/production/dashboard_assets/recommendation_ui.js",
+    "foundation/production/dashboard_assets/recommendation_visual.css",
+    "tests/delivery/test_mtg_crypto_quality_visual_parity.py"
+  ],
+
+  "authorized_existing_test_adjustments": [
+    "tests/delivery/test_mtg_native_authority_hydration_recovery.py",
+    "tests/delivery/test_mtg_native_lane_deep_research.py",
+    "tests/delivery/test_mtg_final_research_ux_semantic_cleanup.py",
+    "tests/delivery/test_mtg_premium_frontend_integration.py"
+  ],
+
+  "explicitly_forbidden": {
+    "database_write": true,
+    "backend_endpoint_change": true,
+    "presentation_api_contract_change": true,
+
+    "mtg_source_repository_change": true,
+
+    "ranking_algorithm_change": true,
+    "forecast_algorithm_change": true,
+    "risk_algorithm_change": true,
+
+    "model_retraining": true,
+
+    "recommendation_status_recalculation": true,
+
+    "secret_lair_q10_policy_change": true,
+
+    "universal_mtg_rank": true,
+    "cross_domain_rank": true,
+
+    "automatic_purchase_execution": true,
+
+    "hosted_deployment": true
+  },
+
+  "implementation_acceptance": {
+    "collector_card_crypto_quality_visual_hierarchy": true,
+
+    "precollector_card_crypto_quality_visual_hierarchy": true,
+
+    "collector_detail_crypto_quality_visual_hierarchy": true,
+
+    "precollector_detail_crypto_quality_visual_hierarchy": true,
+
+    "current_to_target_visual_test": true,
+
+    "positive_return_emphasis_test": true,
+
+    "missing_forecast_no_visual_synthesis_test": true,
+
+    "observed_asset_lane_authority_promotion_test": true,
+
+    "tier_and_evidence_separation_test": true,
+
+    "true_missing_preservation_test": true,
+
+    "secret_lair_regression_test": true,
+
+    "full_existing_recommendation_regression_test": true,
+
+    "local_browser_acceptance_required": true
+  },
+
+  "next_gate": {
+    "authorized_next_step":
+      "IMPLEMENT_MTG_CRYPTO_QUALITY_VISUAL_PARITY",
+
+    "frontend_only": true,
+
+    "hosted_deployment_authorized": false
+  }
+}
