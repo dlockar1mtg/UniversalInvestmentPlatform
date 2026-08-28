@@ -1,0 +1,42 @@
+{
+  "authorization_id": "METALS-COMPOSITE-PRESENTATION-ACTIVATION-AUTHORIZATION-1",
+  "source_governed_head": "5b55da63934a930bef0913d664c9507f5195fa2b",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "previous_active_publication_id": "mtg-premium-stage-rehearsal-ac8adb415f03",
+  "candidate": {
+    "publication_id": "metals-mtg-composite-recovery-r1-20260828",
+    "publication_status": "STAGED",
+    "record_count": 13264,
+    "content_fingerprint": "67352221b51e7479fe9e154e12dd718a9cf392c794d2320461203fe980bfc009",
+    "metals_final_action_match_count": 12,
+    "mtg_premium_record_count": 787,
+    "hosted_content_matches_local_candidate": true
+  },
+  "activation_contract": {
+    "candidate_must_remain_staged_before_switch": true,
+    "candidate_record_count_must_equal_13264": true,
+    "candidate_fingerprint_must_match": true,
+    "metals_final_actions_must_equal_12": true,
+    "mtg_premium_records_must_equal_787": true,
+    "previous_active_pointer_must_match_expected": true,
+    "activation_must_be_atomic": true,
+    "previous_active_must_become_superseded": true,
+    "candidate_must_become_active": true,
+    "post_activation_read_only_validation_required": true
+  },
+  "authorization_scope": {
+    "hosted_publication_activation_authorized": true,
+    "active_pointer_mutation_authorized": true,
+    "hosted_publication_stage_authorized": false,
+    "repository_code_change_authorized": false,
+    "analytical_database_write_authorized": false,
+    "model_refresh_authorized": false,
+    "forecast_refresh_authorized": false,
+    "recommendation_recompute_authorized": false,
+    "mtg_premium_recompute_authorized": false,
+    "manual_render_deployment_authorized": false,
+    "allocation_or_execution_authorized": false
+  },
+  "authorization_decision": "AUTHORIZE_BOUNDED_COMPOSITE_PRESENTATION_ACTIVATION",
+  "next_decision": "ACTIVATE_AND_CERTIFY_BOUNDED_COMPOSITE_PRESENTATION_RECOVERY"
+}
