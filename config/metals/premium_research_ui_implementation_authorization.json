@@ -1,0 +1,37 @@
+{
+  "authorization_id": "METALS-PREMIUM-RESEARCH-UI-IMPLEMENTATION-AUTHORIZATION-1",
+  "source_governed_head": "c7253506d44816b297c470283491da6d0becc732",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "active_publication_id": "metals-mtg-composite-recovery-r1-20260828",
+  "active_content_fingerprint": "67352221b51e7479fe9e154e12dd718a9cf392c794d2320461203fe980bfc009",
+  "design_id": "METALS-PREMIUM-RESEARCH-UI-BINDING-DESIGN-1",
+  "implementation_contract": {
+    "recommendation_ui_change_authorized": true,
+    "delivery_test_change_authorized": true,
+    "metals_overview_must_use_premium_cards": true,
+    "metals_detail_must_use_premium_research_layout": true,
+    "final_action_must_remain_primary": true,
+    "native_recommendation_must_remain_supporting": true,
+    "tactical_state_must_remain_supporting": true,
+    "bil_must_render_as_reference_control": true,
+    "no_synthetic_cross_domain_rank": true,
+    "no_missing_value_synthesis": true,
+    "gold_forecast_horizons_must_remain_3_6_12_24_months": true,
+    "uranium_unavailable_authority_must_be_explicit": true,
+    "existing_certified_presentation_records_only": true,
+    "crypto_behavior_must_remain_unchanged": true,
+    "mtg_behavior_must_remain_unchanged": true
+  },
+  "closed_scope": {
+    "hosted_publication_mutation_authorized": false,
+    "analytical_database_write_authorized": false,
+    "model_refresh_authorized": false,
+    "forecast_refresh_authorized": false,
+    "recommendation_recompute_authorized": false,
+    "mtg_premium_recompute_authorized": false,
+    "manual_render_deployment_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "authorization_decision": "AUTHORIZE_BOUNDED_METALS_PREMIUM_RESEARCH_UI_IMPLEMENTATION",
+  "next_decision": "MATERIALIZE_AND_CERTIFY_METALS_PREMIUM_RESEARCH_UI_IMPLEMENTATION"
+}
