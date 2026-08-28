@@ -1,0 +1,51 @@
+{
+  "authorization_id": "METALS-COMPOSITE-PRESENTATION-RECOVERY-AUTHORIZATION-1",
+  "source_governed_head": "e798c261996189eeefd57d1f2df6ae7a509f664f",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "active_publication_id": "mtg-premium-stage-rehearsal-ac8adb415f03",
+  "active_publication_record_count": 13264,
+  "certified_metals_publication_id": "metals-final-decision-presentation-r1-20260827",
+  "certified_metals_publication_record_count": 12477,
+  "provenance_finding": {
+    "active_final_action_match_count": 0,
+    "certified_final_action_match_count": 12,
+    "diagnosis": "LATER_ACTIVE_PUBLICATION_SUPERSEDED_CERTIFIED_METALS_FINAL_DECISIONS"
+  },
+  "differential_contract": {
+    "changed_preexisting_record_count": 12,
+    "changed_metals_recommendation_count": 12,
+    "other_changed_preexisting_record_count": 0,
+    "active_only_record_count": 787,
+    "active_only_is_exactly_787_mtg_premium_records": true,
+    "certified_only_record_count": 0,
+    "safe_composite_recovery_shape": true
+  },
+  "recovery_contract": {
+    "candidate_record_count": 13264,
+    "preserve_current_active_records_except_exact_12_metals_recommendations": true,
+    "preserve_all_787_mtg_premium_research_records": true,
+    "replace_exact_12_metals_recommendation_records_from_certified_publication": true,
+    "expected_metals_final_action_match_count_after_recovery": 12,
+    "candidate_must_be_content_fingerprinted": true,
+    "candidate_must_be_materialized_to_new_evidence_root": true,
+    "candidate_must_be_verified_against_both_source_publications": true
+  },
+  "authorization_scope": {
+    "read_hosted_presentation_records_authorized": true,
+    "materialize_local_composite_candidate_authorized": true,
+    "local_candidate_validation_authorized": true,
+    "hosted_publication_stage_authorized": false,
+    "hosted_publication_activation_authorized": false,
+    "active_pointer_mutation_authorized": false,
+    "repository_code_change_authorized": false,
+    "analytical_database_write_authorized": false,
+    "model_refresh_authorized": false,
+    "forecast_refresh_authorized": false,
+    "recommendation_recompute_authorized": false,
+    "mtg_premium_recompute_authorized": false,
+    "manual_render_deployment_authorized": false,
+    "allocation_or_execution_authorized": false
+  },
+  "authorization_decision": "AUTHORIZE_BOUNDED_COMPOSITE_PRESENTATION_RECOVERY_CANDIDATE_MATERIALIZATION",
+  "next_decision": "MATERIALIZE_AND_CERTIFY_BOUNDED_COMPOSITE_PRESENTATION_RECOVERY_CANDIDATE"
+}
