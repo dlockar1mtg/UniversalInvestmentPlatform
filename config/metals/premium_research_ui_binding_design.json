@@ -1,0 +1,171 @@
+{
+  "design_id": "METALS-PREMIUM-RESEARCH-UI-BINDING-DESIGN-1",
+  "source_governed_head": "40c8f19507c44d44e433dc6835a774858f81e791",
+  "active_publication_id": "metals-mtg-composite-recovery-r1-20260828",
+  "active_content_fingerprint": "67352221b51e7479fe9e154e12dd718a9cf392c794d2320461203fe980bfc009",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "evidence_basis": "EXISTING_HOSTED_CERTIFIED_PRESENTATION_RECORDS_ONLY",
+  "binding_inventory": {
+    "all_12_assets": [
+      "final_action",
+      "native_recommendation",
+      "normalized_score",
+      "confidence_score",
+      "final_action_rationale_class",
+      "policy_authority_label",
+      "forward_validation_status"
+    ],
+    "vehicle_current_price_and_history_assets": [
+      "metals:vehicle:BIL",
+      "metals:vehicle:COPX",
+      "metals:vehicle:CPER",
+      "metals:vehicle:GLD",
+      "metals:vehicle:IAU",
+      "metals:vehicle:PPLT",
+      "metals:vehicle:SGOL",
+      "metals:vehicle:SIVR",
+      "metals:vehicle:SLV",
+      "metals:vehicle:URA"
+    ],
+    "vehicle_tactical_assets": [
+      "metals:vehicle:COPX",
+      "metals:vehicle:CPER",
+      "metals:vehicle:GLD",
+      "metals:vehicle:IAU",
+      "metals:vehicle:PPLT",
+      "metals:vehicle:SGOL",
+      "metals:vehicle:SIVR",
+      "metals:vehicle:SLV",
+      "metals:vehicle:URA"
+    ],
+    "vehicle_uncertainty_adjusted_assets": [
+      "metals:vehicle:COPX",
+      "metals:vehicle:CPER",
+      "metals:vehicle:GLD",
+      "metals:vehicle:IAU",
+      "metals:vehicle:PPLT",
+      "metals:vehicle:SGOL",
+      "metals:vehicle:SIVR",
+      "metals:vehicle:SLV"
+    ],
+    "gold_commodity": {
+      "forecast_horizons_months": [3, 6, 12, 24],
+      "derived_decision_explanation_available": true,
+      "forecast_regime_risk_context_available": true,
+      "current_price_available": false,
+      "price_history_available": false,
+      "tactical_state_available": false
+    },
+    "uranium_commodity": {
+      "forecast_horizons_months": [],
+      "derived_decision_explanation_available": false,
+      "forecast_regime_risk_context_available": false,
+      "current_price_available": false,
+      "price_history_available": false,
+      "tactical_state_available": false,
+      "availability_reason": "NO_CURRENT_COMMODITY_FORECAST_MODEL_OR_REGIME_AUTHORITY"
+    }
+  },
+  "overview_design": {
+    "primary_order": "GOVERNED_PRESENTATION_ORDER_NO_SYNTHETIC_CROSS_DOMAIN_RANK",
+    "primary_decision_field": "final_action",
+    "secondary_decision_field": "native_recommendation",
+    "show_policy_boundary": true,
+    "show_forward_validation_status": true,
+    "vehicle_card_fields": [
+      "current_price_usd",
+      "observation_date",
+      "normalized_score",
+      "confidence_score",
+      "risk_level",
+      "risk_score",
+      "return_1m_pct",
+      "return_3m_pct",
+      "return_6m_pct",
+      "tactical_state"
+    ],
+    "commodity_card_fields": [
+      "normalized_score",
+      "confidence_score",
+      "derived_rationale_or_availability_explanation",
+      "longest_governed_expected_return_when_available",
+      "forecast_regime_risk_context_when_available"
+    ],
+    "reference_control_handling": "BIL_MUST_RENDER_AS_REFERENCE_CONTROL_NOT_INVESTMENT_OPPORTUNITY",
+    "missing_data_handling": "SHOW_EXPLICIT_NOT_AVAILABLE_WITH_GOVERNED_REASON_WHEN_KNOWN_NEVER_DASH_PLACEHOLDER_AS_PRIMARY_CONTENT"
+  },
+  "detail_design": {
+    "hero": [
+      "final_action",
+      "native_recommendation",
+      "normalized_score",
+      "confidence_score",
+      "policy_authority_label",
+      "forward_validation_status"
+    ],
+    "decision_rationale": [
+      "final_action_rationale_class",
+      "derived_rationale_when_certified",
+      "availability_explanation_when_derived_rationale_unavailable"
+    ],
+    "vehicle_market_context": [
+      "current_price_usd",
+      "observation_date",
+      "three_year_price_history",
+      "risk_level",
+      "risk_score"
+    ],
+    "vehicle_tactical_context": [
+      "tactical_state",
+      "candidate_regime",
+      "as_of_date",
+      "return_1m_pct",
+      "return_3m_pct",
+      "return_6m_pct",
+      "current_drawdown_pct",
+      "distance_ma50_pct",
+      "distance_ma200_pct",
+      "realized_volatility_3m_pct",
+      "state_reason"
+    ],
+    "uncertainty_context": [
+      "raw_expected_return",
+      "uncertainty_penalty",
+      "downside_penalty",
+      "adjusted_expected_return"
+    ],
+    "gold_forecast_context": [
+      "3_month_expected_return",
+      "6_month_expected_return",
+      "12_month_expected_return",
+      "24_month_expected_return",
+      "probability_positive",
+      "forecast_origin_date",
+      "dominant_regime",
+      "dominant_regime_probability",
+      "risk_context_level"
+    ]
+  },
+  "semantic_guards": {
+    "final_action_is_only_primary_action": true,
+    "native_recommendation_is_supporting_evidence_only": true,
+    "tactical_state_never_replaces_final_action": true,
+    "uncertainty_adjusted_return_is_supporting_evidence_only": true,
+    "commodity_vehicle_inference_prohibited": true,
+    "cross_domain_rank_prohibited": true,
+    "automatic_execution_prohibited": true,
+    "missing_values_must_not_be_synthesized": true
+  },
+  "implementation_scope": {
+    "recommendation_ui_change_authorized": false,
+    "delivery_test_change_authorized": false,
+    "hosted_publication_mutation_authorized": false,
+    "analytical_database_write_authorized": false,
+    "model_refresh_authorized": false,
+    "forecast_refresh_authorized": false,
+    "recommendation_recompute_authorized": false,
+    "manual_render_deployment_authorized": false
+  },
+  "design_decision": "AUTHORIZE_BOUNDED_METALS_PREMIUM_RESEARCH_UI_IMPLEMENTATION_DESIGN",
+  "next_decision": "CERTIFY_METALS_PREMIUM_RESEARCH_UI_BINDING_DESIGN_AND_AUTHORIZE_IMPLEMENTATION"
+}
