@@ -494,7 +494,7 @@ function mtgNativeAvailability(value){
 }
 
 function mtgNativeCardState(item){
-  const p=item.payload||{};
+  const p=mtgNativePayload(item);
 
   if(
     mtgNativeBoolean(p.current_price_authority_available)&&
@@ -515,8 +515,193 @@ function mtgNativeCardState(item){
   return "blocked";
 }
 
+function mtgNativePayload(item){
+  if(
+    item&&
+    item.__mtg_native_payload&&
+    typeof item.__mtg_native_payload==="object"
+  ){
+    return item.__mtg_native_payload;
+  }
+
+  return item?.payload||{};
+}
+
+function mtgNativeRecordPayload(detail,type){
+  const rows=
+    Array.isArray(detail?.records?.[type])
+      ?detail.records[type]
+      :[];
+
+  if(!rows.length){
+    return {};
+  }
+
+  const row=rows[0];
+
+  if(
+    row&&
+    typeof row.payload==="object"&&
+    row.payload!==null
+  ){
+    return row.payload;
+  }
+
+  return row&&typeof row==="object"
+    ?row
+    :{};
+}
+
+function mtgNormalizeNativeDetailAuthority(item,detail){
+  const normalized={
+    ...(item?.payload||{})
+  };
+
+  const asset=
+    mtgNativeRecordPayload(
+      detail,
+      "asset"
+    );
+
+  const forecast=
+    mtgNativeRecordPayload(
+      detail,
+      "forecast"
+    );
+
+  const recommendation=
+    mtgNativeRecordPayload(
+      detail,
+      "recommendation"
+    );
+
+  const risk=
+    mtgNativeRecordPayload(
+      detail,
+      "risk"
+    );
+
+  const observedPriceAuthority=
+    mtgNativeBoolean(
+      asset.current_price_authority_available
+    );
+
+  if(observedPriceAuthority){
+    normalized.current_price_authority_available=true;
+
+    if(mtgNativeHasValue(asset.current_price_usd)){
+      normalized.current_price_usd=
+        asset.current_price_usd;
+    }
+  }
+
+  const observedForecastAuthority=
+    mtgNativeBoolean(
+      forecast.forecast_authority_available
+    );
+
+  if(observedForecastAuthority){
+    normalized.forecast_authority_available=true;
+
+    if(mtgNativeHasValue(forecast.point_forecast)){
+      normalized.forecast_1y_price_usd=
+        forecast.point_forecast;
+    }
+
+    if(mtgNativeHasValue(forecast.expected_return)){
+      normalized.forecast_1y_return=
+        forecast.expected_return;
+    }
+
+    if(mtgNativeHasValue(forecast.forecast_horizon_months)){
+      normalized.forecast_horizon_months=
+        forecast.forecast_horizon_months;
+    }
+
+    if(mtgNativeHasValue(forecast.forecast_method)){
+      normalized.forecast_method=
+        forecast.forecast_method;
+    }
+  }
+
+  if(
+    mtgNativeBoolean(
+      risk.risk_authority_available
+    )
+  ){
+    normalized.risk_authority_available=true;
+  }
+
+  for(const field of [
+    "native_rank",
+    "native_rank_type",
+    "native_purchase_status",
+    "purchase_semantic",
+    "evidence_state",
+    "actionability_state",
+    "native_asset_id",
+    "native_authority_pointer",
+    "native_authority_sha256",
+    "lane_authority_state",
+    "manual_execution_price_check_required",
+    "execution_ready_purchase_certified",
+    "snapshot_population_is_permanent"
+  ]){
+    if(mtgNativeHasValue(recommendation[field])){
+      normalized[field]=
+        recommendation[field];
+    }
+  }
+
+  return normalized;
+}
+
+async function mtgHydrateNativeResearch(items){
+  await Promise.all(
+    items.map(
+      async item=>{
+        if(item.__mtg_native_detail_attempted){
+          return;
+        }
+
+        item.__mtg_native_detail_attempted=true;
+
+        try{
+          const detail=
+            await readAssetDetail(item);
+
+          item.__mtg_native_detail=
+            detail;
+
+          item.__mtg_native_payload=
+            mtgNormalizeNativeDetailAuthority(
+              item,
+              detail
+            );
+
+          item.__mtg_native_detail_error=
+            null;
+        }catch(error){
+          item.__mtg_native_detail=
+            null;
+
+          item.__mtg_native_payload={
+            ...(item.payload||{})
+          };
+
+          item.__mtg_native_detail_error=
+            String(
+              error?.message||
+              error||
+              "Generic asset-detail request failed."
+            );
+        }
+      }
+    )
+  );
+}
 function mtgNativeCard(item){
-  const p=item.payload||{};
+  const p=mtgNativePayload(item);
 
   const rank=
     p.native_rank==null
@@ -565,9 +750,9 @@ function mtgNativeCard(item){
       </span>
     </div>
 
-    <div class="mtg-native-investment-kpis">
+    <div class="mtg-native-investment-kpis mtg-native-investment-kpis-rich">
       <div>
-        <span>Current price</span>
+        <span>Current market</span>
         <strong>${escapeHtml(currentPrice)}</strong>
         <small>
           ${escapeHtml(
@@ -579,14 +764,44 @@ function mtgNativeCard(item){
       </div>
 
       <div>
-        <span>Native 1Y outlook</span>
-        <strong>${escapeHtml(oneYear)}</strong>
+        <span>1Y modeled target</span>
+        <strong>
+          ${
+            mtgNativeBoolean(
+              p.forecast_authority_available
+            )
+              ?escapeHtml(
+                  fmtMoney(
+                    p.forecast_1y_price_usd
+                  )
+                )
+              :"Missing"
+          }
+        </strong>
         <small>
           ${escapeHtml(
             mtgNativeAvailability(
               p.forecast_authority_available
             )
           )} authority
+        </small>
+      </div>
+
+      <div class="mtg-native-return-kpi">
+        <span>Expected 1Y return</span>
+        <strong>${escapeHtml(oneYear)}</strong>
+        <small>
+          ${
+            mtgNativeHasValue(
+              p.forecast_method
+            )
+              ?escapeHtml(
+                  cleanStatus(
+                    p.forecast_method
+                  )
+                )
+              :"Native forecast"
+          }
         </small>
       </div>
     </div>
@@ -740,78 +955,84 @@ function mtgNativeObservedRecordPanel(detail){
     mtgNativeDetailRecordGroups(detail);
 
   if(!groups.length){
-    return `<article class="rec-side-panel mtg-native-observed-panel">
+    return `<article class="rec-side-panel mtg-native-observed-panel mtg-native-provenance-panel">
       <div class="rec-panel-head">
-        <h4>Additional presentation records</h4>
+        <h4>Technical provenance</h4>
         <p>
-          No additional generic presentation records were returned for this asset.
-          Native authority above remains the controlling source.
+          No additional Generic UIP presentation records were returned.
         </p>
       </div>
     </article>`;
   }
 
-  return `<article class="rec-side-panel mtg-native-observed-panel">
-    <div class="rec-panel-head">
-      <h4>Observed presentation records</h4>
-      <p>
-        Read directly from the existing generic UIP asset-detail endpoint.
-      </p>
-    </div>
+  return `<article class="rec-side-panel mtg-native-observed-panel mtg-native-provenance-panel">
+    <details>
+      <summary class="mtg-native-provenance-summary">
+        Technical provenance
+        <span>Generic UIP presentation records</span>
+      </summary>
 
-    <div class="mtg-native-record-groups">
-      ${groups.map(
-        ([type,rows])=>`
-          <details>
-            <summary>
-              ${escapeHtml(cleanStatus(type))}
-              <span>${rows.length}</span>
-            </summary>
+      <div class="rec-panel-head mtg-native-provenance-head">
+        <h4>Observed source records</h4>
+        <p>
+          These records support the normalized investment research above.
+        </p>
+      </div>
 
-            <div class="mtg-native-record-grid">
-              ${rows.slice(0,6).map(
-                record=>{
-                  const payload=
-                    record&&typeof record.payload==="object"
-                      ?record.payload
-                      :{};
+      <div class="mtg-native-record-groups">
+        ${groups.map(
+          ([type,rows])=>`
+            <details>
+              <summary>
+                ${escapeHtml(cleanStatus(type))}
+                <span>${rows.length}</span>
+              </summary>
 
-                  const entries=
-                    Object.entries(payload)
-                      .filter(
-                        ([,value])=>
-                          value!==null&&
-                          value!==undefined&&
-                          value!==""
-                      )
-                      .slice(0,12);
+              <div class="mtg-native-record-grid">
+                ${rows.slice(0,6).map(
+                  record=>{
+                    const payload=
+                      record&&typeof record.payload==="object"
+                        ?record.payload
+                        :{};
 
-                  return `<div class="mtg-native-record">
-                    ${entries.length
-                      ?entries.map(
-                          ([key,value])=>`
-                            <div>
-                              <span>${escapeHtml(cleanStatus(key))}</span>
-                              <strong>${escapeHtml(mtgNativeDisplayValue(value))}</strong>
-                            </div>`
-                        ).join("")
-                      :`<div>
-                          <span>Record</span>
-                          <strong>No populated payload fields</strong>
-                        </div>`
-                    }
-                  </div>`;
-                }
-              ).join("")}
-            </div>
-          </details>`
-      ).join("")}
-    </div>
+                    const entries=
+                      Object.entries(payload)
+                        .filter(
+                          ([,value])=>
+                            value!==null&&
+                            value!==undefined&&
+                            value!==""
+                        )
+                        .slice(0,12);
+
+                    return `<div class="mtg-native-record">
+                      ${entries.length
+                        ?entries.map(
+                            ([key,value])=>`
+                              <div>
+                                <span>${escapeHtml(cleanStatus(key))}</span>
+                                <strong>${escapeHtml(mtgNativeDisplayValue(value))}</strong>
+                              </div>`
+                          ).join("")
+                        :`<div>
+                            <span>Record</span>
+                            <strong>No populated payload fields</strong>
+                          </div>`
+                      }
+                    </div>`;
+                  }
+                ).join("")}
+              </div>
+            </details>`
+        ).join("")}
+      </div>
+    </details>
   </article>`;
 }
 
 function mtgNativeMissingReasons(item){
-  const p=item.payload||{};
+  const p=mtgNativePayload(item);
   const reasons=[];
 
   if(
@@ -866,9 +1087,6 @@ async function openMtgNativeDetail(page,item){
     );
   }
 
-  const p=
-    item.payload||{};
-
   page.innerHTML=`
     <div class="rec-shell">
       <div class="mtg-detail-loading">
@@ -876,20 +1094,50 @@ async function openMtgNativeDetail(page,item){
       </div>
     </div>`;
 
-  let detail=null;
-  let detailError=null;
+  let detail=
+    item.__mtg_native_detail||null;
 
-  try{
-    detail=
-      await readAssetDetail(item);
-  }catch(error){
-    detailError=
-      String(
-        error?.message||
-        error||
-        "Generic asset-detail request failed."
-      );
+  let detailError=
+    item.__mtg_native_detail_error||null;
+
+  if(!item.__mtg_native_detail_attempted){
+    try{
+      detail=
+        await readAssetDetail(item);
+
+      item.__mtg_native_detail=
+        detail;
+
+      item.__mtg_native_detail_attempted=
+        true;
+
+      item.__mtg_native_detail_error=
+        null;
+
+      detailError=null;
+    }catch(error){
+      item.__mtg_native_detail_attempted=
+        true;
+
+      detailError=
+        String(
+          error?.message||
+          error||
+          "Generic asset-detail request failed."
+        );
+
+      item.__mtg_native_detail_error=
+        detailError;
+    }
   }
+
+  const p=
+    mtgNormalizeNativeDetailAuthority(
+      item,
+      detail
+    );
+
+  item.__mtg_native_payload=p;
 
   const rank=
     p.native_rank==null
@@ -904,6 +1152,8 @@ async function openMtgNativeDetail(page,item){
 
   const status=
     cleanStatus(
+      p.native_purchase_status||
+      p.actionability_state||
       nativeStatus(item)
     );
 
@@ -1022,9 +1272,9 @@ async function openMtgNativeDetail(page,item){
           </div>
         </div>
 
-        <div class="mtg-native-detail-authority-grid">
-          <article>
-            <span>Current price</span>
+        <div class="mtg-native-detail-authority-grid mtg-native-primary-metrics">
+          <article class="mtg-native-primary-price">
+            <span>Current market</span>
             <strong>${escapeHtml(currentPrice)}</strong>
             <small>
               ${currentPriceAvailable
@@ -1033,29 +1283,40 @@ async function openMtgNativeDetail(page,item){
             </small>
           </article>
 
-          <article>
-            <span>Native 1Y forecast</span>
+          <article class="mtg-native-primary-target">
+            <span>Native 1Y forecast &middot; 1Y modeled target</span>
             <strong>${escapeHtml(forecastPrice)}</strong>
             <small>
-              ${forecastAvailable
-                ?`${escapeHtml(forecastReturn)} governed return`
-                :"Forecast authority unavailable"}
+              ${
+                forecastAvailable
+                  ?escapeHtml(
+                      cleanStatus(
+                        p.forecast_method||
+                        "mtg_native_1y"
+                      )
+                    )
+                  :"Forecast authority unavailable"
+              }
+            </small>
+          </article>
+
+          <article class="mtg-native-primary-return">
+            <span>Expected 1Y return</span>
+            <strong>${escapeHtml(forecastReturn)}</strong>
+            <small>
+              ${
+                forecastAvailable
+                  ?`${escapeHtml(String(p.forecast_horizon_months||12))} month horizon`
+                  :"Forecast authority unavailable"
+              }
             </small>
           </article>
 
           <article>
-            <span>Native rank</span>
+            <span>Native lane rank</span>
             <strong>${escapeHtml(rank)}</strong>
             <small>
               ${escapeHtml(cleanStatus(p.native_rank_type))}
-            </small>
-          </article>
-
-          <article>
-            <span>Risk authority</span>
-            <strong>${riskAvailable?"AVAILABLE":"UNAVAILABLE"}</strong>
-            <small>
-              Authority availability only; no risk value is fabricated.
             </small>
           </article>
         </div>
@@ -1341,6 +1602,15 @@ async function renderMtgDomain(page,all,filtered,statusOptions,start,maxPage){
 
   if(mtgLane==="secret_lair"){
     await hydrateMtgPremiumResearch(
+      visible
+    );
+  }
+
+  if(
+    mtgLane==="collector"||
+    mtgLane==="pre_collector"
+  ){
+    await mtgHydrateNativeResearch(
       visible
     );
   }

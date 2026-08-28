@@ -1390,3 +1390,105 @@
     grid-template-columns:1fr
   }
 }
+
+/* MTG_NATIVE_AUTHORITY_HYDRATION_RECOVERY_V1 */
+
+.mtg-native-investment-kpis-rich{
+  grid-template-columns:repeat(3,minmax(0,1fr))
+}
+
+.mtg-native-investment-kpis-rich>div{
+  min-height:82px;
+  display:flex;
+  flex-direction:column;
+  justify-content:center
+}
+
+.mtg-native-investment-kpis-rich strong{
+  font-size:19px;
+  letter-spacing:-.02em
+}
+
+.mtg-native-return-kpi strong{
+  color:var(--accent)
+}
+
+.mtg-native-primary-metrics{
+  grid-template-columns:repeat(2,minmax(0,1fr))
+}
+
+.mtg-native-primary-metrics article{
+  min-height:116px;
+  position:relative;
+  overflow:hidden
+}
+
+.mtg-native-primary-metrics article:before{
+  content:"";
+  position:absolute;
+  inset:0 auto 0 0;
+  width:3px;
+  background:rgba(255,255,255,.08)
+}
+
+.mtg-native-primary-price:before,
+.mtg-native-primary-target:before,
+.mtg-native-primary-return:before{
+  background:var(--accent)!important
+}
+
+.mtg-native-primary-return{
+  background:
+    radial-gradient(
+      circle at 80% 20%,
+      rgba(99,230,190,.10),
+      transparent 42%
+    ),
+    rgba(6,17,16,.48)!important
+}
+
+.mtg-native-primary-metrics strong{
+  font-size:24px;
+  letter-spacing:-.03em
+}
+
+.mtg-native-primary-return strong{
+  color:var(--accent)
+}
+
+.mtg-native-observed-panel.mtg-native-provenance-panel{
+  background:rgba(7,18,17,.35);
+  border-color:rgba(255,255,255,.055)
+}
+
+.mtg-native-provenance-summary{
+  cursor:pointer;
+  padding:13px 15px;
+  font-size:10px;
+  font-weight:850;
+  display:flex;
+  align-items:center;
+  gap:10px
+}
+
+.mtg-native-provenance-summary span{
+  margin-left:auto;
+  color:var(--muted);
+  font-size:8px;
+  font-weight:600
+}
+
+.mtg-native-provenance-head{
+  padding:0 15px
+}
+
+.mtg-native-provenance-panel .mtg-native-record-groups{
+  padding:0 15px 15px
+}
+
+@media(max-width:900px){
+  .mtg-native-investment-kpis-rich,
+  .mtg-native-primary-metrics{
+    grid-template-columns:1fr
+  }
+}
