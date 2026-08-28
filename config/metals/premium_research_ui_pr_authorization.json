@@ -1,0 +1,40 @@
+{
+  "authorization_id": "METALS-PREMIUM-RESEARCH-UI-PR-AUTHORIZATION-1",
+  "source_governed_head": "b4c13cf3c2bac22f23bfd0934d22a3e820eaaade",
+  "implementation_head": "8581dbbc1a9545afa72cf1c622831e7fab052686",
+  "expected_main_head": "348f2a94c4bea371bde47dac880dc1d91fe7fa07",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "implementation_contract": {
+    "commit_count": 1,
+    "changed_files": [
+      "foundation/production/dashboard_assets/recommendation_ui.js",
+      "tests/delivery/test_rec_ui_1.py"
+    ],
+    "delivery_test_count": 13,
+    "implementation_authorization_test_count": 3,
+    "premium_metals_overview_cards_bound": true,
+    "premium_metals_detail_bound": true,
+    "final_action_remains_primary": true,
+    "native_recommendation_remains_supporting": true,
+    "tactical_context_remains_supporting": true,
+    "bil_remains_reference_control": true,
+    "metals_forecast_horizons_months": [3, 6, 12, 24],
+    "missing_forecast_authority_remains_explicit": true,
+    "crypto_contract_preserved": true,
+    "mtg_contract_preserved": true
+  },
+  "authorization_scope": {
+    "pull_request_creation_authorized": true,
+    "pull_request_review_authorized": true,
+    "merge_authorized": false,
+    "repository_additional_code_change_authorized": false,
+    "hosted_presentation_mutation_authorized": false,
+    "analytical_database_write_authorized": false,
+    "model_refresh_authorized": false,
+    "forecast_refresh_authorized": false,
+    "recommendation_recompute_authorized": false,
+    "manual_render_deployment_authorized": false
+  },
+  "authorization_decision": "AUTHORIZE_METALS_PREMIUM_RESEARCH_UI_PULL_REQUEST",
+  "next_decision": "CREATE_AND_CERTIFY_METALS_PREMIUM_RESEARCH_UI_PULL_REQUEST"
+}
