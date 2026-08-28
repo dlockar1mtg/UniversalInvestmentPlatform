@@ -210,6 +210,66 @@ function mtgInvestmentSort(items){
   );
 }
 
+function mtgNativeRankNumber(item){
+  const p=
+    mtgNativePayload(item);
+
+  const rank=
+    Number(p.native_rank);
+
+  return Number.isFinite(rank)
+    ?rank
+    :Number.POSITIVE_INFINITY;
+}
+
+function mtgNativePresentationPriority(item){
+  const p=
+    mtgNativePayload(item);
+
+  if(mtgNativeHasValue(p.native_rank)){
+    return 0;
+  }
+
+  if(
+    mtgNativeBoolean(
+      p.current_price_authority_available
+    )
+  ){
+    return 1;
+  }
+
+  return 2;
+}
+
+function mtgNativeInvestmentSort(items){
+  return items
+    .slice()
+    .sort(
+      (a,b)=>{
+        const priorityDifference=
+          mtgNativePresentationPriority(a)-
+          mtgNativePresentationPriority(b);
+
+        if(priorityDifference!==0){
+          return priorityDifference;
+        }
+
+        const rankDifference=
+          mtgNativeRankNumber(a)-
+          mtgNativeRankNumber(b);
+
+        if(rankDifference!==0){
+          return rankDifference;
+        }
+
+        return String(
+          displayName(a)
+        ).localeCompare(
+          String(displayName(b))
+        );
+      }
+    );
+}
 function mtgIsBuyCandidate(item){
   const status=String(
     nativeStatus(item)||""
@@ -258,18 +318,6 @@ function mtgEvidenceLabel(premium){
 }
 
 function mtgDistanceToQ10(premium){
-  const governedRaw=
-    premium?.current_price_margin_to_q10_break_even;
-
-  const governed=
-    governedRaw==null||governedRaw===""
-      ?NaN
-      :Number(governedRaw);
-
-  if(Number.isFinite(governed)){
-    return governed;
-  }
-
   const current=Number(
     premium?.current_tcg_market_price_usd
   );
@@ -398,7 +446,7 @@ function mtgPremiumCard(item){
         <div class="rec-coin mtg-product-icon">MTG</div>
         <div class="rec-asset-name">
           <strong>${escapeHtml(premium.product_name||displayName(item))}</strong>
-          <small>Secret Lair ? Native rank ${escapeHtml(p.native_rank==null?"?":fmtNumber(p.native_rank,0))}</small>
+          <small>Secret Lair &middot; Native rank ${escapeHtml(p.native_rank==null?"Not ranked":fmtNumber(p.native_rank,0))}</small>
         </div>
       </div>
       <span class="rec-status mtg-decision ${q10Class}">${escapeHtml(status)}</span>
@@ -705,7 +753,7 @@ function mtgNativeCard(item){
 
   const rank=
     p.native_rank==null
-      ?"?"
+      ?"Not ranked"
       :fmtNumber(p.native_rank,0);
 
   const lane=
@@ -1579,6 +1627,16 @@ async function renderMtgDomain(page,all,filtered,statusOptions,start,maxPage){
       mtgInvestmentSort(laneFiltered);
   }
 
+  if(
+    mtgLane==="collector"||
+    mtgLane==="pre_collector"
+  ){
+    laneFiltered=
+      mtgNativeInvestmentSort(
+        laneFiltered
+      );
+  }
+
   const laneMaxPage=
     Math.max(
       0,
@@ -1904,7 +1962,7 @@ async function openMtgPremiumDetail(page,item){
     page.innerHTML=`
       <div class="rec-shell">
         <div class="mtg-detail-loading">
-          Loading certified Secret Lair research?
+          Loading certified Secret Lair research...
         </div>
       </div>`;
 

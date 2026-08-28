@@ -1492,3 +1492,95 @@
     grid-template-columns:1fr
   }
 }
+
+/* MTG_FINAL_RESEARCH_UX_SEMANTIC_CLEANUP_V1 */
+
+/* Investment-ready cards lead visually. */
+.mtg-native-card.mtg-native-research-ready{
+  background:
+    radial-gradient(
+      circle at 88% 10%,
+      rgba(99,230,190,.08),
+      transparent 32%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(18,37,34,.97),
+      rgba(8,22,20,.98)
+    )
+}
+
+/* Keep authority state, but make it compact supporting metadata. */
+.mtg-native-authority-strip{
+  display:flex;
+  flex-wrap:wrap;
+  gap:5px;
+  margin:4px 0 5px
+}
+
+.mtg-native-authority-strip span{
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding:4px 6px;
+  border-radius:999px;
+  text-align:left;
+  font-size:7.5px
+}
+
+.mtg-native-authority-strip strong{
+  display:inline;
+  margin:0;
+  font-size:7.5px
+}
+
+/* Lane/policy wording remains visible but secondary. */
+.mtg-native-context{
+  font-size:7.5px;
+  line-height:1.3;
+  opacity:.62;
+  margin-top:3px
+}
+
+.mtg-native-policy{
+  font-size:7px;
+  line-height:1.3;
+  opacity:.60;
+  max-width:240px;
+  margin-top:3px
+}
+
+.mtg-native-kpis{
+  margin:8px 0 6px
+}
+
+.mtg-native-kpis div{
+  padding:7px 8px
+}
+
+.mtg-native-investment-kpis{
+  margin:10px 0 6px
+}
+
+.mtg-native-card{
+  min-height:270px
+}
+
+.mtg-native-card.mtg-native-blocked{
+  min-height:230px
+}
+
+/* Keep blocked products accessible without competing visually
+   with ranked research-ready candidates. */
+.mtg-native-card.mtg-native-blocked
+.mtg-native-investment-kpis{
+  opacity:.78
+}
+
+.mtg-native-card.mtg-native-blocked
+.mtg-native-context,
+.mtg-native-card.mtg-native-blocked
+.mtg-native-policy{
+  opacity:.48
+}
+
