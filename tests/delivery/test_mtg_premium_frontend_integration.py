@@ -1,4 +1,4 @@
-﻿from pathlib import Path
+from pathlib import Path
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -50,10 +50,27 @@ def test_q10_purchase_policy_is_visually_explicit() -> None:
     javascript = source()
 
     assert "Governed Q10 entry" in javascript
+    assert "current_tcg_market_price_usd" in javascript
     assert "y1_q10_break_even_entry_price_usd" in javascript
-
-    assert "current_price_margin_to_q10_break_even" in javascript
     assert "current_price_vs_q10_break_even_state" in javascript
+
+    start = javascript.index(
+        "function mtgDistanceToQ10(premium){"
+    )
+
+    end = javascript.index(
+        "function mtgGovernedQ10State(",
+        start,
+    )
+
+    distance_function = javascript[start:end]
+
+    assert "return q10-current;" in distance_function
+
+    assert (
+        "current_price_margin_to_q10_break_even"
+        not in distance_function
+    )
 
     assert "Q25 and Q50 are diagnostic context only" in javascript
 

@@ -2023,7 +2023,7 @@ async function openMtgPremiumDetail(page,item){
 
   const rank=
     p.native_rank==null
-      ?"?"
+      ?"Not ranked"
       :fmtNumber(
           p.native_rank,
           0
@@ -2062,11 +2062,11 @@ async function openMtgPremiumDetail(page,item){
 
       <div class="rec-detail-head">
         <div class="rec-detail-title">
-          <span class="eyebrow">MTG ? SECRET LAIR RESEARCH</span>
+          <span class="eyebrow">MTG &middot; SECRET LAIR RESEARCH</span>
           <h2>${escapeHtml(premium.product_name||displayName(item))}</h2>
           <p>
             Native rank ${escapeHtml(rank)}
-            ? ${escapeHtml(status)}
+            &middot; ${escapeHtml(status)}
           </p>
         </div>
 
@@ -2141,7 +2141,7 @@ async function openMtgPremiumDetail(page,item){
 
           <div class="mtg-entry-caption">
             ${escapeHtml(governedQ10State)}
-            ? ${escapeHtml(distanceLabel)}
+            &middot; ${escapeHtml(distanceLabel)}
           </div>
         </div>
       </article>
@@ -2220,7 +2220,7 @@ async function openMtgPremiumDetail(page,item){
             <div class="rec-panel-head">
               <h4>3Y scenario</h4>
               <p>
-                Scenario distribution only ? not a direct certified forecast
+                Scenario distribution only &middot; not a direct certified forecast
                 and not a purchase trigger.
               </p>
             </div>
