@@ -146,5 +146,49 @@ def test_rec_ui_metals_final_action_is_primary_while_native_domain_semantics_rem
         'item.domain_id==="mtg"?(payload.native_purchase_status??null):(payload.native_recommendation??payload.recommendation??null)'
         in javascript
     )
-    assert javascript.count("nativeStatus(") == 2
+    assert 'const native=cleanStatus(nativeStatus(item));' in javascript
+    assert '<td>${escapeHtml(cleanStatus(nativeStatus(item)))}</td>' in javascript
+    assert '<div><span>Native recommendation</span><p>${escapeHtml(cleanStatus(nativeStatus(item)))}</p></div>' in javascript
     assert javascript.count("displayStatus(") >= 3
+
+def test_rec_ui_metals_premium_research_implementation_contract():
+    javascript = read("foundation/production/dashboard_assets/recommendation_ui.js")
+
+    assert "function metalsCard(item)" in javascript
+    assert "function metalsRows(items)" in javascript
+    assert "function metalsForecasts(detail)" in javascript
+    assert "function metalsForecastRows(detail)" in javascript
+
+    assert "[3,6,12,24].includes(Number(row.forecast_horizon_months))" in javascript
+    assert 'Number(row.forecast_horizon_months)===24' in javascript
+    assert "Forecast authority unavailable for this asset. No missing forecast is synthesized." in javascript
+
+    assert "The governed final decision is primary. Native recommendation, forecast, and risk remain supporting evidence." in javascript
+    assert "<th>Final decision</th><th>Native recommendation</th>" in javascript
+    assert 'cleanStatus(nativeStatus(item))' in javascript
+    assert 'selectedDomain==="metals"?"All decision statuses":"All native statuses"' in javascript
+
+    assert "BIL is reference/control only." in javascript
+    assert "Featured cards exclude BIL." in javascript
+
+    assert 'typeof renderTactical==="function"?renderTactical(detail)' in javascript
+    assert "The governed long-term final decision remains authoritative." in javascript
+
+    assert 'async function openDomain(domain)' in javascript
+    assert 'if(domain==="metals")' in javascript
+    assert "await hydrateMetalsResearch()" in javascript
+
+    assert "No missing forecast is synthesized." in javascript
+    assert "UIP does not manufacture a rank" in javascript
+
+
+def test_rec_ui_metals_does_not_regress_crypto_or_mtg_contracts():
+    javascript = read("foundation/production/dashboard_assets/recommendation_ui.js")
+
+    assert 'forecastBy(detail,36,"LONG_RANGE_SCENARIO_MODEL")' in javascript
+    assert "3-YEAR GROWTH OUTLOOK" in javascript
+    assert "UIP does not extrapolate a shorter forecast into three years" in javascript
+
+    assert 'if(selectedDomain==="mtg")' in javascript
+    assert "MTG native rank is used only inside MTG where provided" in javascript
+    assert "automatic_purchase_execution" in javascript
