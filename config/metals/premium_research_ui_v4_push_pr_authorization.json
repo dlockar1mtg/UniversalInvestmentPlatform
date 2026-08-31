@@ -1,0 +1,42 @@
+{
+  "authorization_id": "METALS-PREMIUM-RESEARCH-UI-V4-PUSH-PR-AUTHORIZATION-1",
+  "source_governed_head": "c30e18eb6739558ebe961c6bfc47babc033fe536",
+  "production_base": "348f2a94c4bea371bde47dac880dc1d91fe7fa07",
+  "deployment_branch": "deploy/metals-premium-research-ui",
+  "local_reconciliation_head": "1d453a38e8ca63e4b76e2d3e391106c5c4eec26e",
+  "local_reconciliation_parent": "348f2a94c4bea371bde47dac880dc1d91fe7fa07",
+  "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+  "committed_files": [
+    "foundation/production/dashboard_assets/recommendation_ui.js",
+    "tests/delivery/test_rec_ui_1.py"
+  ],
+  "file_sha256": {
+    "foundation/production/dashboard_assets/recommendation_ui.js": "5378a26dc5eed1b0b6272f6e73899d49e89d3f18be00d7d44fa1dd4cd39e1933",
+    "tests/delivery/test_rec_ui_1.py": "0e75c0942ca4b269367801e3a4b76d003403367263b987eed20742da559df530"
+  },
+  "certification": {
+    "rec_ui_tests_passed": 16,
+    "status_filter_controls_labeled": 3,
+    "final_action_first_preserved": true,
+    "premium_metals_ui_preserved": true,
+    "crypto_semantics_preserved": true,
+    "mtg_native_semantics_preserved": true,
+    "dom_ownership_safeguard_preserved": true,
+    "exact_two_file_boundary": true
+  },
+  "authorization_scope": {
+    "deployment_branch_push_authorized": true,
+    "pull_request_creation_authorized": true,
+    "pull_request_review_authorized": true,
+    "merge_authorized": false,
+    "additional_code_change_authorized": false,
+    "hosted_presentation_mutation_authorized": false,
+    "analytical_database_write_authorized": false,
+    "model_refresh_authorized": false,
+    "forecast_refresh_authorized": false,
+    "recommendation_recompute_authorized": false,
+    "manual_render_deployment_authorized": false
+  },
+  "authorization_decision": "AUTHORIZE_EXPLICIT_TWO_FILE_PRODUCTION_RECONCILIATION_V4_PUSH_AND_PR",
+  "next_decision": "PUSH_AND_CREATE_CERTIFIED_METALS_PREMIUM_RESEARCH_UI_PR"
+}
