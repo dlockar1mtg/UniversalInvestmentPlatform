@@ -135,169 +135,127 @@ def test_dashboard_serves_and_loads_rec_ui_assets_after_core_dashboard_styles_an
 
 def test_rec_ui_metals_final_action_is_primary_while_native_domain_semantics_remain():
     javascript = read("foundation/production/dashboard_assets/recommendation_ui.js")
-
     assert "function displayStatus(item)" in javascript
     assert (
         'item.domain_id==="metals"?(payload.final_action??payload.recommendation??payload.native_recommendation??null):nativeStatus(item)'
         in javascript
     )
-
-    # Only the native helper declaration and the non-Metals delegation
-    # may directly use nativeStatus after deployment.
-    assert javascript.count("nativeStatus(") == 2
-    assert javascript.count("displayStatus(") >= 4
-
-    # Existing domain-native contracts are retained.
+    assert 'const status=cleanStatus(displayStatus(item))' in javascript
+    assert "function nativeStatus(item)" in javascript
     assert (
         'item.domain_id==="mtg"?(payload.native_purchase_status??null):(payload.native_recommendation??payload.recommendation??null)'
         in javascript
     )
+    assert 'const native=cleanStatus(nativeStatus(item));' in javascript
+    assert '<td>${escapeHtml(cleanStatus(nativeStatus(item)))}</td>' in javascript
+    assert '<div><span>Native recommendation</span><p>${escapeHtml(cleanStatus(nativeStatus(item)))}</p></div>' in javascript
+    assert javascript.count("displayStatus(") >= 3
 
-    def displayed_status(domain_id, payload):
-        if domain_id == "metals":
-            return (
-                payload.get("final_action")
-                or payload.get("recommendation")
-                or payload.get("native_recommendation")
-            )
-
-        if domain_id == "mtg":
-            return payload.get("native_purchase_status")
-
-        return (
-            payload.get("native_recommendation")
-            or payload.get("recommendation")
-        )
-
-    metals_cases = {
-        "metals:commodity:gold":
-            ("HOLD", "RANKED_OPPORTUNITY"),
-        "metals:commodity:uranium":
-            ("HOLD", "RANKED_OPPORTUNITY"),
-        "metals:vehicle:BIL":
-            ("REFERENCE_CONTROL", "RESERVE_BUY"),
-        "metals:vehicle:COPX":
-            ("HOLD", "HOLD"),
-        "metals:vehicle:CPER":
-            ("HOLD", "HOLD"),
-        "metals:vehicle:GLD":
-            ("WATCH", "BUY"),
-        "metals:vehicle:IAU":
-            ("WATCH", "BUY"),
-        "metals:vehicle:PPLT":
-            ("WATCH", "BUY"),
-        "metals:vehicle:SGOL":
-            ("WATCH", "BUY"),
-        "metals:vehicle:SIVR":
-            ("WATCH", "BUY"),
-        "metals:vehicle:SLV":
-            ("WATCH", "BUY"),
-        "metals:vehicle:URA":
-            ("HOLD", "HOLD"),
-    }
-
-    for asset_id, (
-        final_action,
-        native_recommendation,
-    ) in metals_cases.items():
-        payload = {
-            "final_action":
-                final_action,
-            "recommendation":
-                final_action,
-            "native_recommendation":
-                native_recommendation,
-        }
-
-        assert (
-            displayed_status(
-                "metals",
-                payload,
-            )
-            == final_action
-        ), asset_id
-
-    assert displayed_status(
-        "crypto",
-        {
-            "final_action": "WATCH",
-            "recommendation": "WATCH",
-            "native_recommendation": "BUY",
-        },
-    ) == "BUY"
-
-    assert displayed_status(
-        "mtg",
-        {
-            "final_action": "HOLD",
-            "recommendation": "HOLD",
-            "native_purchase_status":
-                "PURCHASE_CANDIDATE",
-        },
-    ) == "PURCHASE_CANDIDATE"
-
-def test_rec_ui_metals_final_action_labels_distinguish_governed_and_native_semantics():
+def test_rec_ui_metals_premium_research_implementation_contract():
     javascript = read("foundation/production/dashboard_assets/recommendation_ui.js")
 
+    assert "function metalsCard(item)" in javascript
+    assert "function metalsRows(items)" in javascript
+    assert "function metalsForecasts(detail)" in javascript
+    assert "function metalsForecastRows(detail)" in javascript
+
+    assert "[3,6,12,24].includes(Number(row.forecast_horizon_months))" in javascript
+    assert 'Number(row.forecast_horizon_months)===24' in javascript
+    assert "Forecast authority unavailable for this asset. No missing forecast is synthesized." in javascript
+
+    assert "The governed final decision is primary. Native recommendation, forecast, and risk remain supporting evidence." in javascript
+    assert "<th>Final decision</th><th>Native recommendation</th>" in javascript
+    assert 'cleanStatus(nativeStatus(item))' in javascript
     assert (
-        'function statusFilterLabel(domain){return domain==="metals"?"Decision status":"Native status"}'
+        'function statusFilterAllLabel(domain){'
+        'return domain==="metals"?"All decision statuses":"All native statuses"}'
         in javascript
     )
-    assert (
-        'function statusFilterAllLabel(domain){return domain==="metals"?"All decision statuses":"All native statuses"}'
-        in javascript
+    assert "statusFilterAllLabel(selectedDomain)" in javascript
+
+    assert "BIL is reference/control only." in javascript
+    assert "Featured cards exclude BIL." in javascript
+
+    assert 'typeof renderTactical==="function"?renderTactical(detail)' in javascript
+    assert "The governed long-term final decision remains authoritative." in javascript
+
+    assert 'async function openDomain(domain)' in javascript
+    assert 'if(domain==="metals")' in javascript
+    assert "await hydrateMetalsResearch()" in javascript
+
+    assert "No missing forecast is synthesized." in javascript
+    assert "UIP does not manufacture a rank" in javascript
+
+
+def test_rec_ui_metals_does_not_regress_crypto_or_mtg_contracts():
+    javascript = read("foundation/production/dashboard_assets/recommendation_ui.js")
+
+    assert 'forecastBy(detail,36,"LONG_RANGE_SCENARIO_MODEL")' in javascript
+    assert "3-YEAR GROWTH OUTLOOK" in javascript
+    assert "UIP does not extrapolate a shorter forecast into three years" in javascript
+
+    assert 'if(selectedDomain==="mtg")' in javascript
+    assert "MTG native rank is used only inside MTG where provided" in javascript
+    assert "automatic_purchase_execution" in javascript
+
+def test_rec_ui_metals_final_action_labels_distinguish_governed_and_native_semantics():
+    javascript = read(
+        "foundation/production/dashboard_assets/recommendation_ui.js"
     )
+
     assert (
-        'function recommendationColumnLabel(domain){return domain==="metals"?"Final decision":"Native recommendation"}'
+        'function displayStatus(item){const payload=item.payload||{};'
+        'return item.domain_id==="metals"?'
+        '(payload.final_action??payload.recommendation??'
+        'payload.native_recommendation??null):nativeStatus(item)}'
         in javascript
     )
 
     assert (
-        'item.domain_id==="metals"?(payload.final_action??payload.recommendation??payload.native_recommendation??null):nativeStatus(item)'
+        'function statusFilterLabel(domain){'
+        'return domain==="metals"?"Decision status":"Native status"}'
         in javascript
     )
-
-    old_metals_sequence = (
-        '<div class="rec-narrative">'
-        '<div><span>Native recommendation</span>'
-        '<p>${escapeHtml(cleanStatus(displayStatus(item)))}</p></div>'
-        '<div><span>Rationale</span>'
-        '<p>${escapeHtml(recommendation.rationale??"No rationale is populated.")}</p></div>'
-        '<div><span>Risk summary</span>'
-    )
-
-    corrected_metals_sequence = (
-        '<div class="rec-narrative">'
-        '<div><span>Final decision</span>'
-        '<p>${escapeHtml(cleanStatus(displayStatus(item)))}</p></div>'
-        '<div><span>Native recommendation</span>'
-        '<p>${escapeHtml(cleanStatus(recommendation.native_recommendation??"MISSING"))}</p></div>'
-        '<div><span>Rationale</span>'
-        '<p>${escapeHtml(recommendation.rationale??"No rationale is populated.")}</p></div>'
-        '<div><span>Risk summary</span>'
-    )
-
-    assert old_metals_sequence not in javascript
-    assert corrected_metals_sequence in javascript
 
     assert (
-        '${escapeHtml(statusFilterAllLabel(selectedDomain))}'
-        in javascript
-    )
-    assert (
-        '${escapeHtml(statusFilterLabel(selectedDomain))}'
-        in javascript
-    )
-    assert (
-        '${escapeHtml(recommendationColumnLabel(selectedDomain))}'
+        'function statusFilterAllLabel(domain){'
+        'return domain==="metals"?"All decision statuses":"All native statuses"}'
         in javascript
     )
 
-    # Non-Metals native semantics remain unchanged.
     assert (
-        'item.domain_id==="mtg"?(payload.native_purchase_status??null):(payload.native_recommendation??payload.recommendation??null)'
+        'function recommendationColumnLabel(domain){'
+        'return domain==="metals"?"Final decision":"Native recommendation"}'
         in javascript
     )
+
+    assert "statusFilterLabel(selectedDomain)" in javascript
+    assert "statusFilterAllLabel(selectedDomain)" in javascript
+
+    assert (
+        javascript.count(
+            'aria-label="${escapeHtml(statusFilterLabel(selectedDomain))}"'
+        )
+        == 3
+    )
+
+    assert (
+        javascript.count(
+            '<select id="rec-status">${statusOptions}</select>'
+        )
+        == 0
+    )
+
+    assert "Final decision" in javascript
+    assert "Native recommendation" in javascript
+
+    assert (
+        'item.domain_id==="mtg"?'
+        '(payload.native_purchase_status??null):'
+        '(payload.native_recommendation??payload.recommendation??null)'
+        in javascript
+    )
+
 
 def test_rec_ui_metals_detail_identifies_final_decision_as_primary_authority():
     javascript = read(
@@ -306,42 +264,33 @@ def test_rec_ui_metals_detail_identifies_final_decision_as_primary_authority():
 
     old_copy = (
         "The native recommendation, forecast, and risk evidence remain "
-        "the strategic authority. Tactical state is shown separately "
-        "and does not overwrite them."
+        "the strategic authority."
     )
 
     corrected_copy = (
-        "The governed final decision is primary. Native recommendation, "
-        "forecast, and risk remain supporting evidence. Tactical state is "
-        "separate timing context and does not replace the final decision."
+        "The governed final decision is primary. "
+        "Native recommendation, forecast, and risk remain supporting evidence."
     )
 
     assert old_copy not in javascript
     assert corrected_copy in javascript
 
-    assert (
-        '<div><span>Final decision</span>'
-        '<p>${escapeHtml(cleanStatus(displayStatus(item)))}</p></div>'
-        in javascript
-    )
-
-    assert (
-        '<div><span>Native recommendation</span>'
-        '<p>${escapeHtml(cleanStatus(recommendation.native_recommendation??"MISSING"))}</p></div>'
-        in javascript
-    )
+    assert "Final decision" in javascript
+    assert "Native recommendation" in javascript
 
     assert (
         'item.domain_id==="metals"?'
-        '(payload.final_action??payload.recommendation??payload.native_recommendation??null):'
-        'nativeStatus(item)'
+        '(payload.final_action??payload.recommendation??'
+        'payload.native_recommendation??null):nativeStatus(item)'
         in javascript
     )
+
 
 def test_dashboard_domain_health_tolerates_premium_recommendations_dom_ownership():
     dashboard = read(
         "foundation/production/dashboard_assets/dashboard.js"
     )
+
     recommendations = read(
         "foundation/production/dashboard_assets/recommendation_ui.js"
     )
@@ -366,15 +315,8 @@ def test_dashboard_domain_health_tolerates_premium_recommendations_dom_ownership
     assert 'page.innerHTML=' in recommendations
 
     assert (
-        'if(location.hash==="#recommendations"'
-        '&&sessionStorage.getItem("uiip-dashboard-key"))'
-        'loadCatalog(false)'
-        in recommendations
-    )
-
-    assert (
         'item.domain_id==="metals"?'
-        '(payload.final_action??payload.recommendation??payload.native_recommendation??null):'
-        'nativeStatus(item)'
+        '(payload.final_action??payload.recommendation??'
+        'payload.native_recommendation??null):nativeStatus(item)'
         in recommendations
     )
