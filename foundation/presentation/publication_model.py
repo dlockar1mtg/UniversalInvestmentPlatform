@@ -255,6 +255,77 @@ def _mtg_premium_records_from_environment() -> list[PresentationRecord]:
         mtg_head=EXPECTED_MTG_HEAD,
     )
 
+
+def _mtg_lane_native_research_records_from_environment() -> list[PresentationRecord]:
+    """
+    Append certified Collector / Pre-Collector research only when all
+    four explicit external sidecar paths are supplied.
+
+    No filesystem discovery, source copying, database ingestion,
+    recommendation recalculation, or publication activation occurs.
+    """
+    environment_names = (
+        "UIP_MTG_COLLECTOR_RESEARCH_PATH",
+        "UIP_MTG_COLLECTOR_HORIZON_RESEARCH_PATH",
+        "UIP_MTG_PRECOLLECTOR_RESEARCH_PATH",
+        "UIP_MTG_PRECOLLECTOR_SCENARIO_RESEARCH_PATH",
+    )
+
+    raw = {
+        name: str(
+            os.environ.get(
+                name,
+                "",
+            )
+        ).strip()
+        for name in environment_names
+    }
+
+    present = {
+        name
+        for name, value in raw.items()
+        if value
+    }
+
+    if not present:
+        return []
+
+    if len(present) != len(environment_names):
+        missing = sorted(
+            set(environment_names)
+            - present
+        )
+
+        raise RuntimeError(
+            "Partial MTG lane-native research sidecar configuration "
+            f"is forbidden; missing={missing}"
+        )
+
+    paths = {
+        name: Path(value)
+        for name, value in raw.items()
+    }
+
+    for name, sidecar_path in paths.items():
+        if not sidecar_path.is_file():
+            raise RuntimeError(
+                "Explicit MTG lane-native research sidecar is missing: "
+                f"{name}={sidecar_path}"
+            )
+
+    from .mtg_lane_native_research_projection import (
+        EXPECTED_MTG_HEAD,
+        build_mtg_lane_native_research_records,
+    )
+
+    return build_mtg_lane_native_research_records(
+        paths["UIP_MTG_COLLECTOR_RESEARCH_PATH"],
+        paths["UIP_MTG_COLLECTOR_HORIZON_RESEARCH_PATH"],
+        paths["UIP_MTG_PRECOLLECTOR_RESEARCH_PATH"],
+        paths["UIP_MTG_PRECOLLECTOR_SCENARIO_RESEARCH_PATH"],
+        mtg_head=EXPECTED_MTG_HEAD,
+    )
+
 def _domain_health_records(connection: Any) -> list[PresentationRecord]:
     rows = _rows(connection, """
         SELECT domain_id, domain_name, platform_id, ownership_type,
@@ -296,6 +367,7 @@ def build_presentation_publication(
     records.extend(build_metals_tactical_records(repository_root, connection, source_sha256))
     records.extend(_mtg_records(connection))
     records.extend(_mtg_premium_records_from_environment())
+    records.extend(_mtg_lane_native_research_records_from_environment())
     records.sort(key=lambda item: (item.record_type, item.domain_id, item.asset_id or "", item.record_key))
     return PresentationPublication(
         publication_id=publication_id or str(uuid4()),

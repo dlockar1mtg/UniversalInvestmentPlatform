@@ -1584,3 +1584,1028 @@
   opacity:.48
 }
 
+/* MTG_CRYPTO_QUALITY_VISUAL_PARITY_V1 */
+
+/* ---------------------------------------------------------
+   Native product card — investment-first research hierarchy
+   --------------------------------------------------------- */
+
+.mtg-native-visual-parity{
+  min-height:310px;
+  padding:17px;
+  background:
+    radial-gradient(
+      circle at 88% 6%,
+      rgba(99,230,190,.08),
+      transparent 28%
+    ),
+    linear-gradient(
+      150deg,
+      rgba(18,37,34,.98),
+      rgba(8,21,19,.98)
+    );
+  box-shadow:0 12px 32px rgba(0,0,0,.18);
+  transition:
+    transform .16s ease,
+    border-color .16s ease,
+    box-shadow .16s ease
+}
+
+.mtg-native-visual-parity:hover{
+  transform:translateY(-2px);
+  border-color:rgba(99,230,190,.40);
+  box-shadow:0 20px 44px rgba(0,0,0,.25)
+}
+
+.mtg-native-rank-status{
+  display:flex;
+  align-items:center;
+  gap:7px;
+  flex-wrap:wrap;
+  justify-content:flex-end
+}
+
+.mtg-native-rank-badge{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  min-width:34px;
+  min-height:25px;
+  padding:3px 8px;
+  border-radius:999px;
+  border:1px solid rgba(138,125,255,.30);
+  background:rgba(138,125,255,.10);
+  color:#c8c1ff;
+  font-size:10px;
+  font-weight:900
+}
+
+.mtg-native-card-thesis{
+  display:grid;
+  grid-template-columns:minmax(0,1.15fr) minmax(0,.85fr);
+  gap:12px;
+  margin:18px 0 12px
+}
+
+.mtg-native-card-thesis>div{
+  padding:11px 12px;
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:10px;
+  background:rgba(5,15,14,.38)
+}
+
+.mtg-native-card-thesis span,
+.mtg-native-card-thesis small{
+  display:block;
+  color:var(--muted);
+  font-size:8.5px
+}
+
+.mtg-native-card-thesis strong{
+  display:block;
+  margin:4px 0;
+  font-size:20px;
+  letter-spacing:-.025em
+}
+
+.mtg-native-return-positive{
+  color:var(--accent)!important
+}
+
+.mtg-native-return-negative{
+  color:var(--bad)!important
+}
+
+.mtg-native-return-flat{
+  color:var(--warn)!important
+}
+
+.mtg-native-return-missing{
+  color:var(--muted)!important
+}
+
+.mtg-native-card-target strong{
+  font-size:17px
+}
+
+/* ---------------------------------------------------------
+   Current -> target visual
+   --------------------------------------------------------- */
+
+.mtg-native-journey{
+  margin:4px 0 12px;
+  padding:10px 11px;
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:10px;
+  background:#091715
+}
+
+.mtg-native-journey-values{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+  margin-bottom:8px
+}
+
+.mtg-native-journey-values div:last-child{
+  text-align:right
+}
+
+.mtg-native-journey-values span{
+  display:block;
+  color:var(--muted);
+  font-size:8px
+}
+
+.mtg-native-journey-values strong{
+  display:block;
+  margin-top:3px;
+  font-size:11px
+}
+
+.mtg-native-journey-track{
+  position:relative;
+  display:grid;
+  grid-template-columns:auto 1fr auto;
+  align-items:center;
+  gap:0
+}
+
+.mtg-native-journey-track span{
+  height:5px;
+  background:
+    linear-gradient(
+      90deg,
+      var(--warn),
+      var(--accent)
+    );
+  box-shadow:0 0 18px rgba(99,230,190,.10)
+}
+
+.mtg-native-journey-down
+.mtg-native-journey-track span{
+  background:
+    linear-gradient(
+      90deg,
+      var(--warn),
+      var(--bad)
+    )
+}
+
+.mtg-native-journey-track i{
+  width:13px;
+  height:13px;
+  border-radius:50%;
+  border:3px solid #091513;
+  z-index:2
+}
+
+.mtg-native-journey-track i.current{
+  background:var(--warn)
+}
+
+.mtg-native-journey-track i.target{
+  background:var(--accent)
+}
+
+.mtg-native-journey-down
+.mtg-native-journey-track i.target{
+  background:var(--bad)
+}
+
+.mtg-native-journey-axis{
+  display:flex;
+  justify-content:space-between;
+  margin-top:5px;
+  color:var(--muted);
+  font-size:7.5px
+}
+
+.mtg-native-journey-missing{
+  display:grid;
+  min-height:58px;
+  place-items:center;
+  border-style:dashed;
+  opacity:.72
+}
+
+.mtg-native-journey-message{
+  color:var(--muted);
+  font-size:8.5px
+}
+
+/* ---------------------------------------------------------
+   Separate governed concepts
+   --------------------------------------------------------- */
+
+.mtg-native-card-semantics{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+  margin-top:4px
+}
+
+.mtg-native-card-semantics>div{
+  min-width:0;
+  padding:8px;
+  border:1px solid rgba(255,255,255,.055);
+  border-radius:8px;
+  background:rgba(7,19,16,.30)
+}
+
+.mtg-native-card-semantics span{
+  display:block;
+  color:var(--muted);
+  font-size:7.5px
+}
+
+.mtg-native-card-semantics strong{
+  display:block;
+  margin-top:4px;
+  font-size:8.5px;
+  line-height:1.25;
+  overflow-wrap:anywhere
+}
+
+/* ---------------------------------------------------------
+   Authority completeness — not a synthetic risk score
+   --------------------------------------------------------- */
+
+.mtg-native-card-foot{
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  gap:12px;
+  margin-top:auto;
+  padding-top:14px
+}
+
+.mtg-native-authority-visual{
+  display:flex;
+  align-items:center;
+  gap:10px
+}
+
+.mtg-native-authority-visual span{
+  display:block;
+  color:var(--muted);
+  font-size:7.5px
+}
+
+.mtg-native-authority-visual strong{
+  display:block;
+  margin-top:2px;
+  font-size:10px
+}
+
+.mtg-native-authority-dots{
+  display:flex;
+  gap:4px
+}
+
+.mtg-native-authority-dots i{
+  width:16px;
+  height:5px;
+  border-radius:999px;
+  background:#2c3f3a
+}
+
+.mtg-native-authority-dots i.on{
+  background:var(--accent)
+}
+
+.mtg-native-card-governance{
+  margin-top:9px;
+  padding-top:7px;
+  border-top:1px solid rgba(255,255,255,.04);
+  color:var(--muted);
+  opacity:.58;
+  font-size:7px;
+  line-height:1.35
+}
+
+/* ---------------------------------------------------------
+   Native research detail
+   --------------------------------------------------------- */
+
+.mtg-native-detail-visual-parity{
+  gap:15px
+}
+
+.mtg-native-detail-visual-parity
+.mtg-native-detail-hero{
+  grid-template-columns:minmax(0,1.05fr) minmax(380px,.95fr);
+  padding:24px;
+  gap:26px;
+  box-shadow:0 18px 50px rgba(0,0,0,.24)
+}
+
+.mtg-native-strategic-copy h3{
+  max-width:650px
+}
+
+.mtg-native-detail-journey{
+  display:grid;
+  align-content:center;
+  gap:10px
+}
+
+.mtg-native-detail-journey
+.mtg-native-journey{
+  margin:0
+}
+
+.mtg-native-detail-journey
+.mtg-native-journey-values strong{
+  font-size:16px
+}
+
+.mtg-native-detail-journey
+.mtg-native-authority-visual{
+  justify-content:flex-end
+}
+
+.mtg-native-visual-kpis
+.rec-kpi-card{
+  min-height:128px
+}
+
+.mtg-native-visual-kpis
+.rec-kpi-card strong{
+  font-size:21px
+}
+
+.mtg-rank-chip{
+  border-color:rgba(138,125,255,.35);
+  background:rgba(138,125,255,.08);
+  color:#c8c1ff
+}
+
+/* ---------------------------------------------------------
+   Investment thesis panel
+   --------------------------------------------------------- */
+
+.mtg-native-thesis-panel{
+  background:
+    radial-gradient(
+      circle at 92% 12%,
+      rgba(138,125,255,.07),
+      transparent 30%
+    ),
+    linear-gradient(
+      145deg,
+      rgba(18,37,34,.94),
+      rgba(10,24,22,.96)
+    )
+}
+
+.mtg-native-thesis-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin-top:14px
+}
+
+.mtg-native-thesis-grid>div{
+  padding:13px;
+  border:1px solid var(--line);
+  border-radius:10px;
+  background:#091715
+}
+
+.mtg-native-thesis-grid span{
+  display:block;
+  color:var(--muted);
+  font-size:8.5px
+}
+
+.mtg-native-thesis-grid strong{
+  display:block;
+  margin:5px 0 4px;
+  font-size:13px;
+  overflow-wrap:anywhere
+}
+
+.mtg-native-thesis-grid p{
+  margin:0;
+  color:var(--muted);
+  font-size:8.5px;
+  line-height:1.45
+}
+
+.mtg-native-authority-summary
+.mtg-native-authority-visual{
+  justify-content:space-between;
+  padding:12px;
+  margin:12px 0;
+  border:1px solid rgba(99,230,190,.12);
+  border-radius:10px;
+  background:rgba(99,230,190,.025)
+}
+
+.mtg-native-authority-list{
+  display:grid;
+  gap:0
+}
+
+.mtg-native-authority-list>div{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  padding:9px 0;
+  border-bottom:1px solid rgba(255,255,255,.05);
+  font-size:9px
+}
+
+.mtg-native-authority-list span{
+  color:var(--muted)
+}
+
+.mtg-native-authority-list strong{
+  text-align:right
+}
+
+/* ---------------------------------------------------------
+   Responsive behavior
+   --------------------------------------------------------- */
+
+@media(max-width:1100px){
+  .mtg-native-detail-visual-parity
+  .mtg-native-detail-hero{
+    grid-template-columns:1fr
+  }
+}
+
+@media(max-width:760px){
+  .mtg-native-card-thesis,
+  .mtg-native-card-semantics,
+  .mtg-native-thesis-grid{
+    grid-template-columns:1fr
+  }
+
+  .mtg-native-card-foot{
+    align-items:stretch;
+    flex-direction:column
+  }
+
+  .mtg-native-authority-visual{
+    justify-content:space-between
+  }
+}
+
+
+
+/* MTG_LANE_NATIVE_RICH_DETAIL_V1 */
+
+.mtg-native-rich-panel{
+  overflow:hidden;
+  padding:17px;
+  background:
+    radial-gradient(
+      circle at 92% 5%,
+      rgba(138,125,255,.075),
+      transparent 29%
+    ),
+    linear-gradient(
+      150deg,
+      rgba(15,32,29,.98),
+      rgba(8,20,18,.98)
+    )
+}
+
+.mtg-native-rich-heading{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:14px;
+  margin-bottom:14px
+}
+
+.mtg-native-rich-heading h4{
+  margin:5px 0 0;
+  font-size:15px
+}
+
+.mtg-native-rich-count{
+  flex:0 0 auto;
+  padding:5px 9px;
+  border:1px solid rgba(138,125,255,.26);
+  border-radius:999px;
+  background:rgba(138,125,255,.08);
+  color:#c8c1ff;
+  font-size:8px;
+  font-weight:800
+}
+
+.mtg-native-rich-kpis{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:9px
+}
+
+.mtg-native-rich-kpis>div{
+  min-width:0;
+  padding:12px;
+  border:1px solid rgba(255,255,255,.065);
+  border-radius:10px;
+  background:#091715
+}
+
+.mtg-native-rich-kpis span,
+.mtg-native-rich-kpis small{
+  display:block;
+  color:var(--muted);
+  font-size:8px
+}
+
+.mtg-native-rich-kpis strong{
+  display:block;
+  margin:5px 0 4px;
+  font-size:15px;
+  line-height:1.15;
+  overflow-wrap:anywhere
+}
+
+.mtg-native-calibration-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:9px;
+  margin-top:10px
+}
+
+.mtg-native-calibration-grid>div{
+  padding:11px 12px;
+  border:1px solid rgba(99,230,190,.10);
+  border-radius:9px;
+  background:rgba(99,230,190,.025)
+}
+
+.mtg-native-calibration-grid span{
+  display:block;
+  color:var(--muted);
+  font-size:8px
+}
+
+.mtg-native-calibration-grid strong{
+  display:block;
+  margin-top:4px;
+  font-size:10px;
+  overflow-wrap:anywhere
+}
+
+.mtg-native-limitations{
+  margin-top:10px;
+  padding:11px 12px;
+  border-left:3px solid rgba(255,194,92,.58);
+  border-radius:8px;
+  background:rgba(255,194,92,.035)
+}
+
+.mtg-native-limitations span{
+  color:var(--warn);
+  font-size:8px;
+  font-weight:800
+}
+
+.mtg-native-limitations p{
+  margin:5px 0 0;
+  color:var(--muted);
+  font-size:9px;
+  line-height:1.5
+}
+
+.mtg-native-rich-table-wrap{
+  margin-top:13px;
+  overflow-x:auto;
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:10px
+}
+
+.mtg-native-rich-table{
+  width:100%;
+  min-width:760px;
+  border-collapse:collapse
+}
+
+.mtg-native-rich-table th,
+.mtg-native-rich-table td{
+  padding:9px 10px;
+  border-bottom:1px solid rgba(255,255,255,.045);
+  text-align:right;
+  white-space:nowrap;
+  font-size:8.5px
+}
+
+.mtg-native-rich-table th{
+  color:var(--muted);
+  font-size:7.5px;
+  font-weight:700
+}
+
+.mtg-native-rich-table th:first-child,
+.mtg-native-rich-table td:first-child{
+  text-align:left
+}
+
+.mtg-native-rich-table tbody tr:last-child td{
+  border-bottom:0
+}
+
+.mtg-native-rich-empty{
+  padding:18px;
+  color:var(--muted);
+  text-align:center;
+  font-size:9px;
+  line-height:1.5
+}
+
+.mtg-native-scenario-grid{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin-top:13px
+}
+
+.mtg-native-scenario-card{
+  min-width:0;
+  padding:13px;
+  border:1px solid rgba(138,125,255,.15);
+  border-radius:11px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(16,31,29,.95),
+      rgba(7,18,16,.98)
+    )
+}
+
+.mtg-native-scenario-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:10px
+}
+
+.mtg-native-scenario-head span{
+  display:block;
+  color:var(--muted);
+  font-size:8px
+}
+
+.mtg-native-scenario-head strong{
+  display:block;
+  margin-top:4px;
+  font-size:14px
+}
+
+.mtg-native-scenario-badge{
+  max-width:150px;
+  padding:5px 7px;
+  border-radius:7px;
+  text-align:right;
+  font-size:7px!important;
+  font-weight:800
+}
+
+.mtg-native-scenario-badge.scenario{
+  border:1px solid rgba(255,194,92,.22);
+  background:rgba(255,194,92,.055);
+  color:var(--warn)!important
+}
+
+.mtg-native-scenario-badge.direct{
+  border:1px solid rgba(99,230,190,.22);
+  background:rgba(99,230,190,.055);
+  color:var(--accent)!important
+}
+
+.mtg-native-scenario-metrics{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:7px;
+  margin-top:12px
+}
+
+.mtg-native-scenario-metrics>div{
+  min-width:0;
+  padding:8px;
+  border:1px solid rgba(255,255,255,.05);
+  border-radius:8px;
+  background:#091715
+}
+
+.mtg-native-scenario-metrics span{
+  display:block;
+  color:var(--muted);
+  font-size:7px
+}
+
+.mtg-native-scenario-metrics strong{
+  display:block;
+  margin-top:4px;
+  font-size:10px;
+  overflow-wrap:anywhere
+}
+
+.mtg-native-scenario-foot{
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
+  margin-top:10px;
+  padding-top:8px;
+  border-top:1px solid rgba(255,255,255,.05);
+  color:var(--muted);
+  font-size:7.5px
+}
+
+@media(max-width:1000px){
+  .mtg-native-rich-kpis{
+    grid-template-columns:repeat(2,minmax(0,1fr))
+  }
+
+  .mtg-native-scenario-grid{
+    grid-template-columns:1fr
+  }
+}
+
+@media(max-width:680px){
+  .mtg-native-rich-kpis,
+  .mtg-native-calibration-grid,
+  .mtg-native-scenario-metrics{
+    grid-template-columns:1fr
+  }
+
+  .mtg-native-rich-heading,
+  .mtg-native-scenario-head,
+  .mtg-native-scenario-foot{
+    flex-direction:column
+  }
+
+  .mtg-native-scenario-badge{
+    max-width:none;
+    text-align:left
+  }
+}
+
+
+/* MTG_FINAL_UX_REFINEMENT_V1 */
+
+.mtg-native-card-secondary{
+  margin-top:9px;
+  border-top:1px solid rgba(255,255,255,.045)
+}
+
+.mtg-native-card-secondary>summary{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:8px 1px 2px;
+  color:var(--muted);
+  cursor:pointer;
+  font-size:7.5px;
+  font-weight:700;
+  list-style:none
+}
+
+.mtg-native-card-secondary>summary::-webkit-details-marker{
+  display:none
+}
+
+.mtg-native-card-secondary>summary::after{
+  content:"+";
+  font-size:12px;
+  color:var(--accent)
+}
+
+.mtg-native-card-secondary[open]>summary::after{
+  content:"?"
+}
+
+.mtg-native-card-secondary .mtg-native-card-semantics{
+  margin-top:8px
+}
+
+.mtg-native-card-secondary .mtg-native-card-governance{
+  margin:8px 0 0
+}
+
+.mtg-native-horizon-viz{
+  margin-top:13px;
+  padding:13px 13px 8px;
+  border:1px solid rgba(255,255,255,.06);
+  border-radius:11px;
+  background:
+    linear-gradient(
+      145deg,
+      rgba(9,24,21,.98),
+      rgba(6,17,15,.98)
+    )
+}
+
+.mtg-native-horizon-viz-head{
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  margin-bottom:7px
+}
+
+.mtg-native-horizon-viz-head span{
+  display:block;
+  color:var(--muted);
+  font-size:8px
+}
+
+.mtg-native-horizon-viz-head strong{
+  display:block;
+  margin-top:3px;
+  font-size:12px
+}
+
+.mtg-native-horizon-legend{
+  display:flex;
+  gap:10px;
+  font-size:7.5px;
+  font-weight:800
+}
+
+.mtg-native-horizon-legend .p10{
+  color:var(--bad)
+}
+
+.mtg-native-horizon-legend .median{
+  color:var(--accent)
+}
+
+.mtg-native-horizon-legend .p90{
+  color:var(--warn)
+}
+
+.mtg-native-horizon-viz svg{
+  display:block;
+  width:100%;
+  min-height:190px;
+  overflow:visible
+}
+
+.mtg-native-horizon-viz text{
+  fill:var(--muted);
+  font-size:8px
+}
+
+.mtg-native-horizon-grid{
+  stroke:rgba(255,255,255,.045);
+  stroke-width:1
+}
+
+.mtg-native-horizon-line{
+  fill:none;
+  stroke-width:2.1;
+  stroke-linecap:round;
+  stroke-linejoin:round
+}
+
+.mtg-native-horizon-line.p10{
+  stroke:var(--bad)
+}
+
+.mtg-native-horizon-line.median{
+  stroke:var(--accent);
+  stroke-width:3
+}
+
+.mtg-native-horizon-line.p90{
+  stroke:var(--warn)
+}
+
+.mtg-native-horizon-viz>p{
+  margin:4px 0 0;
+  color:var(--muted);
+  font-size:7.5px
+}
+
+.mtg-native-scenario-primary{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:8px;
+  margin-top:12px
+}
+
+.mtg-native-scenario-primary>div{
+  padding:10px;
+  border:1px solid rgba(99,230,190,.10);
+  border-radius:9px;
+  background:rgba(99,230,190,.028)
+}
+
+.mtg-native-scenario-primary span{
+  display:block;
+  color:var(--muted);
+  font-size:7.5px
+}
+
+.mtg-native-scenario-primary strong{
+  display:block;
+  margin-top:5px;
+  font-size:17px;
+  line-height:1.1
+}
+
+.mtg-native-scenario-metrics{
+  grid-template-columns:repeat(3,minmax(0,1fr))
+}
+
+.mtg-native-scenario-foot{
+  flex-wrap:wrap
+}
+
+.mtg-native-methodology-disclosure{
+  padding:0;
+  overflow:hidden
+}
+
+.mtg-native-methodology-disclosure>summary{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:12px;
+  padding:14px;
+  cursor:pointer;
+  list-style:none
+}
+
+.mtg-native-methodology-disclosure>summary::-webkit-details-marker{
+  display:none
+}
+
+.mtg-native-methodology-disclosure>summary>div:first-child strong{
+  display:block;
+  font-size:11px
+}
+
+.mtg-native-methodology-disclosure>summary>div:first-child span{
+  display:block;
+  margin-top:4px;
+  color:var(--muted);
+  font-size:7.5px
+}
+
+.mtg-native-methodology-body{
+  display:grid;
+  gap:13px;
+  padding:0 14px 14px;
+  border-top:1px solid rgba(255,255,255,.05)
+}
+
+.mtg-native-methodology-body>section{
+  padding-top:12px
+}
+
+.mtg-native-methodology-body h5{
+  margin:0 0 9px;
+  font-size:9px
+}
+
+.mtg-native-methodology-governance p{
+  margin:5px 0;
+  color:var(--muted);
+  font-size:8px;
+  line-height:1.45
+}
+
+@media(max-width:680px){
+
+  .mtg-native-scenario-primary{
+    grid-template-columns:1fr
+  }
+
+  .mtg-native-horizon-viz-head{
+    flex-direction:column
+  }
+
+  .mtg-native-methodology-disclosure>summary{
+    grid-template-columns:1fr
+  }
+}
+
+/* MTG_CRYPTO_QUALITY_VISUAL_PARITY_D1_COMPAT */
+
+.mtg-native-provenance-heading{
+  display:flex;
+  align-items:end;
+  justify-content:space-between;
+  gap:12px;
+  margin:3px 2px -5px;
+  padding-top:4px
+}
+
+.mtg-native-provenance-heading span{
+  color:var(--text);
+  font-size:9px;
+  font-weight:800
+}
+
+.mtg-native-provenance-heading small{
+  color:var(--muted);
+  font-size:7.5px
+}

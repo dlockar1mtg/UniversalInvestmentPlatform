@@ -1,0 +1,129 @@
+{
+    "authorization_id": "UIP_MTG_LANE_NATIVE_RESEARCH_HYDRATION_IMPLEMENTATION_AUTHORIZATION_V1",
+    "authorization_version": "1.0.0",
+    "status": "AUTHORIZED_FOR_BOUNDED_PRESENTATION_PROJECTION_AND_WIRING_IMPLEMENTATION",
+    "domain_id": "mtg",
+    "governing_checkpoints": {
+        "uip_branch": "phase-uip-rec-utility-mtg-premium-research",
+        "required_uip_parent_head": "b041d8b7df2312d949ecab6e71a9c16b505f8c70",
+        "mtg_branch": "phase-9.1-mtg-to-uip-export-contract",
+        "required_mtg_head": "6b610b208549bec4be2c0ec7f7f3c2f69b154302",
+        "source_hydration_contract": "config/mtg/governance/mtg_lane_native_research_hydration_contract_v1.json",
+        "frozen_common_mtg_field_count": 23
+    },
+    "certified_datasets": {
+        "collector_product": {
+            "path": "docs/phase_9/uip_export/research_sidecars/mtg_collector_research.csv",
+            "sha256": "b81ee16a310f8a4f9dcbccf21047e31396df9810d53291cdb9b631fbe046d457",
+            "row_count": 50,
+            "record_type": "mtg_collector_research",
+            "asset_id_rule": "COLLECTOR_V1|{canonical_product_id}"
+        },
+        "collector_horizon": {
+            "path": "docs/phase_9/uip_export/research_sidecars/mtg_collector_forecast_horizon.csv",
+            "sha256": "585257520197fff9700c0a9f1d1d517af60c1792d944f3f4dab1f65c564cf3e8",
+            "row_count": 294,
+            "record_type": "mtg_collector_forecast_horizon",
+            "asset_id_rule": "COLLECTOR_V1|{canonical_product_id}",
+            "record_key_rule": "{canonical_product_id}|{horizon_days}"
+        },
+        "precollector_product": {
+            "path": "docs/phase_9/uip_export/research_sidecars/mtg_precollector_research.csv",
+            "sha256": "80d8a60ffcc35d688e6560ee94f2d1f910fb3cd961eea097d5ffd00862034f81",
+            "row_count": 131,
+            "record_type": "mtg_precollector_research",
+            "asset_id_rule": "PRE_COLLECTOR_V1|{canonical_product_id}"
+        },
+        "precollector_scenario": {
+            "path": "docs/phase_9/uip_export/research_sidecars/mtg_precollector_scenario_horizon.csv",
+            "sha256": "74caad4f8d39ce255455854ab5a5459779f6e73adc0afebc8269e769858aed0a",
+            "row_count": 190,
+            "record_type": "mtg_precollector_scenario_horizon",
+            "asset_id_rule": "PRE_COLLECTOR_V1|{canonical_product_id}",
+            "record_key_rule": "{canonical_product_id}|{monte_carlo_horizon_years}"
+        }
+    },
+    "architecture": {
+        "use_existing_presentation_records_table": true,
+        "use_existing_generic_asset_detail_endpoint": true,
+        "generic_asset_detail_endpoint": "/v1/presentation/assets/{domain_id}/{asset_id}",
+        "create_new_http_endpoint": false,
+        "modify_specialized_mtg_premium_research_method": false,
+        "specialized_mtg_premium_research_remains_secret_lair_specific": true,
+        "modify_read_api": false,
+        "modify_http_service": false,
+        "modify_frontend_during_this_implementation": false,
+        "publication_projection_required": true,
+        "publication_model_wiring_required": true
+    },
+    "authorized_runtime_files": [
+        "foundation/presentation/mtg_lane_native_research_projection.py",
+        "foundation/presentation/publication_model.py",
+        "tests/delivery/test_mtg_lane_native_research_projection.py",
+        "tests/delivery/test_mtg_lane_native_research_publication_wiring.py"
+    ],
+    "required_projection_behavior": [
+        "VALIDATE_EXACT_DATASET_SHA_BEFORE_PROJECTION",
+        "VALIDATE_EXACT_ROW_COUNT_BEFORE_PROJECTION",
+        "VALIDATE_REQUIRED_SCHEMA_BEFORE_PROJECTION",
+        "VALIDATE_UNIQUE_PRODUCT_KEYS",
+        "VALIDATE_UNIQUE_HORIZON_KEYS",
+        "MAP_COLLECTOR_ASSET_ID_AS_COLLECTOR_V1_PIPE_CANONICAL_PRODUCT_ID",
+        "MAP_PRECOLLECTOR_ASSET_ID_AS_PRE_COLLECTOR_V1_PIPE_CANONICAL_PRODUCT_ID",
+        "COPY_SOURCE_VALUES_LOSSLESSLY",
+        "PRESERVE_BLANK_VALUES_AS_MISSING",
+        "PRESERVE_3Y_5Y_SCENARIO_TERMINOLOGY",
+        "DO_NOT_POPULATE_COMMON_NATIVE_AUTHORITY_FIELDS",
+        "DO_NOT_RECALCULATE_ANY_ANALYTICAL_VALUE"
+    ],
+    "required_publication_wiring": {
+        "external_paths_must_be_explicit": true,
+        "filesystem_discovery_authorized": false,
+        "implicit_repository_search_authorized": false,
+        "copy_sidecars_into_uip_authorized": false,
+        "missing_all_lane_native_sidecar_environment_variables_behavior": "PRESERVE_EXISTING_PUBLICATION_WITHOUT_LANE_NATIVE_RESEARCH_RECORDS",
+        "present_invalid_sidecar_behavior": "FAIL_CLOSED",
+        "append_records_without_replacing_existing_mtg_records": true
+    },
+    "proposed_environment_variables": [
+        "UIP_MTG_COLLECTOR_RESEARCH_PATH",
+        "UIP_MTG_COLLECTOR_HORIZON_RESEARCH_PATH",
+        "UIP_MTG_PRECOLLECTOR_RESEARCH_PATH",
+        "UIP_MTG_PRECOLLECTOR_SCENARIO_RESEARCH_PATH"
+    ],
+    "semantic_guardrails": [
+        "COMMON_23_FIELD_NATIVE_AUTHORITY_REMAINS_AUTHORITATIVE",
+        "SIDECARS_SUPPLEMENT_BUT_DO_NOT_OVERRIDE_NATIVE_AUTHORITY",
+        "COLLECTOR_NATIVE_RANK_REMAINS_COLLECTOR_ONLY",
+        "PRECOLLECTOR_NATIVE_RANK_REMAINS_PRECOLLECTOR_ONLY",
+        "LOTR_CURRENT_PRICE_ONLY_ASSET_REMAINS_UNRANKED",
+        "3Y_AND_5Y_PRECOLLECTOR_VALUES_REMAIN_SCENARIOS_NOT_DIRECT_FORECASTS",
+        "MISSING_VALUES_REMAIN_MISSING",
+        "NO_FAKE_ZERO_VALUES",
+        "NO_FAKE_CHART_POINTS",
+        "NO_SECRET_LAIR_Q10_POLICY_REUSE",
+        "NO_CRYPTO_BEAR_BASE_BULL_MAPPING",
+        "NO_CROSS_LANE_SCORE",
+        "NO_UNIVERSAL_MTG_RANK",
+        "NO_AUTOMATIC_PURCHASE_EXECUTION"
+    ],
+    "authorization_boundary": {
+        "runtime_projection_implementation_authorized": true,
+        "local_non_active_publication_validation_authorized": true,
+        "read_api_change_authorized": false,
+        "new_endpoint_authorized": false,
+        "frontend_change_authorized": false,
+        "analytical_database_write_authorized": false,
+        "postgres_write_authorized": false,
+        "presentation_stage_authorized": false,
+        "presentation_activation_authorized": false,
+        "hosted_deployment_authorized": false,
+        "mtg_source_change_authorized": false,
+        "model_execution_authorized": false,
+        "model_retraining_authorized": false,
+        "forecast_recalculation_authorized": false,
+        "risk_recalculation_authorized": false,
+        "automatic_purchase_execution_authorized": false
+    },
+    "next_gate": "IMPLEMENT_AND_CERTIFY_BOUNDED_MTG_LANE_NATIVE_RESEARCH_PRESENTATION_PROJECTION"
+}
