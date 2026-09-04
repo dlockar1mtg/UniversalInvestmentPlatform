@@ -1,0 +1,159 @@
+﻿{
+  "evidence_id": "UIP_MTG_PREMIUM_LIVE_PRESENTATION_ACTIVATION_EVIDENCE_V1",
+  "evidence_version": "1.0.0",
+  "certification_state": "PASS",
+  "execution_step": "STEP_14K_A",
+
+  "governing_authorization": {
+    "authorization_id": "UIP_MTG_PREMIUM_LIVE_PRESENTATION_ACTIVATION_AUTHORIZATION_V1",
+    "governing_uip_head": "9bc82954e29f73ce5b8605a8ccfc50cffa5b5603"
+  },
+
+  "certified_sources": {
+    "uip_repository": "dlockar1mtg/UniversalInvestmentPlatform",
+    "uip_branch": "phase-uip-rec-utility-mtg-premium-research",
+    "uip_head": "9bc82954e29f73ce5b8605a8ccfc50cffa5b5603",
+
+    "mtg_repository": "dlockar1mtg/mtg-investment-terminal",
+    "mtg_branch": "phase-9.1-mtg-to-uip-export-contract",
+    "mtg_head": "6b610b208549bec4be2c0ec7f7f3c2f69b154302",
+
+    "analytical_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+
+    "premium_sidecar_sha256": "296ccbb9ba96812b99dacd771f1ad311496b4997fa0ac7103e68a1d4aaa03333",
+    "premium_sidecar_row_count": 787
+  },
+
+  "pre_activation_certification": {
+    "validation_state": "PASS",
+
+    "target_publication_id": "mtg-premium-stage-rehearsal-ac8adb415f03",
+    "target_status": "STAGED",
+    "target_content_fingerprint": "4a67d16878f0cdb5077b98aa13bd44276f1a993ce2a2b045f52a1ebefe633154",
+    "target_record_count": 13264,
+
+    "premium_record_count": 787,
+    "premium_payload_readback": "LOSSLESS",
+
+    "asset_counts": {
+      "crypto": 6,
+      "metals": 16,
+      "mtg": 968
+    },
+
+    "store_validate_staged": "PASS"
+  },
+
+  "last_good_active_before_activation": {
+    "publication_id": "metals-final-decision-presentation-r1-20260827",
+    "publication_status": "ACTIVE",
+    "content_fingerprint": "9de5edb450542be85dd68f3b0dd539dc520ef1f92b9de1b743672d7a6b1e289d",
+    "record_count": 12477,
+    "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+    "published_at_utc": "2026-08-27 00:46:46.744407+00:00",
+    "activated_at_utc": "2026-08-27 01:06:18.281055+00:00"
+  },
+
+  "activation_execution": {
+    "activation_method": "PostgresPresentationRepository.activate",
+    "target_publication_id": "mtg-premium-stage-rehearsal-ac8adb415f03",
+
+    "activation_call_count": 1,
+    "activation_call_completed": true,
+
+    "automatic_second_activation_performed": false,
+    "automatic_fallback_activation_performed": false
+  },
+
+  "active_publication_after_activation": {
+    "publication_id": "mtg-premium-stage-rehearsal-ac8adb415f03",
+    "publication_status": "ACTIVE",
+
+    "content_fingerprint": "4a67d16878f0cdb5077b98aa13bd44276f1a993ce2a2b045f52a1ebefe633154",
+
+    "record_count": 13264,
+
+    "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+
+    "published_at_utc": "2026-08-27 01:15:00+00:00",
+
+    "activated_at_utc": "2026-08-27 12:02:07.529798+00:00"
+  },
+
+  "previous_publication_after_activation": {
+    "publication_id": "metals-final-decision-presentation-r1-20260827",
+    "publication_status": "SUPERSEDED",
+
+    "content_fingerprint": "9de5edb450542be85dd68f3b0dd539dc520ef1f92b9de1b743672d7a6b1e289d",
+
+    "record_count": 12477,
+
+    "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+
+    "preserved": true
+  },
+
+  "post_activation_certification": {
+    "target_active_pointer": "PASS",
+    "target_status_active": "PASS",
+
+    "target_fingerprint_preserved": "PASS",
+    "target_record_count_preserved": "PASS",
+
+    "premium_record_count": 787,
+    "premium_unique_asset_id_count": 787,
+    "premium_payload_readback": "LOSSLESS",
+
+    "previous_active_status": "SUPERSEDED",
+
+    "active_pointer_count": 1,
+    "active_publication_count": 1
+  },
+
+  "semantic_certification": {
+    "one_year_direct_certified_semantics_preserved": true,
+
+    "q10_governed_threshold_preserved": true,
+
+    "three_year_values_remain_scenarios": true,
+    "five_year_values_remain_scenarios": true,
+
+    "three_year_values_are_purchase_trigger": false,
+    "five_year_values_are_purchase_trigger": false,
+
+    "rank_can_override_purchase_threshold": false,
+
+    "automatic_purchase_execution_surface_present": false,
+    "execution_ready_purchase_surface_present": false
+  },
+
+  "immutability_results": {
+    "analytical_database_modified": false,
+    "mtg_source_modified": false,
+    "mtg_premium_sidecar_modified": false,
+
+    "uip_repository_modified_by_activation": false,
+
+    "read_api_code_changed": false,
+    "frontend_changed": false,
+    "model_execution_performed": false
+  },
+
+  "certified_conclusion": {
+    "premium_presentation_is_live": true,
+
+    "active_publication_record_count": 13264,
+
+    "live_mtg_premium_research_record_count": 787,
+
+    "premium_rows_live_and_lossless": true,
+
+    "single_active_publication_preserved": true,
+
+    "read_api_validation_authorized_by_this_evidence": false,
+    "read_api_code_change_authorized": false,
+    "frontend_change_authorized": false,
+
+    "next_gate": "CONSIDER_BOUNDED_MTG_PREMIUM_READ_API_VALIDATION_AUTHORIZATION"
+  }
+}

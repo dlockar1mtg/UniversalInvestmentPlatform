@@ -1,0 +1,385 @@
+﻿{
+  "authorization_id": "UIP_MTG_NATIVE_AUTHORITY_HYDRATION_RECOVERY_AUTHORIZATION_V1",
+  "authorization_version": "1.0.0",
+
+  "status": "AUTHORIZED_FOR_BOUNDED_MTG_NATIVE_AUTHORITY_HYDRATION_AND_CRYPTO_QUALITY_RESEARCH_RECOVERY",
+
+  "domain_id": "mtg",
+
+  "governing_uip_checkpoint": {
+    "repository": "dlockar1mtg/UniversalInvestmentPlatform",
+    "branch": "phase-uip-rec-utility-mtg-premium-research",
+    "required_parent_head": "fb58b2b82c67e1709ba1beada84705757b0630cd"
+  },
+
+  "governing_mtg_checkpoint": {
+    "repository": "dlockar1mtg/mtg-investment-terminal",
+    "branch": "phase-9.1-mtg-to-uip-export-contract",
+    "required_head": "6b610b208549bec4be2c0ec7f7f3c2f69b154302"
+  },
+
+  "step_14m_g_visual_acceptance": {
+    "status": "REJECTED",
+
+    "secret_lair_general_visual_direction": "ACCEPTABLE_BASELINE",
+
+    "collector_data_fidelity": "REJECTED",
+    "collector_visual_quality": "REJECTED",
+
+    "precollector_data_fidelity": "UNRESOLVED_AND_REQUIRES_HYDRATION_VALIDATION",
+    "precollector_visual_quality": "REJECTED",
+
+    "hosted_deployment_authorized": false
+  },
+
+  "proven_collector_contradiction": {
+    "product_name": "Edge of Eternities - Collector Booster Display",
+
+    "native_rank": 1,
+    "native_purchase_status": "STRONG_PURCHASE_CANDIDATE",
+
+    "current_visible_hero_state": {
+      "current_price": "Missing",
+      "current_price_authority": "Unavailable",
+      "forecast_1y": "Missing",
+      "forecast_authority": "Unavailable"
+    },
+
+    "generic_asset_detail_observed_state": {
+      "current_price_usd": 717.61,
+      "current_price_authority_available": true,
+
+      "forecast_horizon_months": 12,
+      "point_forecast": 1205.893871,
+      "expected_return": 0.6804306949457226,
+      "forecast_authority_available": true,
+
+      "forecast_method": "mtg_native_1y"
+    },
+
+    "finding":
+      "The frontend successfully reads the generic MTG asset-detail endpoint but does not promote the richer observed authority into the primary native research presentation."
+  },
+
+  "root_cause_boundary": {
+    "generic_asset_detail_http_failure_proven": false,
+    "generic_asset_detail_read_success_proven": true,
+
+    "primary_problem":
+      "FRONTEND_NATIVE_AUTHORITY_MAPPING_AND_PRESENTATION",
+
+    "catalog_payload_may_be_thinner_than_generic_detail": true,
+
+    "detail_payload_must_not_be_ignored_when_it_contains_stronger_certified_authority":
+      true
+  },
+
+  "authorized_frontend_files": {
+    "logic":
+      "foundation/production/dashboard_assets/recommendation_ui.js",
+
+    "visuals":
+      "foundation/production/dashboard_assets/recommendation_visual.css",
+
+    "new_contract_test":
+      "tests/delivery/test_mtg_native_authority_hydration_recovery.py",
+
+    "existing_native_lane_test_may_be_updated_for_intended_behavior":
+      "tests/delivery/test_mtg_native_lane_deep_research.py",
+
+    "existing_visual_test_may_be_updated_for_intended_behavior":
+      "tests/delivery/test_mtg_premium_crypto_parity_visual_redesign.py",
+
+    "existing_rec_ui_test_may_be_updated_only_for_intended_behavior":
+      "tests/delivery/test_rec_ui_1.py"
+  },
+
+  "required_normalization_behavior": {
+    "normalizer_required": true,
+
+    "required_function_intent":
+      "Construct one normalized native-research authority object from the generic asset-detail records plus the recommendation-catalog payload.",
+
+    "record_precedence": {
+      "asset_record_current_price":
+        "Use observed generic asset record when current_price_authority_available is true.",
+
+      "forecast_record":
+        "Use observed generic forecast record when forecast_authority_available is true.",
+
+      "recommendation_record":
+        "Use observed recommendation record for native rank, rank type, purchase status, purchase semantic, evidence, actionability, and native authority SHA when populated.",
+
+      "native_authority_record":
+        "Use observed native authority record for lane identity, product identity, evidence, rank, source filename, and source platform when populated.",
+
+      "catalog_payload":
+        "Retain as initial summary/fallback authority only where richer observed detail does not provide a populated certified value."
+    }
+  },
+
+  "required_hydrated_fields": {
+    "current_price_usd": true,
+    "current_price_authority_available": true,
+
+    "forecast_1y_price_usd_from_point_forecast": true,
+    "forecast_1y_return_from_expected_return": true,
+    "forecast_horizon_months": true,
+    "forecast_method": true,
+    "forecast_authority_available": true,
+
+    "native_rank": true,
+    "native_rank_type": true,
+
+    "native_purchase_status": true,
+    "purchase_semantic": true,
+
+    "evidence_state": true,
+    "actionability_state": true,
+
+    "lane_authority_state": true,
+
+    "native_asset_id": true,
+    "universal_asset_id": true,
+
+    "native_authority_sha256": true,
+    "manifest_sha256": true,
+
+    "source_filename": true,
+    "source_platform": true
+  },
+
+  "required_missing_semantics": {
+    "missing_remains_missing": true,
+
+    "missing_must_be_evaluated_after_detail_normalization":
+      true,
+
+    "catalog_missing_must_not_override_observed_certified_detail":
+      true,
+
+    "observed_unavailable_authority_must_remain_unavailable":
+      true,
+
+    "zero_must_not_be_substituted_for_missing":
+      true,
+
+    "secret_lair_fields_must_not_be_used_to_fill_native_lane_gaps":
+      true
+  },
+
+  "collector_requirements": {
+    "hydrate_visible_research_detail": true,
+
+    "promote_current_price_when_observed": true,
+    "promote_1y_target_when_observed": true,
+    "promote_1y_expected_return_when_observed": true,
+
+    "promote_native_rank": true,
+    "promote_purchase_status": true,
+    "promote_evidence": true,
+    "promote_actionability": true,
+
+    "authority_gap_panel_must_reflect_normalized_authority":
+      true,
+
+    "raw_records_must_not_contradict_primary_research_surface":
+      true
+  },
+
+  "precollector_requirements": {
+    "hydrate_visible_research_detail": true,
+
+    "ranked_forecastable_products_must_attempt_generic_detail_hydration":
+      true,
+
+    "ranked_forecastable_products_must_not_be_labeled_forecast_missing_if_generic_detail_contains_certified_forecast":
+      true,
+
+    "blocked_products_must_remain_blocked_if_generic_detail_confirms_no_authority":
+      true,
+
+    "ranked_products_must_be_visually_distinguishable_from_blocked_products":
+      true
+  },
+
+  "list_card_requirements": {
+    "collector_cards_should_not_display_false_missing_values":
+      true,
+
+    "precollector_cards_should_not_display_false_missing_values":
+      true,
+
+    "bounded_visible_page_hydration_authorized":
+      true,
+
+    "hydration_may_be_per_visible_page_only":
+      true,
+
+    "bulk_fetch_of_entire_mtg_universe_not_required":
+      true,
+
+    "loading_state_required":
+      true,
+
+    "failed_detail_read_must_fail_closed":
+      true
+  },
+
+  "crypto_quality_visual_requirements": {
+    "raw_record_dump_is_secondary_provenance_not_primary_research":
+      true,
+
+    "primary_research_hierarchy_required":
+      true,
+
+    "investment_thesis_or_recommendation_headline_required":
+      true,
+
+    "current_price_primary_metric_when_available":
+      true,
+
+    "one_year_target_primary_metric_when_available":
+      true,
+
+    "one_year_return_primary_metric_when_available":
+      true,
+
+    "native_rank_primary_context":
+      true,
+
+    "evidence_and_actionability_visible":
+      true,
+
+    "authority_state_compact_not_dominant":
+      true,
+
+    "missing_state_compact_not_repetitive":
+      true,
+
+    "technical_provenance_collapsible_or_secondary":
+      true,
+
+    "responsive_cards_required":
+      true,
+
+    "collector_and_precollector_must_feel_like_investment_research_not_database_debug_views":
+      true
+  },
+
+  "semantic_constraints": {
+    "secret_lair_q10_policy_unchanged": true,
+
+    "secret_lair_1y_certified_forecast_semantics_unchanged": true,
+
+    "secret_lair_3y_5y_scenario_semantics_unchanged": true,
+
+    "collector_native_rank_is_lane_specific": true,
+
+    "precollector_native_rank_is_lane_specific": true,
+
+    "collector_secret_lair_q10_policy_applies": false,
+
+    "precollector_secret_lair_q10_policy_applies": false,
+
+    "universal_mtg_rank_may_be_created": false,
+
+    "cross_domain_rank_may_be_created": false,
+
+    "automatic_purchase_execution_authorized": false
+  },
+
+  "explicitly_forbidden": {
+    "postgres_write": true,
+
+    "presentation_stage": true,
+    "presentation_activate": true,
+    "active_pointer_mutation": true,
+
+    "analytical_database_change": true,
+
+    "mtg_source_repository_change": true,
+
+    "mtg_model_change": true,
+    "mtg_model_retraining": true,
+
+    "new_backend_endpoint": true,
+
+    "read_api_contract_change_without_separate_authorization":
+      true,
+
+    "secret_lair_premium_synthesis_for_collector": true,
+
+    "secret_lair_premium_synthesis_for_precollector": true,
+
+    "universal_mtg_rank": true,
+
+    "cross_domain_rank": true,
+
+    "automatic_purchase_execution": true,
+
+    "hosted_deployment": true
+  },
+
+  "implementation_certification_requirements": {
+    "normalization_contract_tests": true,
+
+    "collector_edge_of_eternities_hydration_regression":
+      true,
+
+    "current_price_hydration_test": true,
+
+    "forecast_target_hydration_test": true,
+
+    "expected_return_hydration_test": true,
+
+    "catalog_missing_cannot_override_observed_detail_test":
+      true,
+
+    "true_missing_remains_missing_test": true,
+
+    "precollector_ranked_forecastable_hydration_test":
+      true,
+
+    "precollector_blocked_fail_closed_test":
+      true,
+
+    "native_lane_visual_hierarchy_test":
+      true,
+
+    "secret_lair_regression_required":
+      true,
+
+    "existing_native_lane_regression_required":
+      true,
+
+    "rec_ui_regression_required":
+      true,
+
+    "live_read_api_regression_required":
+      true,
+
+    "projection_regression_required":
+      true,
+
+    "exact_file_scope_required":
+      true,
+
+    "local_browser_acceptance_required_after_implementation":
+      true
+  },
+
+  "next_gate": {
+    "authorized_next_step":
+      "IMPLEMENT_MTG_NATIVE_AUTHORITY_HYDRATION_AND_CRYPTO_QUALITY_RESEARCH_RECOVERY",
+
+    "frontend_only_first":
+      true,
+
+    "backend_expansion_requires_separate_evidence_and_authorization":
+      true,
+
+    "hosted_deployment_authorized":
+      false
+  }
+}

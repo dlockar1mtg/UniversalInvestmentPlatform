@@ -1,0 +1,119 @@
+﻿{
+  "recovery_authorization_id": "UIP_MTG_PREMIUM_LIVE_READ_API_VALIDATION_READ_ONLY_RECOVERY_V1",
+  "recovery_version": "1.0.0",
+  "status": "AUTHORIZED_FOR_SERVER_ENFORCED_TRANSACTION_READ_ONLY_RETRY",
+
+  "governing_authorization": {
+    "authorization_id": "UIP_MTG_PREMIUM_LIVE_READ_API_VALIDATION_AUTHORIZATION_V1",
+    "governing_uip_head": "2eed6325798f5bc453abccc527aa37f8ba0ee4c1"
+  },
+
+  "failed_execution": {
+    "step": "STEP_14L_D",
+    "failure_class": "NEON_POOLED_CONNECTION_STARTUP_PARAMETER_UNSUPPORTED",
+
+    "failed_before_successful_postgres_connection": true,
+    "failed_before_live_database_select": true,
+    "failed_before_repository_live_projection": true,
+    "failed_before_fastapi_live_route_validation": true,
+
+    "postgres_write_attempted": false,
+    "presentation_activation_attempted": false,
+    "active_pointer_mutation_attempted": false
+  },
+
+  "observed_connection_constraint": {
+    "provider": "NEON",
+    "connection_mode": "POOLED",
+
+    "unsupported_startup_parameter": "default_transaction_read_only",
+
+    "startup_options_read_only_mechanism_authorized": false
+  },
+
+  "authorized_replacement_read_only_mechanism": {
+    "connect_using_existing_pooled_dsn_without_startup_options": true,
+
+    "execute_set_transaction_read_only_immediately_after_connection": true,
+
+    "set_transaction_read_only_must_precede_application_selects": true,
+
+    "verify_show_transaction_read_only_equals_on": true,
+
+    "apply_to_every_connection_created_by_repository_or_route": true,
+
+    "server_enforced_transaction_read_only_required": true,
+
+    "default_transaction_read_only_equals_on_not_required": true
+  },
+
+  "required_connection_factory_behavior": {
+    "connection_factory_must_return_connection_with_current_transaction_read_only": true,
+
+    "connection_factory_may_execute_only_transaction_control_before_return": true,
+
+    "connection_factory_may_not_execute_application_data_select_before_read_only_is_enabled": true,
+
+    "repository_from_dsn_method_must_not_be_used": true
+  },
+
+  "all_original_validation_requirements_preserved": {
+    "exact_active_publication_validation": true,
+    "exact_active_fingerprint_validation": true,
+    "active_record_count_13264": true,
+
+    "live_premium_record_count_787": true,
+    "live_premium_unique_asset_id_count_787": true,
+
+    "deterministic_premium_asset_selection": true,
+
+    "repository_lossless_payload_validation": true,
+    "fastapi_lossless_payload_validation": true,
+
+    "missing_premium_authority_remains_missing": true,
+
+    "q10_semantics_preserved": true,
+    "one_year_certified_semantics_preserved": true,
+    "three_year_values_remain_scenarios": true,
+    "five_year_values_remain_scenarios": true,
+
+    "universal_mtg_rank_not_created": true,
+    "cross_domain_rank_not_created": true,
+
+    "automatic_purchase_execution_not_authorized": true
+  },
+
+  "explicitly_forbidden": {
+    "postgres_insert": true,
+    "postgres_update": true,
+    "postgres_delete": true,
+    "postgres_schema_change": true,
+
+    "presentation_stage": true,
+    "presentation_activate": true,
+    "active_pointer_mutation": true,
+
+    "read_api_code_change": true,
+    "frontend_change": true,
+
+    "analytical_database_change": true,
+
+    "mtg_source_change": true,
+    "premium_sidecar_change": true,
+
+    "model_execution": true,
+    "model_retraining": true,
+
+    "automatic_purchase_execution": true
+  },
+
+  "retry_scope": {
+    "step_14l_d_retry_authorized": true,
+
+    "retry_must_use_transaction_read_only_mechanism": true,
+
+    "hosted_external_api_request_authorized": false,
+
+    "frontend_integration_authorized": false
+  }
+}

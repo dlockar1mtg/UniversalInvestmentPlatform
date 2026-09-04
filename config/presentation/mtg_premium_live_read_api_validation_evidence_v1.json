@@ -1,0 +1,140 @@
+﻿{
+  "evidence_id": "UIP_MTG_PREMIUM_LIVE_READ_API_VALIDATION_EVIDENCE_V1",
+  "evidence_version": "1.0.0",
+  "certification_state": "PASS",
+  "execution_step": "STEP_14L_D_R",
+
+  "governing_authorities": {
+    "live_validation_authorization": "UIP_MTG_PREMIUM_LIVE_READ_API_VALIDATION_AUTHORIZATION_V1",
+    "read_only_recovery_authorization": "UIP_MTG_PREMIUM_LIVE_READ_API_VALIDATION_READ_ONLY_RECOVERY_V1",
+
+    "uip_execution_head": "f244105455ee605717ce6a9d65e27186a62f9a36",
+
+    "mtg_head": "6b610b208549bec4be2c0ec7f7f3c2f69b154302",
+
+    "analytical_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+
+    "premium_sidecar_sha256": "296ccbb9ba96812b99dacd771f1ad311496b4997fa0ac7103e68a1d4aaa03333"
+  },
+
+  "active_publication_validation": {
+    "publication_id": "mtg-premium-stage-rehearsal-ac8adb415f03",
+    "publication_status": "ACTIVE",
+
+    "content_fingerprint": "4a67d16878f0cdb5077b98aa13bd44276f1a993ce2a2b045f52a1ebefe633154",
+
+    "record_count": 13264,
+
+    "source_database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+
+    "mtg_premium_research_record_count": 787,
+    "mtg_premium_unique_asset_id_count": 787
+  },
+
+  "read_only_enforcement": {
+    "connection_type": "NEON_POOLED",
+
+    "mechanism": "SET_TRANSACTION_READ_ONLY",
+
+    "read_only_enabled_before_application_select": true,
+
+    "transaction_read_only_verified_before_live_validation": true,
+
+    "transaction_read_only_verified_after_live_validation": true,
+
+    "server_enforced_transaction_read_only": true
+  },
+
+  "deterministic_validation_assets": {
+    "premium_asset_id": "SECRET_LAIR_V1_1|SL-00DFD5FAF7A6FF",
+
+    "missing_premium_authority_asset_id": "COLLECTOR_V1|MTG-CANON-TCGPLAYER-208279"
+  },
+
+  "repository_validation": {
+    "repository_method": "PresentationReadRepository.mtg_premium_research",
+
+    "premium_asset_resolved": true,
+
+    "premium_record_count": 1,
+
+    "premium_payload_readback": "LOSSLESS",
+
+    "missing_premium_asset_resolved": true,
+
+    "missing_premium_payload": null,
+
+    "missing_premium_record_count": 0,
+
+    "missing_authority_was_synthesized": false
+  },
+
+  "fastapi_route_validation": {
+    "endpoint": "/v1/presentation/mtg-research/{asset_id}",
+
+    "validation_mode": "LOCAL_IN_PROCESS_FASTAPI_AGAINST_LIVE_READ_ONLY_POSTGRES",
+
+    "http_status": 200,
+
+    "premium_payload_readback": "LOSSLESS",
+
+    "premium_record_count": 1,
+
+    "hosted_external_api_request_performed": false
+  },
+
+  "semantic_certification": {
+    "one_year_certified_semantics_preserved": true,
+
+    "q10_governed_purchase_threshold_preserved": true,
+
+    "three_year_values_remain_scenarios": true,
+    "five_year_values_remain_scenarios": true,
+
+    "three_year_direct_forecast_created": false,
+    "five_year_direct_forecast_created": false,
+
+    "cross_domain_rank_created": false,
+    "universal_mtg_rank_created": false,
+
+    "automatic_purchase_execution_authorized": false
+  },
+
+  "immutability_certification": {
+    "postgres_write_attempted": false,
+
+    "presentation_activation_attempted": false,
+
+    "active_pointer_mutation_attempted": false,
+
+    "analytical_database_modified": false,
+
+    "mtg_source_modified": false,
+
+    "premium_sidecar_modified": false,
+
+    "uip_repository_modified_by_validation": false,
+
+    "read_api_code_changed": false,
+
+    "frontend_changed": false
+  },
+
+  "certified_conclusion": {
+    "live_end_to_end_premium_read_path_proven": true,
+
+    "certified_source_to_active_postgres_proven": true,
+
+    "active_postgres_to_repository_projection_proven": true,
+
+    "repository_to_existing_fastapi_route_proven": true,
+
+    "premium_payload_lossless_end_to_end": true,
+
+    "missing_premium_authority_remains_missing_end_to_end": true,
+
+    "frontend_integration_authorized_by_this_evidence": false,
+
+    "next_gate": "CONSIDER_BOUNDED_MTG_PREMIUM_FRONTEND_INTEGRATION_AUTHORIZATION"
+  }
+}
