@@ -38,6 +38,14 @@ jobs:
         run: python -m pip install --upgrade pip
       - name: Install platform and production dependencies
         run: pip install -r requirements.txt -r requirements/phase_7_3.txt
+      - name: Set up Node.js for production JavaScript validation
+        uses: actions/setup-node@v4
+        with:
+          node-version: "24"
+      - name: Validate production JavaScript syntax
+        run: |
+          node --version
+          node --check foundation/production/dashboard_assets/recommendation_ui.js
       - name: Run complete test suite
         run: python -m pytest -q
       - name: Compile production source

@@ -27,11 +27,24 @@ ENV_NAMES = (
 
 
 def paths() -> tuple[Path, Path, Path, Path]:
+    raw_values = [
+        os.environ.get(name, "").strip()
+        for name in ENV_NAMES
+    ]
+
+    if not any(raw_values):
+        pytest.skip(
+            "Certified MTG lane-native external authorities "
+            "are not configured."
+        )
+
     values = []
 
-    for name in ENV_NAMES:
-        raw = os.environ.get(name, "").strip()
-
+    for name, raw in zip(
+        ENV_NAMES,
+        raw_values,
+        strict=True,
+    ):
         assert raw, f"Missing test environment variable: {name}"
 
         values.append(Path(raw))

@@ -17,10 +17,21 @@ ENV_NAMES = (
 
 
 def source_environment() -> dict[str, str]:
+    values = {
+        name: os.environ.get(name, "").strip()
+        for name in ENV_NAMES
+    }
+
+    if not any(values.values()):
+        pytest.skip(
+            "Certified MTG lane-native external authorities "
+            "are not configured."
+        )
+
     result = {}
 
     for name in ENV_NAMES:
-        value = os.environ.get(name, "").strip()
+        value = values[name]
         assert value, f"Missing test environment variable: {name}"
         result[name] = value
 
