@@ -175,6 +175,337 @@ class PresentationReadRepository:
             })
         return {"domain_id": domain_id, "asset_id": asset_id, "records": grouped}
 
+    def mtg_premium_research(
+        self,
+        asset_id: str,
+    ) -> dict[str, object] | None:
+        """Project lane-native MTG premium research from active publication records.
+
+        This method does not invent missing authority and does not create a
+        universal MTG rank. It only projects fields already present in the
+        active certified presentation publication.
+        """
+        detail = self.asset_detail("mtg", asset_id)
+
+        if detail is None:
+            return None
+
+        records = detail["records"]
+
+        asset_records = records.get("asset", [])
+        recommendation_records = records.get(
+            "recommendation",
+            [],
+        )
+        native_authority_records = records.get(
+            "native_authority",
+            [],
+        )
+        forecast_records = records.get(
+            "forecast",
+            [],
+        )
+        risk_records = records.get(
+            "risk_metric",
+            [],
+        )
+        premium_research_records = records.get(
+            "mtg_premium_research",
+            [],
+        )
+
+        def payloads(items):
+            return [
+                dict(item["payload"])
+                for item in items
+            ]
+
+        assets = payloads(asset_records)
+        recommendations = payloads(
+            recommendation_records
+        )
+        native_authorities = payloads(
+            native_authority_records
+        )
+        forecasts = payloads(forecast_records)
+        risks = payloads(risk_records)
+        premium_research_payloads = payloads(
+            premium_research_records
+        )
+
+        if len(premium_research_payloads) > 1:
+            raise ValueError(
+                "MTG premium projection refuses duplicate "
+                "premium research authority"
+            )
+
+        premium_research = (
+            premium_research_payloads[0]
+            if premium_research_payloads
+            else None
+        )
+
+        if premium_research is not None:
+            for forbidden_field in (
+                "automatic_purchase_execution",
+                "execution_ready_purchase_certified",
+            ):
+                if forbidden_field in premium_research:
+                    raise ValueError(
+                        "MTG premium projection refuses "
+                        "execution authority surface in "
+                        f"{forbidden_field}"
+                    )
+
+        identity: dict[str, object] = {}
+
+        if assets:
+            identity = assets[0]
+
+        lane = str(
+            identity.get("mtg_lane")
+            or identity.get("lane")
+            or identity.get("asset_subclass")
+            or ""
+        ).strip()
+
+        lane_upper = lane.upper()
+
+        native_authority: dict[str, object] = {}
+
+        if native_authorities:
+            native_authority = native_authorities[0]
+
+        native_rank = native_authority.get(
+            "native_rank"
+        )
+        native_rank_type = native_authority.get(
+            "native_rank_type"
+        )
+        native_purchase_status = (
+            native_authority.get(
+                "native_purchase_status"
+            )
+        )
+        purchase_semantic = (
+            native_authority.get(
+                "purchase_semantic"
+            )
+        )
+
+        def strict_boolean(
+            value: object,
+            *,
+            field_name: str,
+        ) -> bool:
+            if value is None:
+                return False
+
+            if isinstance(value, bool):
+                return value
+
+            if (
+                isinstance(value, int)
+                and not isinstance(value, bool)
+                and value in (0, 1)
+            ):
+                return bool(value)
+
+            if isinstance(value, str):
+                normalized = value.strip().lower()
+
+                if normalized in {
+                    "true",
+                    "yes",
+                    "y",
+                    "1",
+                }:
+                    return True
+
+                if normalized in {
+                    "false",
+                    "no",
+                    "n",
+                    "0",
+                    "",
+                }:
+                    return False
+
+            raise ValueError(
+                "Unsupported MTG boolean authority value "
+                f"for {field_name}: {value!r}"
+            )
+
+        execution_ready = strict_boolean(
+            native_authority.get(
+                "execution_ready_purchase_certified"
+            ),
+            field_name=(
+                "execution_ready_purchase_certified"
+            ),
+        )
+
+        automatic_execution = strict_boolean(
+            native_authority.get(
+                "automatic_purchase_execution"
+            ),
+            field_name=(
+                "automatic_purchase_execution"
+            ),
+        )
+
+        if automatic_execution:
+            raise ValueError(
+                "MTG premium projection refuses automatic "
+                "purchase execution authority"
+            )
+
+        presentation_state = (
+            "NATIVE_CORE_ONLY"
+        )
+
+        research_state = (
+            "PARTIAL"
+        )
+
+        rank_state = (
+            "AVAILABLE"
+            if native_rank is not None
+            else "MISSING"
+        )
+
+        purchase_state = (
+            "AVAILABLE"
+            if native_purchase_status
+            else "MISSING"
+        )
+
+        if "SECRET" in lane_upper:
+            presentation_state = (
+                "SECRET_LAIR_PREMIUM_RESEARCH"
+            )
+
+            if (
+                forecasts
+                and risks
+                and native_rank is not None
+                and native_purchase_status
+            ):
+                research_state = "FULL"
+            else:
+                research_state = "PARTIAL"
+
+        elif (
+            "PRE" in lane_upper
+            and "COLLECTOR" in lane_upper
+        ):
+            presentation_state = (
+                "PRECOLLECTOR_CERTIFICATION_BRIDGE_REQUIRED"
+            )
+            research_state = "BLOCKED"
+
+        elif "COLLECTOR" in lane_upper:
+            presentation_state = (
+                "COLLECTOR_CERTIFIED_CORE"
+            )
+            research_state = "PARTIAL"
+
+        result = {
+            "domain_id": "mtg",
+            "asset_id": asset_id,
+            "lane": lane or None,
+            "presentation_state": presentation_state,
+            "research_state": research_state,
+            "identity": identity,
+            "native_authority": {
+                "native_rank": native_rank,
+                "native_rank_type": native_rank_type,
+                "native_purchase_status": (
+                    native_purchase_status
+                ),
+                "purchase_semantic": purchase_semantic,
+                "evidence_state": (
+                    native_authority.get(
+                        "evidence_state"
+                    )
+                ),
+                "actionability_state": (
+                    native_authority.get(
+                        "actionability_state"
+                    )
+                ),
+                "manual_execution_price_check_required": (
+                    native_authority.get(
+                        "manual_execution_price_check_required"
+                    )
+                ),
+                "execution_ready_purchase_certified": (
+                    execution_ready
+                ),
+                "automatic_purchase_execution": False,
+            },
+            "authority_availability": {
+                "native_authority_record_count": len(
+                    native_authorities
+                ),
+                "recommendation_record_count": len(
+                    recommendations
+                ),
+                "forecast_record_count": len(
+                    forecasts
+                ),
+                "risk_record_count": len(
+                    risks
+                ),
+                "premium_research_record_count": len(
+                    premium_research_payloads
+                ),
+                "native_rank_state": rank_state,
+                "native_purchase_state": purchase_state,
+            },
+            "forecasts": forecasts,
+            "risk_metrics": risks,
+            "premium_research": premium_research,
+            "recommendations": recommendations,
+            "native_authorities": native_authorities,
+            "presentation_semantics": {
+                "cross_domain_rank_created": False,
+                "universal_mtg_rank_created": False,
+                "native_purchase_semantics_preserved": True,
+                "missing_authority_remains_missing": True,
+                "automatic_purchase_execution_authorized": False,
+            },
+        }
+
+        if presentation_state == (
+            "PRECOLLECTOR_CERTIFICATION_BRIDGE_REQUIRED"
+        ):
+            result["blocked_reason"] = (
+                "Pre-Collector premium scenario promotion "
+                "requires a certified presentation authority."
+            )
+
+        if (
+            presentation_state
+            == "COLLECTOR_CERTIFIED_CORE"
+        ):
+            result["ranking_bridge_state"] = (
+                "IDENTITY_BRIDGE_REQUIRED"
+            )
+
+        if (
+            presentation_state
+            == "SECRET_LAIR_PREMIUM_RESEARCH"
+            and research_state == "PARTIAL"
+        ):
+            result["missing_research_label"] = (
+                "Native premium research is incomplete "
+                "for this product."
+            )
+
+        return result
+
+
     def lineage(self, domain_id: str, asset_id: str) -> dict[str, object] | None:
         detail = self.asset_detail(domain_id, asset_id)
         if detail is None:
@@ -273,6 +604,37 @@ def install_presentation_read_routes(
         if detail is None:
             return JSONResponse({"error": {"code": "ASSET_NOT_FOUND", "message": "asset is not present in the active presentation publication"}}, status_code=404)
         return detail
+
+    @app.get("/v1/presentation/mtg-research/{asset_id}")
+    def presentation_mtg_research(
+        asset_id: str,
+        x_api_key: str | None = Header(default=None),
+    ):
+        denied = authorize(x_api_key)
+
+        if denied:
+            return denied
+
+        detail = repository.mtg_premium_research(
+            asset_id
+        )
+
+        if detail is None:
+            return JSONResponse(
+                {
+                    "error": {
+                        "code": "ASSET_NOT_FOUND",
+                        "message": (
+                            "MTG asset is not present in "
+                            "the active presentation publication"
+                        ),
+                    }
+                },
+                status_code=404,
+            )
+
+        return detail
+
 
     @app.get("/v1/presentation/lineage/{domain_id}/{asset_id}")
     def presentation_lineage(domain_id: str, asset_id: str, x_api_key: str | None = Header(default=None)):

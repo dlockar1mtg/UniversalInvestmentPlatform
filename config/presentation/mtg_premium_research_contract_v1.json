@@ -1,0 +1,214 @@
+﻿{
+  "contract_id": "UIP_MTG_PREMIUM_RESEARCH_PRESENTATION_V1",
+  "contract_version": "1.0.0",
+  "domain_id": "mtg",
+  "purpose": "Expose richer certified lane-native MTG research through UIP without creating universal ranks, reinterpreting native purchase semantics, or promoting uncertified source evidence.",
+  "design_principles": {
+    "long_term_thesis_first": true,
+    "current_entry_context_second": true,
+    "cross_domain_rank_created": false,
+    "universal_mtg_rank_created": false,
+    "automatic_purchase_execution_authorized": false,
+    "native_purchase_semantics_preserved": true,
+    "missing_authority_remains_missing": true,
+    "source_values_may_not_be_synthesized": true,
+    "scenario_may_not_be_relabelled_as_direct_forecast": true
+  },
+  "existing_uip_native_authority": {
+    "interface": "mtg_native_authority_current",
+    "required_contract_field_count": 23,
+    "remains_authoritative_for": [
+      "mtg_asset_id",
+      "mtg_lane",
+      "native_asset_id",
+      "product_name",
+      "current_price_usd",
+      "native_rank",
+      "native_rank_type",
+      "native_purchase_status",
+      "purchase_semantic",
+      "evidence_state",
+      "actionability_state",
+      "execution_ready_purchase_certified",
+      "manual_execution_price_check_required",
+      "automatic_purchase_execution",
+      "native_authority_pointer",
+      "native_authority_sha256"
+    ]
+  },
+  "lanes": {
+    "COLLECTOR_V1": {
+      "presentation_state": "PARTIALLY_READY",
+      "primary_identity_key": "canonical_product_id",
+      "certified_product_count": 49,
+      "forecast_authority": {
+        "state": "AUTHORIZED_SOURCE_IDENTIFIED",
+        "source": "data/governance/permanence/certification/collector_v1_canonical_identity_lineage_recertification/collector_final_authority_bound_49_product_forecasts.csv",
+        "rows": 294,
+        "unique_products": 49,
+        "horizons": 6,
+        "allowed_research_fields": [
+          "current_price",
+          "horizon_days",
+          "mean_expected_return",
+          "mean_price",
+          "median_expected_return",
+          "median_price",
+          "p10_price",
+          "p25_price",
+          "p75_price",
+          "p90_price",
+          "probability_of_50pct_gain",
+          "probability_of_doubling",
+          "probability_of_loss",
+          "explicit_method_id",
+          "route",
+          "simulation_count",
+          "semantic_certification_status"
+        ]
+      },
+      "purchase_authority": {
+        "state": "AUTHORIZED_SOURCE_IDENTIFIED",
+        "source": "data/governance/permanence/certification/collector_v1_purchase_recommendation_certification/collector_purchase_recommendation_authority.csv",
+        "rows": 49,
+        "unique_products": 49,
+        "join_key": "canonical_product_id",
+        "allowed_research_fields": [
+          "final_rank",
+          "final_governed_score",
+          "purchase_status",
+          "purchase_basis",
+          "candidate_entry_ceiling",
+          "strong_entry_ceiling",
+          "recommended_quantity",
+          "probability_of_loss_365",
+          "probability_of_50pct_gain_365",
+          "probability_of_doubling_365"
+        ]
+      },
+      "ranking_authority": {
+        "state": "IDENTITY_BRIDGE_REQUIRED",
+        "source": "data/governance/permanence/certification/collector_v1_product_level_forecast_ranking_tournament/collector_v1_product_level_rankings.csv",
+        "rows": 50,
+        "reason": "The ranking authority uses investment_product_id and tcgplayer_product_id rather than the canonical_product_id used by the certified 49-product forecast and purchase authorities.",
+        "name_join_authorized": false,
+        "implicit_tcgplayer_join_authorized": false,
+        "presentation_promotion_authorized": false
+      },
+      "long_horizon_semantics": {
+        "three_year_fields_may_be_displayed_only_when_authority_is_identity_bound": true,
+        "five_year_fields_may_be_displayed_only_when_authority_is_identity_bound": true,
+        "direct_backtest_claim_allowed": false
+      }
+    },
+    "PRE_COLLECTOR": {
+      "presentation_state": "CERTIFICATION_BRIDGE_REQUIRED",
+      "guarded_scenario_source": {
+        "source": "data/validation/phase_10/pre_collector_booster_boxes/full_evaluation/pre_collector_booster_box_guarded_forecasts.csv",
+        "rows": 119,
+        "unique_products": 119,
+        "identity_key": "canonical_product_id",
+        "available_fields": [
+          "current_market_value_usd",
+          "forecast_method",
+          "forecast_eligible",
+          "1y_downside_usd",
+          "1y_base_usd",
+          "1y_upside_usd",
+          "3y_downside_usd",
+          "3y_base_usd",
+          "3y_upside_usd",
+          "5y_downside_usd",
+          "5y_base_usd",
+          "5y_upside_usd"
+        ]
+      },
+      "certified_structured_outputs_found_under_permanence_tree": 0,
+      "presentation_promotion_authorized": false,
+      "reason": "The guarded 1Y/3Y/5Y scenario source exists under validation, but Step 5 did not locate a corresponding structured permanence/certification presentation authority. UIP must not silently promote validation output as certified production authority.",
+      "next_required_gate": "RESOLVE_PRECOLLECTOR_CERTIFIED_PRESENTATION_AUTHORITY_OR_CREATE_EXPLICIT_GOVERNED_PROMOTION"
+    },
+    "SECRET_LAIR_V1_1": {
+      "presentation_state": "PREMIUM_RESEARCH_READY",
+      "primary_identity_key": "secret_lair_id",
+      "scenario_population": 993,
+      "full_research_population": 787,
+      "partial_research_population": 206,
+      "scenario_authority": {
+        "source": "docs/phase_8/secret_lair/secret_lair_v1_uncertainty_and_scenarios.csv",
+        "unique_products": 993
+      },
+      "risk_distribution_authority": {
+        "source": "docs/phase_8/secret_lair/secret_lair_v1_monte_carlo_risk_distribution.csv",
+        "rows": 2979,
+        "unique_products": 993,
+        "horizons": [
+          "1Y",
+          "3Y",
+          "5Y"
+        ]
+      },
+      "ranking_authority": {
+        "source": "docs/phase_8/secret_lair_v1_1/secret_lair_v1_1_production_ranking.csv",
+        "unique_products": 787,
+        "native_rank_field": "v1_1_production_competition_rank"
+      },
+      "purchase_authority": {
+        "source": "docs/phase_8/secret_lair_v1_1/secret_lair_v1_1_purchase_recommendation_reconciliation.csv",
+        "unique_products": 787,
+        "native_recommendation_field": "purchase_recommendation",
+        "entry_field": "q10_entry_price_usd"
+      },
+      "research_semantics": {
+        "one_year": "CERTIFIED_FORECAST_AND_EMPIRICAL_RISK",
+        "three_year": "SCENARIO_DISTRIBUTION_NOT_DIRECTLY_VALIDATED",
+        "five_year": "SCENARIO_DISTRIBUTION_NOT_DIRECTLY_VALIDATED",
+        "three_or_five_year_scenario_may_trigger_buy": false,
+        "q25_or_q50_may_be_used_as_buy_threshold": false,
+        "q10_entry_policy_preserved": true,
+        "rank_may_override_purchase_policy": false
+      },
+      "partial_population_policy": {
+        "products_without_full_research_stack": 206,
+        "synthetic_rank_allowed": false,
+        "synthetic_purchase_recommendation_allowed": false,
+        "scenario_and_risk_may_remain_visible_when_authorized": true,
+        "missing_rank_label": "Not ranked — evidence incomplete",
+        "missing_purchase_label": "No native purchase recommendation"
+      }
+    }
+  },
+  "ui_contract": {
+    "landing_label": "Long-term sealed growth",
+    "landing_description": "Long-term MTG opportunity with lane-native forecasts, scenarios, risk, rank and entry semantics.",
+    "lane_filters": [
+      "ALL",
+      "COLLECTOR",
+      "PRE_COLLECTOR",
+      "SECRET_LAIR"
+    ],
+    "detail_sections": [
+      "LONG_TERM_OUTLOOK",
+      "CURRENT_VALUATION",
+      "ENTRY_CONTEXT",
+      "FORECAST_OR_SCENARIO_PATH",
+      "WHY_THIS_PRODUCT",
+      "COMPARABLE_EVIDENCE",
+      "RISK_ASSESSMENT",
+      "NATIVE_RECOMMENDATION"
+    ],
+    "crypto_semantic_parity_required": false,
+    "crypto_visual_quality_parity_required": true
+  },
+  "authorization": {
+    "contract_creation_authorized": true,
+    "presentation_projection_implementation_authorized_next": true,
+    "source_copy_or_ingestion_authorized": false,
+    "database_schema_change_authorized": false,
+    "precollector_validation_promotion_authorized": false,
+    "collector_ranking_identity_bridge_authorized": false,
+    "frontend_premium_mtg_detail_authorized": false,
+    "automatic_purchase_execution_authorized": false
+  },
+  "next_gate": "IMPLEMENT_MTG_PREMIUM_PRESENTATION_PROJECTION_WITH_SECRET_LAIR_FULL_SUPPORT_COLLECTOR_CERTIFIED_CORE_AND_FAIL_CLOSED_PENDING_LANES"
+}

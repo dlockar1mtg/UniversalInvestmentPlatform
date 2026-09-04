@@ -1,0 +1,332 @@
+﻿{
+  "authorization_id": "UIP_MTG_FINAL_RESEARCH_UX_SEMANTIC_CLEANUP_AUTHORIZATION_V1",
+  "authorization_version": "1.0.0",
+
+  "status": "AUTHORIZED_FOR_BOUNDED_MTG_FINAL_RESEARCH_UX_AND_SEMANTIC_CLEANUP",
+
+  "domain_id": "mtg",
+
+  "governing_uip_checkpoint": {
+    "repository": "dlockar1mtg/UniversalInvestmentPlatform",
+    "branch": "phase-uip-rec-utility-mtg-premium-research",
+    "required_parent_head": "25c99851b3c85c281f27c3005c04b0b571773277"
+  },
+
+  "governing_mtg_checkpoint": {
+    "repository": "dlockar1mtg/mtg-investment-terminal",
+    "branch": "phase-9.1-mtg-to-uip-export-contract",
+    "required_head": "6b610b208549bec4be2c0ec7f7f3c2f69b154302"
+  },
+
+  "step_14m_i4_acceptance": {
+    "status": "PARTIAL_PASS_FINAL_ACCEPTANCE_WITHHELD",
+
+    "collector_hydration": "PASS",
+    "collector_data_fidelity": "PASS",
+
+    "precollector_ranked_hydration": "PASS",
+    "precollector_true_missing_preservation": "PASS",
+
+    "secret_lair_research_regression": "PASS_WITH_KNOWN_DISPLAY_DEFECTS",
+
+    "final_visual_acceptance": "WITHHELD",
+
+    "hosted_deployment_authorized": false
+  },
+
+  "resolved_defects": {
+    "collector_false_missing_current_price": true,
+    "collector_false_missing_forecast": true,
+    "collector_false_missing_expected_return": true,
+
+    "ranked_precollector_current_price_hydration": true,
+    "ranked_precollector_forecast_hydration": true,
+
+    "generic_detail_normalization": true,
+    "technical_provenance_secondary": true
+  },
+
+  "authorized_cleanup_scope": {
+    "secret_lair_q10_dollar_distance_display": true,
+
+    "secret_lair_separator_encoding_cleanup": true,
+    "native_lane_separator_encoding_cleanup": true,
+
+    "collector_default_investment_ordering": true,
+    "precollector_default_investment_ordering": true,
+
+    "native_card_information_hierarchy_cleanup": true,
+    "native_card_governance_compression": true,
+
+    "blocked_native_card_compaction": true,
+
+    "status_and_rank_visual_emphasis": true
+  },
+
+  "secret_lair_q10_distance_contract": {
+    "governing_rule":
+      "Displayed dollar distance to governed Q10 entry must be computed as absolute USD difference between current market and governed Q10 entry.",
+
+    "buy_candidate_below_q10_formula":
+      "q10_entry_usd - current_price_usd",
+
+    "wait_candidate_above_q10_formula":
+      "current_price_usd - q10_entry_usd",
+
+    "must_not_format_ratio_as_currency": true,
+
+    "must_preserve_q10_purchase_gate_semantics": true,
+
+    "example": {
+      "current_price_usd": 63.67,
+      "q10_entry_usd": 64.18,
+      "correct_display_distance_usd": 0.51,
+
+      "incorrect_existing_display": "$0.01 below Q10",
+      "required_display_semantic": "$0.51 below Q10"
+    }
+  },
+
+  "encoding_cleanup_contract": {
+    "visible_question_mark_separator_artifacts_forbidden": true,
+
+    "safe_separator_text_authorized": true,
+
+    "preferred_html_separator": "&middot;",
+
+    "plain_text_fallback": " - ",
+
+    "examples_requiring_cleanup": [
+      "MTG ? SECRET LAIR RESEARCH",
+      "Native rank 1 ? BUY CANDIDATE NOW",
+      "CURRENT PRICE BELOW BREAK EVEN LEVEL ? $0.01 below Q10"
+    ],
+
+    "question_mark_in_legitimate_product_name_must_not_be_removed": true
+  },
+
+  "native_default_ordering_contract": {
+    "scope": [
+      "collector",
+      "pre_collector"
+    ],
+
+    "ordering_is_presentation_only": true,
+
+    "native_rank_values_must_not_change": true,
+
+    "recommendation_status_values_must_not_change": true,
+
+    "model_outputs_must_not_change": true,
+
+    "preferred_default_priority": [
+      "ranked_and_forecast_available",
+      "ranked_with_partial_authority",
+      "unranked_with_current_price_authority",
+      "unranked_without_current_price_authority"
+    ],
+
+    "within_ranked_group": "ascending native rank",
+
+    "unranked_products_remain_searchable": true,
+    "unranked_products_remain_browsable": true,
+
+    "blocked_products_may_not_be_hidden": true,
+
+    "filtering_semantics_may_not_be_changed_without_separate_authorization": true
+  },
+
+  "collector_ordering_requirement": {
+    "ranked_collector_assets_should_lead_default_view": true,
+
+    "unranked_current_price_only_asset_may_follow_ranked_assets": true,
+
+    "strong_purchase_candidate_should_not_be_buried_by_unranked_asset": true,
+
+    "native_rank_remains_collector_lane_specific": true
+  },
+
+  "precollector_ordering_requirement": {
+    "ranked_forecastable_products_should_lead_default_view": true,
+
+    "ranked_products_should_not_begin_after_large_unranked_block": true,
+
+    "dominaria_rank_1_should_sort_before_unranked_forecast_gap_products": true,
+
+    "kaladesh_rank_2_should_sort_after_dominaria_rank_1": true,
+
+    "blocked_and_unranked_products_remain_accessible": true,
+
+    "native_rank_remains_precollector_lane_specific": true
+  },
+
+  "native_card_visual_cleanup": {
+    "investment_fields_primary": [
+      "native recommendation status",
+      "native rank",
+      "current market",
+      "1Y modeled target",
+      "expected 1Y return"
+    ],
+
+    "supporting_fields_secondary": [
+      "evidence",
+      "actionability"
+    ],
+
+    "authority_yes_no_triplet_may_be_compacted": true,
+
+    "repeated_lane_governance_copy_may_be_compacted": true,
+
+    "repeated_missing_semantic_copy_may_be_compacted": true,
+
+    "open_research_action_must_remain_visible": true,
+
+    "true_missing_state_must_remain_explicit": true,
+
+    "manual_execution_semantics_must_remain_preserved": true
+  },
+
+  "semantic_preservation": {
+    "secret_lair_q10_is_purchase_gate": true,
+
+    "secret_lair_q25_q50_remain_diagnostic_only": true,
+
+    "secret_lair_1y_forecast_remains_certified": true,
+
+    "secret_lair_3y_5y_remain_scenarios_only": true,
+
+    "collector_rank_remains_native": true,
+    "precollector_rank_remains_native": true,
+
+    "secret_lair_rank_cannot_override_q10": true,
+
+    "universal_mtg_rank_forbidden": true,
+    "cross_domain_rank_forbidden": true,
+
+    "recommendation_does_not_authorize_execution": true
+  },
+
+  "authority_contradiction_presentation": {
+    "source_evidence_must_not_be_rewritten": true,
+
+    "generic_current_market_authority_may_be_newer_or_different_from_ranking_certification_evidence": true,
+
+    "ui_must_not_present_these_as_same_authority": true,
+
+    "recommended_distinction": {
+      "presentation_price_label": "Current market authority",
+      "ranking_evidence_label": "Ranking certification evidence"
+    },
+
+    "silent_reconciliation_forbidden": true,
+
+    "synthetic_evidence_forbidden": true
+  },
+
+  "authorized_frontend_files": {
+    "logic":
+      "foundation/production/dashboard_assets/recommendation_ui.js",
+
+    "visuals":
+      "foundation/production/dashboard_assets/recommendation_visual.css",
+
+    "new_contract_test":
+      "tests/delivery/test_mtg_final_research_ux_semantic_cleanup.py",
+
+    "existing_visual_regression_may_be_updated_for_intended_behavior":
+      "tests/delivery/test_mtg_premium_crypto_parity_visual_redesign.py",
+
+    "existing_native_lane_regression_may_be_updated_only_for_intended_behavior":
+      "tests/delivery/test_mtg_native_lane_deep_research.py",
+
+    "existing_hydration_regression_may_be_updated_only_for_intended_behavior":
+      "tests/delivery/test_mtg_native_authority_hydration_recovery.py"
+  },
+
+  "explicitly_forbidden": {
+    "postgres_write": true,
+
+    "presentation_stage": true,
+    "presentation_activate": true,
+    "active_pointer_mutation": true,
+
+    "analytical_database_change": true,
+
+    "mtg_source_repository_change": true,
+
+    "mtg_model_change": true,
+    "mtg_model_retraining": true,
+
+    "new_backend_endpoint": true,
+    "read_api_contract_change": true,
+
+    "ranking_algorithm_change": true,
+    "forecast_algorithm_change": true,
+
+    "recommendation_status_recalculation": true,
+
+    "secret_lair_q10_purchase_policy_change": true,
+
+    "secret_lair_premium_synthesis_for_collector": true,
+    "secret_lair_premium_synthesis_for_precollector": true,
+
+    "universal_mtg_rank": true,
+    "cross_domain_rank": true,
+
+    "automatic_purchase_execution": true,
+
+    "hosted_deployment": true
+  },
+
+  "implementation_certification_requirements": {
+    "secret_lair_q10_distance_unit_test": true,
+
+    "sonic_63_67_to_64_18_must_equal_0_51_test": true,
+
+    "q10_wait_state_distance_test": true,
+
+    "ratio_must_not_be_rendered_as_usd_test": true,
+
+    "separator_encoding_test": true,
+
+    "legitimate_question_mark_preservation_test": true,
+
+    "collector_ranked_first_order_test": true,
+
+    "precollector_ranked_forecastable_first_order_test": true,
+
+    "dominaria_rank_1_priority_test": true,
+
+    "unranked_products_remain_present_test": true,
+
+    "true_missing_remains_missing_test": true,
+
+    "native_rank_unchanged_test": true,
+
+    "secret_lair_q10_policy_regression": true,
+
+    "secret_lair_3y_5y_scenario_regression": true,
+
+    "collector_hydration_regression": true,
+
+    "precollector_hydration_regression": true,
+
+    "native_card_visual_hierarchy_test": true,
+
+    "governance_semantics_preserved_test": true,
+
+    "existing_rec_ui_regression": true,
+
+    "local_browser_acceptance_required": true
+  },
+
+  "next_gate": {
+    "authorized_next_step":
+      "IMPLEMENT_MTG_FINAL_RESEARCH_UX_AND_SEMANTIC_CLEANUP",
+
+    "frontend_only": true,
+
+    "hosted_deployment_authorized": false
+  }
+}

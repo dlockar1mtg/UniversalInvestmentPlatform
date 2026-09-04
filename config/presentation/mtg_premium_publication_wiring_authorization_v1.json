@@ -1,0 +1,118 @@
+﻿{
+  "authorization_id": "UIP_MTG_PREMIUM_PUBLICATION_WIRING_AUTHORIZATION_V1",
+  "authorization_version": "1.0.0",
+  "status": "AUTHORIZED_FOR_BOUNDED_STAGED_PUBLICATION_WIRING_IMPLEMENTATION",
+  "domain_id": "mtg",
+  "lane": "SECRET_LAIR_V1_1",
+
+  "governing_uip_checkpoint": {
+    "repository": "dlockar1mtg/UniversalInvestmentPlatform",
+    "branch": "phase-uip-rec-utility-mtg-premium-research",
+    "required_parent_head": "5e18e5915c7b30dea4e728f0572f64d057211f9c"
+  },
+
+  "certified_mtg_authority": {
+    "repository": "dlockar1mtg/mtg-investment-terminal",
+    "branch": "phase-9.1-mtg-to-uip-export-contract",
+    "head": "6b610b208549bec4be2c0ec7f7f3c2f69b154302",
+    "sidecar_sha256": "296ccbb9ba96812b99dacd771f1ad311496b4997fa0ac7103e68a1d4aaa03333",
+    "sidecar_row_count": 787,
+    "sidecar_field_count": 36
+  },
+
+  "certified_projector": {
+    "module": "foundation.presentation.mtg_premium_projection",
+    "builder": "build_mtg_premium_records",
+    "record_type": "mtg_premium_research",
+    "expected_record_count": 787,
+    "payload_semantic": "LOSSLESS_CERTIFIED_SIDECAR_ROW"
+  },
+
+  "authorized_wiring_behavior": {
+    "publication_builder": "build_presentation_publication",
+    "publication_module": "foundation/presentation/publication_model.py",
+    "external_path_environment_variable": "UIP_MTG_PREMIUM_SIDECAR_PATH",
+
+    "filesystem_discovery_authorized": false,
+    "implicit_repository_search_authorized": false,
+    "sidecar_copy_into_uip_authorized": false,
+
+    "environment_variable_absent_behavior": "PRESERVE_EXISTING_PUBLICATION_WITHOUT_PREMIUM_RECORDS",
+    "environment_variable_present_behavior": "VALIDATE_EXACT_CERTIFIED_SIDECAR_AND_PROJECT",
+    "invalid_present_path_behavior": "FAIL_CLOSED",
+
+    "premium_records_may_be_appended_to_staged_publication": true,
+    "publication_status_must_remain_staged": true,
+
+    "existing_mtg_native_records_must_remain_present": true,
+    "existing_mtg_native_records_mutable": false,
+
+    "generic_forecast_records_mutable": false,
+    "generic_risk_records_mutable": false,
+    "native_authority_records_mutable": false,
+
+    "analytical_database_required_for_premium_payload": false,
+    "analytical_database_schema_change_required": false
+  },
+
+  "semantic_contract": {
+    "one_year_semantic": "CERTIFIED_FORECAST_AND_EMPIRICAL_RISK",
+    "three_year_semantic": "SCENARIO_DISTRIBUTION_NOT_DIRECTLY_VALIDATED",
+    "five_year_semantic": "SCENARIO_DISTRIBUTION_NOT_DIRECTLY_VALIDATED",
+
+    "q10_is_governed_purchase_entry_threshold": true,
+    "q25_or_q50_may_replace_q10": false,
+    "three_or_five_year_scenario_may_trigger_purchase": false,
+    "rank_may_override_purchase_policy": false,
+    "automatic_purchase_execution_authorized": false
+  },
+
+  "implementation_scope": {
+    "modify_publication_model_for_bounded_wiring_authorized": true,
+    "add_bounded_publication_wiring_tests_authorized": true,
+
+    "copy_sidecar_into_uip_repository_authorized": false,
+    "copy_sidecar_into_delivery_package_authorized": false,
+
+    "analytical_database_ingestion_authorized": false,
+    "analytical_database_schema_change_authorized": false,
+
+    "presentation_postgres_write_authorized": false,
+    "live_publication_activation_authorized": false,
+
+    "read_api_change_authorized": false,
+    "frontend_change_authorized": false,
+
+    "collector_premium_wiring_authorized": false,
+    "precollector_premium_wiring_authorized": false,
+    "secret_lair_partial_206_promotion_authorized": false,
+
+    "model_execution_authorized": false,
+    "model_retraining_authorized": false,
+    "automatic_purchase_execution_authorized": false
+  },
+
+  "required_implementation_controls": {
+    "fail_if_existing_native_mtg_projection_changes": true,
+    "fail_if_external_path_is_present_but_invalid": true,
+    "fail_if_sidecar_sha256_differs": true,
+    "fail_if_sidecar_schema_differs": true,
+    "fail_if_sidecar_population_differs": true,
+    "fail_if_projected_record_count_differs": true,
+    "fail_if_projected_record_type_differs": true,
+    "fail_if_projected_payload_differs_from_certified_sidecar": true,
+
+    "prove_no_premium_records_when_environment_variable_absent": true,
+    "prove_787_premium_records_when_environment_variable_present": true,
+
+    "prove_existing_publication_record_counts_are_preserved_plus_787": true,
+    "prove_publication_status_remains_staged": true,
+
+    "prove_no_database_mutation": true,
+    "prove_no_sidecar_copy": true,
+    "prove_no_live_activation": true,
+    "prove_no_frontend_change": true
+  },
+
+  "next_gate": "IMPLEMENT_AND_CERTIFY_BOUNDED_MTG_PREMIUM_STAGED_PUBLICATION_WIRING"
+}

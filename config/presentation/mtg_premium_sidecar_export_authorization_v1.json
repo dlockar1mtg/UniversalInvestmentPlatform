@@ -1,0 +1,145 @@
+﻿{
+  "authorization_id": "UIP_MTG_PREMIUM_SIDECAR_EXPORT_AUTHORIZATION_V1",
+  "authorization_version": "1.0.0",
+  "status": "AUTHORIZED_FOR_BOUNDED_SOURCE_IMPLEMENTATION",
+  "domain_id": "mtg",
+  "lane": "SECRET_LAIR_V1_1",
+
+  "governing_design": {
+    "design_id": "UIP_MTG_PREMIUM_SIDECAR_BRIDGE_V1",
+    "design_version": "1.0.0",
+    "required_uip_head": "c58a7b8f433fbedb2e64461e73336148ab2687b5"
+  },
+
+  "certified_source_authority": {
+    "repository": "dlockar1mtg/mtg-investment-terminal",
+    "required_source_branch": "phase-9.1-mtg-to-uip-export-contract",
+    "required_source_head": "f7dea3e2611f27de4ff6541da3b1d6a60dc6d695",
+    "source_path": "docs/phase_8/secret_lair/secret_lair_v1_purchase_analysis.csv",
+    "source_sha256": "eb5efced959116eb7b174d4aff27c06d321e774eda39b3f8572d958499441cdb",
+    "source_row_count": 787,
+    "source_field_count": 58,
+    "identity_key": "secret_lair_id",
+    "unique_identity_count": 787,
+    "automatic_purchase_execution_true_rows": 0
+  },
+
+  "authorized_output": {
+    "dataset_name": "mtg_secret_lair_premium_research",
+    "filename": "mtg_secret_lair_premium_research.csv",
+    "row_grain": "ONE_ROW_PER_GOVERNED_SECRET_LAIR_PRODUCT_PER_CERTIFIED_PREMIUM_AUTHORITY_SNAPSHOT",
+    "initial_expected_rows": 787,
+    "dynamic_population_allowed_on_future_certified_refreshes": true,
+    "uip_asset_id_rule": "SECRET_LAIR_V1_1|{secret_lair_id}",
+    "duplicate_uip_asset_id_allowed": false,
+    "blank_identity_allowed": false
+  },
+
+  "authorized_identity_fields": [
+    "mtg_asset_id",
+    "secret_lair_id",
+    "product_name"
+  ],
+
+  "authorized_source_fields": [
+    "current_tcg_market_price_usd",
+    "certified_1y_point_forecast_usd",
+    "certified_1y_point_return",
+
+    "y1_q10_break_even_entry_price_usd",
+    "current_price_margin_to_q10_break_even",
+    "current_price_vs_q10_break_even_state",
+
+    "y1_probability_of_loss",
+    "y1_probability_of_positive_return",
+    "y1_downside_tail_mean_total_return",
+    "y1_upside_tail_mean_total_return",
+
+    "y1_q10_terminal_value_usd",
+    "y1_q50_terminal_value_usd",
+    "y1_q90_terminal_value_usd",
+
+    "y3_median_total_return_scenario",
+    "y3_probability_of_loss_scenario",
+    "y3_q10_terminal_value_scenario_usd",
+    "y3_q50_terminal_value_scenario_usd",
+    "y3_q90_terminal_value_scenario_usd",
+
+    "y5_median_total_return_scenario",
+    "y5_probability_of_loss_scenario",
+    "y5_q10_terminal_value_scenario_usd",
+    "y5_q50_terminal_value_scenario_usd",
+    "y5_q90_terminal_value_scenario_usd",
+
+    "own_history_evidence_class",
+    "history_span_days",
+    "historical_observation_count",
+    "exact_structural_comparable_support",
+    "exact_structural_comparable_product_count",
+    "global_comparable_product_count",
+    "exact_structural_comparable_event_count",
+    "global_comparable_event_count"
+  ],
+
+  "required_lineage_fields": [
+    "source_authority_path",
+    "source_authority_sha256"
+  ],
+
+  "semantic_contract": {
+    "one_year_semantic": "CERTIFIED_FORECAST_AND_EMPIRICAL_RISK",
+    "three_year_semantic": "SCENARIO_DISTRIBUTION_NOT_DIRECTLY_VALIDATED",
+    "five_year_semantic": "SCENARIO_DISTRIBUTION_NOT_DIRECTLY_VALIDATED",
+    "q10_is_governed_purchase_entry_threshold": true,
+    "q25_or_q50_may_replace_q10": false,
+    "three_or_five_year_scenario_may_trigger_purchase": false,
+    "rank_may_override_purchase_policy": false,
+    "automatic_purchase_execution_authorized": false
+  },
+
+  "copy_rules": {
+    "source_values_must_be_preserved_losslessly": true,
+    "recalculation_authorized": false,
+    "forecast_recomputation_authorized": false,
+    "scenario_recomputation_authorized": false,
+    "risk_recomputation_authorized": false,
+    "entry_threshold_recomputation_authorized": false,
+    "missing_value_synthesis_authorized": false,
+    "semantic_relabeling_authorized": false
+  },
+
+  "implementation_scope": {
+    "mtg_source_repository_change_authorized": true,
+    "bounded_sidecar_export_builder_authorized": true,
+    "bounded_sidecar_export_tests_authorized": true,
+
+    "existing_23_field_export_mutation_authorized": false,
+    "collector_premium_export_authorized": false,
+    "precollector_premium_export_authorized": false,
+    "secret_lair_partial_206_promotion_authorized": false,
+
+    "model_execution_authorized": false,
+    "model_retraining_authorized": false,
+
+    "database_write_authorized": false,
+    "uip_ingestion_authorized": false,
+    "presentation_projection_write_authorized": false,
+    "hosted_activation_authorized": false,
+    "frontend_change_authorized": false,
+    "automatic_purchase_execution_authorized": false
+  },
+
+  "required_source_implementation_controls": {
+    "fail_if_source_sha256_differs": true,
+    "fail_if_source_row_count_differs_for_initial_build": true,
+    "fail_if_source_identity_count_differs_for_initial_build": true,
+    "fail_if_duplicate_secret_lair_id_exists": true,
+    "fail_if_blank_secret_lair_id_exists": true,
+    "fail_if_automatic_purchase_execution_is_true": true,
+    "fail_if_required_authorized_field_missing": true,
+    "fail_if_output_contains_non_authorized_analytical_field": true,
+    "existing_phase_9_export_must_remain_byte_unchanged": true
+  },
+
+  "next_gate": "IMPLEMENT_AND_CERTIFY_MTG_SOURCE_PREMIUM_SIDECAR_EXPORT"
+}

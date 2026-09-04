@@ -1,0 +1,160 @@
+﻿{
+  "authorization_id": "UIP_MTG_PREMIUM_LIVE_PRESENTATION_ACTIVATION_AUTHORIZATION_V1",
+  "authorization_version": "1.0.0",
+  "status": "AUTHORIZED_FOR_BOUNDED_LIVE_PRESENTATION_ACTIVATION_EXECUTION",
+
+  "domain_id": "mtg",
+  "lane": "SECRET_LAIR_V1_1",
+
+  "governing_uip_checkpoint": {
+    "repository": "dlockar1mtg/UniversalInvestmentPlatform",
+    "branch": "phase-uip-rec-utility-mtg-premium-research",
+    "required_parent_head": "05ab096c4ce3974b00a7e7684c8240cc2449b99d"
+  },
+
+  "certified_mtg_authority": {
+    "repository": "dlockar1mtg/mtg-investment-terminal",
+    "branch": "phase-9.1-mtg-to-uip-export-contract",
+    "head": "6b610b208549bec4be2c0ec7f7f3c2f69b154302",
+
+    "premium_sidecar_sha256": "296ccbb9ba96812b99dacd771f1ad311496b4997fa0ac7103e68a1d4aaa03333",
+    "premium_row_count": 787
+  },
+
+  "analytical_authority": {
+    "database_sha256": "9588eab0820f5299982b4f5837056f5750675bc839a0bcb13f166dce13ecef6f",
+    "database_is_read_only_for_activation": true
+  },
+
+  "certified_staged_publication": {
+    "publication_id": "mtg-premium-stage-rehearsal-ac8adb415f03",
+    "required_status_before_activation": "STAGED",
+    "content_fingerprint": "4a67d16878f0cdb5077b98aa13bd44276f1a993ce2a2b045f52a1ebefe633154",
+    "record_count": 13264,
+
+    "mtg_premium_research_record_count": 787,
+    "mtg_premium_unique_asset_id_count": 787,
+
+    "crypto_asset_count": 6,
+    "metals_asset_count": 16,
+    "mtg_asset_count": 968
+  },
+
+  "required_pre_activation_validation": {
+    "capture_current_active_publication_immediately_before_activation": true,
+
+    "require_exactly_one_active_pointer": true,
+    "require_current_active_status_active": true,
+
+    "require_staged_publication_exists": true,
+    "require_staged_publication_status_staged": true,
+    "require_staged_fingerprint_exact_match": true,
+    "require_staged_record_count_13264": true,
+
+    "require_787_premium_records": true,
+    "require_787_unique_premium_asset_ids": true,
+    "require_lossless_premium_payload_readback": true,
+
+    "require_q10_semantics_present": true,
+    "require_three_year_scenario_semantics_present": true,
+    "require_five_year_scenario_semantics_present": true,
+
+    "require_automatic_execution_surface_absent": true
+  },
+
+  "authorized_activation_behavior": {
+    "postgres_repository_class": "PostgresPresentationRepository",
+    "activation_method": "activate",
+
+    "activate_exact_certified_staged_publication_once": true,
+
+    "activation_may_change_active_pointer": true,
+    "activation_may_mark_previous_active_publication_superseded": true,
+    "activation_may_mark_target_publication_active": true
+  },
+
+  "required_post_activation_validation": {
+    "target_publication_must_be_active": true,
+    "target_publication_must_be_active_pointer": true,
+
+    "target_fingerprint_must_remain_exact": true,
+    "target_record_count_must_remain_13264": true,
+
+    "premium_record_count_must_remain_787": true,
+    "premium_unique_asset_count_must_remain_787": true,
+    "premium_payload_readback_must_remain_lossless": true,
+
+    "previous_active_publication_must_remain_present": true,
+    "previous_active_publication_must_be_superseded": true,
+
+    "exactly_one_active_pointer_required": true,
+    "exactly_one_active_publication_required": true
+  },
+
+  "failure_and_recovery_controls": {
+    "do_not_activate_if_any_precheck_fails": true,
+
+    "capture_last_good_active_identity_before_activation": true,
+    "capture_last_good_active_fingerprint_before_activation": true,
+    "capture_last_good_active_record_count_before_activation": true,
+
+    "fail_closed_on_any_post_activation_mismatch": true,
+
+    "automatic_second_activation_attempt_authorized": false,
+    "automatic_fallback_activation_authorized": false,
+
+    "manual_recovery_requires_separate_governed_decision": true
+  },
+
+  "semantic_constraints": {
+    "one_year_direct_certified_semantics_preserved": true,
+
+    "q10_is_governed_purchase_threshold": true,
+    "q25_may_replace_q10": false,
+    "q50_may_replace_q10": false,
+
+    "three_year_values_are_scenarios": true,
+    "five_year_values_are_scenarios": true,
+
+    "three_year_values_are_direct_certified_forecasts": false,
+    "five_year_values_are_direct_certified_forecasts": false,
+
+    "three_year_values_may_trigger_purchase": false,
+    "five_year_values_may_trigger_purchase": false,
+
+    "rank_may_override_purchase_threshold": false,
+
+    "automatic_purchase_execution_authorized": false
+  },
+
+  "explicitly_forbidden": {
+    "rebuild_staged_publication": true,
+    "modify_staged_payloads": true,
+    "modify_analytical_database": true,
+    "modify_mtg_source_repository": true,
+    "modify_mtg_premium_sidecar": true,
+
+    "model_execution": true,
+    "model_retraining": true,
+
+    "read_api_code_change": true,
+    "frontend_code_change": true,
+
+    "collector_lane_expansion": true,
+    "precollector_lane_expansion": true,
+    "partial_secret_lair_population_expansion": true,
+
+    "automatic_purchase_execution": true
+  },
+
+  "activation_scope": {
+    "postgres_activation_execution_authorized_next": true,
+
+    "read_api_validation_after_activation_authorized": false,
+    "read_api_code_change_authorized": false,
+
+    "frontend_change_authorized": false,
+
+    "next_gate_after_successful_activation": "CONSIDER_BOUNDED_MTG_PREMIUM_READ_API_VALIDATION_AUTHORIZATION"
+  }
+}

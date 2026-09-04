@@ -1,0 +1,106 @@
+﻿{
+  "authorization_id": "UIP_MTG_PREMIUM_STAGED_PERSISTENCE_REHEARSAL_AUTHORIZATION_V1",
+  "authorization_version": "1.0.0",
+  "status": "AUTHORIZED_FOR_BOUNDED_NON_ACTIVE_PRESENTATION_PERSISTENCE_REHEARSAL",
+  "domain_id": "mtg",
+  "lane": "SECRET_LAIR_V1_1",
+
+  "governing_uip_checkpoint": {
+    "repository": "dlockar1mtg/UniversalInvestmentPlatform",
+    "branch": "phase-uip-rec-utility-mtg-premium-research",
+    "required_parent_head": "e1931c807ef4ab86250eff953465cdb4700f23e5"
+  },
+
+  "certified_mtg_authority": {
+    "repository": "dlockar1mtg/mtg-investment-terminal",
+    "branch": "phase-9.1-mtg-to-uip-export-contract",
+    "head": "6b610b208549bec4be2c0ec7f7f3c2f69b154302",
+    "sidecar_sha256": "296ccbb9ba96812b99dacd771f1ad311496b4997fa0ac7103e68a1d4aaa03333",
+    "premium_record_count": 787,
+    "premium_record_type": "mtg_premium_research"
+  },
+
+  "certified_publication_wiring": {
+    "module": "foundation.presentation.publication_model",
+    "publication_builder": "build_presentation_publication",
+    "external_path_environment_variable": "UIP_MTG_PREMIUM_SIDECAR_PATH",
+    "publication_status": "STAGED",
+    "premium_records_appended": 787,
+    "non_premium_records_preserved": true
+  },
+
+  "presentation_store": {
+    "module": "foundation.presentation.postgres_read_model",
+    "repository_class": "PostgresPresentationRepository",
+    "staging_method": "stage",
+    "staged_validation_method": "validate_staged",
+    "activation_method": "activate",
+    "active_pointer_table": "presentation_active_publication"
+  },
+
+  "authorized_rehearsal_behavior": {
+    "connect_to_explicit_presentation_postgres_authorized": true,
+    "initialize_existing_presentation_schema_authorized": true,
+
+    "create_one_new_staged_publication_authorized": true,
+    "persist_presentation_records_authorized": true,
+    "validate_staged_publication_authorized": true,
+    "read_back_staged_records_authorized": true,
+
+    "require_787_mtg_premium_research_records": true,
+    "require_787_unique_premium_asset_ids": true,
+    "require_lossless_premium_payloads": true,
+
+    "capture_active_publication_before_rehearsal": true,
+    "capture_active_publication_after_rehearsal": true,
+    "require_active_pointer_unchanged": true,
+
+    "rehearsal_publication_must_remain_staged": true
+  },
+
+  "explicitly_forbidden": {
+    "activate_rehearsal_publication": true,
+    "call_activate_method": true,
+    "update_active_publication_pointer": true,
+    "supersede_current_active_publication": true,
+
+    "modify_analytical_database": true,
+    "modify_analytical_schema": true,
+    "modify_mtg_source_repository": true,
+    "modify_mtg_sidecar": true,
+
+    "read_api_change": true,
+    "frontend_change": true,
+    "live_publication_activation": true,
+
+    "model_execution": true,
+    "model_retraining": true,
+    "automatic_purchase_execution": true
+  },
+
+  "required_rehearsal_controls": {
+    "fail_if_uip_head_differs": true,
+    "fail_if_mtg_head_differs": true,
+    "fail_if_sidecar_sha256_differs": true,
+
+    "fail_if_publication_not_staged": true,
+    "fail_if_premium_record_count_not_787": true,
+    "fail_if_premium_asset_identity_not_unique": true,
+    "fail_if_premium_payload_differs": true,
+
+    "fail_if_active_pointer_changes": true,
+    "fail_if_previous_active_publication_status_changes": true,
+
+    "fail_if_read_api_changes": true,
+    "fail_if_frontend_changes": true,
+    "fail_if_analytical_database_changes": true
+  },
+
+  "rehearsal_cleanup_policy": {
+    "automatic_activation_after_success": false,
+    "rehearsal_publication_may_remain_staged_for_inspection": true,
+    "deletion_authorized_in_this_contract": false
+  },
+
+  "next_gate": "IMPLEMENT_AND_EXECUTE_BOUNDED_NON_ACTIVE_MTG_PREMIUM_PRESENTATION_PERSISTENCE_REHEARSAL"
+}
