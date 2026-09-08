@@ -56,11 +56,20 @@ def find_package(root: Path, domain: str) -> Path:
             continue
         platform = str(payload.get("platform_id") or payload.get("domain") or "").strip().lower()
         status = str(payload.get("status") or payload.get("validation_status") or "").strip().upper()
-        if domain == "mtg":
-            if "mtg_uip_delivery" in summary_path.as_posix() and status == "PASS":
+        posix = summary_path.as_posix()
+
+        if domain == "crypto":
+            # Crypto artifacts legitimately contain both a production universal_package
+            # and the prepared UIP delivery package. The R1 consumer boundary is the
+            # prepared UIP delivery, so select only that path.
+            if platform == "crypto" and status == "PASS" and "/uip_delivery/" in posix:
+                candidates.append(summary_path.parent)
+        elif domain == "mtg":
+            if "mtg_uip_delivery" in posix and status == "PASS":
                 candidates.append(summary_path.parent)
         elif platform == domain and status == "PASS":
             candidates.append(summary_path.parent)
+
     unique = sorted({path.resolve() for path in candidates}, key=lambda p: p.as_posix())
     if len(unique) != 1:
         raise RuntimeError(f"Expected exactly one PASS {domain} package, found {len(unique)}: {unique}")
