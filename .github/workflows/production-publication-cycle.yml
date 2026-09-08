@@ -1,0 +1,130 @@
+name: UIP Production Publication Cycle
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "15 16 * * *"
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: uip-production-publication-cycle
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: staging
+    env:
+      UIIP_DATABASE_URL: ${{ secrets.UIIP_DATABASE_URL }}
+      SOURCE_TOKEN: ${{ secrets.UIP_SOURCE_ARTIFACTS_TOKEN }}
+    steps:
+      - name: Checkout UIP
+        uses: actions/checkout@v4
+
+      - name: Checkout certified MTG contracts
+        uses: actions/checkout@v4
+        with:
+          repository: dlockar1mtg/mtg-investment-terminal
+          ref: main
+          token: ${{ secrets.UIP_SOURCE_ARTIFACTS_TOKEN }}
+          path: source_repos/mtg
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+
+      - name: Install UIP dependencies
+        run: pip install -r requirements.txt -r requirements/phase_7_3.txt
+
+      - name: Validate required secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$UIIP_DATABASE_URL" || { echo "UIIP_DATABASE_URL is missing"; exit 1; }
+          test -n "$SOURCE_TOKEN" || { echo "UIP_SOURCE_ARTIFACTS_TOKEN is missing"; exit 1; }
+
+      - name: Resolve and download latest successful source artifacts
+        shell: bash
+        env:
+          UIP_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p incoming/crypto incoming/metals incoming/mtg
+
+          api_get() {
+            local token="$1"
+            local url="$2"
+            curl --fail-with-body --silent --show-error --location \
+              --header "Accept: application/vnd.github+json" \
+              --header "Authorization: Bearer ${token}" \
+              --header "X-GitHub-Api-Version: 2022-11-28" \
+              "$url"
+          }
+
+          download_latest() {
+            local repo="$1"
+            local workflow="$2"
+            local artifact_prefix="$3"
+            local token="$4"
+            local destination="$5"
+
+            local runs_json run_id artifacts_json artifact_id artifact_name
+            runs_json="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/workflows/${workflow}/runs?branch=main&status=success&per_page=30")"
+            run_id="$(printf '%s' "$runs_json" | jq -r '[.workflow_runs[] | select(.event == "schedule" or .event == "workflow_dispatch")][0].id // empty')"
+            test -n "$run_id" || { echo "No successful production run found for ${repo}/${workflow}"; exit 1; }
+
+            artifacts_json="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/runs/${run_id}/artifacts?per_page=100")"
+            artifact_id="$(printf '%s' "$artifacts_json" | jq -r --arg prefix "$artifact_prefix" '[.artifacts[] | select(.expired == false and (.name | startswith($prefix)))][0].id // empty')"
+            artifact_name="$(printf '%s' "$artifacts_json" | jq -r --arg prefix "$artifact_prefix" '[.artifacts[] | select(.expired == false and (.name | startswith($prefix)))][0].name // empty')"
+            test -n "$artifact_id" || { echo "No unexpired artifact matching ${artifact_prefix} for run ${run_id}"; exit 1; }
+
+            echo "SOURCE repo=${repo} workflow=${workflow} run_id=${run_id} artifact=${artifact_name}"
+            api_get "$token" "https://api.github.com/repos/${repo}/actions/artifacts/${artifact_id}/zip" > "${destination}.zip"
+            unzip -q "${destination}.zip" -d "$destination"
+          }
+
+          download_latest \
+            "dlockar1mtg/CryptoIntelligencePlatform" \
+            "crypto-production-cycle.yml" \
+            "crypto-production-" \
+            "$SOURCE_TOKEN" \
+            "incoming/crypto"
+
+          download_latest \
+            "dlockar1mtg/mtg-investment-terminal" \
+            "mtg-marketplace-production.yml" \
+            "mtg-marketplace-production-" \
+            "$SOURCE_TOKEN" \
+            "incoming/mtg"
+
+          download_latest \
+            "dlockar1mtg/UniversalInvestmentPlatform" \
+            "metals-production-cycle.yml" \
+            "metals-production-" \
+            "$UIP_TOKEN" \
+            "incoming/metals"
+
+      - name: Build candidate database and atomically publish to PostgreSQL
+        run: |
+          python scripts/publish_latest_domain_artifacts.py \
+            --crypto-artifact incoming/crypto \
+            --metals-artifact incoming/metals \
+            --mtg-artifact incoming/mtg \
+            --mtg-repo source_repos/mtg \
+            --evidence-output data/operations/publication/latest_publication.json
+
+      - name: Upload publication evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: uip-production-publication-${{ github.run_id }}
+          path: data/operations/publication/latest_publication.json
+          if-no-files-found: warn
+          retention-days: 30
