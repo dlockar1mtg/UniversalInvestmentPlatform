@@ -67,6 +67,29 @@ def test_forecast_contract_columns_are_published(tmp_path: Path):
     assert row["forecast_horizon_months"] == "12"
     assert row["forecast_method"] == "native-v1"
 
+
+def test_canonical_native_asset_id_is_accepted(tmp_path: Path):
+    cycle_path = tmp_path / "cycle.json"
+    document = json.loads(_cycle(cycle_path).read_text(encoding="utf-8"))
+    document["forecasts"][0]["asset_id"] = "METALS:COMMODITY:ALUMINUM"
+    cycle_path.write_text(json.dumps(document), encoding="utf-8")
+
+    result = publish_uip_native_metals_package(
+        cycle_path,
+        tmp_path / "packages",
+        run_id="run-canonical-identity",
+        generated_at_utc="2026-07-25T12:00:00Z",
+    )
+
+    with (
+        Path(result.package_root) / "asset_master.csv"
+    ).open(newline="", encoding="utf-8") as handle:
+        row = next(csv.DictReader(handle))
+
+    assert row["universal_asset_id"] == "metals:commodity:aluminum"
+    assert row["platform_asset_id"] == "METALS:COMMODITY:ALUMINUM"
+
+
 def _governed_contract_columns(name: str) -> list[str]:
     root = Path(__file__).resolve().parents[2]
     path = root / "schemas" / "v1" / "csv" / f"{name}_columns.csv"
