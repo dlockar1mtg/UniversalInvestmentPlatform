@@ -1,0 +1,112 @@
+{
+  "contract_version": "1.0.0",
+  "milestone": "UIP_R4_REFRESH_OPERATIONS",
+  "status": "REHEARSAL_CERTIFIED_CADENCE_LOCK_PENDING_MERGE",
+  "principles": {
+    "github_actions_is_production_refresh_authority": true,
+    "local_execution_is_required_for_recurring_refresh": false,
+    "refresh_is_not_retraining": true,
+    "failed_cycle_preserves_previous_certified_state": true,
+    "cross_asset_ranking_authorized": false,
+    "allocation_policy_authorized": false,
+    "automatic_execution_authorized": false
+  },
+  "domains": {
+    "crypto": {
+      "repository": "dlockar1mtg/CryptoIntelligencePlatform",
+      "workflow": ".github/workflows/crypto-production-cycle.yml",
+      "daily_schedule_utc": "15 11 * * 1-6",
+      "weekly_full_refresh_schedule_utc": "45 10 * * 0",
+      "daily_mode": "normal_refresh",
+      "weekly_mode": "full_refresh",
+      "latest_certified_rehearsal": {
+        "run_id": 34247105467,
+        "head_sha": "1bdbeb1b57087b25b0e7004945585e352be14f0c",
+        "event": "workflow_dispatch",
+        "mode": "normal_refresh",
+        "conclusion": "success"
+      },
+      "artifact_pattern": "crypto-production-<github_run_id>-<github_run_attempt>",
+      "required_observability": [
+        "last_run_status",
+        "last_success_at_utc",
+        "data_freshness_status",
+        "provider_health",
+        "production_run_id",
+        "uip_delivery_status",
+        "next_scheduled_run_utc"
+      ]
+    },
+    "metals": {
+      "repository": "dlockar1mtg/UniversalInvestmentPlatform",
+      "workflow": ".github/workflows/metals-production-cycle.yml",
+      "daily_schedule_utc": "23 12 * * *",
+      "daily_mode": "production_refresh",
+      "latest_certified_rehearsal": {
+        "run_id": 34255762792,
+        "head_sha": "6ca4427d756a8b6df458c69f4bb049e3bdd90101",
+        "event": "workflow_dispatch",
+        "conclusion": "success"
+      },
+      "artifact_pattern": "metals-production-<github_run_id>",
+      "required_observability": [
+        "last_run_status",
+        "last_success_at_utc",
+        "benchmark_freshness_status",
+        "daily_market_freshness_status",
+        "forecast_status",
+        "package_readiness_status",
+        "next_scheduled_run_utc"
+      ]
+    },
+    "mtg": {
+      "repository": "dlockar1mtg/mtg-investment-terminal",
+      "daily_workflow": ".github/workflows/mtg-marketplace-production.yml",
+      "daily_schedule_utc": "15 12 * * *",
+      "weekly_workflow": ".github/workflows/mtg-full-marketplace-universe.yml",
+      "weekly_full_refresh_schedule_utc": "30 11 * * 0",
+      "daily_mode": "bounded_live_marketplace_refresh",
+      "weekly_mode": "full_marketplace_universe_refresh",
+      "latest_certified_daily_rehearsal": {
+        "run_id": 34256278555,
+        "head_sha": "cc7a78f2fc222ef1dadd769e5477896dda950819",
+        "event": "workflow_dispatch",
+        "conclusion": "success"
+      },
+      "daily_artifact_pattern": "mtg-marketplace-production-<github_run_id>",
+      "weekly_artifact_pattern": "mtg-full-marketplace-universe-<github_run_id>",
+      "required_observability": [
+        "last_run_status",
+        "last_success_at_utc",
+        "marketplace_refresh_status",
+        "certified_observation_count",
+        "certified_decision_count",
+        "uip_delivery_status",
+        "ebay_batch_coverage",
+        "next_daily_run_utc",
+        "next_weekly_full_refresh_utc"
+      ]
+    }
+  },
+  "r4_d_cadence_gate": {
+    "cadence_locked_when_registry_is_merged": true,
+    "schedule_changes_require_governed_pull_request": true
+  },
+  "r4_e_observability_gate": {
+    "goal": "Expose domain refresh health without requiring manual inspection of workflow logs.",
+    "minimum_fields": [
+      "domain_id",
+      "workflow_name",
+      "last_run_status",
+      "last_run_started_at_utc",
+      "last_run_completed_at_utc",
+      "last_success_at_utc",
+      "freshness_status",
+      "artifact_or_package_reference",
+      "failure_summary",
+      "next_scheduled_run_utc"
+    ],
+    "stale_or_failed_state_must_be_visible": true,
+    "silent_fallback_to_stale_data_forbidden": true
+  }
+}
