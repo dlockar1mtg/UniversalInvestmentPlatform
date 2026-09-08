@@ -55,7 +55,7 @@ def find_package(root: Path, domain: str) -> Path:
         except Exception:
             continue
         platform = str(payload.get("platform_id") or payload.get("domain") or "").strip().lower()
-        status = str(payload.get("status") or "").strip().upper()
+        status = str(payload.get("status") or payload.get("validation_status") or "").strip().upper()
         if domain == "mtg":
             if "mtg_uip_delivery" in summary_path.as_posix() and status == "PASS":
                 candidates.append(summary_path.parent)
