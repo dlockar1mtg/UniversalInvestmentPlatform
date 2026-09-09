@@ -1,0 +1,44 @@
+name: MTG Premium Line Ending Portability Audit
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout UIP
+        uses: actions/checkout@v4
+
+      - name: Checkout MTG source repository
+        uses: actions/checkout@v4
+        with:
+          repository: dlockar1mtg/mtg-investment-terminal
+          ref: main
+          token: ${{ secrets.UIP_SOURCE_ARTIFACTS_TOKEN }}
+          path: source_repos/mtg
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+
+      - name: Audit Secret Lair premium line endings
+        run: |
+          python scripts/audit_mtg_premium_line_endings.py \
+            --sidecar source_repos/mtg/docs/phase_9/uip_export/premium_research/mtg_secret_lair_premium_research.csv \
+            --evidence-output data/operations/publication/mtg_premium_line_ending_audit.json
+
+      - name: Upload portability evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: mtg-premium-line-ending-portability-${{ github.run_id }}
+          path: data/operations/publication/mtg_premium_line_ending_audit.json
+          if-no-files-found: warn
+          retention-days: 30
