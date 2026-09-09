@@ -125,9 +125,17 @@ def import_mtg(config: ImportEngineConfig, package_root: Path, mtg_repo: Path) -
         raise RuntimeError("MTG import unexpectedly created execution authority")
     if not result.native_fields_preserved:
         raise RuntimeError("MTG native fields were not preserved")
+
+    # The MTG A2 binding performs the transactional import but intentionally leaves
+    # shared platform-registry synchronization to the UIP consumer. Mirror the
+    # Crypto/Metals import path so the successfully imported MTG domain becomes ACTIVE
+    # before the presentation bundle is built and validated.
+    synchronize_successful_import(config, import_id=result.import_id)
+
     return {
         "domain": "mtg",
         "status": result.status,
+        "import_id": result.import_id,
         "payload_rows": result.payload_rows,
         "imported_rows": result.imported_row_count,
         "lane_counts": result.lane_counts,
