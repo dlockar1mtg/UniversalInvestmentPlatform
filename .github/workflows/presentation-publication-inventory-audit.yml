@@ -1,0 +1,49 @@
+name: Presentation Publication Inventory Audit
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout UIP
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install PostgreSQL client dependency
+        run: python -m pip install "psycopg[binary]>=3.2,<4"
+
+      - name: Validate database secret
+        shell: bash
+        env:
+          UIIP_DATABASE_URL: ${{ secrets.UIIP_DATABASE_URL }}
+        run: |
+          set -euo pipefail
+          if [ -z "${UIIP_DATABASE_URL:-}" ]; then
+            echo "UIIP_DATABASE_URL is missing" >&2
+            exit 1
+          fi
+
+      - name: Audit presentation publication inventory read-only
+        env:
+          UIIP_DATABASE_URL: ${{ secrets.UIIP_DATABASE_URL }}
+        run: |
+          python scripts/audit_presentation_publication_inventory.py \
+            --output data/operations/publication_audit/presentation_publication_inventory.json
+
+      - name: Upload audit evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: presentation-publication-inventory-${{ github.run_id }}
+          path: data/operations/publication_audit/presentation_publication_inventory.json
+          if-no-files-found: error
+          retention-days: 30
