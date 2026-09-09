@@ -1,0 +1,47 @@
+name: Metals Freshness Authority Audit
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Resolve latest successful Metals production run
+        id: metals
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          run_id=$(gh run list --workflow "Metals Production Cycle" --status success --limit 1 --json databaseId --jq '.[0].databaseId')
+          if [ -z "$run_id" ] || [ "$run_id" = "null" ]; then
+            echo "No successful Metals Production Cycle run found."
+            exit 1
+          fi
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+      - name: Download latest Metals production artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          mkdir -p _metals_artifact
+          gh run download "${{ steps.metals.outputs.run_id }}" \
+            -n "metals-production-${{ steps.metals.outputs.run_id }}" \
+            -D _metals_artifact
+      - name: Audit native freshness authority
+        run: >-
+          python scripts/audit_metals_freshness_authority.py
+          --benchmark _metals_artifact/operations/metals/benchmark_input.csv
+          --daily-market _metals_artifact/operations/metals/daily_market_input.csv
+          --output data/operations/publication/metals_freshness_authority_audit.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: metals-freshness-authority-${{ github.run_id }}
+          path: data/operations/publication/metals_freshness_authority_audit.json
+          retention-days: 30
