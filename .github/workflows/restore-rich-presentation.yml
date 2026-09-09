@@ -1,0 +1,65 @@
+name: Restore Rich Presentation Publication
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type RESTORE_RICH_PRESENTATION to authorize the exact audited rollback
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: restore-rich-presentation
+  cancel-in-progress: false
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    environment: staging
+    env:
+      UIIP_DATABASE_URL: ${{ secrets.UIIP_DATABASE_URL }}
+    steps:
+      - name: Checkout UIP
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install PostgreSQL client dependency
+        run: python -m pip install "psycopg[binary]>=3.2,<4"
+
+      - name: Validate exact restoration confirmation
+        shell: bash
+        env:
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          set -euo pipefail
+          test "$CONFIRMATION" = "RESTORE_RICH_PRESENTATION" || {
+            echo "Exact confirmation token was not provided" >&2
+            exit 1
+          }
+          test -n "$UIIP_DATABASE_URL" || {
+            echo "UIIP_DATABASE_URL is missing" >&2
+            exit 1
+          }
+
+      - name: Restore exact audited rich publication atomically
+        run: |
+          python scripts/restore_rich_presentation_publication.py \
+            --confirm RESTORE_RICH_PRESENTATION \
+            --output data/operations/publication_restore/rich_presentation_restore.json
+
+      - name: Upload restoration evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rich-presentation-restore-${{ github.run_id }}
+          path: data/operations/publication_restore/rich_presentation_restore.json
+          if-no-files-found: warn
+          retention-days: 30
