@@ -36,7 +36,25 @@ jobs:
       - name: Validate required secrets
         run: python -c "import os; assert os.environ.get('UIIP_DATABASE_URL')"
       - name: Collect vehicle metadata
-        run: python scripts/collect_metals_vehicle_metadata.py
+        shell: bash
+        run: |
+          set +e
+          python scripts/collect_metals_vehicle_metadata.py 2>&1 | tee "$RUNNER_TEMP/metals_vehicle_metadata_collection.log"
+          collection_status=${PIPESTATUS[0]}
+          set -e
+
+          if [ "$collection_status" -eq 0 ]; then
+            exit 0
+          fi
+
+          if grep -Eq "YFRateLimitError|Too Many Requests|Rate limited" "$RUNNER_TEMP/metals_vehicle_metadata_collection.log"; then
+            echo "Yahoo metadata collection was rate limited; validating existing governed metadata snapshot."
+            python scripts/validate_metals_vehicle_metadata_fallback.py
+            exit 0
+          fi
+
+          echo "Vehicle metadata collection failed for a non-rate-limit reason."
+          exit "$collection_status"
       - name: Collect official benchmark input
         run: python scripts/collect_metals_benchmark_input.py
       - name: Collect daily market input
