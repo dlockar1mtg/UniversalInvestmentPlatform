@@ -8,6 +8,7 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
+import importlib.util
 import json
 import os
 import sys
@@ -17,10 +18,15 @@ from pathlib import Path
 import psycopg
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
-if str(REPO_ROOT) not in sys.path:
-    sys.path.insert(0, str(REPO_ROOT))
-
-from foundation.production.metals_registry import load_metals_registry
+REGISTRY_PATH = REPO_ROOT / "foundation" / "production" / "metals_registry.py"
+_REGISTRY_MODULE_NAME = "uip_metals_registry_direct"
+_registry_spec = importlib.util.spec_from_file_location(_REGISTRY_MODULE_NAME, REGISTRY_PATH)
+if _registry_spec is None or _registry_spec.loader is None:
+    raise RuntimeError(f"Unable to load Metals registry module from {REGISTRY_PATH}")
+_registry_module = importlib.util.module_from_spec(_registry_spec)
+sys.modules[_REGISTRY_MODULE_NAME] = _registry_module
+_registry_spec.loader.exec_module(_registry_module)
+load_metals_registry = _registry_module.load_metals_registry
 
 SOURCE_AUTHORITY = "UIP_NATIVE_METALS_VEHICLE_OBSERVATIONS_V1"
 PRICE_SEMANTICS = "UNADJUSTED_CLOSE"
