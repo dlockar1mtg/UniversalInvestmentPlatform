@@ -11,35 +11,41 @@ import json
 from pathlib import Path
 
 
-# Exact governed MTG sidecar contracts. A sidecar is reproducible only when both
-# its row count and its certified byte-level SHA-256 match. This intentionally
-# fails closed on checkout/portability drift rather than treating a matching
-# population as equivalent authority.
+# Exact governed MTG sidecar contracts. Secret Lair premium was originally
+# certified from Windows CRLF bytes; the portability audit proved that GitHub
+# Actions sees the same content with LF line endings. Its certification check
+# therefore hashes a canonical CRLF representation while all other sidecars
+# continue to use their certified raw-byte hashes.
 EXPECTED_MTG = {
     "premium": {
         "path": "docs/phase_9/uip_export/premium_research/mtg_secret_lair_premium_research.csv",
         "rows": 787,
         "sha256": "296ccbb9ba96812b99dacd771f1ad311496b4997fa0ac7103e68a1d4aaa03333",
+        "hash_mode": "canonical_crlf",
     },
     "collector": {
         "path": "docs/phase_9/uip_export/research_sidecars/mtg_collector_research.csv",
         "rows": 50,
         "sha256": "b81ee16a310f8a4f9dcbccf21047e31396df9810d53291cdb9b631fbe046d457",
+        "hash_mode": "raw",
     },
     "collector_horizon": {
         "path": "docs/phase_9/uip_export/research_sidecars/mtg_collector_forecast_horizon.csv",
         "rows": 294,
         "sha256": "585257520197fff9700c0a9f1d1d517af60c1792d944f3f4dab1f65c564cf3e8",
+        "hash_mode": "raw",
     },
     "precollector": {
         "path": "docs/phase_9/uip_export/research_sidecars/mtg_precollector_research.csv",
         "rows": 131,
         "sha256": "80d8a60ffcc35d688e6560ee94f2d1f910fb3cd961eea097d5ffd00862034f81",
+        "hash_mode": "raw",
     },
     "precollector_scenario": {
         "path": "docs/phase_9/uip_export/research_sidecars/mtg_precollector_scenario_horizon.csv",
         "rows": 190,
         "sha256": "74caad4f8d39ce255455854ab5a5459779f6e73adc0afebc8269e769858aed0a",
+        "hash_mode": "raw",
     },
 }
 
@@ -72,6 +78,13 @@ def sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
+def canonical_crlf_sha256(path: Path) -> str:
+    raw = path.read_bytes()
+    normalized_lf = raw.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    canonical = normalized_lf.replace(b"\n", b"\r\n")
+    return hashlib.sha256(canonical).hexdigest()
+
+
 def inventory(root: Path) -> list[str]:
     return sorted(path.relative_to(root).as_posix() for path in root.rglob("*") if path.is_file())
 
@@ -96,12 +109,18 @@ def main() -> int:
         relative = str(spec["path"])
         expected_rows = int(spec["rows"])
         expected_sha = str(spec["sha256"])
+        hash_mode = str(spec["hash_mode"])
         path = mtg_root / relative
         exists = path.is_file()
         rows = csv_rows(path) if exists else None
-        observed_sha = sha256(path) if exists else None
+        raw_sha = sha256(path) if exists else None
+        certification_sha = (
+            canonical_crlf_sha256(path)
+            if exists and hash_mode == "canonical_crlf"
+            else raw_sha
+        )
         row_count_pass = exists and rows == expected_rows
-        sha256_pass = exists and observed_sha == expected_sha
+        sha256_pass = exists and certification_sha == expected_sha
         passed = bool(row_count_pass and sha256_pass)
         mtg_pass = mtg_pass and passed
         mtg[key] = {
@@ -110,8 +129,10 @@ def main() -> int:
             "rows": rows,
             "expected_rows": expected_rows,
             "row_count_pass": row_count_pass,
-            "sha256": observed_sha,
+            "raw_sha256": raw_sha,
+            "certification_sha256": certification_sha,
             "expected_sha256": expected_sha,
+            "hash_mode": hash_mode,
             "sha256_pass": sha256_pass,
             "pass": passed,
         }

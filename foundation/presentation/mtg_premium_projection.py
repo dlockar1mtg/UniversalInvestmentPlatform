@@ -1,4 +1,4 @@
-﻿"""Validate and project the certified MTG Secret Lair premium sidecar."""
+"""Validate and project the certified MTG Secret Lair premium sidecar."""
 
 from __future__ import annotations
 
@@ -101,6 +101,21 @@ def sha256_file(path: Path) -> str:
     return digest.hexdigest()
 
 
+def canonical_crlf_sha256(path: Path) -> str:
+    """Hash certified text using the original Windows CRLF byte convention.
+
+    The Secret Lair sidecar was certified on Windows. Git checkout on Linux
+    normalizes line endings to LF, so raw-byte hashing creates a false mismatch.
+    Canonicalizing only line endings preserves the original governed hash while
+    continuing to fail closed on any substantive content change.
+    """
+
+    raw = path.read_bytes()
+    normalized_lf = raw.replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+    canonical = normalized_lf.replace(b"\n", b"\r\n")
+    return hashlib.sha256(canonical).hexdigest()
+
+
 def _read_sidecar(
     path: Path,
 ) -> tuple[list[dict[str, str]], list[str]]:
@@ -135,11 +150,11 @@ def validate_certified_sidecar(
             "the governed checkpoint."
         )
 
-    observed_sha = sha256_file(path)
+    observed_sha = canonical_crlf_sha256(path)
 
     if observed_sha != EXPECTED_SIDECAR_SHA256:
         raise RuntimeError(
-            "MTG premium sidecar SHA-256 does not match "
+            "MTG premium sidecar canonical SHA-256 does not match "
             "the governed authority."
         )
 
