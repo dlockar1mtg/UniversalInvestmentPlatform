@@ -1,0 +1,32 @@
+name: Metals Native History Sidecar Rehearsal
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rehearse:
+    runs-on: ubuntu-latest
+    environment: staging
+    env:
+      UIIP_DATABASE_URL: ${{ secrets.UIIP_DATABASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: Install dependencies
+        run: pip install "psycopg[binary]>=3.2,<4"
+      - name: Validate required database secret
+        run: python -c "import os; assert os.environ.get('UIIP_DATABASE_URL')"
+      - name: Build native Metals history sidecars
+        run: >-
+          python scripts/build_metals_native_history_sidecars.py
+          --output-root data/operations/metals/native_rich_history_rehearsal
+      - uses: actions/upload-artifact@v4
+        with:
+          name: metals-native-history-sidecars-${{ github.run_id }}
+          path: data/operations/metals/native_rich_history_rehearsal/
+          retention-days: 30
