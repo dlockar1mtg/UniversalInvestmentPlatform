@@ -11,12 +11,36 @@ import json
 from pathlib import Path
 
 
+# Exact governed MTG sidecar contracts. A sidecar is reproducible only when both
+# its row count and its certified byte-level SHA-256 match. This intentionally
+# fails closed on checkout/portability drift rather than treating a matching
+# population as equivalent authority.
 EXPECTED_MTG = {
-    "premium": ("docs/phase_9/uip_export/premium_research/mtg_secret_lair_premium_research.csv", 787),
-    "collector": ("docs/phase_9/uip_export/research_sidecars/mtg_collector_research.csv", 50),
-    "collector_horizon": ("docs/phase_9/uip_export/research_sidecars/mtg_collector_forecast_horizon.csv", 294),
-    "precollector": ("docs/phase_9/uip_export/research_sidecars/mtg_precollector_research.csv", 131),
-    "precollector_scenario": ("docs/phase_9/uip_export/research_sidecars/mtg_precollector_scenario_horizon.csv", 190),
+    "premium": {
+        "path": "docs/phase_9/uip_export/premium_research/mtg_secret_lair_premium_research.csv",
+        "rows": 787,
+        "sha256": "296ccbb9ba96812b99dacd771f1ad311496b4997fa0ac7103e68a1d4aaa03333",
+    },
+    "collector": {
+        "path": "docs/phase_9/uip_export/research_sidecars/mtg_collector_research.csv",
+        "rows": 50,
+        "sha256": "b81ee16a310f8a4f9dcbccf21047e31396df9810d53291cdb9b631fbe046d457",
+    },
+    "collector_horizon": {
+        "path": "docs/phase_9/uip_export/research_sidecars/mtg_collector_forecast_horizon.csv",
+        "rows": 294,
+        "sha256": "585257520197fff9700c0a9f1d1d517af60c1792d944f3f4dab1f65c564cf3e8",
+    },
+    "precollector": {
+        "path": "docs/phase_9/uip_export/research_sidecars/mtg_precollector_research.csv",
+        "rows": 131,
+        "sha256": "80d8a60ffcc35d688e6560ee94f2d1f910fb3cd961eea097d5ffd00862034f81",
+    },
+    "precollector_scenario": {
+        "path": "docs/phase_9/uip_export/research_sidecars/mtg_precollector_scenario_horizon.csv",
+        "rows": 190,
+        "sha256": "74caad4f8d39ce255455854ab5a5459779f6e73adc0afebc8269e769858aed0a",
+    },
 }
 
 # These record families are present in the restored 13,929-record publication and therefore
@@ -68,23 +92,31 @@ def main() -> int:
 
     mtg = {}
     mtg_pass = True
-    for key, (relative, expected_rows) in EXPECTED_MTG.items():
+    for key, spec in EXPECTED_MTG.items():
+        relative = str(spec["path"])
+        expected_rows = int(spec["rows"])
+        expected_sha = str(spec["sha256"])
         path = mtg_root / relative
         exists = path.is_file()
         rows = csv_rows(path) if exists else None
-        passed = exists and rows == expected_rows
+        observed_sha = sha256(path) if exists else None
+        row_count_pass = exists and rows == expected_rows
+        sha256_pass = exists and observed_sha == expected_sha
+        passed = bool(row_count_pass and sha256_pass)
         mtg_pass = mtg_pass and passed
         mtg[key] = {
             "path": relative,
             "exists": exists,
             "rows": rows,
             "expected_rows": expected_rows,
-            "sha256": sha256(path) if exists else None,
+            "row_count_pass": row_count_pass,
+            "sha256": observed_sha,
+            "expected_sha256": expected_sha,
+            "sha256_pass": sha256_pass,
             "pass": passed,
         }
 
     files = inventory(metals_root)
-    lower_files = [name.lower() for name in files]
     metals_families = {}
     metals_pass = True
     for key, (needle, minimum) in REQUIRED_METALS_RICH_FAMILIES.items():
