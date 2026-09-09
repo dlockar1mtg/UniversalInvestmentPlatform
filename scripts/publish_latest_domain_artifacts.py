@@ -65,7 +65,10 @@ def find_package(root: Path, domain: str) -> Path:
             if platform == "crypto" and status == "PASS" and "/uip_delivery/" in posix:
                 candidates.append(summary_path.parent)
         elif domain == "mtg":
-            if "mtg_uip_delivery" in posix and status == "PASS":
+            # MTG artifacts retain a history copy, a timestamped hosted package, and
+            # the canonical current delivery. Production UIP consumes only the
+            # source-owned declared live boundary: operations/mtg_uip_delivery/latest.
+            if status == "PASS" and posix.endswith("/operations/mtg_uip_delivery/latest/package_summary.json"):
                 candidates.append(summary_path.parent)
         elif platform == domain and status == "PASS":
             candidates.append(summary_path.parent)
