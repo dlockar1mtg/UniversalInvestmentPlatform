@@ -20,6 +20,10 @@ TARGET_SOURCE_DATABASE_SHA256 = "9588eab0820f5299982b4f5837056f5750675bc839a0bcb
 TARGET_RECORD_COUNT = 13929
 EXPECTED_CURRENT_ACTIVE_ID = "uip-production-20260909T114650Z-16445e77b711"
 
+# These sentinels are taken directly from the 2026-09-09 read-only inventory
+# for TARGET_PUBLICATION_ID. Do not substitute record types from earlier Metals
+# publications (for example, metals_momentum_state), because the rich target
+# publication uses the later tactical_state contract instead.
 EXPECTED_SENTINELS = {
     ("mtg", "mtg_premium_research"): 787,
     ("mtg", "mtg_collector_research"): 50,
@@ -31,8 +35,10 @@ EXPECTED_SENTINELS = {
     ("metals", "risk"): 11,
     ("metals", "metals_price_history"): 8283,
     ("metals", "metals_current_price"): 11,
-    ("metals", "metals_momentum_state"): 11,
+    ("metals", "metals_data_freshness"): 21,
     ("metals", "metals_model_component"): 64,
+    ("metals", "metals_platform_health"): 1,
+    ("metals", "metals_recommendation_change"): 10,
     ("metals", "metals_regime_probability"): 12,
     ("metals", "metals_uncertainty_adjusted"): 32,
     ("metals", "metals_commodity_decision_explanation"): 2,
