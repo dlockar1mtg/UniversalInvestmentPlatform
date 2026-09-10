@@ -79,6 +79,15 @@ jobs:
           --daily-market data/operations/metals/daily_market_input.csv
           --contract config/presentation/metals_data_freshness_v1.json
           --output-root data/operations/metals/native_freshness_v1
+      - name: Build UIP-native platform health V1 sidecar
+        run: >-
+          python scripts/build_metals_native_platform_health_sidecar.py
+          --freshness data/operations/metals/native_freshness_v1/metals_data_freshness.csv
+          --freshness-manifest data/operations/metals/native_freshness_v1/manifest.json
+          --native-cycle data/operations/metals/native_cycle/latest.json
+          --history-manifest data/operations/metals/native_rich_history/manifest.json
+          --contract config/presentation/metals_platform_health_v1.json
+          --output-root data/operations/metals/native_platform_health_v1
       - name: Publish UIP-native package
         run: python scripts/publish_metals_uip_native_package.py --run-id "gha-${{ github.run_id }}" --strict
       - name: Resolve latest package root
@@ -106,5 +115,6 @@ jobs:
             data/operations/metals/native_readiness/
             data/operations/metals/native_rich_history/
             data/operations/metals/native_freshness_v1/
+            data/operations/metals/native_platform_health_v1/
             data/integration/metals/uip_native_packages/
           retention-days: 30
