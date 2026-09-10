@@ -1,0 +1,24 @@
+name: Metals Freshness Methodology History Audit
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Audit historical Metals freshness methodology
+        run: python scripts/audit_metals_freshness_methodology_history.py
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: metals-freshness-methodology-history-${{ github.run_id }}
+          path: data/operations/publication/metals_freshness_methodology_history_audit.json
+          retention-days: 30
