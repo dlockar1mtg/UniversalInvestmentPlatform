@@ -1,0 +1,48 @@
+{
+  "authority_id": "UIP_NATIVE_METALS_MODEL_COMPONENT_V1",
+  "schema_version": "1.0.0",
+  "legacy_equivalent": false,
+  "description": "Transparent presentation of the three forecast-driving signals already emitted by the UIP-native Metals forecast cycle. These are not the retired v8 model families and must not be relabeled as bayesian_shrinkage, macro_view, or mean_reversion.",
+  "required_output_fields": [
+    "forecast_run_id",
+    "metal",
+    "horizon_months",
+    "model_name",
+    "model_forecast",
+    "model_weight"
+  ],
+  "component_semantics": "model_forecast is the native pre-bound annualized signal value for the named component; model_weight is the governed coefficient applied by the current UIP-native forecast formula. Rows are explanatory decomposition evidence, not independent predictive models.",
+  "forecast_run_id_semantics": "YYYYMMDD integer derived from each forecast as_of_date; native presentation key only, not a legacy database run identifier.",
+  "components": [
+    {
+      "model_name": "uip_native_benchmark_momentum",
+      "source_component": "benchmark_momentum",
+      "transform": "identity",
+      "model_weight": 0.45
+    },
+    {
+      "model_name": "uip_native_vehicle_confirmation",
+      "source_component": "vehicle_confirmation",
+      "transform": "identity",
+      "model_weight": 0.35
+    },
+    {
+      "model_name": "uip_native_data_completeness_adjustment",
+      "source_component": "data_completeness",
+      "transform": "(value - 0.5) * 0.10",
+      "model_weight": 0.20
+    }
+  ],
+  "excluded_evidence_fields": [
+    "benchmark_observation_count",
+    "vehicle_series_count"
+  ],
+  "expected_native_asset_count": 9,
+  "expected_horizons_per_asset": 3,
+  "expected_components_per_forecast": 3,
+  "publication_policy": {
+    "postgres_write_allowed": false,
+    "presentation_stage_allowed": false,
+    "presentation_activation_allowed": false
+  }
+}

@@ -1,0 +1,70 @@
+name: Metals Native Model Component V1 Rehearsal
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  rehearse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+      - name: Resolve latest successful Metals production run
+        id: production
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          run_id=$(gh run list --workflow "Metals Production Cycle" --status success --limit 1 --json databaseId --jq '.[0].databaseId')
+          if [ -z "$run_id" ] || [ "$run_id" = "null" ]; then
+            echo "No successful Metals Production Cycle run found."
+            exit 1
+          fi
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+      - name: Download latest Metals production artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          mkdir -p _metals_artifact
+          gh run download "${{ steps.production.outputs.run_id }}" \
+            -n "metals-production-${{ steps.production.outputs.run_id }}" \
+            -D _metals_artifact
+      - name: Build and certify native model component V1 sidecar
+        run: >-
+          python scripts/build_metals_native_model_component_sidecar.py
+          --native-cycle _metals_artifact/operations/metals/native_cycle/latest.json
+          --contract config/presentation/metals_model_component_v1.json
+          --output-root data/operations/metals/native_model_component_v1_rehearsal
+      - name: Assert rehearsal remains publication-safe
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          p = Path("data/operations/metals/native_model_component_v1_rehearsal/manifest.json")
+          m = json.loads(p.read_text())
+          assert m["status"] == "METALS_NATIVE_MODEL_COMPONENT_V1_PASS"
+          assert m["legacy_equivalent"] is False
+          assert m["row_count"] == 81
+          assert m["forecast_count"] == 27
+          assert m["asset_count"] == 9
+          assert m["horizon_count"] == 3
+          assert m["component_count"] == 3
+          assert m["postgres_write_performed"] is False
+          assert m["publication_staged"] is False
+          assert m["publication_activated"] is False
+          assert m["source_collection_performed"] is False
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: metals-native-model-component-v1-${{ github.run_id }}
+          path: data/operations/metals/native_model_component_v1_rehearsal/
+          retention-days: 30
