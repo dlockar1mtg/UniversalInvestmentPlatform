@@ -1,0 +1,37 @@
+{
+  "authority_id": "UIP_NATIVE_METALS_DATA_FRESHNESS_V1",
+  "schema_version": "1.0.0",
+  "legacy_equivalent": false,
+  "description": "Deterministic UIP-native freshness methodology for current Metals benchmark and vehicle observations. This is a new native contract and is not represented as a reproduction of the retired v8 freshness methodology.",
+  "status_order": ["CURRENT", "AGING", "STALE"],
+  "health_score_method": "linear_to_zero_at_stale_threshold",
+  "message_policy": "mechanical_source_age_threshold_summary",
+  "source_policies": {
+    "world_bank": {
+      "frequency": "MONTHLY",
+      "current_max_age_days": 45,
+      "stale_after_days": 75
+    },
+    "eia": {
+      "frequency": "ANNUAL",
+      "current_max_age_days": 365,
+      "stale_after_days": 730
+    },
+    "yfinance_daily_market_input": {
+      "frequency": "DAILY",
+      "current_max_age_days": 3,
+      "stale_after_days": 5
+    }
+  },
+  "status_method": "CURRENT when age_days <= current_max_age_days; AGING when current_max_age_days < age_days <= stale_after_days; STALE when age_days > stale_after_days.",
+  "health_score_formula": "round(max(0, 100 * (1 - age_days / stale_after_days)), 2)",
+  "required_output_fields": [
+    "series_key",
+    "frequency",
+    "last_observation",
+    "age_days",
+    "freshness_status",
+    "health_score",
+    "message"
+  ]
+}
