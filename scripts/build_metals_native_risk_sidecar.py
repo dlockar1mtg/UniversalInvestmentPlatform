@@ -62,6 +62,71 @@ def maximum_drawdown(prices: list[float]) -> float:
     return worst
 
 
+def canonicalize_same_date_rows(
+    asset_id: str,
+    rows: list[dict[str, str]],
+    *,
+    relative_tolerance: float,
+    absolute_tolerance: float,
+) -> tuple[list[dict[str, str]], int]:
+    """Collapse same-date multi-source rows only when their closes agree.
+
+    The source authority is keyed by (ticker, observation_date, source), so duplicate
+    dates are a legitimate source shape. Risk V1 requires one close per date. We do
+    not rank sources: equivalent closes are collapsed deterministically; conflicting
+    closes fail closed.
+    """
+    by_date: dict[str, list[dict[str, str]]] = defaultdict(list)
+    for row in rows:
+        by_date[str(row["observation_date"])].append(row)
+
+    canonical: list[dict[str, str]] = []
+    collapsed = 0
+    for observation_date in sorted(by_date):
+        group = by_date[observation_date]
+        tickers = {str(row.get("ticker", "")).strip() for row in group}
+        if len(tickers) != 1 or "" in tickers:
+            raise RuntimeError(
+                f"same-date source rows disagree on ticker for {asset_id} on {observation_date}"
+            )
+
+        closes: list[float] = []
+        for row in group:
+            close = float(row["close_usd"])
+            if not math.isfinite(close) or close <= 0.0:
+                raise RuntimeError(
+                    f"nonpositive or nonfinite close found for {asset_id} on {observation_date}"
+                )
+            closes.append(close)
+
+        reference = closes[0]
+        if any(
+            not math.isclose(
+                value,
+                reference,
+                rel_tol=relative_tolerance,
+                abs_tol=absolute_tolerance,
+            )
+            for value in closes[1:]
+        ):
+            raise RuntimeError(
+                f"conflicting same-date source closes for {asset_id} on {observation_date}: {closes}"
+            )
+
+        chosen = min(
+            group,
+            key=lambda row: (
+                str(row.get("source_system", "")),
+                str(row.get("source_run_id", "")),
+                str(row.get("collected_at_utc", "")),
+            ),
+        )
+        canonical.append(chosen)
+        collapsed += len(group) - 1
+
+    return canonical, collapsed
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--history", type=Path, required=True)
@@ -88,6 +153,16 @@ def main() -> int:
         raise RuntimeError("unexpected configured risk source authority")
     if contract.get("price_semantics") != PRICE_SEMANTICS:
         raise RuntimeError("risk V1 must use UNADJUSTED_CLOSE semantics")
+
+    reconciliation = contract.get("same_date_multi_source_policy") or {}
+    if reconciliation.get("method") != "REQUIRE_EQUIVALENT_CLOSE_THEN_COLLAPSE":
+        raise RuntimeError("unexpected Risk V1 same-date multi-source policy")
+    if reconciliation.get("conflicting_close_behavior") != "FAIL_CLOSED":
+        raise RuntimeError("Risk V1 conflicting same-date closes must fail closed")
+    relative_tolerance = float(reconciliation["relative_tolerance"])
+    absolute_tolerance = float(reconciliation["absolute_tolerance"])
+    if relative_tolerance < 0.0 or absolute_tolerance < 0.0:
+        raise RuntimeError("same-date reconciliation tolerances cannot be negative")
 
     if history_manifest.get("status") != SOURCE_STATUS:
         raise RuntimeError("native history sidecar did not pass")
@@ -133,19 +208,23 @@ def main() -> int:
 
     output_rows: list[dict[str, object]] = []
     seen_tickers: set[str] = set()
+    total_canonical_observations = 0
+    total_duplicate_source_rows_collapsed = 0
     for asset_id, rows in sorted(by_asset.items()):
-        ordered = sorted(rows, key=lambda row: str(row["observation_date"]))
-        dates = [str(row["observation_date"]) for row in ordered]
-        if len(dates) != len(set(dates)):
-            raise RuntimeError(f"duplicate observation dates for {asset_id}")
+        ordered, collapsed = canonicalize_same_date_rows(
+            asset_id,
+            rows,
+            relative_tolerance=relative_tolerance,
+            absolute_tolerance=absolute_tolerance,
+        )
+        total_canonical_observations += len(ordered)
+        total_duplicate_source_rows_collapsed += collapsed
         if len(ordered) < minimum:
             raise RuntimeError(
-                f"insufficient observations for {asset_id}: {len(ordered)} < {minimum}"
+                f"insufficient unique-date observations for {asset_id}: {len(ordered)} < {minimum}"
             )
         window = ordered[-lookback:]
         prices = [float(row["close_usd"]) for row in window]
-        if any(value <= 0 for value in prices):
-            raise RuntimeError(f"nonpositive close found for {asset_id}")
         returns = [prices[index] / prices[index - 1] - 1.0 for index in range(1, len(prices))]
         if len(returns) < 2:
             raise RuntimeError(f"insufficient return observations for {asset_id}")
@@ -211,6 +290,13 @@ def main() -> int:
         "price_semantics": PRICE_SEMANTICS,
         "source_authority": SOURCE_AUTHORITY,
         "source_history_sha256": sha256(args.history),
+        "raw_source_history_row_count": len(history_rows),
+        "canonical_unique_date_observation_count": total_canonical_observations,
+        "duplicate_source_rows_collapsed": total_duplicate_source_rows_collapsed,
+        "same_date_multi_source_method": reconciliation["method"],
+        "same_date_relative_tolerance": relative_tolerance,
+        "same_date_absolute_tolerance": absolute_tolerance,
+        "same_date_conflicting_close_behavior": reconciliation["conflicting_close_behavior"],
         "first_as_of_date": min(str(row["as_of_date"]) for row in output_rows),
         "last_as_of_date": max(str(row["as_of_date"]) for row in output_rows),
         "output_sha256": sha256(output),
