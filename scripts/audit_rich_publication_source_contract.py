@@ -11,11 +11,6 @@ import json
 from pathlib import Path
 
 
-# Exact governed MTG sidecar contracts. Secret Lair premium was originally
-# certified from Windows CRLF bytes; the portability audit proved that GitHub
-# Actions sees the same content with LF line endings. Its certification check
-# therefore hashes a canonical CRLF representation while all other sidecars
-# continue to use their certified raw-byte hashes.
 EXPECTED_MTG = {
     "premium": {
         "path": "docs/phase_9/uip_export/premium_research/mtg_secret_lair_premium_research.csv",
@@ -49,20 +44,86 @@ EXPECTED_MTG = {
     },
 }
 
-# These record families are present in the restored 13,929-record publication and therefore
-# must have an explicit fresh source contract before production activation can be re-enabled.
 REQUIRED_METALS_RICH_FAMILIES = {
-    "price_history": ("metals_price_history", 1),
-    "current_price": ("metals_current_price", 1),
-    "data_freshness": ("metals_data_freshness", 1),
-    "model_component": ("metals_model_component", 1),
-    "platform_health": ("metals_platform_health", 1),
-    "recommendation_change": ("metals_recommendation_change", 1),
-    "regime_probability": ("metals_regime_probability", 1),
-    "uncertainty_adjusted": ("metals_uncertainty_adjusted", 1),
-    "tactical_state": ("tactical_state", 1),
-    "risk": ("risk", 1),
+    "price_history": "metals_price_history",
+    "current_price": "metals_current_price",
+    "data_freshness": "metals_data_freshness",
+    "model_component": "metals_model_component",
+    "platform_health": "metals_platform_health",
+    "recommendation_change": "metals_recommendation_change",
+    "regime_probability": "metals_regime_probability",
+    "uncertainty_adjusted": "metals_uncertainty_adjusted",
+    "tactical_state": "tactical_state",
+    "risk": "risk",
 }
+
+NATIVE_METALS_CERTIFIED_CONTRACTS = {
+    "current_price": {
+        "csv": "operations/metals/native_rich_history/metals_current_price.csv",
+        "manifest": "operations/metals/native_rich_history/manifest.json",
+        "manifest_status": "METALS_NATIVE_HISTORY_SIDECARS_PASS",
+        "manifest_authority_key": "source_authority",
+        "manifest_authority": "UIP_NATIVE_METALS_VEHICLE_OBSERVATIONS_V1",
+        "row_count_key": "current_price_row_count",
+        "expected_rows": 11,
+        "manifest_file_key": "metals_current_price.csv",
+    },
+    "price_history": {
+        "csv": "operations/metals/native_rich_history/metals_price_history.csv",
+        "manifest": "operations/metals/native_rich_history/manifest.json",
+        "manifest_status": "METALS_NATIVE_HISTORY_SIDECARS_PASS",
+        "manifest_authority_key": "source_authority",
+        "manifest_authority": "UIP_NATIVE_METALS_VEHICLE_OBSERVATIONS_V1",
+        "row_count_key": "history_row_count",
+        "minimum_rows": 1,
+        "manifest_file_key": "metals_price_history.csv",
+    },
+    "data_freshness": {
+        "csv": "operations/metals/native_freshness_v1/metals_data_freshness.csv",
+        "manifest": "operations/metals/native_freshness_v1/manifest.json",
+        "manifest_status": "METALS_NATIVE_DATA_FRESHNESS_V1_PASS",
+        "manifest_authority_key": "authority_id",
+        "manifest_authority": "UIP_NATIVE_METALS_DATA_FRESHNESS_V1",
+        "row_count_key": "row_count",
+        "expected_rows": 20,
+        "require_nonlegacy": True,
+        "output_sha_key": "output_sha256",
+    },
+    "platform_health": {
+        "csv": "operations/metals/native_platform_health_v1/metals_platform_health.csv",
+        "manifest": "operations/metals/native_platform_health_v1/manifest.json",
+        "manifest_status": "METALS_NATIVE_PLATFORM_HEALTH_V1_PASS",
+        "manifest_authority_key": "authority_id",
+        "manifest_authority": "UIP_NATIVE_METALS_PLATFORM_HEALTH_V1",
+        "row_count_key": "row_count",
+        "expected_rows": 1,
+        "require_nonlegacy": True,
+        "output_sha_key": "output_sha256",
+    },
+    "model_component": {
+        "csv": "operations/metals/native_model_component_v1/metals_model_component.csv",
+        "manifest": "operations/metals/native_model_component_v1/manifest.json",
+        "manifest_status": "METALS_NATIVE_MODEL_COMPONENT_V1_PASS",
+        "manifest_authority_key": "authority_id",
+        "manifest_authority": "UIP_NATIVE_METALS_MODEL_COMPONENT_V1",
+        "row_count_key": "row_count",
+        "expected_rows": 81,
+        "require_nonlegacy": True,
+        "output_sha_key": "output_sha256",
+        "expected_component_names": [
+            "uip_native_benchmark_momentum",
+            "uip_native_vehicle_confirmation",
+            "uip_native_data_completeness_adjustment",
+        ],
+        "expected_source_model_ids": ["uip-metals-native-trend-v1"],
+    },
+}
+
+SAFETY_FALSE_KEYS = (
+    "postgres_write_performed",
+    "publication_staged",
+    "publication_activated",
+)
 
 
 def csv_rows(path: Path) -> int:
@@ -87,6 +148,66 @@ def canonical_crlf_sha256(path: Path) -> str:
 
 def inventory(root: Path) -> list[str]:
     return sorted(path.relative_to(root).as_posix() for path in root.rglob("*") if path.is_file())
+
+
+def load_json(path: Path) -> dict:
+    return json.loads(path.read_text(encoding="utf-8-sig"))
+
+
+def audit_certified_metals_family(root: Path, family: str, spec: dict) -> dict:
+    csv_path = root / str(spec["csv"])
+    manifest_path = root / str(spec["manifest"])
+    csv_exists = csv_path.is_file()
+    manifest_exists = manifest_path.is_file()
+    result = {
+        "family": family,
+        "csv": str(spec["csv"]),
+        "manifest": str(spec["manifest"]),
+        "csv_exists": csv_exists,
+        "manifest_exists": manifest_exists,
+        "pass": False,
+    }
+    if not csv_exists or not manifest_exists:
+        return result
+
+    manifest = load_json(manifest_path)
+    rows = csv_rows(csv_path)
+    actual_sha = sha256(csv_path)
+    checks: dict[str, bool] = {
+        "manifest_status": manifest.get("status") == spec["manifest_status"],
+        "manifest_authority": manifest.get(spec["manifest_authority_key"]) == spec["manifest_authority"],
+        "csv_row_count_matches_manifest": rows == int(manifest.get(spec["row_count_key"], -1)),
+        "safety_flags_false": all(manifest.get(key) is False for key in SAFETY_FALSE_KEYS),
+    }
+
+    if "expected_rows" in spec:
+        checks["expected_row_count"] = rows == int(spec["expected_rows"])
+    if "minimum_rows" in spec:
+        checks["minimum_row_count"] = rows >= int(spec["minimum_rows"])
+    if spec.get("require_nonlegacy"):
+        checks["legacy_equivalent_false"] = manifest.get("legacy_equivalent") is False
+    if spec.get("output_sha_key"):
+        checks["output_sha_matches_manifest"] = actual_sha == manifest.get(spec["output_sha_key"])
+    if spec.get("manifest_file_key"):
+        file_entry = (manifest.get("files") or {}).get(spec["manifest_file_key"], {})
+        checks["manifest_file_row_count"] = rows == int(file_entry.get("row_count", -1))
+        checks["manifest_file_sha"] = actual_sha == file_entry.get("sha256")
+    if spec.get("expected_component_names"):
+        checks["component_names"] = manifest.get("component_names") == spec["expected_component_names"]
+    if spec.get("expected_source_model_ids"):
+        checks["source_model_ids"] = manifest.get("source_model_ids") == spec["expected_source_model_ids"]
+
+    result.update(
+        {
+            "rows": rows,
+            "sha256": actual_sha,
+            "manifest_status": manifest.get("status"),
+            "manifest_authority": manifest.get(spec["manifest_authority_key"]),
+            "checks": checks,
+            "pass": all(checks.values()),
+        }
+    )
+    return result
 
 
 def main() -> int:
@@ -114,11 +235,7 @@ def main() -> int:
         exists = path.is_file()
         rows = csv_rows(path) if exists else None
         raw_sha = sha256(path) if exists else None
-        certification_sha = (
-            canonical_crlf_sha256(path)
-            if exists and hash_mode == "canonical_crlf"
-            else raw_sha
-        )
+        certification_sha = canonical_crlf_sha256(path) if exists and hash_mode == "canonical_crlf" else raw_sha
         row_count_pass = exists and rows == expected_rows
         sha256_pass = exists and certification_sha == expected_sha
         passed = bool(row_count_pass and sha256_pass)
@@ -139,17 +256,30 @@ def main() -> int:
 
     files = inventory(metals_root)
     metals_families = {}
-    metals_pass = True
-    for key, (needle, minimum) in REQUIRED_METALS_RICH_FAMILIES.items():
-        matches = [name for name in files if needle in name.lower()]
-        passed = len(matches) >= minimum
-        metals_pass = metals_pass and passed
-        metals_families[key] = {
-            "needle": needle,
-            "matches": matches,
-            "pass": passed,
-        }
+    certified_count = 0
+    for key, needle in REQUIRED_METALS_RICH_FAMILIES.items():
+        if key in NATIVE_METALS_CERTIFIED_CONTRACTS:
+            contract_result = audit_certified_metals_family(
+                metals_root, key, NATIVE_METALS_CERTIFIED_CONTRACTS[key]
+            )
+            passed = bool(contract_result["pass"])
+            matches = [name for name in files if needle in name.lower()]
+            contract_result["needle"] = needle
+            contract_result["matches"] = matches
+            metals_families[key] = contract_result
+        else:
+            matches = [name for name in files if needle in name.lower()]
+            passed = False
+            metals_families[key] = {
+                "needle": needle,
+                "matches": matches,
+                "contract_defined": False,
+                "pass": False,
+            }
+        if passed:
+            certified_count += 1
 
+    metals_pass = certified_count == len(REQUIRED_METALS_RICH_FAMILIES)
     evidence = {
         "status": "PASS" if mtg_pass and metals_pass else "FAIL_CLOSED",
         "postgres_write_performed": False,
@@ -158,6 +288,9 @@ def main() -> int:
         "mtg_rich_source_contract_pass": mtg_pass,
         "mtg": mtg,
         "metals_rich_source_contract_pass": metals_pass,
+        "metals_certified_family_count": certified_count,
+        "metals_required_family_count": len(REQUIRED_METALS_RICH_FAMILIES),
+        "metals_remaining_family_count": len(REQUIRED_METALS_RICH_FAMILIES) - certified_count,
         "metals_required_families": metals_families,
         "metals_artifact_file_count": len(files),
         "metals_artifact_files": files,
