@@ -7,6 +7,8 @@ import json
 from datetime import date, timedelta
 from pathlib import Path
 
+import pytest
+
 
 ROOT = Path(__file__).resolve().parents[2]
 SCRIPT = ROOT / "scripts" / "build_metals_native_risk_sidecar.py"
@@ -34,10 +36,17 @@ def test_contract_is_vehicle_only_and_nonlegacy():
     assert contract["minimum_observations"] == 252
     assert contract["return_convention"] == "SIMPLE_CLOSE_TO_CLOSE_DAILY_RETURN"
     assert contract["annualization_factor"] == 252
+    assert contract["methodology_version"] == "1.0.1"
+    policy = contract["same_date_multi_source_policy"]
+    assert policy["method"] == "REQUIRE_EQUIVALENT_CLOSE_THEN_COLLAPSE"
+    assert policy["relative_tolerance"] == 1e-9
+    assert policy["absolute_tolerance"] == 1e-8
+    assert policy["conflicting_close_behavior"] == "FAIL_CLOSED"
     assert contract["var"]["method"] == "HISTORICAL_EMPIRICAL"
     assert contract["var"]["confidence_level"] == 0.95
     assert "VEHICLE_TO_COMMODITY_RISK_PROJECTION" in contract["forbidden_semantics"]
     assert "LEGACY_RISK_ROW_COPY_FORWARD" in contract["forbidden_semantics"]
+    assert "SILENT_CONFLICTING_SAME_DATE_SOURCE_SELECTION" in contract["forbidden_semantics"]
 
 
 def test_math_helpers_are_deterministic():
@@ -46,9 +55,77 @@ def test_math_helpers_are_deterministic():
     assert module.maximum_drawdown([100.0, 120.0, 90.0, 108.0]) == -0.25
 
 
+def test_same_date_equivalent_multi_source_rows_are_collapsed():
+    module = _load_module()
+    rows = [
+        {
+            "ticker": "BIL",
+            "observation_date": "2026-09-10",
+            "close_usd": "91.500000000",
+            "source_system": "source-b",
+            "source_run_id": "run-2",
+            "collected_at_utc": "2026-09-11T00:00:00Z",
+        },
+        {
+            "ticker": "BIL",
+            "observation_date": "2026-09-10",
+            "close_usd": "91.500000005",
+            "source_system": "source-a",
+            "source_run_id": "run-1",
+            "collected_at_utc": "2026-09-10T23:59:00Z",
+        },
+        {
+            "ticker": "BIL",
+            "observation_date": "2026-09-11",
+            "close_usd": "91.51",
+            "source_system": "source-a",
+            "source_run_id": "run-3",
+            "collected_at_utc": "2026-09-11T23:59:00Z",
+        },
+    ]
+    canonical, collapsed = module.canonicalize_same_date_rows(
+        "metals:vehicle:BIL",
+        rows,
+        relative_tolerance=1e-9,
+        absolute_tolerance=1e-8,
+    )
+    assert collapsed == 1
+    assert len(canonical) == 2
+    assert canonical[0]["source_system"] == "source-a"
+    assert [row["observation_date"] for row in canonical] == ["2026-09-10", "2026-09-11"]
+
+
+def test_same_date_conflicting_multi_source_rows_fail_closed():
+    module = _load_module()
+    rows = [
+        {
+            "ticker": "BIL",
+            "observation_date": "2026-09-10",
+            "close_usd": "91.50",
+            "source_system": "source-a",
+            "source_run_id": "run-1",
+            "collected_at_utc": "2026-09-11T00:00:00Z",
+        },
+        {
+            "ticker": "BIL",
+            "observation_date": "2026-09-10",
+            "close_usd": "91.75",
+            "source_system": "source-b",
+            "source_run_id": "run-2",
+            "collected_at_utc": "2026-09-11T00:01:00Z",
+        },
+    ]
+    with pytest.raises(RuntimeError, match="conflicting same-date source closes"):
+        module.canonicalize_same_date_rows(
+            "metals:vehicle:BIL",
+            rows,
+            relative_tolerance=1e-9,
+            absolute_tolerance=1e-8,
+        )
+
+
 def test_builder_produces_one_vehicle_row_per_series(tmp_path, monkeypatch):
     module = _load_module()
-    contract = json.loads(CONTRACT.read_text(encoding="utf-8"))
     tickers = ["BIL", "COPX", "CPER", "GLD", "IAU", "PPLT", "SGOL", "SIVR", "SLV", "URA", "URNM"]
     history_path = tmp_path / "metals_price_history.csv"
     fieldnames = [
@@ -87,6 +164,11 @@ def test_builder_produces_one_vehicle_row_per_series(tmp_path, monkeypatch):
                     "collected_at_utc": "2026-09-11T00:00:00Z",
                 }
             )
+    duplicate = dict(rows[0])
+    duplicate["source_system"] = "test-secondary"
+    duplicate["source_run_id"] = "test-run-secondary"
+    rows.append(duplicate)
+
     with history_path.open("w", encoding="utf-8", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)
         writer.writeheader()
@@ -136,6 +218,11 @@ def test_builder_produces_one_vehicle_row_per_series(tmp_path, monkeypatch):
     assert manifest["legacy_equivalent"] is False
     assert manifest["scope"] == "VEHICLE_ONLY"
     assert manifest["row_count"] == 11
+    assert manifest["raw_source_history_row_count"] == len(rows)
+    assert manifest["canonical_unique_date_observation_count"] == 11 * 252
+    assert manifest["duplicate_source_rows_collapsed"] == 1
+    assert manifest["same_date_multi_source_method"] == "REQUIRE_EQUIVALENT_CLOSE_THEN_COLLAPSE"
+    assert manifest["same_date_conflicting_close_behavior"] == "FAIL_CLOSED"
     assert manifest["source_collection_performed"] is False
     assert manifest["postgres_write_performed"] is False
     assert manifest["publication_staged"] is False
