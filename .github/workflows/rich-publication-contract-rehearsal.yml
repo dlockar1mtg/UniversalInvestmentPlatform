@@ -69,11 +69,51 @@ jobs:
           unzip -q incoming/metals.zip -d incoming/metals
 
       - name: Audit rich publication source contracts
+        id: rich_audit
+        shell: bash
         run: |
+          set +e
           python scripts/audit_rich_publication_source_contract.py \
             --metals-artifact incoming/metals \
             --mtg-repo source_repos/mtg \
             --evidence-output data/operations/publication/rich_source_contract_rehearsal.json
+          audit_status=$?
+          set -e
+          echo "audit_status=${audit_status}" >> "$GITHUB_OUTPUT"
+
+      - name: Certify current fail-closed recovery state
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          evidence = json.loads(
+              Path("data/operations/publication/rich_source_contract_rehearsal.json").read_text()
+          )
+          assert evidence["status"] == "FAIL_CLOSED"
+          assert evidence["mtg_rich_source_contract_pass"] is True
+          assert evidence["metals_rich_source_contract_pass"] is False
+          assert evidence["metals_certified_family_count"] == 5
+          assert evidence["metals_required_family_count"] == 10
+          assert evidence["metals_remaining_family_count"] == 5
+
+          expected_pass = {
+              "current_price",
+              "price_history",
+              "data_freshness",
+              "platform_health",
+              "model_component",
+          }
+          actual_pass = {
+              key
+              for key, value in evidence["metals_required_families"].items()
+              if value["pass"]
+          }
+          assert actual_pass == expected_pass, (actual_pass, expected_pass)
+          PY
+          test "${{ steps.rich_audit.outputs.audit_status }}" = "1"
+          echo "RICH_PUBLICATION_RECOVERY_STATE=5_OF_10_FAIL_CLOSED_PASS"
 
       - name: Upload rehearsal evidence
         if: always()
