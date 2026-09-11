@@ -1,4 +1,4 @@
-"""Validate an existing Metals vehicle metadata snapshot for rate-limit fallback use."""
+"""Validate an existing Metals vehicle metadata snapshot for bounded provider-degradation fallback use."""
 from __future__ import annotations
 
 import argparse
@@ -20,10 +20,15 @@ from foundation.production.metals_vehicle_metadata import (  # noqa: E402
     summarize_vehicle_metadata,
 )
 
+ALLOWED_FALLBACK_REASONS = (
+    "YAHOO_RATE_LIMIT",
+    "YAHOO_INCOMPLETE_METADATA_RESPONSE",
+)
+
 
 def parse_arguments() -> argparse.Namespace:
     parser = argparse.ArgumentParser(
-        description="Validate an existing Metals metadata snapshot for bounded rate-limit fallback."
+        description="Validate an existing Metals metadata snapshot for bounded provider-degradation fallback."
     )
     parser.add_argument(
         "--structural-metadata",
@@ -36,6 +41,11 @@ def parse_arguments() -> argparse.Namespace:
         default=ROOT / "config" / "metals" / "vehicle_market_metadata.csv",
     )
     parser.add_argument("--as-of", type=date.fromisoformat, default=date.today())
+    parser.add_argument(
+        "--fallback-reason",
+        choices=ALLOWED_FALLBACK_REASONS,
+        default="YAHOO_RATE_LIMIT",
+    )
     return parser.parse_args()
 
 
@@ -74,7 +84,8 @@ def main() -> int:
         "complete_vehicle_count": summary["complete_vehicle_count"],
         "freshness_counts": summary["freshness_counts"],
         "maximum_metadata_age_days": max(ages) if ages else None,
-        "fallback_reason_allowed": "YAHOO_RATE_LIMIT_ONLY",
+        "fallback_reason": args.fallback_reason,
+        "fallback_reasons_allowed": list(ALLOWED_FALLBACK_REASONS),
         "network_collection_performed_by_validator": False,
     }
     print(json.dumps(evidence, indent=2, sort_keys=True))
