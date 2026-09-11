@@ -1,7 +1,7 @@
 {
   "authority_id": "UIP_NATIVE_METALS_RISK_V1",
   "schema_version": "1.0.0",
-  "methodology_version": "1.0.0",
+  "methodology_version": "1.0.1",
   "legacy_equivalent": false,
   "scope": "VEHICLE_ONLY",
   "source_authority": "UIP_NATIVE_METALS_VEHICLE_OBSERVATIONS_V1",
@@ -11,6 +11,12 @@
   "minimum_observations": 252,
   "return_convention": "SIMPLE_CLOSE_TO_CLOSE_DAILY_RETURN",
   "annualization_factor": 252,
+  "same_date_multi_source_policy": {
+    "method": "REQUIRE_EQUIVALENT_CLOSE_THEN_COLLAPSE",
+    "relative_tolerance": 1e-9,
+    "absolute_tolerance": 1e-8,
+    "conflicting_close_behavior": "FAIL_CLOSED"
+  },
   "volatility_convention": "SAMPLE_STANDARD_DEVIATION_ANNUALIZED_SQRT_252",
   "downside_volatility_convention": "NEGATIVE_SIMPLE_DAILY_RETURNS_SAMPLE_STANDARD_DEVIATION_ANNUALIZED_SQRT_252",
   "maximum_drawdown_convention": "MINIMUM_CLOSE_OVER_RUNNING_PEAK_MINUS_ONE_WITHIN_LOOKBACK",
@@ -40,6 +46,7 @@
   "forbidden_semantics": [
     "PORTFOLIO_RISK_WITHOUT_PORTFOLIO_AUTHORITY",
     "VEHICLE_TO_COMMODITY_RISK_PROJECTION",
-    "LEGACY_RISK_ROW_COPY_FORWARD"
+    "LEGACY_RISK_ROW_COPY_FORWARD",
+    "SILENT_CONFLICTING_SAME_DATE_SOURCE_SELECTION"
   ]
 }
