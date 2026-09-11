@@ -79,7 +79,7 @@ jobs:
           rows = list(csv.DictReader((root / 'risk.csv').open(encoding='utf-8')))
           assert manifest['status'] == 'METALS_NATIVE_RISK_V1_PASS'
           assert manifest['authority_id'] == 'UIP_NATIVE_METALS_RISK_V1'
-          assert manifest['methodology_version'] == '1.0.1'
+          assert manifest['methodology_version'] == '1.0.2'
           assert manifest['legacy_equivalent'] is False
           assert manifest['scope'] == 'VEHICLE_ONLY'
           assert manifest['row_count'] == 11
@@ -92,14 +92,16 @@ jobs:
           assert manifest['var_confidence_level'] == 0.95
           assert manifest['price_semantics'] == 'UNADJUSTED_CLOSE'
           assert manifest['source_authority'] == 'UIP_NATIVE_METALS_VEHICLE_OBSERVATIONS_V1'
-          assert manifest['same_date_multi_source_method'] == 'REQUIRE_EQUIVALENT_CLOSE_THEN_COLLAPSE'
-          assert manifest['same_date_conflicting_close_behavior'] == 'FAIL_CLOSED'
-          assert manifest['same_date_relative_tolerance'] == 1e-9
-          assert manifest['same_date_absolute_tolerance'] == 1e-8
+          assert manifest['same_date_multi_source_method'] == 'LATEST_COLLECTED_REVISION_WINS'
+          assert manifest['conflicting_latest_timestamp_tie_behavior'] == 'FAIL_CLOSED'
+          assert manifest['missing_or_invalid_collected_at_behavior'] == 'FAIL_CLOSED'
+          assert manifest['latest_timestamp_tie_relative_tolerance'] == 1e-9
+          assert manifest['latest_timestamp_tie_absolute_tolerance'] == 1e-8
           assert manifest['raw_source_history_row_count'] >= manifest['canonical_unique_date_observation_count']
           assert manifest['duplicate_source_rows_collapsed'] == (
               manifest['raw_source_history_row_count'] - manifest['canonical_unique_date_observation_count']
           )
+          assert manifest['superseded_conflicting_revision_rows'] >= 0
           assert manifest['source_collection_performed'] is False
           assert manifest['postgres_write_performed'] is False
           assert manifest['publication_staged'] is False
