@@ -11,6 +11,7 @@ import hashlib
 import json
 import math
 from collections import defaultdict
+from datetime import datetime
 from pathlib import Path
 from statistics import stdev
 
@@ -62,19 +63,34 @@ def maximum_drawdown(prices: list[float]) -> float:
     return worst
 
 
+def parse_collected_at(value: str, *, asset_id: str, observation_date: str) -> datetime:
+    text = str(value or "").strip()
+    if not text:
+        raise RuntimeError(
+            f"missing collected_at_utc for {asset_id} on {observation_date}"
+        )
+    try:
+        return datetime.fromisoformat(text.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise RuntimeError(
+            f"invalid collected_at_utc for {asset_id} on {observation_date}: {text}"
+        ) from exc
+
+
 def canonicalize_same_date_rows(
     asset_id: str,
     rows: list[dict[str, str]],
     *,
-    relative_tolerance: float,
-    absolute_tolerance: float,
-) -> tuple[list[dict[str, str]], int]:
-    """Collapse same-date multi-source rows only when their closes agree.
+    tie_relative_tolerance: float,
+    tie_absolute_tolerance: float,
+) -> tuple[list[dict[str, str]], int, int]:
+    """Canonicalize same-date source rows using latest collection time as revision authority.
 
-    The source authority is keyed by (ticker, observation_date, source), so duplicate
-    dates are a legitimate source shape. Risk V1 requires one close per date. We do
-    not rank sources: equivalent closes are collapsed deterministically; conflicting
-    closes fail closed.
+    The source authority is keyed by (ticker, observation_date, source), so more than one
+    source row may exist for a date. Risk V1 interprets a later collected_at_utc value as a
+    newer governed revision. Older rows are superseded. If the newest timestamp is tied
+    across rows whose closes conflict, the builder fails closed instead of choosing by
+    source name or averaging values.
     """
     by_date: dict[str, list[dict[str, str]]] = defaultdict(list)
     for row in rows:
@@ -82,6 +98,7 @@ def canonicalize_same_date_rows(
 
     canonical: list[dict[str, str]] = []
     collapsed = 0
+    superseded_conflicting_revisions = 0
     for observation_date in sorted(by_date):
         group = by_date[observation_date]
         tickers = {str(row.get("ticker", "")).strip() for row in group}
@@ -90,41 +107,59 @@ def canonicalize_same_date_rows(
                 f"same-date source rows disagree on ticker for {asset_id} on {observation_date}"
             )
 
-        closes: list[float] = []
+        annotated: list[tuple[datetime, dict[str, str], float]] = []
         for row in group:
             close = float(row["close_usd"])
             if not math.isfinite(close) or close <= 0.0:
                 raise RuntimeError(
                     f"nonpositive or nonfinite close found for {asset_id} on {observation_date}"
                 )
-            closes.append(close)
+            collected_at = parse_collected_at(
+                row.get("collected_at_utc", ""),
+                asset_id=asset_id,
+                observation_date=observation_date,
+            )
+            annotated.append((collected_at, row, close))
 
-        reference = closes[0]
+        latest_time = max(item[0] for item in annotated)
+        latest = [item for item in annotated if item[0] == latest_time]
+        latest_closes = [item[2] for item in latest]
+        reference = latest_closes[0]
         if any(
             not math.isclose(
                 value,
                 reference,
-                rel_tol=relative_tolerance,
-                abs_tol=absolute_tolerance,
+                rel_tol=tie_relative_tolerance,
+                abs_tol=tie_absolute_tolerance,
             )
-            for value in closes[1:]
+            for value in latest_closes[1:]
         ):
             raise RuntimeError(
-                f"conflicting same-date source closes for {asset_id} on {observation_date}: {closes}"
+                f"conflicting closes tied at latest collected_at_utc for {asset_id} "
+                f"on {observation_date}: {latest_closes}"
             )
 
         chosen = min(
-            group,
+            (item[1] for item in latest),
             key=lambda row: (
                 str(row.get("source_system", "")),
                 str(row.get("source_run_id", "")),
-                str(row.get("collected_at_utc", "")),
             ),
         )
+        chosen_close = float(chosen["close_usd"])
+        for collected_at, _, close in annotated:
+            if collected_at < latest_time and not math.isclose(
+                close,
+                chosen_close,
+                rel_tol=tie_relative_tolerance,
+                abs_tol=tie_absolute_tolerance,
+            ):
+                superseded_conflicting_revisions += 1
+
         canonical.append(chosen)
         collapsed += len(group) - 1
 
-    return canonical, collapsed
+    return canonical, collapsed, superseded_conflicting_revisions
 
 
 def main() -> int:
@@ -155,13 +190,15 @@ def main() -> int:
         raise RuntimeError("risk V1 must use UNADJUSTED_CLOSE semantics")
 
     reconciliation = contract.get("same_date_multi_source_policy") or {}
-    if reconciliation.get("method") != "REQUIRE_EQUIVALENT_CLOSE_THEN_COLLAPSE":
+    if reconciliation.get("method") != "LATEST_COLLECTED_REVISION_WINS":
         raise RuntimeError("unexpected Risk V1 same-date multi-source policy")
-    if reconciliation.get("conflicting_close_behavior") != "FAIL_CLOSED":
-        raise RuntimeError("Risk V1 conflicting same-date closes must fail closed")
-    relative_tolerance = float(reconciliation["relative_tolerance"])
-    absolute_tolerance = float(reconciliation["absolute_tolerance"])
-    if relative_tolerance < 0.0 or absolute_tolerance < 0.0:
+    if reconciliation.get("conflicting_latest_timestamp_tie_behavior") != "FAIL_CLOSED":
+        raise RuntimeError("Risk V1 conflicting latest-timestamp ties must fail closed")
+    if reconciliation.get("missing_or_invalid_collected_at_behavior") != "FAIL_CLOSED":
+        raise RuntimeError("Risk V1 missing/invalid collected_at_utc must fail closed")
+    tie_relative_tolerance = float(reconciliation["latest_timestamp_tie_relative_tolerance"])
+    tie_absolute_tolerance = float(reconciliation["latest_timestamp_tie_absolute_tolerance"])
+    if tie_relative_tolerance < 0.0 or tie_absolute_tolerance < 0.0:
         raise RuntimeError("same-date reconciliation tolerances cannot be negative")
 
     if history_manifest.get("status") != SOURCE_STATUS:
@@ -210,15 +247,17 @@ def main() -> int:
     seen_tickers: set[str] = set()
     total_canonical_observations = 0
     total_duplicate_source_rows_collapsed = 0
+    total_superseded_conflicting_revisions = 0
     for asset_id, rows in sorted(by_asset.items()):
-        ordered, collapsed = canonicalize_same_date_rows(
+        ordered, collapsed, superseded_conflicts = canonicalize_same_date_rows(
             asset_id,
             rows,
-            relative_tolerance=relative_tolerance,
-            absolute_tolerance=absolute_tolerance,
+            tie_relative_tolerance=tie_relative_tolerance,
+            tie_absolute_tolerance=tie_absolute_tolerance,
         )
         total_canonical_observations += len(ordered)
         total_duplicate_source_rows_collapsed += collapsed
+        total_superseded_conflicting_revisions += superseded_conflicts
         if len(ordered) < minimum:
             raise RuntimeError(
                 f"insufficient unique-date observations for {asset_id}: {len(ordered)} < {minimum}"
@@ -293,10 +332,12 @@ def main() -> int:
         "raw_source_history_row_count": len(history_rows),
         "canonical_unique_date_observation_count": total_canonical_observations,
         "duplicate_source_rows_collapsed": total_duplicate_source_rows_collapsed,
+        "superseded_conflicting_revision_rows": total_superseded_conflicting_revisions,
         "same_date_multi_source_method": reconciliation["method"],
-        "same_date_relative_tolerance": relative_tolerance,
-        "same_date_absolute_tolerance": absolute_tolerance,
-        "same_date_conflicting_close_behavior": reconciliation["conflicting_close_behavior"],
+        "latest_timestamp_tie_relative_tolerance": tie_relative_tolerance,
+        "latest_timestamp_tie_absolute_tolerance": tie_absolute_tolerance,
+        "conflicting_latest_timestamp_tie_behavior": reconciliation["conflicting_latest_timestamp_tie_behavior"],
+        "missing_or_invalid_collected_at_behavior": reconciliation["missing_or_invalid_collected_at_behavior"],
         "first_as_of_date": min(str(row["as_of_date"]) for row in output_rows),
         "last_as_of_date": max(str(row["as_of_date"]) for row in output_rows),
         "output_sha256": sha256(output),
