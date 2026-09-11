@@ -1,0 +1,45 @@
+{
+  "authority_id": "UIP_NATIVE_METALS_RISK_V1",
+  "schema_version": "1.0.0",
+  "methodology_version": "1.0.0",
+  "legacy_equivalent": false,
+  "scope": "VEHICLE_ONLY",
+  "source_authority": "UIP_NATIVE_METALS_VEHICLE_OBSERVATIONS_V1",
+  "price_semantics": "UNADJUSTED_CLOSE",
+  "expected_vehicle_count": 11,
+  "lookback_observations": 252,
+  "minimum_observations": 252,
+  "return_convention": "SIMPLE_CLOSE_TO_CLOSE_DAILY_RETURN",
+  "annualization_factor": 252,
+  "volatility_convention": "SAMPLE_STANDARD_DEVIATION_ANNUALIZED_SQRT_252",
+  "downside_volatility_convention": "NEGATIVE_SIMPLE_DAILY_RETURNS_SAMPLE_STANDARD_DEVIATION_ANNUALIZED_SQRT_252",
+  "maximum_drawdown_convention": "MINIMUM_CLOSE_OVER_RUNNING_PEAK_MINUS_ONE_WITHIN_LOOKBACK",
+  "var": {
+    "included": true,
+    "method": "HISTORICAL_EMPIRICAL",
+    "confidence_level": 0.95,
+    "horizon_days": 1,
+    "loss_sign_convention": "POSITIVE_LOSS_MAGNITUDE",
+    "quantile_method": "LINEAR_INTERPOLATION"
+  },
+  "required_output_fields": [
+    "universal_asset_id",
+    "ticker",
+    "as_of_date",
+    "lookback_observations",
+    "return_convention",
+    "annualization_factor",
+    "volatility",
+    "downside_volatility",
+    "maximum_drawdown",
+    "value_at_risk",
+    "price_semantics",
+    "source_authority",
+    "methodology_version"
+  ],
+  "forbidden_semantics": [
+    "PORTFOLIO_RISK_WITHOUT_PORTFOLIO_AUTHORITY",
+    "VEHICLE_TO_COMMODITY_RISK_PROJECTION",
+    "LEGACY_RISK_ROW_COPY_FORWARD"
+  ]
+}
