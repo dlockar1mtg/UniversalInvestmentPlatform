@@ -1,0 +1,110 @@
+name: Metals Native Risk V1 Rehearsal
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  rehearse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout UIP
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Resolve latest successful Metals Production Cycle artifact
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          run_id="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            '/repos/${{ github.repository }}/actions/workflows/metals-production-cycle.yml/runs?branch=main&status=success&per_page=20' \
+            --jq '.workflow_runs[] | select(.event == "workflow_dispatch" or .event == "schedule") | .id' | head -n 1)"
+          test -n "$run_id"
+          artifact_name="metals-production-${run_id}"
+          artifact_url="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/${{ github.repository }}/actions/runs/${run_id}/artifacts" \
+            --jq ".artifacts[] | select(.name == \"${artifact_name}\") | .archive_download_url" | head -n 1)"
+          test -n "$artifact_url"
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=$artifact_name" >> "$GITHUB_OUTPUT"
+          echo "artifact_url=$artifact_url" >> "$GITHUB_OUTPUT"
+
+      - name: Download certified Metals production artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p incoming/metals
+          gh api "${{ steps.resolve.outputs.artifact_url }}" > incoming/metals.zip
+          unzip -q incoming/metals.zip -d incoming/metals
+
+      - name: Build UIP-native Metals Risk V1 sidecar
+        shell: bash
+        run: |
+          set -euo pipefail
+          history_csv="$(find incoming/metals -type f -path '*/native_rich_history/metals_price_history.csv' | head -n 1)"
+          history_manifest="$(find incoming/metals -type f -path '*/native_rich_history/manifest.json' | head -n 1)"
+          test -n "$history_csv"
+          test -n "$history_manifest"
+          python scripts/build_metals_native_risk_sidecar.py \
+            --history "$history_csv" \
+            --history-manifest "$history_manifest" \
+            --contract config/presentation/metals_risk_v1.json \
+            --output-root data/operations/metals/native_risk_v1
+
+      - name: Certify rehearsal safety and shape
+        shell: bash
+        run: |
+          python - <<'PY'
+          import csv
+          import json
+          from pathlib import Path
+
+          root = Path('data/operations/metals/native_risk_v1')
+          manifest = json.loads((root / 'manifest.json').read_text(encoding='utf-8'))
+          rows = list(csv.DictReader((root / 'risk.csv').open(encoding='utf-8')))
+          assert manifest['status'] == 'METALS_NATIVE_RISK_V1_PASS'
+          assert manifest['authority_id'] == 'UIP_NATIVE_METALS_RISK_V1'
+          assert manifest['legacy_equivalent'] is False
+          assert manifest['scope'] == 'VEHICLE_ONLY'
+          assert manifest['row_count'] == 11
+          assert manifest['vehicle_count'] == 11
+          assert manifest['lookback_observations'] == 252
+          assert manifest['minimum_observations'] == 252
+          assert manifest['return_convention'] == 'SIMPLE_CLOSE_TO_CLOSE_DAILY_RETURN'
+          assert manifest['annualization_factor'] == 252
+          assert manifest['var_method'] == 'HISTORICAL_EMPIRICAL'
+          assert manifest['var_confidence_level'] == 0.95
+          assert manifest['price_semantics'] == 'UNADJUSTED_CLOSE'
+          assert manifest['source_authority'] == 'UIP_NATIVE_METALS_VEHICLE_OBSERVATIONS_V1'
+          assert manifest['source_collection_performed'] is False
+          assert manifest['postgres_write_performed'] is False
+          assert manifest['publication_staged'] is False
+          assert manifest['publication_activated'] is False
+          assert len(rows) == 11
+          assert all(row['universal_asset_id'].startswith('metals:vehicle:') for row in rows)
+          assert all(row['price_semantics'] == 'UNADJUSTED_CLOSE' for row in rows)
+          print('METALS_NATIVE_RISK_V1_REHEARSAL=PASS')
+          PY
+
+      - name: Upload risk V1 rehearsal evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: metals-native-risk-v1-${{ github.run_id }}
+          path: data/operations/metals/native_risk_v1/
+          if-no-files-found: error
+          retention-days: 30
