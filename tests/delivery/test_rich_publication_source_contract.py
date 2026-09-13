@@ -26,7 +26,7 @@ def test_mtg_contracts_pin_exact_certified_hashes():
     assert expected["precollector_scenario"]["sha256"] == "74caad4f8d39ce255455854ab5a5459779f6e73adc0afebc8269e769858aed0a"
 
 
-def test_metals_native_contracts_cover_exactly_eight_certified_families():
+def test_metals_native_contracts_cover_exactly_nine_certified_families():
     module = _load_module()
     contracts = module.NATIVE_METALS_CERTIFIED_CONTRACTS
     assert set(contracts) == {
@@ -38,6 +38,7 @@ def test_metals_native_contracts_cover_exactly_eight_certified_families():
         "risk",
         "recommendation_change",
         "regime_probability",
+        "uncertainty_adjusted",
     }
     assert contracts["current_price"]["expected_rows"] == 11
     assert contracts["data_freshness"]["expected_rows"] == 20
@@ -46,6 +47,7 @@ def test_metals_native_contracts_cover_exactly_eight_certified_families():
     assert contracts["risk"]["expected_rows"] == 11
     assert contracts["recommendation_change"]["minimum_rows"] == 1
     assert contracts["regime_probability"]["expected_rows"] == 27
+    assert contracts["uncertainty_adjusted"]["expected_rows"] == 27
     assert contracts["data_freshness"]["manifest_authority"] == "UIP_NATIVE_METALS_DATA_FRESHNESS_V1"
     assert contracts["platform_health"]["manifest_authority"] == "UIP_NATIVE_METALS_PLATFORM_HEALTH_V1"
     assert contracts["model_component"]["manifest_authority"] == "UIP_NATIVE_METALS_MODEL_COMPONENT_V1"
@@ -53,6 +55,7 @@ def test_metals_native_contracts_cover_exactly_eight_certified_families():
     assert contracts["risk"]["manifest_authority"] == "UIP_NATIVE_METALS_RISK_V1"
     assert contracts["recommendation_change"]["manifest_authority"] == "UIP_NATIVE_METALS_RECOMMENDATION_CHANGE_V1"
     assert contracts["regime_probability"]["manifest_authority"] == "UIP_NATIVE_METALS_REGIME_PROBABILITY_V1"
+    assert contracts["uncertainty_adjusted"]["manifest_authority"] == "UIP_NATIVE_METALS_UNCERTAINTY_ADJUSTED_V1"
 
     expected_risk = contracts["risk"]["expected_manifest_values"]
     assert expected_risk["methodology_version"] == "1.0.2"
@@ -80,6 +83,23 @@ def test_metals_native_contracts_cover_exactly_eight_certified_families():
     assert expected_regime["commodity_to_vehicle_regime_projection_performed"] is False
     assert expected_regime["legacy_rows_copied_forward"] is False
 
+    expected_uncertainty = contracts["uncertainty_adjusted"]["expected_manifest_values"]
+    assert expected_uncertainty["methodology_version"] == "1.0.0"
+    assert expected_uncertainty["scope"] == "BENCHMARK_COMMODITY_ASSET_BY_FORECAST_HORIZON"
+    assert expected_uncertainty["source_state_mode"] == "CURRENT_CERTIFIED_NATIVE_CYCLE_ONLY"
+    assert expected_uncertainty["adjusted_quantity"] == "ONE_SIDED_CONFIDENCE_HAIRCUT_EXPECTED_RETURN"
+    assert expected_uncertainty["adjustment_interpretation"] == "DESCRIPTIVE_CONSERVATIVE_CONFIDENCE_HAIRCUT_NOT_STATISTICALLY_CALIBRATED_INTERVAL"
+    assert expected_uncertainty["regime_semantics"] == "CERTIFIED_REGIME_PROBABILITY_V1_CONTEXT_ONLY_NO_NUMERIC_ADJUSTMENT"
+    assert expected_uncertainty["risk_semantics"] == "VEHICLE_ONLY_RISK_V1_EXCLUDED_UNTIL_EXPLICIT_COMMODITY_MAPPING_IS_GOVERNED"
+    assert expected_uncertainty["statistical_calibration_claimed"] is False
+    assert expected_uncertainty["vehicle_risk_projection_performed"] is False
+    assert expected_uncertainty["regime_numeric_adjustment_performed"] is False
+    assert expected_uncertainty["commodity_to_vehicle_adjusted_projection_performed"] is False
+    assert expected_uncertainty["legacy_rows_copied_forward"] is False
+    assert expected_uncertainty["cross_asset_ranking_performed"] is False
+    assert expected_uncertainty["portfolio_allocation_performed"] is False
+    assert expected_uncertainty["automatic_execution_performed"] is False
+
 
 def test_metals_native_contracts_require_publication_safety_flags():
     module = _load_module()
@@ -95,18 +115,20 @@ def test_metals_native_contracts_require_publication_safety_flags():
         "risk",
         "recommendation_change",
         "regime_probability",
+        "uncertainty_adjusted",
     ):
         assert module.NATIVE_METALS_CERTIFIED_CONTRACTS[family]["require_nonlegacy"] is True
 
 
-def test_rehearsal_certifies_eight_of_ten_without_opening_publication_gate():
+def test_rehearsal_certifies_nine_of_ten_without_opening_publication_gate():
     workflow = WORKFLOW.read_text(encoding="utf-8")
     assert 'assert evidence["status"] == "FAIL_CLOSED"' in workflow
-    assert 'assert evidence["metals_certified_family_count"] == 8' in workflow
+    assert 'assert evidence["metals_certified_family_count"] == 9' in workflow
     assert 'assert evidence["metals_required_family_count"] == 10' in workflow
-    assert 'assert evidence["metals_remaining_family_count"] == 2' in workflow
+    assert 'assert evidence["metals_remaining_family_count"] == 1' in workflow
     assert '"risk",' in workflow
     assert '"recommendation_change",' in workflow
     assert '"regime_probability",' in workflow
+    assert '"uncertainty_adjusted",' in workflow
     assert 'test "${{ steps.rich_audit.outputs.audit_status }}" = "1"' in workflow
-    assert "RICH_PUBLICATION_RECOVERY_STATE=8_OF_10_FAIL_CLOSED_PASS" in workflow
+    assert "RICH_PUBLICATION_RECOVERY_STATE=9_OF_10_FAIL_CLOSED_PASS" in workflow
