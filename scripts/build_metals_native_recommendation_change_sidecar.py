@@ -1,9 +1,4 @@
-"""Build UIP-native Metals Recommendation Change V1 from read-only native observations.
-
-This is a retrospective reconstruction authority. It does not mutate source history,
-write PostgreSQL, stage a publication, activate a publication, or project commodity
-recommendations onto vehicles.
-"""
+"""Build UIP-native Metals Recommendation Change V1 from read-only native observations."""
 from __future__ import annotations
 
 import argparse
@@ -27,7 +22,6 @@ if str(ROOT) not in sys.path:
 
 
 def _load_metals_native_cycle_module():
-    """Load metals_native_cycle.py directly without importing foundation.production.__init__."""
     module_path = ROOT / "foundation" / "production" / "metals_native_cycle.py"
     module_name = "_uip_metals_native_cycle_for_recommendation_change_v1"
     spec = importlib.util.spec_from_file_location(module_name, module_path)
@@ -70,7 +64,14 @@ def parse_timestamp(value: object) -> datetime:
     return parsed
 
 
-def canonicalize(rows: Iterable[dict], *, id_field: str, value_field: str, rel_tol: float, abs_tol: float) -> tuple[list[dict], dict[str, int]]:
+def canonicalize(
+    rows: Iterable[dict],
+    *,
+    id_field: str,
+    value_field: str,
+    rel_tol: float,
+    abs_tol: float,
+) -> tuple[list[dict], dict[str, int]]:
     grouped: dict[tuple[str, str], list[dict]] = defaultdict(list)
     raw_count = 0
     for raw in rows:
@@ -100,17 +101,22 @@ def canonicalize(rows: Iterable[dict], *, id_field: str, value_field: str, rel_t
                     f"conflicting latest-timestamp source values for {key[0]} on {key[1]}: "
                     f"{[float(x[value_field]) for x in latest]}"
                 )
-        chosen = sorted(latest, key=lambda item: (str(item.get("source") or ""), str(item.get("run_id") or "")))[0]
+        chosen = sorted(
+            latest,
+            key=lambda item: (str(item.get("source") or ""), str(item.get("run_id") or "")),
+        )[0]
         duplicate_rows += max(0, len(candidates) - 1)
         for item in candidates:
             if item is chosen:
                 continue
             if item["_parsed_collected_at"] < latest_time and not math.isclose(
-                float(item[value_field]), float(chosen[value_field]), rel_tol=rel_tol, abs_tol=abs_tol
+                float(item[value_field]),
+                float(chosen[value_field]),
+                rel_tol=rel_tol,
+                abs_tol=abs_tol,
             ):
                 superseded_conflicting_rows += 1
-        chosen = {k: v for k, v in chosen.items() if k != "_parsed_collected_at"}
-        canonical.append(chosen)
+        canonical.append({k: v for k, v in chosen.items() if k != "_parsed_collected_at"})
 
     canonical.sort(key=lambda item: (str(item[id_field]), str(item["observation_date"])))
     return canonical, {
@@ -166,40 +172,34 @@ def main() -> int:
         with db.cursor() as cur:
             cur.execute("SET TRANSACTION READ ONLY")
             cur.execute(
-                """
-                SELECT series_id, observation_date, value, source, collected_at_utc, run_id
-                FROM metals_observations
-                ORDER BY series_id, observation_date, source
-                """
+                "SELECT series_id, observation_date, value, source, collected_at_utc, run_id "
+                "FROM metals_observations ORDER BY series_id, observation_date, source"
             )
             benchmark_raw = [
                 {
-                    "series_id": str(row[0]),
-                    "observation_date": str(row[1]),
-                    "value": float(row[2]),
-                    "source": str(row[3]),
-                    "collected_at_utc": str(row[4]),
-                    "run_id": str(row[5]),
+                    "series_id": str(r[0]),
+                    "observation_date": str(r[1]),
+                    "value": float(r[2]),
+                    "source": str(r[3]),
+                    "collected_at_utc": str(r[4]),
+                    "run_id": str(r[5]),
                 }
-                for row in cur.fetchall()
+                for r in cur.fetchall()
             ]
             cur.execute(
-                """
-                SELECT ticker, observation_date, COALESCE(adjusted_close, close), source, collected_at_utc, run_id
-                FROM metals_vehicle_observations
-                ORDER BY ticker, observation_date, source
-                """
+                "SELECT ticker, observation_date, COALESCE(adjusted_close, close), source, collected_at_utc, run_id "
+                "FROM metals_vehicle_observations ORDER BY ticker, observation_date, source"
             )
             vehicle_raw = [
                 {
-                    "ticker": str(row[0]),
-                    "observation_date": str(row[1]),
-                    "value": float(row[2]),
-                    "source": str(row[3]),
-                    "collected_at_utc": str(row[4]),
-                    "run_id": str(row[5]),
+                    "ticker": str(r[0]),
+                    "observation_date": str(r[1]),
+                    "value": float(r[2]),
+                    "source": str(r[3]),
+                    "collected_at_utc": str(r[4]),
+                    "run_id": str(r[5]),
                 }
-                for row in cur.fetchall()
+                for r in cur.fetchall()
             ]
             db.rollback()
 
@@ -212,12 +212,13 @@ def main() -> int:
     if not benchmark or not vehicles:
         raise RuntimeError("canonical native history is empty")
 
+    # The contract requires the union of canonical benchmark and vehicle dates.
+    # Do not discard pre-benchmark vehicle observations: they are historical model
+    # context and must be present once benchmark forecasts become available.
     evaluation_dates = sorted(
         {str(row["observation_date"]) for row in benchmark}
         | {str(row["observation_date"]) for row in vehicles}
     )
-    first_benchmark_date = min(str(row["observation_date"]) for row in benchmark)
-    evaluation_dates = [date for date in evaluation_dates if date >= first_benchmark_date]
 
     benchmark_by_date: dict[str, list[dict]] = defaultdict(list)
     vehicle_by_date: dict[str, list[dict]] = defaultdict(list)
@@ -231,7 +232,7 @@ def main() -> int:
     previous: dict[str, tuple[str, str]] = {}
     changes: list[dict[str, object]] = []
     latest_state: dict[str, str] = {}
-    order = {value: index for index, value in enumerate(contract["recommendation_order_worst_to_best"])}
+    order = {v: i for i, v in enumerate(contract["recommendation_order_worst_to_best"])}
 
     models = methodology.get("models") or []
     model = models[0] if models and isinstance(models[0], dict) else {}
@@ -244,12 +245,12 @@ def main() -> int:
         benchmark_seen.extend(benchmark_by_date.get(evaluation_date, []))
         vehicle_seen.extend(vehicle_by_date.get(evaluation_date, []))
         benchmark_obs = [
-            NativeObservation(str(row["series_id"]), str(row["observation_date"]), float(row["value"]), str(row["source"]))
-            for row in benchmark_seen
+            NativeObservation(str(r["series_id"]), str(r["observation_date"]), float(r["value"]), str(r["source"]))
+            for r in benchmark_seen
         ]
         vehicle_obs = [
-            NativeObservation(str(row["ticker"]), str(row["observation_date"]), float(row["value"]), str(row["source"]))
-            for row in vehicle_seen
+            NativeObservation(str(r["ticker"]), str(r["observation_date"]), float(r["value"]), str(r["source"]))
+            for r in vehicle_seen
         ]
         report = evaluate_native_cycle(benchmark_obs, vehicle_obs, methodology)
         if report.status not in {"PASS", "INCOMPLETE"}:
@@ -281,7 +282,8 @@ def main() -> int:
                 }
             )
             previous[asset_id] = (evaluation_date, recommendation)
-        latest_state = current
+        if current:
+            latest_state = current
 
     expected_current: dict[str, set[str]] = defaultdict(set)
     for row in native_cycle.get("forecasts") or []:
@@ -340,8 +342,9 @@ def main() -> int:
         "vehicle_recommendation_projection_performed": False,
         "legacy_rows_copied_forward": False,
     }
-    manifest_path = output_root / "manifest.json"
-    manifest_path.write_text(json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+    (output_root / "manifest.json").write_text(
+        json.dumps(manifest, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+    )
     print(json.dumps(manifest, indent=2, sort_keys=True))
     print("METALS_NATIVE_RECOMMENDATION_CHANGE_V1=PASS")
     return 0
