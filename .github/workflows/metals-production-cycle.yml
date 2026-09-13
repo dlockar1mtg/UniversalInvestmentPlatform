@@ -121,6 +121,13 @@ jobs:
           --methodology config/metals/model_methodology_registry.json
           --native-cycle data/operations/metals/native_cycle/latest.json
           --output-root data/operations/metals/native_recommendation_change_v1
+      - name: Build UIP-native regime probability V1 sidecar
+        run: >-
+          python scripts/build_metals_native_regime_probability_sidecar.py
+          --contract config/presentation/metals_regime_probability_v1.json
+          --methodology config/metals/model_methodology_registry.json
+          --native-cycle data/operations/metals/native_cycle/latest.json
+          --output-root data/operations/metals/native_regime_probability_v1
       - name: Publish UIP-native package
         run: python scripts/publish_metals_uip_native_package.py --run-id "gha-${{ github.run_id }}" --strict
       - name: Resolve latest package root
@@ -152,5 +159,6 @@ jobs:
             data/operations/metals/native_model_component_v1/
             data/operations/metals/native_risk_v1/
             data/operations/metals/native_recommendation_change_v1/
+            data/operations/metals/native_regime_probability_v1/
             data/integration/metals/uip_native_packages/
           retention-days: 30
