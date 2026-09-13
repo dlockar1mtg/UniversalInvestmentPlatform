@@ -1,0 +1,66 @@
+{
+  "authority_id": "UIP_NATIVE_METALS_REGIME_PROBABILITY_V1",
+  "schema_version": "1.0.0",
+  "methodology_version": "1.0.0",
+  "legacy_equivalent": false,
+  "scope": "BENCHMARK_COMMODITY_ASSET_ONLY",
+  "source_state_mode": "CURRENT_CERTIFIED_NATIVE_CYCLE_ONLY",
+  "model_id": "uip-metals-native-trend-v1",
+  "source_methodology_registry": "config/metals/model_methodology_registry.json",
+  "regime_taxonomy": [
+    "POSITIVE_TREND",
+    "NEUTRAL_OR_MIXED",
+    "NEGATIVE_TREND"
+  ],
+  "probability_interpretation": "DESCRIPTIVE_NORMALIZED_REGIME_SUPPORT_NOT_STATISTICALLY_CALIBRATED",
+  "probability_grain": "ONE_ROW_PER_COMMODITY_PER_REGIME",
+  "horizon_semantics": "HORIZON_INVARIANT_CURRENT_REGIME_REQUIRE_IDENTICAL_SOURCE_COMPONENTS_ACROSS_HORIZONS",
+  "classifier_inputs": [
+    "benchmark_momentum",
+    "vehicle_confirmation",
+    "confidence"
+  ],
+  "directional_component_weights": {
+    "benchmark_momentum": 0.45,
+    "vehicle_confirmation": 0.35
+  },
+  "directional_signal_denominator": 0.8,
+  "neutral_boundary_policy": "USE_RECOMMENDATION_BUY_AND_HOLD_BOUNDARIES",
+  "confidence_policy": "MULTIPLY_DIRECTIONAL_SUPPORT_BY_NATIVE_CONFIDENCE_AND_ASSIGN_REMAINDER_TO_NEUTRAL",
+  "minimum_evidence": {
+    "benchmark_observation_count": 2,
+    "vehicle_series_count": 1,
+    "insufficient_evidence_behavior": "FAIL_CLOSED"
+  },
+  "normalization": {
+    "method": "PIECEWISE_DIRECTIONAL_SUPPORT_WITH_NEUTRAL_REMAINDER",
+    "sum_to_one_tolerance": 1e-12,
+    "probability_minimum": 0.0,
+    "probability_maximum": 1.0
+  },
+  "methodology_version_transition_policy": "SOURCE_NATIVE_CYCLE_METHODOLOGY_MUST_MATCH_CURRENT_REGISTRY; NEW_SOURCE_OR_AUTHORITY_METHOD_REQUIRES_NEW_AUTHORITY_VERSION",
+  "required_output_fields": [
+    "universal_asset_id",
+    "as_of_date",
+    "regime",
+    "probability",
+    "dominant_regime",
+    "dominant_probability",
+    "directional_signal",
+    "confidence",
+    "model_id",
+    "source_methodology_version",
+    "authority_id",
+    "methodology_version",
+    "probability_interpretation"
+  ],
+  "forbidden_semantics": [
+    "STATISTICALLY_CALIBRATED_PROBABILITY_CLAIM",
+    "LEGACY_REGIME_PROBABILITY_COPY_FORWARD",
+    "VEHICLE_RISK_TO_COMMODITY_PROBABILITY_PROJECTION",
+    "COMMODITY_TO_VEHICLE_REGIME_PROJECTION",
+    "HORIZON_SPECIFIC_REGIME_WITHOUT_SEPARATE_GOVERNANCE",
+    "INSUFFICIENT_EVIDENCE_IMPUTATION",
+    "CROSS_METHODOLOGY_REUSE_WITHOUT_NEW_VERSION"
+  ]
+}
