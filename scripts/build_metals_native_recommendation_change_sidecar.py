@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import csv
 import hashlib
+import importlib.util
 import json
 import math
 import os
@@ -24,11 +25,24 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from foundation.production.metals_native_cycle import (  # noqa: E402
-    NativeObservation,
-    evaluate_native_cycle,
-    load_methodology,
-)
+
+def _load_metals_native_cycle_module():
+    """Load metals_native_cycle.py directly without importing foundation.production.__init__."""
+    module_path = ROOT / "foundation" / "production" / "metals_native_cycle.py"
+    module_name = "_uip_metals_native_cycle_for_recommendation_change_v1"
+    spec = importlib.util.spec_from_file_location(module_name, module_path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"unable to load native cycle module: {module_path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[module_name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+_NATIVE_CYCLE = _load_metals_native_cycle_module()
+NativeObservation = _NATIVE_CYCLE.NativeObservation
+evaluate_native_cycle = _NATIVE_CYCLE.evaluate_native_cycle
+load_methodology = _NATIVE_CYCLE.load_methodology
 
 
 def read_json(path: Path) -> dict:
