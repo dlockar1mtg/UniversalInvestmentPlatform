@@ -1,6 +1,7 @@
 from pathlib import Path
 import importlib.util
 import json
+import math
 
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -21,20 +22,20 @@ def test_confidence_haircut_is_conservative_and_monotone():
     module = _load_module()
 
     penalty, adjusted = module.compute_adjustment(0.20, 0.75)
-    assert penalty == 0.05
-    assert adjusted == 0.15
+    assert math.isclose(penalty, 0.05, rel_tol=0.0, abs_tol=1e-12)
+    assert math.isclose(adjusted, 0.15, rel_tol=0.0, abs_tol=1e-12)
 
     penalty, adjusted = module.compute_adjustment(-0.20, 0.75)
-    assert penalty == 0.05
-    assert adjusted == -0.25
+    assert math.isclose(penalty, 0.05, rel_tol=0.0, abs_tol=1e-12)
+    assert math.isclose(adjusted, -0.25, rel_tol=0.0, abs_tol=1e-12)
 
     penalty, adjusted = module.compute_adjustment(0.20, 1.0)
-    assert penalty == 0.0
-    assert adjusted == 0.20
+    assert math.isclose(penalty, 0.0, rel_tol=0.0, abs_tol=1e-12)
+    assert math.isclose(adjusted, 0.20, rel_tol=0.0, abs_tol=1e-12)
 
     penalty, adjusted = module.compute_adjustment(0.0, 0.25)
-    assert penalty == 0.0
-    assert adjusted == 0.0
+    assert math.isclose(penalty, 0.0, rel_tol=0.0, abs_tol=1e-12)
+    assert math.isclose(adjusted, 0.0, rel_tol=0.0, abs_tol=1e-12)
 
     _, positive_high_confidence = module.compute_adjustment(0.20, 0.90)
     _, positive_low_confidence = module.compute_adjustment(0.20, 0.60)
