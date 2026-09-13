@@ -94,9 +94,9 @@ jobs:
           assert evidence["status"] == "FAIL_CLOSED"
           assert evidence["mtg_rich_source_contract_pass"] is True
           assert evidence["metals_rich_source_contract_pass"] is False
-          assert evidence["metals_certified_family_count"] == 5
+          assert evidence["metals_certified_family_count"] == 6
           assert evidence["metals_required_family_count"] == 10
-          assert evidence["metals_remaining_family_count"] == 5
+          assert evidence["metals_remaining_family_count"] == 4
 
           expected_pass = {
               "current_price",
@@ -104,6 +104,7 @@ jobs:
               "data_freshness",
               "platform_health",
               "model_component",
+              "risk",
           }
           actual_pass = {
               key
@@ -113,7 +114,7 @@ jobs:
           assert actual_pass == expected_pass, (actual_pass, expected_pass)
           PY
           test "${{ steps.rich_audit.outputs.audit_status }}" = "1"
-          echo "RICH_PUBLICATION_RECOVERY_STATE=5_OF_10_FAIL_CLOSED_PASS"
+          echo "RICH_PUBLICATION_RECOVERY_STATE=6_OF_10_FAIL_CLOSED_PASS"
 
       - name: Upload rehearsal evidence
         if: always()
