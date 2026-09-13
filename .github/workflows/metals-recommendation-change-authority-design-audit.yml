@@ -1,0 +1,88 @@
+name: Metals Recommendation Change Authority Design Audit
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  recommendation-change-authority-design:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: staging
+    env:
+      UIIP_DATABASE_URL: ${{ secrets.UIIP_DATABASE_URL }}
+    steps:
+      - name: Checkout UIP
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install audit dependencies
+        run: pip install psycopg[binary]
+
+      - name: Validate required database secret
+        run: python -c "import os; assert os.environ.get('UIIP_DATABASE_URL')"
+
+      - name: Audit restored rich Metals lineage read-only
+        run: >-
+          python scripts/audit_metals_rich_lineage.py
+          --output data/operations/metals/recommendation_change_authority_design/restored_lineage.json
+
+      - name: Resolve latest successful Metals Production Cycle artifact
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          run_id="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            '/repos/${{ github.repository }}/actions/workflows/metals-production-cycle.yml/runs?branch=main&status=success&per_page=20' \
+            --jq '.workflow_runs[] | select(.event == "workflow_dispatch" or .event == "schedule") | .id' | head -n 1)"
+          test -n "$run_id"
+          artifact_name="metals-production-${run_id}"
+          artifact_url="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/${{ github.repository }}/actions/runs/${run_id}/artifacts" \
+            --jq ".artifacts[] | select(.name == \"${artifact_name}\") | .archive_download_url" | head -n 1)"
+          test -n "$artifact_url"
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=$artifact_name" >> "$GITHUB_OUTPUT"
+          echo "artifact_url=$artifact_url" >> "$GITHUB_OUTPUT"
+
+      - name: Download certified Metals production artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p incoming/metals
+          gh api "${{ steps.resolve.outputs.artifact_url }}" > incoming/metals.zip
+          unzip -q incoming/metals.zip -d incoming/metals
+
+      - name: Run read-only recommendation change authority design audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          native_cycle="$(find incoming/metals -type f -path '*/native_cycle/latest.json' | head -n 1)"
+          test -n "$native_cycle"
+          python scripts/audit_metals_recommendation_change_authority_design.py \
+            --lineage-evidence data/operations/metals/recommendation_change_authority_design/restored_lineage.json \
+            --native-cycle "$native_cycle" \
+            --methodology config/metals/model_methodology_registry.json \
+            --output data/operations/metals/recommendation_change_authority_design/evidence.json
+
+      - name: Upload recommendation change design evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: metals-recommendation-change-authority-design-${{ github.run_id }}
+          path: data/operations/metals/recommendation_change_authority_design/
+          if-no-files-found: error
+          retention-days: 30
