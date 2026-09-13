@@ -1,0 +1,61 @@
+{
+  "authority_id": "UIP_NATIVE_METALS_UNCERTAINTY_ADJUSTED_V1",
+  "schema_version": "1.0.0",
+  "methodology_version": "1.0.0",
+  "legacy_equivalent": false,
+  "scope": "BENCHMARK_COMMODITY_ASSET_BY_FORECAST_HORIZON",
+  "source_state_mode": "CURRENT_CERTIFIED_NATIVE_CYCLE_ONLY",
+  "model_id": "uip-metals-native-trend-v1",
+  "source_methodology_registry": "config/metals/model_methodology_registry.json",
+  "adjusted_quantity": "ONE_SIDED_CONFIDENCE_HAIRCUT_EXPECTED_RETURN",
+  "adjustment_interpretation": "DESCRIPTIVE_CONSERVATIVE_CONFIDENCE_HAIRCUT_NOT_STATISTICALLY_CALIBRATED_INTERVAL",
+  "output_grain": "ONE_ROW_PER_COMMODITY_PER_FORECAST_HORIZON",
+  "formula": "adjusted_expected_return = raw_expected_return - abs(raw_expected_return) * (1 - confidence)",
+  "uncertainty_penalty_formula": "abs(raw_expected_return) * (1 - confidence)",
+  "confidence_semantics": "USE_NATIVE_FORECAST_CONFIDENCE_AS_GOVERNED_0_TO_1_SHRINKAGE_INPUT_ONLY",
+  "regime_semantics": "CERTIFIED_REGIME_PROBABILITY_V1_CONTEXT_ONLY_NO_NUMERIC_ADJUSTMENT",
+  "risk_semantics": "VEHICLE_ONLY_RISK_V1_EXCLUDED_UNTIL_EXPLICIT_COMMODITY_MAPPING_IS_GOVERNED",
+  "monotonicity_requirements": [
+    "uncertainty_penalty_is_nonnegative",
+    "adjusted_expected_return_is_never_greater_than_raw_expected_return",
+    "for_positive_raw_return_lower_confidence_cannot_increase_adjusted_return",
+    "for_negative_raw_return lower_confidence_cannot_make_adjusted_return_less_negative",
+    "confidence_one_produces_zero_penalty_and_exact_raw_return",
+    "raw_return_zero_produces_zero_penalty_and_zero_adjusted_return"
+  ],
+  "horizon_semantics": "APPLY_IDENTICAL_FORMULA_INDEPENDENTLY_TO_EACH_NATIVE_FORECAST_HORIZON",
+  "minimum_evidence": {
+    "native_forecast_required": true,
+    "native_confidence_required": true,
+    "regime_probability_v1_asset_context_required": true,
+    "insufficient_evidence_behavior": "FAIL_CLOSED"
+  },
+  "required_output_fields": [
+    "universal_asset_id",
+    "as_of_date",
+    "horizon_months",
+    "raw_expected_return",
+    "confidence",
+    "uncertainty_penalty",
+    "adjusted_expected_return",
+    "dominant_regime",
+    "dominant_regime_probability",
+    "model_id",
+    "source_methodology_version",
+    "authority_id",
+    "methodology_version",
+    "adjustment_interpretation"
+  ],
+  "forbidden_semantics": [
+    "STATISTICALLY_CALIBRATED_INTERVAL_CLAIM",
+    "LEGACY_UNCERTAINTY_ADJUSTED_COPY_FORWARD",
+    "VEHICLE_RISK_TO_COMMODITY_ADJUSTMENT_PROJECTION",
+    "REGIME_SUPPORT_NUMERIC_DOUBLE_COUNTING",
+    "COMMODITY_TO_VEHICLE_ADJUSTED_FORECAST_PROJECTION",
+    "CROSS_ASSET_RANKING",
+    "PORTFOLIO_ALLOCATION",
+    "AUTOMATIC_EXECUTION",
+    "INSUFFICIENT_EVIDENCE_IMPUTATION",
+    "CROSS_METHODOLOGY_REUSE_WITHOUT_NEW_VERSION"
+  ]
+}
