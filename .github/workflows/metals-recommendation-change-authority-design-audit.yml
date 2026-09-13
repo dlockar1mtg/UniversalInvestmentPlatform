@@ -44,13 +44,13 @@ jobs:
           run_id="$(gh api \
             -H 'Accept: application/vnd.github+json' \
             '/repos/${{ github.repository }}/actions/workflows/metals-production-cycle.yml/runs?branch=main&status=success&per_page=20' \
-            --jq '.workflow_runs[] | select(.event == "workflow_dispatch" or .event == "schedule") | .id' | head -n 1)"
+            --jq '[.workflow_runs[] | select(.event == "workflow_dispatch" or .event == "schedule")][0].id // empty')"
           test -n "$run_id"
           artifact_name="metals-production-${run_id}"
           artifact_url="$(gh api \
             -H 'Accept: application/vnd.github+json' \
             "/repos/${{ github.repository }}/actions/runs/${run_id}/artifacts" \
-            --jq ".artifacts[] | select(.name == \"${artifact_name}\") | .archive_download_url" | head -n 1)"
+            --jq "[.artifacts[] | select(.name == \"${artifact_name}\")][0].archive_download_url // empty")"
           test -n "$artifact_url"
           echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
           echo "artifact_name=$artifact_name" >> "$GITHUB_OUTPUT"
@@ -70,7 +70,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          native_cycle="$(find incoming/metals -type f -path '*/native_cycle/latest.json' | head -n 1)"
+          native_cycle="$(find incoming/metals -type f -path '*/native_cycle/latest.json' -print -quit)"
           test -n "$native_cycle"
           python scripts/audit_metals_recommendation_change_authority_design.py \
             --lineage-evidence data/operations/metals/recommendation_change_authority_design/restored_lineage.json \
