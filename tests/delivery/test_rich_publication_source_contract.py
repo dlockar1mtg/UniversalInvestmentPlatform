@@ -26,7 +26,7 @@ def test_mtg_contracts_pin_exact_certified_hashes():
     assert expected["precollector_scenario"]["sha256"] == "74caad4f8d39ce255455854ab5a5459779f6e73adc0afebc8269e769858aed0a"
 
 
-def test_metals_native_contracts_cover_exactly_seven_certified_families():
+def test_metals_native_contracts_cover_exactly_eight_certified_families():
     module = _load_module()
     contracts = module.NATIVE_METALS_CERTIFIED_CONTRACTS
     assert set(contracts) == {
@@ -37,6 +37,7 @@ def test_metals_native_contracts_cover_exactly_seven_certified_families():
         "model_component",
         "risk",
         "recommendation_change",
+        "regime_probability",
     }
     assert contracts["current_price"]["expected_rows"] == 11
     assert contracts["data_freshness"]["expected_rows"] == 20
@@ -44,12 +45,14 @@ def test_metals_native_contracts_cover_exactly_seven_certified_families():
     assert contracts["model_component"]["expected_rows"] == 81
     assert contracts["risk"]["expected_rows"] == 11
     assert contracts["recommendation_change"]["minimum_rows"] == 1
+    assert contracts["regime_probability"]["expected_rows"] == 27
     assert contracts["data_freshness"]["manifest_authority"] == "UIP_NATIVE_METALS_DATA_FRESHNESS_V1"
     assert contracts["platform_health"]["manifest_authority"] == "UIP_NATIVE_METALS_PLATFORM_HEALTH_V1"
     assert contracts["model_component"]["manifest_authority"] == "UIP_NATIVE_METALS_MODEL_COMPONENT_V1"
     assert contracts["model_component"]["expected_source_model_ids"] == ["uip-metals-native-trend-v1"]
     assert contracts["risk"]["manifest_authority"] == "UIP_NATIVE_METALS_RISK_V1"
     assert contracts["recommendation_change"]["manifest_authority"] == "UIP_NATIVE_METALS_RECOMMENDATION_CHANGE_V1"
+    assert contracts["regime_probability"]["manifest_authority"] == "UIP_NATIVE_METALS_REGIME_PROBABILITY_V1"
 
     expected_risk = contracts["risk"]["expected_manifest_values"]
     assert expected_risk["methodology_version"] == "1.0.2"
@@ -66,6 +69,17 @@ def test_metals_native_contracts_cover_exactly_seven_certified_families():
     assert expected_change["vehicle_recommendation_projection_performed"] is False
     assert expected_change["legacy_rows_copied_forward"] is False
 
+    expected_regime = contracts["regime_probability"]["expected_manifest_values"]
+    assert expected_regime["methodology_version"] == "1.0.0"
+    assert expected_regime["scope"] == "BENCHMARK_COMMODITY_ASSET_ONLY"
+    assert expected_regime["source_state_mode"] == "CURRENT_CERTIFIED_NATIVE_CYCLE_ONLY"
+    assert expected_regime["probability_interpretation"] == "DESCRIPTIVE_NORMALIZED_REGIME_SUPPORT_NOT_STATISTICALLY_CALIBRATED"
+    assert expected_regime["regime_taxonomy"] == ["POSITIVE_TREND", "NEUTRAL_OR_MIXED", "NEGATIVE_TREND"]
+    assert expected_regime["statistical_calibration_claimed"] is False
+    assert expected_regime["vehicle_risk_projection_performed"] is False
+    assert expected_regime["commodity_to_vehicle_regime_projection_performed"] is False
+    assert expected_regime["legacy_rows_copied_forward"] is False
+
 
 def test_metals_native_contracts_require_publication_safety_flags():
     module = _load_module()
@@ -80,17 +94,19 @@ def test_metals_native_contracts_require_publication_safety_flags():
         "model_component",
         "risk",
         "recommendation_change",
+        "regime_probability",
     ):
         assert module.NATIVE_METALS_CERTIFIED_CONTRACTS[family]["require_nonlegacy"] is True
 
 
-def test_rehearsal_certifies_seven_of_ten_without_opening_publication_gate():
+def test_rehearsal_certifies_eight_of_ten_without_opening_publication_gate():
     workflow = WORKFLOW.read_text(encoding="utf-8")
     assert 'assert evidence["status"] == "FAIL_CLOSED"' in workflow
-    assert 'assert evidence["metals_certified_family_count"] == 7' in workflow
+    assert 'assert evidence["metals_certified_family_count"] == 8' in workflow
     assert 'assert evidence["metals_required_family_count"] == 10' in workflow
-    assert 'assert evidence["metals_remaining_family_count"] == 3' in workflow
+    assert 'assert evidence["metals_remaining_family_count"] == 2' in workflow
     assert '"risk",' in workflow
     assert '"recommendation_change",' in workflow
+    assert '"regime_probability",' in workflow
     assert 'test "${{ steps.rich_audit.outputs.audit_status }}" = "1"' in workflow
-    assert "RICH_PUBLICATION_RECOVERY_STATE=7_OF_10_FAIL_CLOSED_PASS" in workflow
+    assert "RICH_PUBLICATION_RECOVERY_STATE=8_OF_10_FAIL_CLOSED_PASS" in workflow
