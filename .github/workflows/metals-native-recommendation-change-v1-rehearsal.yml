@@ -1,0 +1,139 @@
+name: Metals Native Recommendation Change V1 Rehearsal
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  recommendation-change-v1:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: staging
+    env:
+      UIIP_DATABASE_URL: ${{ secrets.UIIP_DATABASE_URL }}
+    steps:
+      - name: Checkout UIP
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install dependencies
+        run: pip install psycopg[binary] pytest
+
+      - name: Validate required database secret
+        run: python -c "import os; assert os.environ.get('UIIP_DATABASE_URL')"
+
+      - name: Run Recommendation Change V1 unit tests
+        run: pytest -q tests/production/test_metals_native_recommendation_change_v1.py
+
+      - name: Resolve latest successful Metals Production Cycle artifact
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          run_id="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            '/repos/${{ github.repository }}/actions/workflows/metals-production-cycle.yml/runs?branch=main&status=success&per_page=20' \
+            --jq '[.workflow_runs[] | select(.event == "workflow_dispatch" or .event == "schedule")][0].id // empty')"
+          test -n "$run_id"
+          artifact_name="metals-production-${run_id}"
+          artifact_url="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/${{ github.repository }}/actions/runs/${run_id}/artifacts" \
+            --jq "[.artifacts[] | select(.name == \"${artifact_name}\")][0].archive_download_url // empty")"
+          test -n "$artifact_url"
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=$artifact_name" >> "$GITHUB_OUTPUT"
+          echo "artifact_url=$artifact_url" >> "$GITHUB_OUTPUT"
+
+      - name: Download certified Metals production artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p incoming/metals
+          gh api "${{ steps.resolve.outputs.artifact_url }}" > incoming/metals.zip
+          unzip -q incoming/metals.zip -d incoming/metals
+
+      - name: Build Recommendation Change V1 rehearsal sidecar
+        shell: bash
+        run: |
+          set -euo pipefail
+          native_cycle="$(find incoming/metals -type f -path '*/native_cycle/latest.json' -print -quit)"
+          test -n "$native_cycle"
+          python scripts/build_metals_native_recommendation_change_sidecar.py \
+            --contract config/presentation/metals_recommendation_change_v1.json \
+            --methodology config/metals/model_methodology_registry.json \
+            --native-cycle "$native_cycle" \
+            --output-root data/operations/metals/native_recommendation_change_v1
+
+      - name: Certify Recommendation Change V1 shape and safety
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import csv
+          import json
+          from pathlib import Path
+
+          root = Path('data/operations/metals/native_recommendation_change_v1')
+          manifest = json.loads((root / 'manifest.json').read_text(encoding='utf-8'))
+          with (root / 'metals_recommendation_change.csv').open('r', encoding='utf-8', newline='') as handle:
+              rows = list(csv.DictReader(handle))
+
+          assert manifest['status'] == 'METALS_NATIVE_RECOMMENDATION_CHANGE_V1_PASS'
+          assert manifest['authority_id'] == 'UIP_NATIVE_METALS_RECOMMENDATION_CHANGE_V1'
+          assert manifest['schema_version'] == '1.0.0'
+          assert manifest['methodology_version'] == '1.0.0'
+          assert manifest['legacy_equivalent'] is False
+          assert manifest['scope'] == 'BENCHMARK_COMMODITY_ASSET_ONLY'
+          assert manifest['reconstruction_mode'] == 'RETROSPECTIVE_CANONICAL_OBSERVATION_REPLAY'
+          assert manifest['model_id'] == 'uip-metals-native-trend-v1'
+          assert manifest['source_methodology_version'] == '1.0.0'
+          assert manifest['latest_state_parity'] is True
+          assert manifest['latest_state_asset_count'] == 9
+          assert manifest['evaluation_date_count'] > 1
+          assert manifest['change_row_count'] == len(rows)
+          assert manifest['first_observation_behavior'] == 'BASELINE_ONLY_NO_CHANGE_EVENT'
+          assert manifest['no_op_behavior'] == 'OMIT_REPEATED_RECOMMENDATION'
+          assert manifest['same_date_multi_source_method'] == 'LATEST_COLLECTED_REVISION_WINS'
+          assert manifest['benchmark_reconciliation']['raw_row_count'] >= manifest['benchmark_reconciliation']['canonical_row_count']
+          assert manifest['vehicle_reconciliation']['raw_row_count'] >= manifest['vehicle_reconciliation']['canonical_row_count']
+          assert manifest['postgres_write_performed'] is False
+          assert manifest['source_collection_performed'] is False
+          assert manifest['publication_staged'] is False
+          assert manifest['publication_activated'] is False
+          assert manifest['vehicle_recommendation_projection_performed'] is False
+          assert manifest['legacy_rows_copied_forward'] is False
+
+          allowed = {'STRONG_BUY', 'BUY', 'HOLD', 'REDUCE', 'AVOID'}
+          for row in rows:
+              assert row['universal_asset_id'].startswith('metals:commodity:')
+              assert not row['universal_asset_id'].startswith('metals:vehicle:')
+              assert row['previous_recommendation'] in allowed
+              assert row['current_recommendation'] in allowed
+              assert row['previous_recommendation'] != row['current_recommendation']
+              assert row['transition_direction'] in {'UPGRADE', 'DOWNGRADE'}
+              assert row['authority_id'] == 'UIP_NATIVE_METALS_RECOMMENDATION_CHANGE_V1'
+              assert row['methodology_version'] == '1.0.0'
+
+          print('METALS_NATIVE_RECOMMENDATION_CHANGE_V1_REHEARSAL=PASS')
+          PY
+
+      - name: Upload Recommendation Change V1 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: metals-native-recommendation-change-v1-${{ github.run_id }}
+          path: data/operations/metals/native_recommendation_change_v1/
+          if-no-files-found: error
+          retention-days: 30

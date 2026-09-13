@@ -1,0 +1,55 @@
+{
+  "authority_id": "UIP_NATIVE_METALS_RECOMMENDATION_CHANGE_V1",
+  "schema_version": "1.0.0",
+  "methodology_version": "1.0.0",
+  "legacy_equivalent": false,
+  "scope": "BENCHMARK_COMMODITY_ASSET_ONLY",
+  "reconstruction_mode": "RETROSPECTIVE_CANONICAL_OBSERVATION_REPLAY",
+  "model_id": "uip-metals-native-trend-v1",
+  "source_methodology_registry": "config/metals/model_methodology_registry.json",
+  "evaluation_cadence": "UNION_OF_CANONICAL_BENCHMARK_AND_VEHICLE_OBSERVATION_DATES",
+  "temporal_cutoff_rule": "OBSERVATION_DATE_LE_EVALUATION_DATE",
+  "first_observation_behavior": "BASELINE_ONLY_NO_CHANGE_EVENT",
+  "no_op_behavior": "OMIT_REPEATED_RECOMMENDATION",
+  "change_event_grain": "ONE_ROW_PER_COMMODITY_RECOMMENDATION_TRANSITION",
+  "latest_state_parity_required": true,
+  "methodology_version_transition_policy": "SINGLE_FROZEN_REGISTRY_VERSION_PER_RECONSTRUCTION; NEW_VERSION_REQUIRES_NEW_AUTHORITY_METHODOLOGY_VERSION",
+  "benchmark_value_semantics": "NATIVE_OBSERVATION_VALUE",
+  "vehicle_value_semantics": "ADJUSTED_CLOSE_IF_AVAILABLE_ELSE_CLOSE",
+  "same_date_multi_source_policy": {
+    "method": "LATEST_COLLECTED_REVISION_WINS",
+    "latest_timestamp_tie_relative_tolerance": 1e-9,
+    "latest_timestamp_tie_absolute_tolerance": 1e-8,
+    "conflicting_latest_timestamp_tie_behavior": "FAIL_CLOSED",
+    "missing_or_invalid_collected_at_behavior": "FAIL_CLOSED"
+  },
+  "recommendation_order_worst_to_best": [
+    "AVOID",
+    "REDUCE",
+    "HOLD",
+    "BUY",
+    "STRONG_BUY"
+  ],
+  "required_output_fields": [
+    "universal_asset_id",
+    "evaluation_date",
+    "previous_evaluation_date",
+    "previous_recommendation",
+    "current_recommendation",
+    "transition_direction",
+    "model_id",
+    "source_methodology_version",
+    "authority_id",
+    "methodology_version",
+    "reconstruction_mode"
+  ],
+  "forbidden_semantics": [
+    "COMMODITY_TO_VEHICLE_RECOMMENDATION_PROJECTION",
+    "LEGACY_RECOMMENDATION_CHANGE_COPY_FORWARD",
+    "AVERAGE_CONFLICTING_SAME_DATE_SOURCE_VALUES",
+    "ARBITRARY_SOURCE_NAME_PRECEDENCE",
+    "FIRST_OBSERVATION_AS_CHANGE_EVENT",
+    "NO_OP_AS_CHANGE_EVENT",
+    "CROSS_METHODOLOGY_RECONSTRUCTION_WITHOUT_NEW_VERSION"
+  ]
+}
