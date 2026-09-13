@@ -1,0 +1,97 @@
+name: Metals Uncertainty Adjusted Authority Design Audit
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  uncertainty-adjusted-authority-design:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    environment: staging
+    env:
+      UIIP_DATABASE_URL: ${{ secrets.UIIP_DATABASE_URL }}
+    steps:
+      - name: Checkout UIP
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install audit dependencies
+        run: pip install psycopg[binary]
+
+      - name: Validate required database secret
+        run: python -c "import os; assert os.environ.get('UIIP_DATABASE_URL')"
+
+      - name: Audit restored rich Metals lineage read-only
+        run: >-
+          python scripts/audit_metals_rich_lineage.py
+          --output data/operations/metals/uncertainty_adjusted_authority_design/restored_lineage.json
+
+      - name: Resolve latest successful Metals Production Cycle artifact
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          run_id="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            '/repos/${{ github.repository }}/actions/workflows/metals-production-cycle.yml/runs?branch=main&status=success&per_page=20' \
+            --jq '[.workflow_runs[] | select(.event == "workflow_dispatch" or .event == "schedule")][0].id // empty')"
+          test -n "$run_id"
+          artifact_name="metals-production-${run_id}"
+          artifact_url="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/${{ github.repository }}/actions/runs/${run_id}/artifacts" \
+            --jq "[.artifacts[] | select(.name == \"${artifact_name}\")][0].archive_download_url // empty")"
+          test -n "$artifact_url"
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=$artifact_name" >> "$GITHUB_OUTPUT"
+          echo "artifact_url=$artifact_url" >> "$GITHUB_OUTPUT"
+
+      - name: Download certified Metals production artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p incoming/metals
+          gh api "${{ steps.resolve.outputs.artifact_url }}" > incoming/metals.zip
+          unzip -q incoming/metals.zip -d incoming/metals
+
+      - name: Run read-only uncertainty adjusted authority design audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          native_cycle="$(find incoming/metals -type f -path '*/native_cycle/latest.json' -print -quit)"
+          regime_manifest="$(find incoming/metals -type f -path '*/native_regime_probability_v1/manifest.json' -print -quit)"
+          risk_manifest="$(find incoming/metals -type f -path '*/native_risk_v1/manifest.json' -print -quit)"
+          recommendation_change_manifest="$(find incoming/metals -type f -path '*/native_recommendation_change_v1/manifest.json' -print -quit)"
+          test -n "$native_cycle"
+          test -n "$regime_manifest"
+          test -n "$risk_manifest"
+          test -n "$recommendation_change_manifest"
+          python scripts/audit_metals_uncertainty_adjusted_authority_design.py \
+            --lineage-evidence data/operations/metals/uncertainty_adjusted_authority_design/restored_lineage.json \
+            --native-cycle "$native_cycle" \
+            --regime-probability-manifest "$regime_manifest" \
+            --risk-manifest "$risk_manifest" \
+            --recommendation-change-manifest "$recommendation_change_manifest" \
+            --methodology config/metals/model_methodology_registry.json \
+            --output data/operations/metals/uncertainty_adjusted_authority_design/evidence.json
+
+      - name: Upload uncertainty adjusted design evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: metals-uncertainty-adjusted-authority-design-${{ github.run_id }}
+          path: data/operations/metals/uncertainty_adjusted_authority_design/
+          if-no-files-found: error
+          retention-days: 30
