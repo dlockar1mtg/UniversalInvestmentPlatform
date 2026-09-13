@@ -26,7 +26,7 @@ def test_mtg_contracts_pin_exact_certified_hashes():
     assert expected["precollector_scenario"]["sha256"] == "74caad4f8d39ce255455854ab5a5459779f6e73adc0afebc8269e769858aed0a"
 
 
-def test_metals_native_contracts_cover_exactly_five_certified_families():
+def test_metals_native_contracts_cover_exactly_six_certified_families():
     module = _load_module()
     contracts = module.NATIVE_METALS_CERTIFIED_CONTRACTS
     assert set(contracts) == {
@@ -35,15 +35,23 @@ def test_metals_native_contracts_cover_exactly_five_certified_families():
         "data_freshness",
         "platform_health",
         "model_component",
+        "risk",
     }
     assert contracts["current_price"]["expected_rows"] == 11
     assert contracts["data_freshness"]["expected_rows"] == 20
     assert contracts["platform_health"]["expected_rows"] == 1
     assert contracts["model_component"]["expected_rows"] == 81
+    assert contracts["risk"]["expected_rows"] == 11
     assert contracts["data_freshness"]["manifest_authority"] == "UIP_NATIVE_METALS_DATA_FRESHNESS_V1"
     assert contracts["platform_health"]["manifest_authority"] == "UIP_NATIVE_METALS_PLATFORM_HEALTH_V1"
     assert contracts["model_component"]["manifest_authority"] == "UIP_NATIVE_METALS_MODEL_COMPONENT_V1"
     assert contracts["model_component"]["expected_source_model_ids"] == ["uip-metals-native-trend-v1"]
+    assert contracts["risk"]["manifest_authority"] == "UIP_NATIVE_METALS_RISK_V1"
+    expected_risk = contracts["risk"]["expected_manifest_values"]
+    assert expected_risk["methodology_version"] == "1.0.2"
+    assert expected_risk["scope"] == "VEHICLE_ONLY"
+    assert expected_risk["same_date_multi_source_method"] == "LATEST_COLLECTED_REVISION_WINS"
+    assert expected_risk["source_authority"] == "UIP_NATIVE_METALS_VEHICLE_OBSERVATIONS_V1"
 
 
 def test_metals_native_contracts_require_publication_safety_flags():
@@ -53,15 +61,16 @@ def test_metals_native_contracts_require_publication_safety_flags():
         "publication_staged",
         "publication_activated",
     )
-    for family in ("data_freshness", "platform_health", "model_component"):
+    for family in ("data_freshness", "platform_health", "model_component", "risk"):
         assert module.NATIVE_METALS_CERTIFIED_CONTRACTS[family]["require_nonlegacy"] is True
 
 
-def test_rehearsal_certifies_five_of_ten_without_opening_publication_gate():
+def test_rehearsal_certifies_six_of_ten_without_opening_publication_gate():
     workflow = WORKFLOW.read_text(encoding="utf-8")
     assert 'assert evidence["status"] == "FAIL_CLOSED"' in workflow
-    assert 'assert evidence["metals_certified_family_count"] == 5' in workflow
+    assert 'assert evidence["metals_certified_family_count"] == 6' in workflow
     assert 'assert evidence["metals_required_family_count"] == 10' in workflow
-    assert 'assert evidence["metals_remaining_family_count"] == 5' in workflow
+    assert 'assert evidence["metals_remaining_family_count"] == 4' in workflow
+    assert '"risk",' in workflow
     assert 'test "${{ steps.rich_audit.outputs.audit_status }}" = "1"' in workflow
-    assert "RICH_PUBLICATION_RECOVERY_STATE=5_OF_10_FAIL_CLOSED_PASS" in workflow
+    assert "RICH_PUBLICATION_RECOVERY_STATE=6_OF_10_FAIL_CLOSED_PASS" in workflow
