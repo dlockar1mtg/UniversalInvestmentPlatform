@@ -117,6 +117,34 @@ NATIVE_METALS_CERTIFIED_CONTRACTS = {
         ],
         "expected_source_model_ids": ["uip-metals-native-trend-v1"],
     },
+    "risk": {
+        "csv": "operations/metals/native_risk_v1/risk.csv",
+        "manifest": "operations/metals/native_risk_v1/manifest.json",
+        "manifest_status": "METALS_NATIVE_RISK_V1_PASS",
+        "manifest_authority_key": "authority_id",
+        "manifest_authority": "UIP_NATIVE_METALS_RISK_V1",
+        "row_count_key": "row_count",
+        "expected_rows": 11,
+        "require_nonlegacy": True,
+        "output_sha_key": "output_sha256",
+        "expected_manifest_values": {
+            "schema_version": "1.0.0",
+            "methodology_version": "1.0.2",
+            "scope": "VEHICLE_ONLY",
+            "vehicle_count": 11,
+            "lookback_observations": 252,
+            "minimum_observations": 252,
+            "return_convention": "SIMPLE_CLOSE_TO_CLOSE_DAILY_RETURN",
+            "annualization_factor": 252,
+            "var_method": "HISTORICAL_EMPIRICAL",
+            "var_confidence_level": 0.95,
+            "price_semantics": "UNADJUSTED_CLOSE",
+            "source_authority": "UIP_NATIVE_METALS_VEHICLE_OBSERVATIONS_V1",
+            "same_date_multi_source_method": "LATEST_COLLECTED_REVISION_WINS",
+            "conflicting_latest_timestamp_tie_behavior": "FAIL_CLOSED",
+            "missing_or_invalid_collected_at_behavior": "FAIL_CLOSED",
+        },
+    },
 }
 
 SAFETY_FALSE_KEYS = (
@@ -196,6 +224,8 @@ def audit_certified_metals_family(root: Path, family: str, spec: dict) -> dict:
         checks["component_names"] = manifest.get("component_names") == spec["expected_component_names"]
     if spec.get("expected_source_model_ids"):
         checks["source_model_ids"] = manifest.get("source_model_ids") == spec["expected_source_model_ids"]
+    for key, expected in (spec.get("expected_manifest_values") or {}).items():
+        checks[f"manifest_{key}"] = manifest.get(key) == expected
 
     result.update(
         {
