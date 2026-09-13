@@ -1,0 +1,134 @@
+name: Metals Native Regime Probability V1 Rehearsal
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: metals-native-regime-probability-v1-rehearsal
+  cancel-in-progress: false
+
+jobs:
+  rehearse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout UIP
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install test dependency
+        run: pip install pytest
+
+      - name: Run Regime Probability V1 unit tests
+        run: pytest -q tests/delivery/test_metals_native_regime_probability_v1.py
+
+      - name: Resolve latest successful Metals Production Cycle artifact
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          run_id="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            '/repos/${{ github.repository }}/actions/workflows/metals-production-cycle.yml/runs?branch=main&status=success&per_page=20' \
+            --jq '[.workflow_runs[] | select(.event == "workflow_dispatch" or .event == "schedule")][0].id // empty')"
+          test -n "$run_id"
+          artifact_name="metals-production-${run_id}"
+          artifact_url="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/${{ github.repository }}/actions/runs/${run_id}/artifacts" \
+            --jq "[.artifacts[] | select(.name == \"${artifact_name}\")][0].archive_download_url // empty")"
+          test -n "$artifact_url"
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=$artifact_name" >> "$GITHUB_OUTPUT"
+          echo "artifact_url=$artifact_url" >> "$GITHUB_OUTPUT"
+          echo "REGIME_PROBABILITY_SOURCE run_id=${run_id} artifact=${artifact_name}"
+
+      - name: Download certified Metals production artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p incoming/metals
+          gh api "${{ steps.resolve.outputs.artifact_url }}" > incoming/metals.zip
+          unzip -q incoming/metals.zip -d incoming/metals
+
+      - name: Build Regime Probability V1 rehearsal sidecar
+        shell: bash
+        run: |
+          set -euo pipefail
+          native_cycle="$(find incoming/metals -type f -path '*/native_cycle/latest.json' -print -quit)"
+          test -n "$native_cycle"
+          python scripts/build_metals_native_regime_probability_sidecar.py \
+            --contract config/presentation/metals_regime_probability_v1.json \
+            --methodology config/metals/model_methodology_registry.json \
+            --native-cycle "$native_cycle" \
+            --output-root data/operations/metals/native_regime_probability_v1
+
+      - name: Certify Regime Probability V1 rehearsal shape and safety
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import csv
+          import json
+          import math
+          from collections import defaultdict
+          from pathlib import Path
+
+          root = Path('data/operations/metals/native_regime_probability_v1')
+          manifest = json.loads((root / 'manifest.json').read_text())
+          rows = list(csv.DictReader((root / 'metals_regime_probability.csv').open()))
+
+          assert manifest['status'] == 'METALS_NATIVE_REGIME_PROBABILITY_V1_PASS'
+          assert manifest['authority_id'] == 'UIP_NATIVE_METALS_REGIME_PROBABILITY_V1'
+          assert manifest['legacy_equivalent'] is False
+          assert manifest['scope'] == 'BENCHMARK_COMMODITY_ASSET_ONLY'
+          assert manifest['probability_interpretation'] == 'DESCRIPTIVE_NORMALIZED_REGIME_SUPPORT_NOT_STATISTICALLY_CALIBRATED'
+          assert manifest['regime_taxonomy'] == ['POSITIVE_TREND', 'NEUTRAL_OR_MIXED', 'NEGATIVE_TREND']
+          assert manifest['regime_count'] == 3
+          assert manifest['asset_count'] == 9
+          assert manifest['row_count'] == 27 == len(rows)
+          assert manifest['source_forecast_count'] == 27
+          assert manifest['source_horizons_months'] == [12, 36, 60]
+          assert manifest['postgres_write_performed'] is False
+          assert manifest['source_collection_performed'] is False
+          assert manifest['publication_staged'] is False
+          assert manifest['publication_activated'] is False
+          assert manifest['vehicle_risk_projection_performed'] is False
+          assert manifest['commodity_to_vehicle_regime_projection_performed'] is False
+          assert manifest['legacy_rows_copied_forward'] is False
+          assert manifest['statistical_calibration_claimed'] is False
+
+          by_asset = defaultdict(list)
+          for row in rows:
+              by_asset[row['universal_asset_id']].append(row)
+          assert len(by_asset) == 9
+          for asset, asset_rows in by_asset.items():
+              assert len(asset_rows) == 3
+              assert {row['regime'] for row in asset_rows} == set(manifest['regime_taxonomy'])
+              total = sum(float(row['probability']) for row in asset_rows)
+              assert math.isclose(total, 1.0, rel_tol=0.0, abs_tol=1e-10), (asset, total)
+              assert len({row['dominant_regime'] for row in asset_rows}) == 1
+              assert all(0.0 <= float(row['probability']) <= 1.0 for row in asset_rows)
+          PY
+          echo "METALS_NATIVE_REGIME_PROBABILITY_V1_REHEARSAL=PASS"
+
+      - name: Upload Regime Probability V1 rehearsal evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: metals-native-regime-probability-v1-${{ github.run_id }}
+          path: data/operations/metals/native_regime_probability_v1/
+          if-no-files-found: error
+          retention-days: 30
