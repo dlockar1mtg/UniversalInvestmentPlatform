@@ -32,8 +32,33 @@ def test_projection_covers_exactly_ten_certified_metals_families():
     }
     assert module.FAMILY_PROJECTION["current_price"]["record_type"] == "metals_current_price"
     assert module.FAMILY_PROJECTION["price_history"]["record_type"] == "metals_price_history"
+    assert module.FAMILY_PROJECTION["price_history"]["key_fields"] == (
+        "asset_id",
+        "observation_date",
+        "source_run_id",
+    )
     assert module.FAMILY_PROJECTION["risk"]["record_type"] == "risk"
     assert module.FAMILY_PROJECTION["tactical_state"]["record_type"] == "tactical_state"
+
+
+def test_price_history_revision_key_preserves_same_day_source_revisions():
+    module = _load_projection()
+    fields = module.FAMILY_PROJECTION["price_history"]["key_fields"]
+    original = {
+        "asset_id": "metals:vehicle:BIL",
+        "observation_date": "2026-07-23",
+        "source_run_id": "gha-30205292529",
+    }
+    backfill = {
+        "asset_id": "metals:vehicle:BIL",
+        "observation_date": "2026-07-23",
+        "source_run_id": "metals-market-history-backfill-20260824",
+    }
+    original_key = module._record_key(original, fields, "price_history")
+    backfill_key = module._record_key(backfill, fields, "price_history")
+    assert original_key != backfill_key
+    assert original_key == "metals:vehicle:BIL|2026-07-23|gha-30205292529"
+    assert backfill_key == "metals:vehicle:BIL|2026-07-23|metals-market-history-backfill-20260824"
 
 
 def test_candidate_script_is_non_persistent_and_binds_rich_sources_explicitly():
