@@ -2,6 +2,11 @@ name: UIP Production Publication Cycle
 
 on:
   workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type PUBLISH_REHEARSED_RICH_CANDIDATE to authorize the exact rehearsed rich publication
+        required: true
+        type: string
 
 permissions:
   contents: read
@@ -19,15 +24,20 @@ jobs:
     env:
       UIIP_DATABASE_URL: ${{ secrets.UIIP_DATABASE_URL }}
       SOURCE_TOKEN: ${{ secrets.UIP_SOURCE_ARTIFACTS_TOKEN }}
+      EXPECTED_CRYPTO_RUN_ID: "34871765453"
+      EXPECTED_MTG_RUN_ID: "34768868851"
+      EXPECTED_METALS_RUN_ID: "34849676771"
+      EXPECTED_MTG_HEAD: "2e8b1a77c1bdd3b79141fffc94f84d91222e4266"
+      EXPECTED_RICH_RECORD_COUNT: "14228"
     steps:
       - name: Checkout UIP
         uses: actions/checkout@v4
 
-      - name: Checkout certified MTG contracts
+      - name: Checkout exact rehearsed MTG authority
         uses: actions/checkout@v4
         with:
           repository: dlockar1mtg/mtg-investment-terminal
-          ref: main
+          ref: ${{ env.EXPECTED_MTG_HEAD }}
           token: ${{ secrets.UIP_SOURCE_ARTIFACTS_TOKEN }}
           path: source_repos/mtg
           persist-credentials: false
@@ -41,14 +51,25 @@ jobs:
       - name: Install UIP dependencies
         run: pip install -r requirements.txt -r requirements/phase_7_3.txt
 
-      - name: Validate required secrets
+      - name: Validate exact bounded activation authorization
         shell: bash
+        env:
+          CONFIRMATION: ${{ inputs.confirmation }}
         run: |
           set -euo pipefail
-          test -n "$UIIP_DATABASE_URL" || { echo "UIIP_DATABASE_URL is missing"; exit 1; }
-          test -n "$SOURCE_TOKEN" || { echo "UIP_SOURCE_ARTIFACTS_TOKEN is missing"; exit 1; }
+          test "$CONFIRMATION" = "PUBLISH_REHEARSED_RICH_CANDIDATE" || {
+            echo "Exact rich-publication confirmation token was not provided" >&2
+            exit 1
+          }
+          test -n "$UIIP_DATABASE_URL" || { echo "UIIP_DATABASE_URL is missing" >&2; exit 1; }
+          test -n "$SOURCE_TOKEN" || { echo "UIP_SOURCE_ARTIFACTS_TOKEN is missing" >&2; exit 1; }
+          observed_mtg_head="$(git -C source_repos/mtg rev-parse HEAD)"
+          test "$observed_mtg_head" = "$EXPECTED_MTG_HEAD" || {
+            echo "MTG authority head drifted: $observed_mtg_head" >&2
+            exit 1
+          }
 
-      - name: Resolve and download latest successful source artifacts
+      - name: Download exact rehearsed source artifacts
         shell: bash
         env:
           UIP_TOKEN: ${{ github.token }}
@@ -66,63 +87,96 @@ jobs:
               "$url"
           }
 
-          download_latest() {
+          download_exact() {
             local repo="$1"
-            local workflow="$2"
+            local run_id="$2"
             local artifact_prefix="$3"
             local token="$4"
             local destination="$5"
 
-            local runs_json run_id artifacts_json artifact_id artifact_name
-            runs_json="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/workflows/${workflow}/runs?branch=main&status=success&per_page=30")"
-            run_id="$(printf '%s' "$runs_json" | jq -r '[.workflow_runs[] | select(.event == "schedule" or .event == "workflow_dispatch")][0].id // empty')"
-            test -n "$run_id" || { echo "No successful production run found for ${repo}/${workflow}"; exit 1; }
+            local run_json artifacts_json artifact_id artifact_name
+            run_json="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/runs/${run_id}")"
+            test "$(printf '%s' "$run_json" | jq -r '.status')" = "completed" || {
+              echo "Pinned source run is not completed: ${repo}/${run_id}" >&2
+              exit 1
+            }
+            test "$(printf '%s' "$run_json" | jq -r '.conclusion')" = "success" || {
+              echo "Pinned source run is not successful: ${repo}/${run_id}" >&2
+              exit 1
+            }
+            test "$(printf '%s' "$run_json" | jq -r '.head_branch')" = "main" || {
+              echo "Pinned source run is not from main: ${repo}/${run_id}" >&2
+              exit 1
+            }
+            event="$(printf '%s' "$run_json" | jq -r '.event')"
+            test "$event" = "schedule" -o "$event" = "workflow_dispatch" || {
+              echo "Pinned source run has unauthorized event: ${repo}/${run_id} event=${event}" >&2
+              exit 1
+            }
 
             artifacts_json="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/runs/${run_id}/artifacts?per_page=100")"
             artifact_id="$(printf '%s' "$artifacts_json" | jq -r --arg prefix "$artifact_prefix" '[.artifacts[] | select(.expired == false and (.name | startswith($prefix)))][0].id // empty')"
             artifact_name="$(printf '%s' "$artifacts_json" | jq -r --arg prefix "$artifact_prefix" '[.artifacts[] | select(.expired == false and (.name | startswith($prefix)))][0].name // empty')"
-            test -n "$artifact_id" || { echo "No unexpired artifact matching ${artifact_prefix} for run ${run_id}"; exit 1; }
+            test -n "$artifact_id" || {
+              echo "Pinned source artifact is unavailable: ${repo}/${run_id}/${artifact_prefix}" >&2
+              exit 1
+            }
 
-            echo "SOURCE repo=${repo} workflow=${workflow} run_id=${run_id} artifact=${artifact_name}"
+            echo "PINNED_SOURCE repo=${repo} run_id=${run_id} artifact=${artifact_name}"
             api_get "$token" "https://api.github.com/repos/${repo}/actions/artifacts/${artifact_id}/zip" > "${destination}.zip"
             unzip -q "${destination}.zip" -d "$destination"
           }
 
-          download_latest \
+          download_exact \
             "dlockar1mtg/CryptoIntelligencePlatform" \
-            "crypto-production-cycle.yml" \
+            "$EXPECTED_CRYPTO_RUN_ID" \
             "crypto-production-" \
             "$SOURCE_TOKEN" \
             "incoming/crypto"
 
-          download_latest \
+          download_exact \
             "dlockar1mtg/mtg-investment-terminal" \
-            "mtg-marketplace-production.yml" \
+            "$EXPECTED_MTG_RUN_ID" \
             "mtg-marketplace-production-" \
             "$SOURCE_TOKEN" \
             "incoming/mtg"
 
-          download_latest \
+          download_exact \
             "dlockar1mtg/UniversalInvestmentPlatform" \
-            "metals-production-cycle.yml" \
+            "$EXPECTED_METALS_RUN_ID" \
             "metals-production-" \
             "$UIP_TOKEN" \
             "incoming/metals"
 
-      - name: Build candidate database and atomically publish to PostgreSQL
-        run: |
-          python scripts/publish_latest_domain_artifacts.py \
-            --crypto-artifact incoming/crypto \
-            --metals-artifact incoming/metals \
-            --mtg-artifact incoming/mtg \
-            --mtg-repo source_repos/mtg \
-            --evidence-output data/operations/publication/latest_publication.json
+      - name: Re-certify exact rich source contracts before any PostgreSQL connection
+        run: >-
+          python scripts/audit_rich_publication_source_contract.py
+          --metals-artifact incoming/metals
+          --mtg-repo source_repos/mtg
+          --evidence-output data/operations/publication/rich_production_source_contract.json
 
-      - name: Upload publication evidence
+      - name: Publish exact rehearsed rich candidate atomically
+        run: >-
+          python scripts/publish_rehearsed_rich_candidate.py
+          --confirm PUBLISH_REHEARSED_RICH_CANDIDATE
+          --crypto-artifact incoming/crypto
+          --metals-artifact incoming/metals
+          --mtg-artifact incoming/mtg
+          --mtg-repo source_repos/mtg
+          --expected-mtg-head "$EXPECTED_MTG_HEAD"
+          --crypto-source-run-id "$EXPECTED_CRYPTO_RUN_ID"
+          --metals-source-run-id "$EXPECTED_METALS_RUN_ID"
+          --mtg-source-run-id "$EXPECTED_MTG_RUN_ID"
+          --expected-record-count "$EXPECTED_RICH_RECORD_COUNT"
+          --evidence-output data/operations/publication/latest_rich_publication.json
+
+      - name: Upload rich publication evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: uip-production-publication-${{ github.run_id }}
-          path: data/operations/publication/latest_publication.json
+          name: uip-rich-production-publication-${{ github.run_id }}
+          path: |
+            data/operations/publication/rich_production_source_contract.json
+            data/operations/publication/latest_rich_publication.json
           if-no-files-found: warn
           retention-days: 30
