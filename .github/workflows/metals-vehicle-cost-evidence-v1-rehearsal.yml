@@ -1,0 +1,49 @@
+name: Metals Vehicle Cost Evidence V1 Rehearsal
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Audit issuer-authoritative cost snapshot
+        run: >-
+          python scripts/audit_metals_vehicle_cost_evidence_v1.py
+          --snapshot config/presentation/metals_vehicle_cost_evidence_snapshot_v1.json
+          --output data/operations/metals/vehicle_cost_evidence_v1/audit.json
+
+      - name: Certify fail-closed cost rehearsal state
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          evidence = json.loads(Path('data/operations/metals/vehicle_cost_evidence_v1/audit.json').read_text())
+          assert evidence['status'] == 'METALS_VEHICLE_COST_EVIDENCE_REHEARSAL_PASS'
+          assert evidence['registered_vehicle_count'] == 10
+          assert evidence['issuer_cost_observed_count'] == 9
+          assert evidence['issuer_cost_unresolved_count'] == 1
+          assert evidence['unresolved_tickers'] == ['CPER']
+          assert evidence['preferred_vehicle_ranking_ready'] is False
+          assert evidence['publication_write_performed'] is False
+          assert evidence['ranking_created'] is False
+          print('METALS_VEHICLE_COST_EVIDENCE_V1_REHEARSAL=PASS')
+          PY
+
+      - name: Upload evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: metals-vehicle-cost-evidence-v1-${{ github.run_id }}
+          path: data/operations/metals/vehicle_cost_evidence_v1/audit.json
+          retention-days: 30

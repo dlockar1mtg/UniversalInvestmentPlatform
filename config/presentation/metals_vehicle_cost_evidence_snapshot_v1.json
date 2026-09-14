@@ -1,0 +1,19 @@
+{
+  "authority_id": "UIP_NATIVE_METALS_VEHICLE_COST_EVIDENCE_SNAPSHOT_V1",
+  "schema_version": "1.0.0",
+  "collected_at_utc": "2026-09-14T20:20:00Z",
+  "source_policy": "ISSUER_OR_FUND_AUTHORITY_ONLY",
+  "ranking_authority": false,
+  "vehicles": [
+    {"ticker":"GLD","expense_ratio_pct":0.40,"cost_basis":"gross_expense_ratio","status":"CERTIFIED_SOURCE_OBSERVED","source_url":"https://www.ssga.com/us/en/individual/etfs/spdr-gold-shares-gld","source_authority":"State Street / SPDR Gold Shares","source_as_of":"2026-09-11"},
+    {"ticker":"IAU","expense_ratio_pct":0.25,"cost_basis":"sponsor_fee","status":"CERTIFIED_SOURCE_OBSERVED","source_url":"https://www.ishares.com/us/products/239561/ishares-gold-trust","source_authority":"BlackRock / iShares Gold Trust","source_as_of":"2026-09-10"},
+    {"ticker":"SGOL","expense_ratio_pct":0.17,"cost_basis":"total_expense_ratio","status":"CERTIFIED_SOURCE_OBSERVED","source_url":"https://www.aberdeeninvestments.com/docs?editionId=609cef3b-2b69-4887-b672-3d8fa93b28bd","source_authority":"Aberdeen Investments","source_as_of":"2026-03-31"},
+    {"ticker":"SLV","expense_ratio_pct":0.50,"cost_basis":"sponsor_fee","status":"CERTIFIED_SOURCE_OBSERVED","source_url":"https://www.ishares.com/us/products/239855/ishares-silver-trust-fund","source_authority":"BlackRock / iShares Silver Trust","source_as_of":"2026-09-09"},
+    {"ticker":"SIVR","expense_ratio_pct":0.30,"gross_expense_ratio_pct":0.45,"cost_basis":"net_expense_ratio_with_voluntary_waiver","waiver_note":"Sponsor voluntary fee waiver currently reduces 0.45% gross to 0.30%; current issuer material states waiver through 2027-02-28 and may be withdrawn subject to issuer terms.","status":"CERTIFIED_SOURCE_OBSERVED","source_url":"https://www.aberdeeninvestments.com/en-us/investor/investment-solutions/commodities/sivr","source_authority":"Aberdeen Investments","source_as_of":"2026-09-11"},
+    {"ticker":"PPLT","expense_ratio_pct":0.60,"cost_basis":"total_expense_ratio","status":"CERTIFIED_SOURCE_OBSERVED","source_url":"https://www.aberdeeninvestments.com/en-us/investor/funds/view-all-funds/-us0032601066","source_authority":"Aberdeen Investments","source_as_of":"2026-09-11"},
+    {"ticker":"CPER","expense_ratio_pct":null,"cost_basis":null,"status":"UNRESOLVED_OFFICIAL_RENDERED_VALUE","source_url":"https://www.uscfinvestments.com/cper","source_authority":"USCF Investments","source_as_of":"2026-09-14","note":"Official CPER page exposes the Total Expense Ratio label but the rendered value is blank. Missing remains missing."},
+    {"ticker":"COPX","expense_ratio_pct":0.65,"cost_basis":"total_expense_ratio","status":"CERTIFIED_SOURCE_OBSERVED","source_url":"https://www.globalxetfs.com/funds/copx","source_authority":"Global X","source_as_of":"2026-09-09"},
+    {"ticker":"URA","expense_ratio_pct":0.69,"cost_basis":"total_expense_ratio","status":"CERTIFIED_SOURCE_OBSERVED","source_url":"https://www.globalxetfs.com/funds/ura","source_authority":"Global X","source_as_of":"2026-09-11"},
+    {"ticker":"URNM","expense_ratio_pct":0.75,"cost_basis":"net_total_expense_ratio","status":"CERTIFIED_SOURCE_OBSERVED","source_url":"https://sprottetfs.com/urnm-sprott-uranium-miners-etf","source_authority":"Sprott","source_as_of":"2026-09-09"}
+  ]
+}
