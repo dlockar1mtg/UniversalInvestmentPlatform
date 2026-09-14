@@ -148,6 +148,9 @@ def build_metals_rich_records(artifact_root: Path) -> list[PresentationRecord]:
             if source_asset_id is not None and asset_id != source_asset_id:
                 payload["_rich_source_asset_id"] = source_asset_id
                 payload["_presentation_asset_id"] = asset_id
+            if family == "tactical_state" and row.get("dominant_regime"):
+                payload["candidate_regime"] = row["dominant_regime"]
+                payload["_presentation_schema_alias"] = "candidate_regime<-dominant_regime"
             records.append(
                 PresentationRecord(
                     record_type=record_type,
