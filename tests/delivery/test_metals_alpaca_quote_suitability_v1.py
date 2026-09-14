@@ -43,3 +43,12 @@ def test_suitability_proof_does_not_equal_provider_certification():
     assert "provider_certified'] is False" in text
     assert "quote_collection_authorized'] is False" in text
     assert "preferred_vehicle_ranking_ready'] is False" in text
+
+
+def test_market_holiday_null_quotes_are_empty_but_missing_field_stays_fail_closed():
+    text = SCRIPT.read_text(encoding="utf-8")
+    assert 'if "quotes" not in payload:' in text
+    assert 'if quotes is None:' in text
+    assert 'quotes = []' in text
+    assert 'missing quotes field' in text
+    assert 'quotes field is not a list or null' in text

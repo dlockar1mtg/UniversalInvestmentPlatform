@@ -83,9 +83,22 @@ def _fetch_session_quotes(
         url = f"{BASE_URL}/{urllib.parse.quote(ticker)}/quotes?{urllib.parse.urlencode(params)}"
         payload = _request_json(url, key_id, secret_key)
         pages += 1
-        quotes = payload.get("quotes")
-        if not isinstance(quotes, list):
-            raise RuntimeError(f"Unexpected Alpaca quote payload for {ticker} on {session_date}: missing quotes list")
+
+        if "quotes" not in payload:
+            raise RuntimeError(
+                f"Unexpected Alpaca quote payload for {ticker} on {session_date}: missing quotes field"
+            )
+        quotes = payload["quotes"]
+        if quotes is None:
+            # Alpaca can return an explicit null quote collection for a date with no
+            # market session (for example, a weekday exchange holiday). Treat that
+            # as a valid no-data session and continue probing backward.
+            quotes = []
+        elif not isinstance(quotes, list):
+            raise RuntimeError(
+                f"Unexpected Alpaca quote payload for {ticker} on {session_date}: quotes field is not a list or null"
+            )
+
         rows.extend(quotes)
         next_token = payload.get("next_page_token")
         if not next_token:
