@@ -1,0 +1,61 @@
+name: Metals Vehicle ADV V1 Rehearsal
+
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  rehearsal:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Download pinned certified Metals production artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: metals-production-34849676771
+          path: _metals_artifact
+          github-token: ${{ github.token }}
+          run-id: 34849676771
+
+      - name: Derive read-only 30-session average dollar volume
+        run: >-
+          python scripts/rehearse_metals_vehicle_adv_v1.py
+          --artifact-root _metals_artifact
+          --output data/operations/metals/vehicle_liquidity_v1/adv_rehearsal.json
+
+      - name: Certify ADV rehearsal remains fail-closed for preferred ranking
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          evidence = json.loads(Path('data/operations/metals/vehicle_liquidity_v1/adv_rehearsal.json').read_text())
+          assert evidence['status'] == 'METALS_VEHICLE_ADV_V1_REHEARSAL_PASS'
+          assert evidence['registered_vehicle_count'] == 10
+          assert evidence['adv_complete_vehicle_count'] == 10
+          assert evidence['window_sessions'] == 30
+          assert evidence['adv_evidence_complete'] is True
+          assert evidence['quoted_spread_evidence_complete'] is False
+          assert evidence['preferred_vehicle_ranking_ready'] is False
+          assert evidence['network_collection_performed'] is False
+          assert evidence['publication_write_performed'] is False
+          assert evidence['ranking_created'] is False
+          assert {row['ticker'] for row in evidence['vehicles']} == {'GLD','IAU','SGOL','SLV','SIVR','PPLT','CPER','COPX','URA','URNM'}
+          print('METALS_VEHICLE_ADV_V1_REHEARSAL=PASS')
+          PY
+
+      - name: Upload ADV rehearsal evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: metals-vehicle-adv-v1-${{ github.run_id }}
+          path: data/operations/metals/vehicle_liquidity_v1/adv_rehearsal.json
+          retention-days: 30
