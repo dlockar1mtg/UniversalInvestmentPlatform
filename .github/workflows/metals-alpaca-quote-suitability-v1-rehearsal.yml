@@ -1,0 +1,78 @@
+name: Metals Alpaca Quote Suitability V1 Rehearsal
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: "Type PROVE_ALPACA_SIP_10_TICKER_COVERAGE"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  rehearse:
+    runs-on: ubuntu-latest
+    env:
+      ALPACA_API_KEY_ID: ${{ secrets.ALPACA_API_KEY_ID }}
+      ALPACA_API_SECRET_KEY: ${{ secrets.ALPACA_API_SECRET_KEY }}
+    steps:
+      - name: Validate explicit confirmation
+        shell: bash
+        run: |
+          test "${{ inputs.confirmation }}" = "PROVE_ALPACA_SIP_10_TICKER_COVERAGE" || {
+            echo "Exact confirmation token was not supplied."
+            exit 1
+          }
+
+      - name: Validate credential presence without printing values
+        shell: bash
+        run: |
+          test -n "$ALPACA_API_KEY_ID" || { echo "ALPACA_API_KEY_ID secret is missing."; exit 1; }
+          test -n "$ALPACA_API_SECRET_KEY" || { echo "ALPACA_API_SECRET_KEY secret is missing."; exit 1; }
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Run bounded read-only Alpaca SIP suitability rehearsal
+        run: >-
+          python scripts/rehearse_metals_alpaca_quote_suitability_v1.py
+          --output data/operations/metals/alpaca_quote_suitability_v1/evidence.json
+
+      - name: Certify provider remains non-production after suitability proof
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          evidence = json.loads(Path('data/operations/metals/alpaca_quote_suitability_v1/evidence.json').read_text())
+          assert evidence['status'] == 'METALS_ALPACA_QUOTE_SUITABILITY_REHEARSAL_PASS'
+          assert evidence['provider'] == 'alpaca_market_data'
+          assert evidence['feed'] == 'sip'
+          assert evidence['required_ticker_count'] == 10
+          assert evidence['resolved_ticker_count'] == 10
+          assert evidence['provider_suitability_pass'] is True
+          assert evidence['provider_certified'] is False
+          assert evidence['quote_collection_authorized'] is False
+          assert evidence['preferred_vehicle_ranking_ready'] is False
+          assert evidence['publication_write_performed'] is False
+          assert evidence['credentials_persisted'] is False
+          for ticker, row in evidence['per_ticker'].items():
+              assert row['distinct_regular_market_sessions'] >= 20, ticker
+              assert row['valid_quote_count'] > 0, ticker
+              assert row['feed'] == 'sip', ticker
+              assert row['pagination_complete'] is True, ticker
+          print('METALS_ALPACA_QUOTE_SUITABILITY_V1_REHEARSAL=PASS')
+          PY
+
+      - name: Upload suitability evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: metals-alpaca-quote-suitability-v1-${{ github.run_id }}
+          path: data/operations/metals/alpaca_quote_suitability_v1/evidence.json
+          retention-days: 30
