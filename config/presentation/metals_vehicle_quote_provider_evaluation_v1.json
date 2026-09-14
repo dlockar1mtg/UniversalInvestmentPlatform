@@ -5,7 +5,7 @@
   "provider_candidates": [
     {
       "provider": "alpaca_market_data",
-      "state": "PROVISIONAL_CANDIDATE_PENDING_LIVE_10_TICKER_REHEARSAL",
+      "state": "CERTIFIED_SIP_QUOTE_PROVIDER_SUITABILITY_V1",
       "historical_quote_endpoint": "/v2/stocks/{symbol}/quotes",
       "preferred_feed": "sip",
       "allow_silent_feed_downgrade": false,
@@ -21,10 +21,27 @@
         "20_distinct_regular_market_sessions_per_ticker",
         "deterministic_pagination_complete",
         "feed_and_source_provenance_retained"
-      ]
+      ],
+      "certification_evidence": {
+        "workflow_run_id": 34904378863,
+        "artifact_id": 10372366176,
+        "artifact_digest": "sha256:772f903988a7f8ea94dd2e013f59c96f8eb04ad025231832199cf9f11a7425bd",
+        "source_head_sha": "acfb831b325d262ed5e7662674c6be599c030cc4",
+        "status": "METALS_ALPACA_QUOTE_SUITABILITY_REHEARSAL_PASS",
+        "feed": "sip",
+        "required_ticker_count": 10,
+        "resolved_ticker_count": 10,
+        "minimum_distinct_sessions_per_ticker": 20,
+        "observed_session_window": {
+          "first_session": "2026-08-14",
+          "last_session": "2026-09-11"
+        }
+      }
     }
   ],
-  "provider_certified": false,
+  "provider_certified": true,
+  "certified_provider": "alpaca_market_data",
+  "certified_feed": "sip",
   "quote_collection_authorized": false,
   "preferred_vehicle_ranking_ready": false
 }
