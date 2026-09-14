@@ -1,0 +1,30 @@
+{
+  "authority_id": "UIP_NATIVE_METALS_VEHICLE_QUOTE_PROVIDER_EVALUATION_V1",
+  "schema_version": "1.0.0",
+  "required_tickers": ["GLD","IAU","SGOL","SLV","SIVR","PPLT","CPER","COPX","URA","URNM"],
+  "provider_candidates": [
+    {
+      "provider": "alpaca_market_data",
+      "state": "PROVISIONAL_CANDIDATE_PENDING_LIVE_10_TICKER_REHEARSAL",
+      "historical_quote_endpoint": "/v2/stocks/{symbol}/quotes",
+      "preferred_feed": "sip",
+      "allow_silent_feed_downgrade": false,
+      "structural_support": {
+        "us_stocks_and_etfs": true,
+        "historical_quotes": true,
+        "timestamped_bid_ask": true,
+        "historical_sip_older_than_15_minutes": true
+      },
+      "live_proof_required": [
+        "exact_10_ticker_resolution",
+        "positive_bid_ask_semantics",
+        "20_distinct_regular_market_sessions_per_ticker",
+        "deterministic_pagination_complete",
+        "feed_and_source_provenance_retained"
+      ]
+    }
+  ],
+  "provider_certified": false,
+  "quote_collection_authorized": false,
+  "preferred_vehicle_ranking_ready": false
+}
