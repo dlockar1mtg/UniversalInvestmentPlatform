@@ -10,6 +10,7 @@ import csv
 from pathlib import Path
 from typing import Any
 
+from foundation.presentation.metals_identity_bridge import canonical_presentation_asset_id
 from foundation.presentation.publication_model import PresentationRecord
 from scripts.audit_rich_publication_source_contract import (
     NATIVE_METALS_CERTIFIED_CONTRACTS,
@@ -126,9 +127,14 @@ def build_metals_rich_records(artifact_root: Path) -> list[PresentationRecord]:
             seen.add(identity)
 
             asset_field = projection["asset_field"]
-            asset_id = None if asset_field is None else str(row.get(str(asset_field), "")).strip()
-            if asset_field is not None and not asset_id:
+            source_asset_id = None if asset_field is None else str(row.get(str(asset_field), "")).strip()
+            if asset_field is not None and not source_asset_id:
                 raise RuntimeError(f"Blank asset identity in certified Metals family {family!r}")
+            asset_id = (
+                None
+                if source_asset_id is None
+                else canonical_presentation_asset_id(family, source_asset_id)
+            )
 
             payload: dict[str, Any] = dict(row)
             payload.update(
@@ -139,6 +145,12 @@ def build_metals_rich_records(artifact_root: Path) -> list[PresentationRecord]:
                     "_rich_source_manifest_authority": audit["manifest_authority"],
                 }
             )
+            if source_asset_id is not None and asset_id != source_asset_id:
+                payload["_rich_source_asset_id"] = source_asset_id
+                payload["_presentation_asset_id"] = asset_id
+            if family == "tactical_state" and row.get("dominant_regime"):
+                payload["candidate_regime"] = row["dominant_regime"]
+                payload["_presentation_schema_alias"] = "candidate_regime<-dominant_regime"
             records.append(
                 PresentationRecord(
                     record_type=record_type,
