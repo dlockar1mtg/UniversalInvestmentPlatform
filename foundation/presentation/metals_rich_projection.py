@@ -27,7 +27,7 @@ FAMILY_PROJECTION = {
     "price_history": {
         "record_type": "metals_price_history",
         "asset_field": "asset_id",
-        "key_fields": ("asset_id", "observation_date"),
+        "key_fields": ("asset_id", "observation_date", "source_run_id"),
     },
     "data_freshness": {
         "record_type": "metals_data_freshness",
