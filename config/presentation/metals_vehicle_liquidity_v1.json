@@ -1,0 +1,38 @@
+{
+  "authority_id": "UIP_NATIVE_METALS_VEHICLE_LIQUIDITY_V1",
+  "schema_version": "1.0.0",
+  "methodology_version": "1.0.0",
+  "scope": "REGISTERED_METALS_IMPLEMENTATION_VEHICLES_ONLY",
+  "average_dollar_volume": {
+    "source_authority": "UIP_NATIVE_METALS_VEHICLE_OBSERVATIONS_V1",
+    "window_sessions": 30,
+    "formula": "mean(close_usd * volume) over the latest 30 distinct trading sessions",
+    "minimum_sessions": 30,
+    "same_date_revision_policy": "latest governed source revision for each ticker/session",
+    "missing_values_may_default": false
+  },
+  "quoted_spread": {
+    "required_metric": "median_relative_bid_ask_spread_bps",
+    "window_sessions": 20,
+    "required_observation_fields": ["ticker", "observation_date", "bid", "ask", "observed_at_utc", "source_authority"],
+    "formula": "median(((ask-bid)/((ask+bid)/2))*10000) across valid quote observations in the latest 20 trading sessions",
+    "minimum_sessions": 20,
+    "daily_ohlcv_may_proxy_spread": false,
+    "missing_values_may_default": false
+  },
+  "ranking_readiness": {
+    "require_adv_complete": true,
+    "require_spread_complete": true,
+    "preferred_vehicle_ranking_ready_when_missing_spread": false
+  },
+  "forbidden": [
+    "high_low_range_as_bid_ask_spread",
+    "close_to_close_volatility_as_bid_ask_spread",
+    "volume_only_as_complete_liquidity_score",
+    "secondary_source_spread_without_governed_provenance",
+    "missing_spread_default",
+    "automatic_execution",
+    "position_sizing",
+    "portfolio_allocation"
+  ]
+}
