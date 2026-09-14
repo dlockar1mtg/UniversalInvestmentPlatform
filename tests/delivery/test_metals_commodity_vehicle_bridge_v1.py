@@ -45,6 +45,6 @@ def test_vehicle_design_restores_registered_purchase_options_without_fake_rankin
     for ticker in ("GLD", "IAU", "SGOL", "SLV", "SIVR", "PPLT", "CPER", "COPX", "URA", "URNM"):
         assert ticker in text
     assert "Preferred-vehicle ranking is NOT YET AUTHORIZED" in text
-    assert "representative test scores are not certified live investment authority" in text
+    assert "representative scores are not certified live investment authority" in text
     assert "using vehicle Risk V1 as commodity risk" in text
     assert "automatic execution" in text
