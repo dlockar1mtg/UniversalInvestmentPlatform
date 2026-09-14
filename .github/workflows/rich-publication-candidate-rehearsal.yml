@@ -1,0 +1,180 @@
+name: Rich Publication Candidate Rehearsal
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: rich-publication-candidate-rehearsal
+  cancel-in-progress: false
+
+jobs:
+  rehearse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: staging
+    env:
+      SOURCE_TOKEN: ${{ secrets.UIP_SOURCE_ARTIFACTS_TOKEN }}
+    steps:
+      - name: Checkout UIP
+        uses: actions/checkout@v4
+
+      - name: Checkout certified MTG research authority
+        uses: actions/checkout@v4
+        with:
+          repository: dlockar1mtg/mtg-investment-terminal
+          ref: main
+          token: ${{ secrets.UIP_SOURCE_ARTIFACTS_TOKEN }}
+          path: source_repos/mtg
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+
+      - name: Install UIP dependencies
+        run: pip install -r requirements.txt -r requirements/phase_7_3.txt
+
+      - name: Validate source token
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -n "$SOURCE_TOKEN" || { echo "UIP_SOURCE_ARTIFACTS_TOKEN is missing"; exit 1; }
+
+      - name: Resolve and download latest successful source artifacts
+        shell: bash
+        env:
+          UIP_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p incoming/crypto incoming/metals incoming/mtg
+
+          api_get() {
+            local token="$1"
+            local url="$2"
+            curl --fail-with-body --silent --show-error --location \
+              --header "Accept: application/vnd.github+json" \
+              --header "Authorization: Bearer ${token}" \
+              --header "X-GitHub-Api-Version: 2022-11-28" \
+              "$url"
+          }
+
+          download_latest() {
+            local repo="$1"
+            local workflow="$2"
+            local artifact_prefix="$3"
+            local token="$4"
+            local destination="$5"
+
+            local runs_json run_id artifacts_json artifact_id artifact_name
+            runs_json="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/workflows/${workflow}/runs?branch=main&status=success&per_page=30")"
+            run_id="$(printf '%s' "$runs_json" | jq -r '[.workflow_runs[] | select(.event == "schedule" or .event == "workflow_dispatch")][0].id // empty')"
+            test -n "$run_id" || { echo "No successful production run found for ${repo}/${workflow}"; exit 1; }
+
+            artifacts_json="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/runs/${run_id}/artifacts?per_page=100")"
+            artifact_id="$(printf '%s' "$artifacts_json" | jq -r --arg prefix "$artifact_prefix" '[.artifacts[] | select(.expired == false and (.name | startswith($prefix)))][0].id // empty')"
+            artifact_name="$(printf '%s' "$artifacts_json" | jq -r --arg prefix "$artifact_prefix" '[.artifacts[] | select(.expired == false and (.name | startswith($prefix)))][0].name // empty')"
+            test -n "$artifact_id" || { echo "No unexpired artifact matching ${artifact_prefix} for run ${run_id}"; exit 1; }
+
+            echo "SOURCE repo=${repo} workflow=${workflow} run_id=${run_id} artifact=${artifact_name}"
+            api_get "$token" "https://api.github.com/repos/${repo}/actions/artifacts/${artifact_id}/zip" > "${destination}.zip"
+            unzip -q "${destination}.zip" -d "$destination"
+          }
+
+          download_latest \
+            "dlockar1mtg/CryptoIntelligencePlatform" \
+            "crypto-production-cycle.yml" \
+            "crypto-production-" \
+            "$SOURCE_TOKEN" \
+            "incoming/crypto"
+
+          download_latest \
+            "dlockar1mtg/mtg-investment-terminal" \
+            "mtg-marketplace-production.yml" \
+            "mtg-marketplace-production-" \
+            "$SOURCE_TOKEN" \
+            "incoming/mtg"
+
+          download_latest \
+            "dlockar1mtg/UniversalInvestmentPlatform" \
+            "metals-production-cycle.yml" \
+            "metals-production-" \
+            "$UIP_TOKEN" \
+            "incoming/metals"
+
+      - name: Re-certify rich source contracts
+        run: >-
+          python scripts/audit_rich_publication_source_contract.py
+          --metals-artifact incoming/metals
+          --mtg-repo source_repos/mtg
+          --evidence-output data/operations/publication/rich_candidate_source_contract.json
+
+      - name: Build complete read-only rich candidate
+        run: >-
+          python scripts/rehearse_rich_publication_candidate.py
+          --crypto-artifact incoming/crypto
+          --metals-artifact incoming/metals
+          --mtg-artifact incoming/mtg
+          --mtg-repo source_repos/mtg
+          --evidence-output data/operations/publication/rich_publication_candidate_rehearsal.json
+
+      - name: Certify candidate remained non-persistent and complete
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+
+          source = json.loads(Path("data/operations/publication/rich_candidate_source_contract.json").read_text())
+          candidate = json.loads(Path("data/operations/publication/rich_publication_candidate_rehearsal.json").read_text())
+
+          assert source["status"] == "PASS"
+          assert source["mtg_rich_source_contract_pass"] is True
+          assert source["metals_rich_source_contract_pass"] is True
+          assert source["metals_certified_family_count"] == 10
+          assert source["metals_remaining_family_count"] == 0
+
+          assert candidate["status"] == "UIP_RICH_PUBLICATION_CANDIDATE_REHEARSAL_PASS"
+          assert candidate["publication_status"] == "STAGED"
+          assert candidate["metals_rich_family_count"] == 10
+          assert candidate["postgres_connection_opened"] is False
+          assert candidate["postgres_write_performed"] is False
+          assert candidate["publication_persisted"] is False
+          assert candidate["publication_activated"] is False
+          assert candidate["automatic_schedule_modified"] is False
+
+          assert candidate["mtg_rich_record_counts"] == {
+              "mtg_premium_research": 787,
+              "mtg_collector_research": 50,
+              "mtg_collector_forecast_horizon": 294,
+              "mtg_precollector_research": 131,
+              "mtg_precollector_scenario_horizon": 190,
+          }
+          assert candidate["metals_rich_record_counts"]["metals_current_price"] == 11
+          assert candidate["metals_rich_record_counts"]["metals_data_freshness"] == 20
+          assert candidate["metals_rich_record_counts"]["metals_platform_health"] == 1
+          assert candidate["metals_rich_record_counts"]["metals_model_component"] == 81
+          assert candidate["metals_rich_record_counts"]["risk"] == 11
+          assert candidate["metals_rich_record_counts"]["metals_regime_probability"] == 27
+          assert candidate["metals_rich_record_counts"]["metals_uncertainty_adjusted"] == 27
+          assert candidate["metals_rich_record_counts"]["tactical_state"] == 9
+          assert candidate["metals_rich_record_counts"]["metals_recommendation_change"] >= 1
+          assert candidate["metals_rich_record_counts"]["metals_price_history"] >= 1
+          PY
+          echo "RICH_PUBLICATION_CANDIDATE_REHEARSAL=PASS"
+
+      - name: Upload candidate rehearsal evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rich-publication-candidate-rehearsal-${{ github.run_id }}
+          path: |
+            data/operations/publication/rich_candidate_source_contract.json
+            data/operations/publication/rich_publication_candidate_rehearsal.json
+          if-no-files-found: warn
+          retention-days: 30
