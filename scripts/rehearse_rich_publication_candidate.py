@@ -11,10 +11,15 @@ import argparse
 import csv
 import json
 import os
+import sys
 import tempfile
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 import duckdb
 
@@ -116,9 +121,9 @@ def main() -> int:
     with tempfile.TemporaryDirectory(prefix="uip-rich-candidate-") as temp_name:
         temp_root = Path(temp_name)
         config = ImportEngineConfig(
-            repository_root=Path(__file__).resolve().parents[1],
+            repository_root=ROOT,
             database_path=temp_root / "universal_investment.duckdb",
-            schema_root=Path(__file__).resolve().parents[1] / "schemas" / "v1" / "csv",
+            schema_root=ROOT / "schemas" / "v1" / "csv",
             integration_root=temp_root / "integration",
             validation_root=temp_root / "validation",
         )
