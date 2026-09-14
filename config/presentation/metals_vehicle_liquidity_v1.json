@@ -1,7 +1,7 @@
 {
   "authority_id": "UIP_NATIVE_METALS_VEHICLE_LIQUIDITY_V1",
   "schema_version": "1.0.0",
-  "methodology_version": "1.0.0",
+  "methodology_version": "1.1.0",
   "scope": "REGISTERED_METALS_IMPLEMENTATION_VEHICLES_ONLY",
   "average_dollar_volume": {
     "source_authority": "UIP_NATIVE_METALS_VEHICLE_OBSERVATIONS_V1",
@@ -13,10 +13,18 @@
   },
   "quoted_spread": {
     "required_metric": "median_relative_bid_ask_spread_bps",
+    "source_provider": "alpaca_market_data",
+    "required_feed": "sip",
+    "allow_feed_downgrade": false,
     "window_sessions": 20,
-    "required_observation_fields": ["ticker", "observation_date", "bid", "ask", "observed_at_utc", "source_authority"],
-    "formula": "median(((ask-bid)/((ask+bid)/2))*10000) across valid quote observations in the latest 20 trading sessions",
     "minimum_sessions": 20,
+    "session_window_local": "15:50:00-16:00:00 America/New_York",
+    "required_observation_fields": ["ticker", "observation_date", "bid", "ask", "observed_at_utc", "source_authority", "feed", "source_run_id"],
+    "observation_formula": "((ask-bid)/((ask+bid)/2))*10000",
+    "per_session_statistic": "median(relative_spread_bps across all valid SIP quotes in the governed session window)",
+    "final_formula": "median(per_session_median_relative_spread_bps across the latest 20 distinct valid trading sessions)",
+    "equal_session_weighting": true,
+    "holiday_and_empty_session_policy": "skip non-trading or no-valid-quote candidate dates; never default; probe backward within bounded rehearsal/collection window",
     "daily_ohlcv_may_proxy_spread": false,
     "missing_values_may_default": false
   },
@@ -25,11 +33,20 @@
     "require_spread_complete": true,
     "preferred_vehicle_ranking_ready_when_missing_spread": false
   },
+  "authorization": {
+    "spread_methodology_governed": true,
+    "production_quote_collection_authorized": false,
+    "read_only_spread_rehearsal_next_gate": true
+  },
   "forbidden": [
     "high_low_range_as_bid_ask_spread",
     "close_to_close_volatility_as_bid_ask_spread",
     "volume_only_as_complete_liquidity_score",
     "secondary_source_spread_without_governed_provenance",
+    "all_raw_quotes_pooled_without_equal_session_weighting",
+    "last_quote_only_without_separate_methodology_authority",
+    "first_quote_only_without_separate_methodology_authority",
+    "silent_iex_fallback",
     "missing_spread_default",
     "automatic_execution",
     "position_sizing",
