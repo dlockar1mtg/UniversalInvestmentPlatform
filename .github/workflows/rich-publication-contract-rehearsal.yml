@@ -81,7 +81,7 @@ jobs:
           set -e
           echo "audit_status=${audit_status}" >> "$GITHUB_OUTPUT"
 
-      - name: Certify current fail-closed recovery state
+      - name: Certify complete rich-source recovery state
         shell: bash
         run: |
           python - <<'PY'
@@ -91,12 +91,12 @@ jobs:
           evidence = json.loads(
               Path("data/operations/publication/rich_source_contract_rehearsal.json").read_text()
           )
-          assert evidence["status"] == "FAIL_CLOSED"
+          assert evidence["status"] == "PASS"
           assert evidence["mtg_rich_source_contract_pass"] is True
-          assert evidence["metals_rich_source_contract_pass"] is False
-          assert evidence["metals_certified_family_count"] == 9
+          assert evidence["metals_rich_source_contract_pass"] is True
+          assert evidence["metals_certified_family_count"] == 10
           assert evidence["metals_required_family_count"] == 10
-          assert evidence["metals_remaining_family_count"] == 1
+          assert evidence["metals_remaining_family_count"] == 0
 
           expected_pass = {
               "current_price",
@@ -108,6 +108,7 @@ jobs:
               "recommendation_change",
               "regime_probability",
               "uncertainty_adjusted",
+              "tactical_state",
           }
           actual_pass = {
               key
@@ -116,8 +117,8 @@ jobs:
           }
           assert actual_pass == expected_pass, (actual_pass, expected_pass)
           PY
-          test "${{ steps.rich_audit.outputs.audit_status }}" = "1"
-          echo "RICH_PUBLICATION_RECOVERY_STATE=9_OF_10_FAIL_CLOSED_PASS"
+          test "${{ steps.rich_audit.outputs.audit_status }}" = "0"
+          echo "RICH_PUBLICATION_RECOVERY_STATE=10_OF_10_SOURCE_CONTRACT_PASS"
 
       - name: Upload rehearsal evidence
         if: always()
