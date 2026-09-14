@@ -1,0 +1,79 @@
+name: Metals Alpaca Spread Evidence V1 Rehearsal
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: "Type REHEARSE_ALPACA_SIP_SPREAD_EVIDENCE_V1"
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  rehearse:
+    runs-on: ubuntu-latest
+    env:
+      ALPACA_API_KEY_ID: ${{ secrets.ALPACA_API_KEY_ID }}
+      ALPACA_API_SECRET_KEY: ${{ secrets.ALPACA_API_SECRET_KEY }}
+    steps:
+      - name: Validate explicit confirmation
+        shell: bash
+        run: |
+          test "${{ inputs.confirmation }}" = "REHEARSE_ALPACA_SIP_SPREAD_EVIDENCE_V1" || {
+            echo "Exact confirmation token was not supplied."
+            exit 1
+          }
+
+      - name: Validate credential presence without printing values
+        shell: bash
+        run: |
+          test -n "$ALPACA_API_KEY_ID" || { echo "ALPACA_API_KEY_ID secret is missing."; exit 1; }
+          test -n "$ALPACA_API_SECRET_KEY" || { echo "ALPACA_API_SECRET_KEY secret is missing."; exit 1; }
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Run bounded read-only Alpaca SIP spread rehearsal
+        run: >-
+          python scripts/rehearse_metals_alpaca_spread_evidence_v1.py
+          --output data/operations/metals/alpaca_spread_evidence_v1/evidence.json
+
+      - name: Verify rehearsal boundaries
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          evidence = json.loads(Path('data/operations/metals/alpaca_spread_evidence_v1/evidence.json').read_text())
+          assert evidence['status'] == 'METALS_ALPACA_SPREAD_EVIDENCE_V1_REHEARSAL_PASS'
+          assert evidence['methodology_version'] == '1.1.0'
+          assert evidence['provider'] == 'alpaca_market_data'
+          assert evidence['feed'] == 'sip'
+          assert evidence['required_ticker_count'] == 10
+          assert evidence['resolved_ticker_count'] == 10
+          assert evidence['spread_evidence_complete_for_exact_10_tickers'] is True
+          assert evidence['production_quote_collection_authorized'] is False
+          assert evidence['preferred_vehicle_ranking_ready'] is False
+          assert evidence['publication_write_performed'] is False
+          assert evidence['credentials_persisted'] is False
+          for ticker, row in evidence['per_ticker'].items():
+              assert row['distinct_session_count'] == 20, ticker
+              assert row['median_relative_bid_ask_spread_bps'] >= 0, ticker
+              assert row['feed'] == 'sip', ticker
+              assert row['pagination_complete'] is True, ticker
+              assert len(row['session_medians']) == 20, ticker
+          print('METALS_ALPACA_SPREAD_EVIDENCE_V1_REHEARSAL=PASS')
+          PY
+
+      - name: Upload spread rehearsal evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: metals-alpaca-spread-evidence-v1-${{ github.run_id }}
+          path: data/operations/metals/alpaca_spread_evidence_v1/evidence.json
+          retention-days: 30
