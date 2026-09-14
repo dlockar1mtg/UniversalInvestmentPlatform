@@ -1,0 +1,70 @@
+{
+  "authority_id": "UIP_NATIVE_METALS_TACTICAL_STATE_V1",
+  "schema_version": "1.0.0",
+  "methodology_version": "1.0.0",
+  "legacy_equivalent": false,
+  "scope": "BENCHMARK_COMMODITY_ASSET_ONLY",
+  "source_state_mode": "CURRENT_CERTIFIED_NATIVE_CYCLE_ONLY",
+  "model_id": "uip-metals-native-trend-v1",
+  "source_methodology_registry": "config/metals/model_methodology_registry.json",
+  "tactical_horizon_months": 12,
+  "state_interpretation": "DESCRIPTIVE_12_MONTH_TACTICAL_ALIGNMENT_NOT_TRADE_INSTRUCTION",
+  "output_grain": "ONE_ROW_PER_COMMODITY",
+  "recommendation_semantics": "CURRENT_CERTIFIED_NATIVE_RECOMMENDATION_AS_STRATEGIC_DIRECTIONAL_CONTEXT",
+  "uncertainty_semantics": "CERTIFIED_UNCERTAINTY_ADJUSTED_V1_12_MONTH_RETURN_AS_TACTICAL_DIRECTIONAL_CONTEXT",
+  "regime_semantics": "CERTIFIED_REGIME_PROBABILITY_V1_DOMINANT_REGIME_AS_DESCRIPTIVE_CONTEXT",
+  "risk_semantics": "VEHICLE_ONLY_RISK_V1_EXCLUDED_NO_COMMODITY_PROJECTION",
+  "taxonomy": [
+    "TACTICAL_SUPPORTIVE",
+    "TACTICAL_POSITIVE_BUT_MIXED",
+    "TACTICAL_NEUTRAL",
+    "TACTICAL_CAUTION",
+    "TACTICAL_DEFENSIVE",
+    "TACTICAL_CONFLICT"
+  ],
+  "classification_rules": [
+    "TACTICAL_SUPPORTIVE when recommendation is STRONG_BUY or BUY, 12-month adjusted expected return is positive, and dominant regime is POSITIVE_TREND",
+    "TACTICAL_POSITIVE_BUT_MIXED when recommendation is STRONG_BUY or BUY and 12-month adjusted expected return is positive but dominant regime is not POSITIVE_TREND",
+    "TACTICAL_NEUTRAL when recommendation is HOLD and no stronger positive or negative conflict rule applies",
+    "TACTICAL_DEFENSIVE when recommendation is REDUCE or AVOID, 12-month adjusted expected return is negative, and dominant regime is NEGATIVE_TREND",
+    "TACTICAL_CAUTION when recommendation is REDUCE or AVOID and 12-month adjusted expected return is negative but dominant regime is not NEGATIVE_TREND, or when recommendation is STRONG_BUY or BUY and 12-month adjusted expected return is non-positive",
+    "TACTICAL_CONFLICT when recommendation is REDUCE or AVOID and 12-month adjusted expected return is non-negative"
+  ],
+  "minimum_evidence": {
+    "native_recommendation_required": true,
+    "uncertainty_adjusted_v1_12_month_row_required": true,
+    "regime_probability_v1_context_required": true,
+    "same_as_of_date_required": true,
+    "insufficient_evidence_behavior": "FAIL_CLOSED"
+  },
+  "required_output_fields": [
+    "universal_asset_id",
+    "as_of_date",
+    "tactical_horizon_months",
+    "recommendation",
+    "adjusted_expected_return",
+    "dominant_regime",
+    "dominant_regime_probability",
+    "tactical_state",
+    "state_reason",
+    "model_id",
+    "source_methodology_version",
+    "authority_id",
+    "methodology_version",
+    "state_interpretation"
+  ],
+  "forbidden_semantics": [
+    "LEGACY_TACTICAL_STATE_COPY_FORWARD",
+    "LEGACY_ACTION_MAPPING_REUSE",
+    "LEGACY_CLASSIFIER_REUSE",
+    "VEHICLE_RISK_TO_COMMODITY_TACTICAL_PROJECTION",
+    "VEHICLE_TACTICAL_STATE_TO_COMMODITY_PROJECTION",
+    "MISSING_STATE_DEFAULT_TO_HOLD_OR_WAIT",
+    "CROSS_ASSET_RANKING",
+    "PORTFOLIO_ALLOCATION",
+    "TRADE_SIZING",
+    "AUTOMATIC_EXECUTION",
+    "STATISTICAL_CALIBRATION_CLAIM",
+    "CROSS_METHODOLOGY_REUSE_WITHOUT_NEW_VERSION"
+  ]
+}
