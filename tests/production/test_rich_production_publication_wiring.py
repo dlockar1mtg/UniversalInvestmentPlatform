@@ -22,6 +22,16 @@ def test_first_rich_production_publication_is_manual_and_exactly_pinned():
     assert "scripts/publish_rehearsed_rich_candidate.py" in text
 
 
+def test_rich_production_script_bootstraps_repository_before_local_imports():
+    text = SCRIPT.read_text(encoding="utf-8")
+
+    assert "import sys" in text
+    root = text.index('ROOT = Path(__file__).resolve().parents[1]')
+    path_insert = text.index("sys.path.insert(0, str(ROOT))")
+    foundation_import = text.index("from foundation.import_engine.audit import")
+    assert root < path_insert < foundation_import
+
+
 def test_rich_production_script_validates_complete_candidate_before_postgres():
     text = SCRIPT.read_text(encoding="utf-8")
 
