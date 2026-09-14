@@ -1,0 +1,158 @@
+name: Metals Native Tactical State V1 Rehearsal
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: metals-native-tactical-state-v1-rehearsal
+  cancel-in-progress: false
+
+jobs:
+  rehearse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout UIP
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Install test dependency
+        run: pip install pytest
+
+      - name: Run Tactical State V1 unit tests
+        run: pytest -q tests/delivery/test_metals_native_tactical_state_v1.py
+
+      - name: Resolve latest successful Metals Production Cycle artifact
+        id: resolve
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          run_id="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            '/repos/${{ github.repository }}/actions/workflows/metals-production-cycle.yml/runs?branch=main&status=success&per_page=20' \
+            --jq '[.workflow_runs[] | select(.event == "workflow_dispatch" or .event == "schedule")][0].id // empty')"
+          test -n "$run_id"
+          artifact_name="metals-production-${run_id}"
+          artifact_url="$(gh api \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/${{ github.repository }}/actions/runs/${run_id}/artifacts" \
+            --jq "[.artifacts[] | select(.name == \"${artifact_name}\")][0].archive_download_url // empty")"
+          test -n "$artifact_url"
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "artifact_name=$artifact_name" >> "$GITHUB_OUTPUT"
+          echo "artifact_url=$artifact_url" >> "$GITHUB_OUTPUT"
+          echo "TACTICAL_STATE_SOURCE run_id=${run_id} artifact=${artifact_name}"
+
+      - name: Download certified Metals production artifact
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p incoming/metals
+          gh api "${{ steps.resolve.outputs.artifact_url }}" > incoming/metals.zip
+          unzip -q incoming/metals.zip -d incoming/metals
+
+      - name: Build Tactical State V1 rehearsal sidecar
+        shell: bash
+        run: |
+          set -euo pipefail
+          native_cycle="$(find incoming/metals -type f -path '*/native_cycle/latest.json' -print -quit)"
+          regime_csv="$(find incoming/metals -type f -path '*/native_regime_probability_v1/metals_regime_probability.csv' -print -quit)"
+          regime_manifest="$(find incoming/metals -type f -path '*/native_regime_probability_v1/manifest.json' -print -quit)"
+          uncertainty_csv="$(find incoming/metals -type f -path '*/native_uncertainty_adjusted_v1/metals_uncertainty_adjusted.csv' -print -quit)"
+          uncertainty_manifest="$(find incoming/metals -type f -path '*/native_uncertainty_adjusted_v1/manifest.json' -print -quit)"
+          test -n "$native_cycle"
+          test -n "$regime_csv"
+          test -n "$regime_manifest"
+          test -n "$uncertainty_csv"
+          test -n "$uncertainty_manifest"
+          python scripts/build_metals_native_tactical_state_sidecar.py \
+            --contract config/presentation/metals_tactical_state_v1.json \
+            --methodology config/metals/model_methodology_registry.json \
+            --native-cycle "$native_cycle" \
+            --regime-probability-csv "$regime_csv" \
+            --regime-probability-manifest "$regime_manifest" \
+            --uncertainty-adjusted-csv "$uncertainty_csv" \
+            --uncertainty-adjusted-manifest "$uncertainty_manifest" \
+            --output-root data/operations/metals/native_tactical_state_v1
+
+      - name: Certify Tactical State V1 rehearsal shape and safety
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import csv
+          import json
+          from pathlib import Path
+
+          root = Path('data/operations/metals/native_tactical_state_v1')
+          manifest = json.loads((root / 'manifest.json').read_text())
+          rows = list(csv.DictReader((root / 'metals_tactical_state.csv').open()))
+
+          assert manifest['status'] == 'METALS_NATIVE_TACTICAL_STATE_V1_PASS'
+          assert manifest['authority_id'] == 'UIP_NATIVE_METALS_TACTICAL_STATE_V1'
+          assert manifest['legacy_equivalent'] is False
+          assert manifest['scope'] == 'BENCHMARK_COMMODITY_ASSET_ONLY'
+          assert manifest['state_interpretation'] == 'DESCRIPTIVE_12_MONTH_TACTICAL_ALIGNMENT_NOT_TRADE_INSTRUCTION'
+          assert manifest['output_grain'] == 'ONE_ROW_PER_COMMODITY'
+          assert manifest['tactical_horizon_months'] == 12
+          assert manifest['risk_semantics'] == 'VEHICLE_ONLY_RISK_V1_EXCLUDED_NO_COMMODITY_PROJECTION'
+          assert manifest['asset_count'] == 9
+          assert manifest['row_count'] == 9 == len(rows)
+          assert manifest['regime_probability_authority_id'] == 'UIP_NATIVE_METALS_REGIME_PROBABILITY_V1'
+          assert manifest['uncertainty_adjusted_authority_id'] == 'UIP_NATIVE_METALS_UNCERTAINTY_ADJUSTED_V1'
+          assert manifest['postgres_write_performed'] is False
+          assert manifest['source_collection_performed'] is False
+          assert manifest['publication_staged'] is False
+          assert manifest['publication_activated'] is False
+          assert manifest['legacy_rows_copied_forward'] is False
+          assert manifest['legacy_action_mapping_reused'] is False
+          assert manifest['legacy_classifier_reused'] is False
+          assert manifest['vehicle_risk_projection_performed'] is False
+          assert manifest['vehicle_tactical_projection_performed'] is False
+          assert manifest['missing_state_imputed'] is False
+          assert manifest['statistical_calibration_claimed'] is False
+          assert manifest['cross_asset_ranking_performed'] is False
+          assert manifest['portfolio_allocation_performed'] is False
+          assert manifest['trade_sizing_performed'] is False
+          assert manifest['automatic_execution_performed'] is False
+
+          allowed_states = {
+              'TACTICAL_SUPPORTIVE',
+              'TACTICAL_POSITIVE_BUT_MIXED',
+              'TACTICAL_NEUTRAL',
+              'TACTICAL_CAUTION',
+              'TACTICAL_DEFENSIVE',
+              'TACTICAL_CONFLICT',
+          }
+          assert len({row['universal_asset_id'] for row in rows}) == 9
+          for row in rows:
+              assert row['universal_asset_id'].startswith('metals:commodity:')
+              assert int(row['tactical_horizon_months']) == 12
+              assert row['recommendation'] in {'STRONG_BUY', 'BUY', 'HOLD', 'REDUCE', 'AVOID'}
+              assert row['dominant_regime'] in {'POSITIVE_TREND', 'NEUTRAL_OR_MIXED', 'NEGATIVE_TREND'}
+              assert row['tactical_state'] in allowed_states
+              assert row['state_reason']
+              assert row['state_interpretation'] == 'DESCRIPTIVE_12_MONTH_TACTICAL_ALIGNMENT_NOT_TRADE_INSTRUCTION'
+          PY
+          echo "METALS_NATIVE_TACTICAL_STATE_V1_REHEARSAL=PASS"
+
+      - name: Upload Tactical State V1 rehearsal evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: metals-native-tactical-state-v1-${{ github.run_id }}
+          path: data/operations/metals/native_tactical_state_v1/
+          if-no-files-found: error
+          retention-days: 30
