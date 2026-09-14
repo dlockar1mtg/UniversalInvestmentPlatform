@@ -30,49 +30,74 @@ For each of the 10 registered commodity implementation vehicles (GLD, IAU, SGOL,
 
 Missing close or volume does not become zero and cannot be backfilled from another ticker.
 
-## Bid/ask spread evidence
+## Bid/ask spread source authority
 
 Daily OHLCV does **not** contain quoted bid and ask and therefore cannot certify implementation spread.
 
-UIP requires a separately governed quote source that supplies, at minimum:
+Alpaca Market Data using the `sip` feed is the certified quote-provider source based on the verified manual suitability rehearsal. Silent downgrade to IEX remains prohibited.
+
+The quote evidence must retain, at minimum:
 
 - ticker;
 - trading date;
 - bid;
 - ask;
 - observation timestamp;
-- source authority/provenance.
+- source authority;
+- feed;
+- source run provenance.
 
 For each valid quote observation:
 
 `relative_spread_bps = ((ask - bid) / ((ask + bid) / 2)) * 10000`
 
-The ranking input is the median relative spread across the latest 20 trading sessions with valid governed observations.
+## Session-balanced spread methodology
 
-At least 20 sessions are required for each compared vehicle.
+The ranking input is not computed by pooling every raw quote across 20 sessions.
 
-## Prohibited spread proxies
+For each ticker and each valid trading session:
 
-The following may not be labeled or substituted as bid/ask spread:
+1. use only valid SIP quotes timestamped from 15:50:00 through 16:00:00 America/New_York;
+2. require finite positive bid and ask with `ask >= bid`;
+3. calculate `relative_spread_bps` for each valid quote;
+4. calculate one session statistic: the median relative spread across all valid quotes in that session window;
+5. retain session date, valid quote count, first/last timestamps, source authority, feed, and source run provenance.
+
+The final vehicle spread metric is the median of those session medians across the latest 20 distinct valid trading sessions.
+
+At least 20 valid sessions are required for each compared vehicle. Each session therefore receives one equal contribution regardless of raw quote-update frequency.
+
+Weekends and exchange holidays do not count as trading sessions. Candidate dates with no valid SIP quotes are skipped and may not be converted to zero or replaced with another ticker's value. The collector may probe farther backward within the separately governed bounded search window to establish 20 valid sessions.
+
+The detailed authority is `docs/project_control/metals_vehicle_spread_sampling_methodology_v1.md`.
+
+## Prohibited spread proxies and shortcuts
+
+The following may not be labeled or substituted as the governed bid/ask spread metric:
 
 - daily high-low range;
 - close-to-close volatility;
 - ATR;
 - turnover or volume alone;
 - issuer-reported average spread without explicit governed provenance and period semantics;
+- every raw quote from all sessions pooled without equal session weighting;
+- a first-quote-only or last-quote-only shortcut without a separately versioned methodology;
+- IEX fallback;
 - missing values filled with zero or a peer value.
 
 ## Ranking boundary
 
-ADV coverage alone does not authorize the liquidity component of the vehicle ranking. Both 30-session ADV and 20-session median quoted spread must be complete for every vehicle in the commodity comparison group.
+ADV coverage alone does not authorize the liquidity component of the vehicle ranking. Both 30-session ADV and 20-session median-of-session-medians quoted spread must be complete for every vehicle in the commodity comparison group.
 
 If spread evidence is missing, the vehicle may remain a registered implementation candidate, but `PREFERRED IMPLEMENTATION CANDIDATE` remains blocked.
 
 ## Current authorization decision
 
 - derive ADV from existing certified vehicle history: **AUTHORIZED FOR READ-ONLY REHEARSAL**;
-- manufacture spread from daily history: **PROHIBITED**;
-- collect governed quote evidence: **REQUIRES SEPARATE SOURCE/COLLECTION AUTHORIZATION**;
+- Alpaca SIP provider suitability: **CERTIFIED**;
+- session-balanced spread methodology: **GOVERNED**;
+- production quote collection: **NOT AUTHORIZED**;
+- bounded read-only spread-evidence rehearsal: **NEXT GATE**;
 - preferred vehicle ranking: **FAIL-CLOSED UNTIL REQUIRED EVIDENCE IS COMPLETE**.
 
 ## Governance boundary
