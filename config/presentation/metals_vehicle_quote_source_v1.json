@@ -1,0 +1,53 @@
+{
+  "authority_id": "UIP_NATIVE_METALS_VEHICLE_QUOTE_SOURCE_V1",
+  "schema_version": "1.0.0",
+  "methodology_version": "1.0.0",
+  "scope": "REGISTERED_METALS_IMPLEMENTATION_VEHICLES_ONLY",
+  "eligible_tickers": ["GLD", "IAU", "SGOL", "SLV", "SIVR", "PPLT", "CPER", "COPX", "URA", "URNM"],
+  "provider_selection": {
+    "provider_preselected": false,
+    "require_documented_us_equity_etf_quote_coverage": true,
+    "require_actual_bid_and_ask": true,
+    "require_quote_timestamp": true,
+    "require_source_authority": true,
+    "require_20_distinct_trading_sessions_per_ticker": true,
+    "minimum_sessions": 20,
+    "single_observation_per_session_allowed": true,
+    "preferred_observation_window": "REGULAR_MARKET_HOURS",
+    "missing_values_may_default": false
+  },
+  "required_fields": [
+    "ticker",
+    "observation_date",
+    "bid",
+    "ask",
+    "observed_at_utc",
+    "source_authority",
+    "source_run_id"
+  ],
+  "validation": {
+    "bid_must_be_positive": true,
+    "ask_must_be_positive": true,
+    "ask_must_be_greater_than_or_equal_to_bid": true,
+    "relative_spread_formula_bps": "((ask-bid)/((ask+bid)/2))*10000",
+    "aggregation": "median relative spread across latest 20 valid distinct trading sessions",
+    "same_date_revision_policy": "latest governed quote observation by observed_at_utc then source_run_id"
+  },
+  "ranking_readiness": {
+    "provider_contract_must_pass": true,
+    "all_tickers_must_have_complete_20_session_coverage": true,
+    "preferred_vehicle_ranking_ready_before_quote_evidence": false
+  },
+  "forbidden": [
+    "high_low_range_as_spread",
+    "close_open_range_as_spread",
+    "volatility_as_spread",
+    "volume_as_spread",
+    "stale_or_undated_quote",
+    "secondary_unverified_quote_snapshot",
+    "missing_quote_default",
+    "automatic_execution",
+    "position_sizing",
+    "portfolio_allocation"
+  ]
+}
