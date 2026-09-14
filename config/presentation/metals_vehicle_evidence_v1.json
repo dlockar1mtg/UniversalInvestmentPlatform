@@ -1,0 +1,71 @@
+{
+  "authority_id": "UIP_NATIVE_METALS_VEHICLE_EVIDENCE_V1",
+  "schema_version": "1.0.0",
+  "methodology_version": "1.0.0",
+  "scope": "REGISTERED_METALS_IMPLEMENTATION_VEHICLES_ONLY",
+  "eligible_vehicle_source": "config/metals/vehicles.json",
+  "evidence_families": {
+    "registered_exposure": {
+      "required": true,
+      "source": "registry",
+      "fields": ["vehicle_id", "ticker", "underlying_asset_id", "vehicle_type", "role", "enabled"]
+    },
+    "recurring_cost": {
+      "required": true,
+      "source": "authoritative_issuer_documentation",
+      "fields": ["expense_ratio_pct", "expense_ratio_as_of", "source_url", "retrieved_at_utc", "source_sha256"]
+    },
+    "liquidity": {
+      "required": true,
+      "source": "governed_market_data",
+      "average_dollar_volume_window_sessions": 30,
+      "bid_ask_spread_window_sessions": 20,
+      "fields": ["average_dollar_volume_usd", "median_bid_ask_spread_bps", "as_of_date", "source_authority", "observation_count"]
+    },
+    "tracking_quality": {
+      "required": true,
+      "source": "governed_vehicle_and_benchmark_history",
+      "window_sessions": 252,
+      "allowed_states": ["AVAILABLE", "NOT_APPLICABLE_INDIRECT_EXPOSURE", "UNAVAILABLE_MISSING_BENCHMARK"],
+      "fields_when_available": ["tracking_error_annualized", "correlation", "window_observations", "benchmark_id", "as_of_date"]
+    },
+    "vehicle_risk_v1": {
+      "required": true,
+      "source": "UIP_NATIVE_METALS_RISK_V1",
+      "fields": ["volatility", "downside_volatility", "maximum_drawdown", "value_at_risk", "lookback_observations", "methodology_version"]
+    }
+  },
+  "tracking_policy": {
+    "physical_backed_etf": "commodity_benchmark_permitted",
+    "futures_fund": "governed_futures_index_required",
+    "miners_etf": "NOT_APPLICABLE_INDIRECT_EXPOSURE",
+    "thematic_equity_etf": "NOT_APPLICABLE_INDIRECT_EXPOSURE",
+    "cash_proxy": "excluded"
+  },
+  "freshness_policy": {
+    "recurring_cost_max_age_days": 120,
+    "liquidity_max_age_days": 7,
+    "tracking_quality_max_age_days": 7,
+    "vehicle_risk_max_age_days": 14
+  },
+  "preferred_ranking_readiness": {
+    "require_all_enabled_compared_vehicles": true,
+    "require_all_required_evidence": true,
+    "allow_missing_defaults": false,
+    "pass_state": "VEHICLE_RANKING_EVIDENCE_READY",
+    "fail_state": "VEHICLE_RANKING_EVIDENCE_INCOMPLETE"
+  },
+  "forbidden": [
+    "issuer_cost_without_source_url",
+    "stale_cost_silently_accepted",
+    "volume_used_as_bid_ask_spread_proxy",
+    "synthetic_tracking_score_for_indirect_equity_vehicle",
+    "vehicle_risk_as_commodity_risk",
+    "commodity_return_as_vehicle_return_forecast",
+    "representative_test_score_as_live_authority",
+    "missing_evidence_default",
+    "automatic_execution",
+    "position_sizing",
+    "portfolio_allocation"
+  ]
+}
