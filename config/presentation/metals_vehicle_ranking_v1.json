@@ -1,7 +1,7 @@
 {
   "authority_id": "UIP_NATIVE_METALS_VEHICLE_RANKING_V1",
   "schema_version": "1.0.0",
-  "methodology_version": "1.1.0",
+  "methodology_version": "1.2.0",
   "scope": "REGISTERED_METALS_IMPLEMENTATION_VEHICLES_ONLY",
   "ranking_grain": "ONE_ROW_PER_REGISTERED_ENABLED_VEHICLE_GROUPED_WITHIN_ONE_COMMODITY",
   "weights": {
@@ -9,6 +9,46 @@
     "cost_efficiency": 0.25,
     "liquidity_implementation_friction": 0.25,
     "risk_efficiency": 0.15
+  },
+  "normalization": {
+    "comparison_scope": "WITHIN_SAME_COMMODITY_GROUP_ONLY",
+    "score_range": [0.0, 100.0],
+    "cost_efficiency": {
+      "direction": "LOWER_IS_BETTER",
+      "formula": "100 * group_min_expense_ratio / vehicle_expense_ratio"
+    },
+    "liquidity_implementation_friction": {
+      "adv_subweight": 0.50,
+      "spread_subweight": 0.50,
+      "adv_direction": "HIGHER_IS_BETTER",
+      "adv_formula": "100 * vehicle_average_dollar_volume / group_max_average_dollar_volume",
+      "spread_direction": "LOWER_IS_BETTER",
+      "spread_formula": "100 * group_min_bid_ask_spread / vehicle_bid_ask_spread",
+      "component_formula": "0.50 * adv_score + 0.50 * spread_score"
+    },
+    "risk_efficiency": {
+      "submetrics": [
+        "volatility",
+        "downside_volatility",
+        "maximum_drawdown_magnitude",
+        "value_at_risk"
+      ],
+      "submetric_weights": {
+        "volatility": 0.25,
+        "downside_volatility": 0.25,
+        "maximum_drawdown_magnitude": 0.25,
+        "value_at_risk": 0.25
+      },
+      "direction": "LOWER_IS_BETTER",
+      "submetric_formula": "100 * group_min_positive_value / vehicle_positive_value",
+      "maximum_drawdown_transform": "ABSOLUTE_VALUE",
+      "component_formula": "arithmetic mean of the four risk submetric scores"
+    },
+    "total_formula": "0.35 * exposure_fidelity + 0.25 * cost_efficiency + 0.25 * liquidity_implementation_friction + 0.15 * risk_efficiency",
+    "single_vehicle_group_policy": "DO_NOT_RANK_LABEL_ONLY_REGISTERED_IMPLEMENTATION",
+    "zero_or_nonpositive_required_input_policy": "FAIL_CLOSED",
+    "missing_required_input_policy": "FAIL_CLOSED",
+    "rounding_policy": "retain full precision for ordering; round only for display"
   },
   "optional_informational_evidence": [
     "tracking_quality"
