@@ -1,16 +1,18 @@
 {
   "authority_id": "UIP_NATIVE_METALS_VEHICLE_RANKING_V1",
   "schema_version": "1.0.0",
-  "methodology_version": "1.0.0",
+  "methodology_version": "1.1.0",
   "scope": "REGISTERED_METALS_IMPLEMENTATION_VEHICLES_ONLY",
   "ranking_grain": "ONE_ROW_PER_REGISTERED_ENABLED_VEHICLE_GROUPED_WITHIN_ONE_COMMODITY",
   "weights": {
-    "exposure_fidelity": 0.30,
-    "cost_efficiency": 0.20,
-    "liquidity_implementation_friction": 0.20,
-    "tracking_quality": 0.15,
+    "exposure_fidelity": 0.35,
+    "cost_efficiency": 0.25,
+    "liquidity_implementation_friction": 0.25,
     "risk_efficiency": 0.15
   },
+  "optional_informational_evidence": [
+    "tracking_quality"
+  ],
   "exposure_fidelity_class_scores": {
     "physical_backed_etf": 100,
     "futures_fund": 90,
@@ -22,7 +24,6 @@
     "expense_ratio",
     "average_dollar_volume",
     "bid_ask_spread",
-    "tracking_quality_or_explicit_not_applicable_state",
     "vehicle_risk_v1"
   ],
   "preferred_vehicle_gate": {
@@ -47,6 +48,7 @@
     "vehicle_return_as_commodity_forecast",
     "commodity_expected_return_as_vehicle_forecast",
     "representative_test_score_as_live_authority",
+    "tracking_proxy_substitution",
     "missing_evidence_default",
     "automatic_execution",
     "position_sizing",
