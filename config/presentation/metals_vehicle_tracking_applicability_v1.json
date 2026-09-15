@@ -1,0 +1,34 @@
+{
+  "authority_id": "UIP_NATIVE_METALS_VEHICLE_TRACKING_APPLICABILITY_V1",
+  "schema_version": "1.0.0",
+  "methodology_version": "1.0.0",
+  "scope": "REGISTERED_METALS_IMPLEMENTATION_VEHICLES_ONLY",
+  "window_sessions": 252,
+  "required_metrics_when_available": [
+    "tracking_error_annualized",
+    "correlation",
+    "window_observations",
+    "benchmark_id",
+    "as_of_date"
+  ],
+  "vehicles": {
+    "GLD": {"vehicle_type": "physical_backed_etf", "tracking_state_required": "AVAILABLE", "benchmark_class": "governed_gold_commodity_benchmark"},
+    "IAU": {"vehicle_type": "physical_backed_etf", "tracking_state_required": "AVAILABLE", "benchmark_class": "governed_gold_commodity_benchmark"},
+    "SGOL": {"vehicle_type": "physical_backed_etf", "tracking_state_required": "AVAILABLE", "benchmark_class": "governed_gold_commodity_benchmark"},
+    "SLV": {"vehicle_type": "physical_backed_etf", "tracking_state_required": "AVAILABLE", "benchmark_class": "governed_silver_commodity_benchmark"},
+    "SIVR": {"vehicle_type": "physical_backed_etf", "tracking_state_required": "AVAILABLE", "benchmark_class": "governed_silver_commodity_benchmark"},
+    "PPLT": {"vehicle_type": "physical_backed_etf", "tracking_state_required": "AVAILABLE", "benchmark_class": "governed_platinum_commodity_benchmark"},
+    "CPER": {"vehicle_type": "futures_fund", "tracking_state_required": "AVAILABLE", "benchmark_class": "governed_copper_futures_index_benchmark"},
+    "COPX": {"vehicle_type": "miners_etf", "tracking_state_required": "NOT_APPLICABLE_INDIRECT_EXPOSURE", "benchmark_class": null},
+    "URA": {"vehicle_type": "thematic_equity_etf", "tracking_state_required": "NOT_APPLICABLE_INDIRECT_EXPOSURE", "benchmark_class": null},
+    "URNM": {"vehicle_type": "thematic_equity_etf", "tracking_state_required": "NOT_APPLICABLE_INDIRECT_EXPOSURE", "benchmark_class": null}
+  },
+  "rules": {
+    "physical_backed_etf_requires_governed_commodity_benchmark": true,
+    "futures_fund_requires_governed_futures_index_benchmark": true,
+    "miners_or_thematic_equity_may_use_not_applicable_state": true,
+    "spot_commodity_may_not_proxy_indirect_equity_tracking": true,
+    "missing_benchmark_may_not_default": true,
+    "preferred_vehicle_ranking_ready": false
+  }
+}
