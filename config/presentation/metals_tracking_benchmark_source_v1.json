@@ -1,0 +1,36 @@
+{
+  "authority_id": "UIP_NATIVE_METALS_TRACKING_BENCHMARK_SOURCE_V1",
+  "schema_version": "1.0.0",
+  "scope": "REGISTERED_METALS_IMPLEMENTATION_VEHICLES_REQUIRING_AVAILABLE_TRACKING_ONLY",
+  "required_tracking_vehicles": ["GLD", "IAU", "SGOL", "SLV", "SIVR", "PPLT", "CPER"],
+  "benchmarks": {
+    "GLD": {"benchmark_id": "LBMA_GOLD_PRICE_PM", "benchmark_name": "LBMA Gold Price PM", "administrator": "ICE Benchmark Administration", "history_access_state": "IDENTITY_CERTIFIED_HISTORY_ACCESS_NOT_YET_CERTIFIED"},
+    "IAU": {"benchmark_id": "LBMA_GOLD_PRICE_PM", "benchmark_name": "LBMA Gold Price PM", "administrator": "ICE Benchmark Administration", "history_access_state": "IDENTITY_CERTIFIED_HISTORY_ACCESS_NOT_YET_CERTIFIED"},
+    "SGOL": {"benchmark_id": "LBMA_GOLD_PRICE_PM", "benchmark_name": "LBMA Gold Price PM", "administrator": "ICE Benchmark Administration", "history_access_state": "IDENTITY_CERTIFIED_HISTORY_ACCESS_NOT_YET_CERTIFIED"},
+    "SLV": {"benchmark_id": "LBMA_SILVER_PRICE", "benchmark_name": "LBMA Silver Price", "administrator": "ICE Benchmark Administration", "history_access_state": "IDENTITY_CERTIFIED_HISTORY_ACCESS_NOT_YET_CERTIFIED"},
+    "SIVR": {"benchmark_id": "LBMA_SILVER_PRICE", "benchmark_name": "LBMA Silver Price", "administrator": "ICE Benchmark Administration", "history_access_state": "IDENTITY_CERTIFIED_HISTORY_ACCESS_NOT_YET_CERTIFIED"},
+    "PPLT": {"benchmark_id": "LBMA_PLATINUM_PRICE_PM", "benchmark_name": "LBMA Platinum Price PM", "administrator": "ICE Benchmark Administration", "history_access_state": "IDENTITY_CERTIFIED_HISTORY_ACCESS_NOT_YET_CERTIFIED"},
+    "CPER": {"benchmark_id": "SUMMERHAVEN_COPPER_INDEX_TOTAL_RETURN", "benchmark_name": "SummerHaven Copper Index Total Return", "administrator": "SummerHaven Index Management", "history_access_state": "IDENTITY_CERTIFIED_HISTORY_ACCESS_NOT_YET_CERTIFIED"}
+  },
+  "history_requirements": {
+    "minimum_aligned_return_observations": 252,
+    "vehicle_series": "governed vehicle NAV or equivalent governed vehicle total-return history",
+    "benchmark_series": "exact certified benchmark history only",
+    "same_currency_required": true,
+    "date_alignment_required": true,
+    "missing_values_may_default": false
+  },
+  "forbidden": [
+    "spot_proxy_for_cper",
+    "generic_gold_proxy_for_lbma_gold_price_pm",
+    "generic_silver_proxy_for_lbma_silver_price",
+    "generic_platinum_proxy_for_lbma_platinum_price_pm",
+    "etf_peer_as_benchmark_substitute",
+    "unlicensed_or_unauthorized_benchmark_history_ingestion",
+    "missing_benchmark_default",
+    "preferred_vehicle_ranking_activation"
+  ],
+  "benchmark_history_collection_authorized": false,
+  "tracking_quality_calculation_authorized": false,
+  "preferred_vehicle_ranking_ready": false
+}
