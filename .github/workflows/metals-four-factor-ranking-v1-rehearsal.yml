@@ -1,0 +1,108 @@
+name: Metals Four-Factor Ranking V1 Rehearsal
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: Type REHEARSE_METALS_FOUR_FACTOR_RANKING_V1
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  rehearsal:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Confirm bounded rehearsal token
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${{ inputs.confirmation }}" = "REHEARSE_METALS_FOUR_FACTOR_RANKING_V1"
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.14'
+
+      - name: Download pinned certified Metals production artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: metals-production-34849676771
+          path: _metals_artifact
+          github-token: ${{ github.token }}
+          run-id: 34849676771
+
+      - name: Derive governed 30-session ADV evidence
+        run: >-
+          python scripts/rehearse_metals_vehicle_adv_v1.py
+          --artifact-root _metals_artifact
+          --output data/operations/metals/vehicle_ranking_v1/adv.json
+
+      - name: Build governed Vehicle Risk V1 evidence
+        shell: bash
+        run: |
+          set -euo pipefail
+          history_csv="$(find _metals_artifact -type f -path '*/native_rich_history/metals_price_history.csv' | head -n 1)"
+          history_manifest="$(find _metals_artifact -type f -path '*/native_rich_history/manifest.json' | head -n 1)"
+          test -n "$history_csv"
+          test -n "$history_manifest"
+          python scripts/build_metals_native_risk_sidecar.py \
+            --history "$history_csv" \
+            --history-manifest "$history_manifest" \
+            --contract config/presentation/metals_risk_v1.json \
+            --output-root data/operations/metals/vehicle_ranking_v1/risk
+
+      - name: Run bounded read-only four-factor ranking rehearsal
+        run: >-
+          python scripts/rehearse_metals_four_factor_ranking_v1.py
+          --adv data/operations/metals/vehicle_ranking_v1/adv.json
+          --risk data/operations/metals/vehicle_ranking_v1/risk/risk.csv
+          --output data/operations/metals/vehicle_ranking_v1/rehearsal.json
+
+      - name: Certify rehearsal safety and output shape
+        shell: bash
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          evidence = json.loads(Path('data/operations/metals/vehicle_ranking_v1/rehearsal.json').read_text())
+          assert evidence['status'] == 'METALS_FOUR_FACTOR_RANKING_V1_REHEARSAL_PASS'
+          assert evidence['authority_id'] == 'UIP_NATIVE_METALS_VEHICLE_RANKING_V1'
+          assert evidence['methodology_version'] == '1.2.0'
+          assert evidence['registered_vehicle_count'] == 10
+          assert evidence['commodity_group_count'] == 5
+          assert evidence['ranking_rehearsal_complete'] is True
+          assert evidence['preferred_vehicle_labels_authorized'] is False
+          assert evidence['publication_write_performed'] is False
+          assert evidence['production_state_modified'] is False
+          assert evidence['allocation_created'] is False
+          assert evidence['position_sizing_created'] is False
+          assert evidence['automatic_execution_authorized'] is False
+          assert evidence['central_publication_cron_restored'] is False
+          groups = {g['commodity_id']: g for g in evidence['groups']}
+          assert set(groups) == {
+              'metals:commodity:gold','metals:commodity:silver','metals:commodity:platinum',
+              'metals:commodity:copper','metals:commodity:uranium'
+          }
+          assert groups['metals:commodity:platinum']['state'] == 'ONLY_REGISTERED_IMPLEMENTATION'
+          assert groups['metals:commodity:platinum']['rehearsal_leader'] is None
+          for key in ('metals:commodity:gold','metals:commodity:silver','metals:commodity:copper','metals:commodity:uranium'):
+              assert groups[key]['state'] == 'READ_ONLY_REHEARSAL_ORDERING_COMPLETE'
+              assert groups[key]['rehearsal_leader']
+          print('METALS_FOUR_FACTOR_RANKING_V1_REHEARSAL=PASS')
+          PY
+
+      - name: Upload ranking rehearsal evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: metals-four-factor-ranking-v1-${{ github.run_id }}
+          path: data/operations/metals/vehicle_ranking_v1/
+          if-no-files-found: error
+          retention-days: 30
