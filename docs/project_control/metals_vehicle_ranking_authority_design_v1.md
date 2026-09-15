@@ -2,17 +2,17 @@
 
 ## Objective
 
-Create a bounded, vehicle-specific implementation authority that can answer a question such as:
+Create a bounded, vehicle-specific implementation authority that can answer:
 
-> Gold is attractive. Of the registered Gold vehicles, which exact instrument is the strongest implementation candidate, and why?
+> The upstream commodity thesis is actionable. Of the registered vehicles for that commodity, which exact instrument is the strongest implementation candidate, and why?
 
-The commodity thesis remains the upstream investment authority. This ranking is downstream implementation research only. It may compare vehicles that are already registered to the same commodity, but it may not create, replace, strengthen, weaken, or override the commodity recommendation.
+The commodity thesis remains the upstream investment authority. Vehicle ranking is downstream implementation research only and may not create, replace, strengthen, weaken, or override the commodity recommendation.
 
 ## Authority identity
 
 - authority id: `UIP_NATIVE_METALS_VEHICLE_RANKING_V1`
 - schema version: `1.0.0`
-- methodology version: `1.0.0`
+- methodology version: `1.1.0`
 - scope: `REGISTERED_METALS_IMPLEMENTATION_VEHICLES_ONLY`
 - ranking grain: one row per registered enabled vehicle, grouped within one underlying commodity
 - cross-domain ranking: prohibited
@@ -23,7 +23,7 @@ The commodity thesis remains the upstream investment authority. This ranking is 
 
 Only enabled vehicles in `config/metals/vehicles.json` may enter the ranking.
 
-Current registered commodity mappings are:
+Current registered commodity mappings:
 
 | Commodity | Vehicles | Exposure form |
 | --- | --- | --- |
@@ -55,11 +55,7 @@ A preferred-vehicle result is authorized only when all required evidence is pres
    - current certified bid/ask spread measure;
    - observation window and as-of date required.
 
-4. **Tracking quality**
-   - certified tracking-error or equivalent benchmark-fidelity measure against the governed underlying commodity benchmark where such a comparison is methodologically valid;
-   - miners/thematic equity vehicles must not receive a synthetic commodity tracking score if the relationship is not directly comparable.
-
-5. **Risk efficiency**
+4. **Risk efficiency**
    - current certified vehicle Risk V1 evidence;
    - annualized volatility;
    - downside volatility;
@@ -67,28 +63,35 @@ A preferred-vehicle result is authorized only when all required evidence is pres
    - value at risk;
    - lookback count and methodology version retained.
 
+## Tracking-quality treatment
+
+Tracking quality is no longer a required ranking component in methodology version `1.1.0`.
+
+Reason: the exact benchmark identities are governed, but the historical LBMA and SummerHaven benchmark series needed for defensible 252-session calculations require separate authorized/licensed access that is not part of the UIP data path. UIP will not weaken the standard by substituting spot prices, front-month futures, peer ETFs, or scraped secondary proxies.
+
+If exact authorized benchmark histories become available later, tracking-quality evidence may be displayed as an **optional informational field** under its separately governed methodology. It may not silently change a live ranking score without a future methodology-version change and audit.
+
 ## Score design
 
 When all required evidence is present, the bounded implementation score is 0-100 with these weights:
 
-- exposure fidelity: **30%**
-- cost efficiency: **20%**
-- liquidity / implementation friction: **20%**
-- tracking quality: **15%**
+- exposure fidelity: **35%**
+- cost efficiency: **25%**
+- liquidity / implementation friction: **25%**
 - risk efficiency: **15%**
 
-The five component scores must be independently visible in the presentation. UIP must never expose only an opaque total score.
+The four component scores must be independently visible in the presentation. UIP must never expose only an opaque total score.
 
 ### Exposure fidelity
 
-Exposure fidelity is categorical and must reflect the registered vehicle structure rather than recent performance:
+Exposure fidelity is categorical and reflects registered vehicle structure rather than recent performance:
 
 - physical-backed ETF: highest direct-fidelity class for precious metals;
 - futures fund: direct commodity implementation class, with explicit futures-roll caveat;
 - miners ETF / thematic equity ETF: indirect equity implementation class;
 - cash proxy: excluded from commodity ranking.
 
-The exact numeric mapping for this component must be versioned in the ranking configuration and cannot be changed without methodology-version change.
+The exact numeric mapping is versioned in the ranking configuration and cannot change without a methodology-version change.
 
 ### Cost efficiency
 
@@ -96,11 +99,7 @@ Lower certified recurring cost is better within the compared commodity group. Mi
 
 ### Liquidity / implementation friction
 
-Higher average dollar volume and lower certified bid/ask spread are better. Missing liquidity or spread fails the preferred-vehicle gate.
-
-### Tracking quality
-
-Lower valid tracking error is better. If a vehicle type is structurally indirect and no valid commodity tracking measure exists, the method must represent that distinction explicitly rather than manufacturing a tracking value.
+Higher average dollar volume and lower certified bid/ask spread are better. Missing ADV or spread fails the preferred-vehicle gate.
 
 ### Risk efficiency
 
@@ -111,13 +110,13 @@ Lower vehicle-specific volatility, downside volatility, drawdown magnitude, and 
 UIP may label one vehicle `PREFERRED IMPLEMENTATION CANDIDATE` only when:
 
 - the upstream commodity recommendation is actionable under its own authority;
-- at least two registered vehicles exist for the commodity, unless the single-vehicle case is explicitly labeled `ONLY REGISTERED IMPLEMENTATION` rather than ranked;
-- all required evidence families are complete and current for every compared vehicle;
-- every component can be scored under this methodology without synthetic missing values;
+- at least two registered vehicles exist for the commodity, unless the single-vehicle case is explicitly labeled `ONLY_REGISTERED_IMPLEMENTATION` rather than ranked;
+- all required four-factor evidence is complete and current for every compared vehicle;
+- every required component can be scored without synthetic missing values;
 - no tied total score remains after deterministic tie-break rules;
 - the ranking audit status is PASS.
 
-If any required evidence is missing, the commodity page may still list registered vehicles, but the result must be `PREFERRED_VEHICLE_NOT_CERTIFIED` and show the missing evidence categories.
+If required evidence is missing, the commodity page may still list registered vehicles, but the result must be `PREFERRED_VEHICLE_NOT_CERTIFIED` and show the missing evidence categories.
 
 ## Tie-break policy
 
@@ -129,42 +128,27 @@ For an exact total-score tie, apply in order:
 4. lower maximum drawdown magnitude;
 5. lexical ticker order only as a deterministic display fallback, never as an economic claim.
 
-## Current evidence audit — 2026-09-14 source set
+## Current evidence state
 
-Using the current certified Metals production source set associated with run `34849676771`:
+As of the post-PR-142 source set:
 
-- current price coverage: present for all 10 registered commodity implementation vehicles;
-- Risk V1 coverage: present for all 10 registered commodity implementation vehicles;
-- Risk V1 lookback: 252 observations for all 10;
-- certified expense-ratio coverage in the registry: **0/10**;
-- certified average-dollar-volume field: **not currently published**;
-- certified bid/ask-spread field: **not currently published**;
-- certified tracking-quality field: **not currently published**.
+- registered exposure type: complete for all 10 implementation vehicles;
+- certified recurring cost: complete for all 10;
+- certified 30-session average dollar volume: complete for all 10;
+- certified 20-session Alpaca SIP quoted spread: complete for all 10;
+- certified vehicle Risk V1: complete for all 10;
+- exact tracking benchmark identities: governed, but benchmark history access is not certified and is therefore optional / non-scoring under methodology v1.1.0.
 
-Therefore the current authorization decision is:
-
-`PREFERRED_VEHICLE_RANKING = FAIL_CLOSED_INSUFFICIENT_EVIDENCE`
-
-This is expected. Risk alone is not enough to make a defensible purchase-vehicle recommendation. For Gold specifically, GLD, IAU, and SGOL have very similar Risk V1 values, so a risk-only ranking would create false precision.
-
-## Next evidence work
-
-Before a ranking rehearsal can be authorized, UIP must add governed vehicle evidence for:
-
-- expense ratio / recurring cost;
-- average dollar volume;
-- bid/ask spread;
-- tracking-quality or a versioned explicit `NOT_APPLICABLE_INDIRECT_EXPOSURE` state where appropriate.
-
-Sources and collection policy must be separately certified. Static fund facts should come from authoritative issuer documentation when practical; market-derived liquidity evidence should come from a governed market-data source with explicit windows and as-of dates.
+This methodology change does **not** itself authorize a live preferred-vehicle result. A separate bounded ranking rehearsal and audit must prove the four-factor calculations before any preferred label can be published.
 
 ## Presentation contract
 
-Once certified, a commodity detail page should present:
+Once separately certified, a commodity detail page should present:
 
 - commodity thesis and rich commodity evidence first;
 - `Ways to invest in <commodity>` second;
-- each vehicle's ticker, name, exposure type, current price, cost, liquidity, tracking, and Risk V1 evidence;
+- each vehicle's ticker, name, exposure type, current price, cost, liquidity, and Risk V1 evidence;
+- optional tracking information only if exact authorized benchmark evidence is available;
 - component scores and total implementation score where authorized;
 - one `PREFERRED IMPLEMENTATION CANDIDATE` only when the gate passes;
 - rationale explaining why the preferred vehicle leads;
@@ -174,11 +158,16 @@ Once certified, a commodity detail page should present:
 
 This authority explicitly prohibits:
 
-- copying the representative test scores currently used in vehicle-constraint tests into live ranking authority;
+- copying representative test scores into live ranking authority;
 - using vehicle returns to manufacture commodity forecasts;
 - using vehicle Risk V1 as commodity risk;
 - projecting commodity expected return onto a vehicle as a vehicle-specific forecast;
-- filling missing cost, liquidity, spread, or tracking evidence with zero/default values;
+- filling missing required cost, liquidity, spread, or risk evidence with zero/default values;
+- substituting unauthorized tracking proxies into either the score or presentation as if they were exact benchmark tracking;
 - ranking vehicles across different commodities;
 - automatic execution, position sizing, or portfolio allocation;
 - restoring the central publication cron solely because this design exists.
+
+## Next gate
+
+Implement a bounded read-only four-factor ranking rehearsal using only certified evidence already present in UIP. The rehearsal must emit full component calculations, deterministic tie-break evidence, provenance, and a fail-closed audit. It must not publish preferred labels or modify production state until separately certified.
