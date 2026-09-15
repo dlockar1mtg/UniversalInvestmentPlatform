@@ -113,6 +113,10 @@ def create_http_app(settings: HTTPServiceSettings, repository=None, dashboard_se
     def metals_tactical_ui_javascript():
         return FileResponse(assets / "metals_tactical_ui.js", media_type="text/javascript")
 
+    @app.get("/dashboard/assets/metals_vehicle_ui.js", include_in_schema=False)
+    def metals_vehicle_ui_javascript():
+        return FileResponse(assets / "metals_vehicle_ui.js", media_type="text/javascript")
+
     @app.get("/dashboard/assets/governed_asset_picker.js", include_in_schema=False)
     def governed_asset_picker_javascript():
         return FileResponse(assets / "governed_asset_picker.js", media_type="text/javascript")

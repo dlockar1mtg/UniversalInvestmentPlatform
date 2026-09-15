@@ -10,4 +10,11 @@ function tacticalExplanation(payload){if(!payload)return "No certified tactical-
 function tacticalViewModel(detail){const payload=firstTactical(detail);return {recordType:RECORD_TYPE,domain:DOMAIN,label:tacticalLabel(payload),explanation:tacticalExplanation(payload),asOf:payload?.as_of_date??null,regime:payload?.candidate_regime??null,stateReason:payload?.state_reason??null,isReferenceControl:payload?.is_reference_control===true,available:payload?.state_available===true};}
 function renderTacticalPanel(detail){const vm=tacticalViewModel(detail);const asOf=vm.asOf?`<span>As of ${vm.asOf}</span>`:"<span>As-of date unavailable</span>";const regime=vm.regime?`<span>Regime: ${clean(vm.regime)}</span>`:"";const reason=vm.stateReason?`<small>${clean(vm.stateReason)}</small>`:"";return `<aside class="rec-tactical-panel" data-record-type="${RECORD_TYPE}"><span class="eyebrow">TACTICAL CONTEXT</span><h4>${vm.label}</h4><p>${vm.explanation}</p><div class="rec-tactical-meta">${asOf}${regime}</div>${reason}</aside>`;}
 window.UIPMetalsTactical={RECORD_TYPE,DOMAIN,NO_OVERLAY_COPY,firstTactical,tacticalViewModel,renderTacticalPanel};
+if(!document.querySelector('script[data-uip-metals-vehicle-ui]')){
+  const script=document.createElement("script");
+  script.src="/dashboard/assets/metals_vehicle_ui.js";
+  script.defer=true;
+  script.dataset.uipMetalsVehicleUi="1";
+  document.head.appendChild(script);
+}
 })();
