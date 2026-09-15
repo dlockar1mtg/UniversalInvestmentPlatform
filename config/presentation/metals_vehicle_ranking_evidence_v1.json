@@ -1,0 +1,77 @@
+{
+  "authority_id": "UIP_NATIVE_METALS_VEHICLE_RANKING_EVIDENCE_V1",
+  "schema_version": "1.0.0",
+  "ranking_authority_id": "UIP_NATIVE_METALS_VEHICLE_RANKING_V1",
+  "ranking_methodology_version": "1.2.0",
+  "source_run_id": 34983030032,
+  "source_head_sha": "1949dd03b4dd0d993b175763e44dd005c9e0d5a7",
+  "source_artifact_id": 10402526066,
+  "source_artifact_name": "metals-four-factor-ranking-v1-34983030032",
+  "source_artifact_digest": "sha256:708a76c8defea92b89c30618608d802d6399b17309a6fed70d02358a5df5d015",
+  "source_production_run_id": 34849676771,
+  "source_production_artifact_id": 10349591580,
+  "source_production_artifact_digest": "sha256:8c15699f4fa89f53039b4d1c4a5ea06882e7a9ea4ece4c1c984b69d7ae8edb7f",
+  "risk_output_sha256": "e44ffa3b57e55f0a36482db057fa6f4cf34d8f0cdf34cc67a6096d9feab59f09",
+  "status": "METALS_FOUR_FACTOR_RANKING_EVIDENCE_CERTIFIED",
+  "registered_vehicle_count": 10,
+  "commodity_group_count": 5,
+  "weights": {
+    "exposure_fidelity": 0.35,
+    "cost_efficiency": 0.25,
+    "liquidity_implementation_friction": 0.25,
+    "risk_efficiency": 0.15
+  },
+  "groups": [
+    {
+      "commodity_id": "metals:commodity:gold",
+      "certified_order": ["GLD", "SGOL", "IAU"],
+      "certified_leader": "GLD",
+      "scores": {
+        "GLD": 85.48544649732895,
+        "SGOL": 77.88981280050356,
+        "IAU": 73.67619141270399
+      }
+    },
+    {
+      "commodity_id": "metals:commodity:silver",
+      "certified_order": ["SLV", "SIVR"],
+      "certified_leader": "SLV",
+      "scores": {
+        "SLV": 89.53498202268918,
+        "SIVR": 88.48041654419333
+      }
+    },
+    {
+      "commodity_id": "metals:commodity:platinum",
+      "state": "ONLY_REGISTERED_IMPLEMENTATION",
+      "certified_order": ["PPLT"],
+      "certified_leader": null
+    },
+    {
+      "commodity_id": "metals:commodity:copper",
+      "certified_order": ["COPX", "CPER"],
+      "certified_leader": "COPX",
+      "scores": {
+        "COPX": 80.070548441811,
+        "CPER": 76.77609981066686
+      }
+    },
+    {
+      "commodity_id": "metals:commodity:uranium",
+      "certified_order": ["URA", "URNM"],
+      "certified_leader": "URA",
+      "scores": {
+        "URA": 84.25,
+        "URNM": 60.9395767763326
+      }
+    }
+  ],
+  "ranking_evidence_certified": true,
+  "preferred_vehicle_labels_authorized": false,
+  "publication_write_authorized": false,
+  "production_state_modification_authorized": false,
+  "allocation_authorized": false,
+  "position_sizing_authorized": false,
+  "automatic_execution_authorized": false,
+  "central_publication_cron_restoration_authorized": false
+}
