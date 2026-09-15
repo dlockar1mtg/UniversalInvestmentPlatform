@@ -4,6 +4,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 WORKFLOW = ROOT / ".github" / "workflows" / "production-publication-cycle.yml"
 SCRIPT = ROOT / "scripts" / "publish_rehearsed_rich_candidate.py"
+SCRIPT_V2 = ROOT / "scripts" / "publish_rehearsed_rich_candidate_v2.py"
 
 
 def test_first_rich_production_publication_is_manual_and_exactly_pinned():
@@ -16,10 +17,10 @@ def test_first_rich_production_publication_is_manual_and_exactly_pinned():
     assert 'EXPECTED_MTG_RUN_ID: "34768868851"' in text
     assert 'EXPECTED_METALS_RUN_ID: "34849676771"' in text
     assert 'EXPECTED_MTG_HEAD: "2e8b1a77c1bdd3b79141fffc94f84d91222e4266"' in text
-    assert 'EXPECTED_RICH_RECORD_COUNT: "14228"' in text
+    assert 'EXPECTED_RICH_RECORD_COUNT: "14238"' in text
     assert "download_exact" in text
     assert "scripts/audit_rich_publication_source_contract.py" in text
-    assert "scripts/publish_rehearsed_rich_candidate.py" in text
+    assert "scripts/publish_rehearsed_rich_candidate_v2.py" in text
 
 
 def test_rich_production_script_bootstraps_repository_before_local_imports():
@@ -53,7 +54,20 @@ def test_rich_production_script_validates_complete_candidate_before_postgres():
     assert '"automatic_schedule_modified": False' in text
 
 
+def test_v2_extends_only_metals_implementation_projection_before_legacy_publisher():
+    text = SCRIPT_V2.read_text(encoding="utf-8")
+
+    assert "build_metals_vehicle_implementation_records" in text
+    assert 'EXPECTED_IMPLEMENTATION_RECORD_COUNT = 10' in text
+    assert "build_metals_rich_records_with_implementation" in text
+    assert "expected_metals_counts_with_implementation" in text
+    assert "publisher.build_metals_rich_records = build_metals_rich_records_with_implementation" in text
+    assert "publisher.expected_metals_counts = expected_metals_counts_with_implementation" in text
+    assert "return publisher.main()" in text
+    assert "automatic_execution" not in text
+
+
 def test_existing_legacy_latest_publisher_is_not_used_by_workflow():
     workflow = WORKFLOW.read_text(encoding="utf-8")
     assert "publish_latest_domain_artifacts.py" not in workflow
-    assert "publish_rehearsed_rich_candidate.py" in workflow
+    assert "publish_rehearsed_rich_candidate_v2.py" in workflow
