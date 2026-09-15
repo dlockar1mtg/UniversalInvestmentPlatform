@@ -2,8 +2,9 @@
 
 The rehearsal consumes the latest certified domain artifacts, uses a temporary local
 DuckDB import database, binds the already-certified MTG research sidecars explicitly,
-projects the ten certified Metals rich families explicitly, and stops before any staging
-or activation against PostgreSQL.
+projects the ten certified Metals rich families and the governed Metals vehicle
+implementation records explicitly, and stops before any staging or activation against
+PostgreSQL.
 """
 from __future__ import annotations
 
@@ -29,6 +30,12 @@ from foundation.import_engine.database import initialize_database
 from foundation.presentation.metals_rich_projection import (
     FAMILY_PROJECTION,
     build_metals_rich_records,
+)
+from foundation.presentation.metals_vehicle_implementation_projection import (
+    ONLY_LABEL,
+    PREFERRED_LABEL,
+    RECORD_TYPE as METALS_VEHICLE_IMPLEMENTATION_RECORD_TYPE,
+    build_metals_vehicle_implementation_records,
 )
 from foundation.presentation.publication_model import (
     PresentationPublication,
@@ -94,6 +101,64 @@ def assert_unique_records(publication: PresentationPublication) -> None:
         raise RuntimeError(f"Candidate publication contains duplicate record identities: {duplicates[:20]}")
 
 
+def assert_metals_vehicle_implementation_semantics(records) -> dict[str, object]:
+    rows = [record for record in records if record.record_type == METALS_VEHICLE_IMPLEMENTATION_RECORD_TYPE]
+    if len(rows) != 10:
+        raise RuntimeError(f"Expected exactly 10 Metals vehicle implementation records, observed {len(rows)}")
+
+    by_commodity: dict[str, list] = {}
+    for record in rows:
+        if record.domain_id != "metals":
+            raise RuntimeError("Metals vehicle implementation record has wrong domain")
+        if not record.asset_id:
+            raise RuntimeError("Metals vehicle implementation record is missing commodity identity")
+        by_commodity.setdefault(record.asset_id, []).append(record)
+
+    expected_orders = {
+        "metals:commodity:gold": ["GLD", "SGOL", "IAU"],
+        "metals:commodity:silver": ["SLV", "SIVR"],
+        "metals:commodity:platinum": ["PPLT"],
+        "metals:commodity:copper": ["COPX", "CPER"],
+        "metals:commodity:uranium": ["URA", "URNM"],
+    }
+    if set(by_commodity) != set(expected_orders):
+        raise RuntimeError(f"Unexpected Metals implementation commodity set: {sorted(by_commodity)}")
+
+    summary: dict[str, object] = {}
+    for commodity_id, expected in expected_orders.items():
+        ordered = sorted(
+            by_commodity[commodity_id],
+            key=lambda record: int(record.payload["certified_rank_within_commodity"]),
+        )
+        tickers = [str(record.payload["ticker"]) for record in ordered]
+        if tickers != expected:
+            raise RuntimeError(f"Metals implementation order mismatch for {commodity_id}: {tickers} != {expected}")
+        labels = {
+            str(record.payload["ticker"]): record.payload.get("presentation_label")
+            for record in ordered
+        }
+        summary[commodity_id] = {"order": tickers, "labels": labels}
+
+    if summary["metals:commodity:gold"]["labels"]["GLD"] != PREFERRED_LABEL:
+        raise RuntimeError("Gold preferred implementation label is not GLD")
+    if summary["metals:commodity:copper"]["labels"]["COPX"] != PREFERRED_LABEL:
+        raise RuntimeError("Copper preferred implementation label is not COPX")
+    if summary["metals:commodity:uranium"]["labels"]["URA"] != PREFERRED_LABEL:
+        raise RuntimeError("Uranium preferred implementation label is not URA")
+    if summary["metals:commodity:platinum"]["labels"]["PPLT"] != ONLY_LABEL:
+        raise RuntimeError("Platinum only-registered implementation label is not PPLT")
+    if any(label == PREFERRED_LABEL for label in summary["metals:commodity:silver"]["labels"].values()):
+        raise RuntimeError("Defensive Silver received a preferred implementation label")
+
+    for record in rows:
+        if record.payload.get("automatic_execution_authorized") is not False:
+            raise RuntimeError("Vehicle implementation rehearsal refuses automatic execution authority")
+        if record.payload.get("central_publication_cron_restoration_authorized") is not False:
+            raise RuntimeError("Vehicle implementation rehearsal refuses cron restoration authority")
+
+    return summary
+
+
 def main() -> int:
     parser = argparse.ArgumentParser()
     parser.add_argument("--crypto-artifact", type=Path, required=True)
@@ -153,7 +218,8 @@ def main() -> int:
             duck.close()
 
         metals_rich = build_metals_rich_records(artifact_roots["metals"])
-        combined = list(base.records) + metals_rich
+        metals_vehicle_implementation = build_metals_vehicle_implementation_records(config.repository_root)
+        combined = list(base.records) + metals_rich + metals_vehicle_implementation
         combined.sort(key=lambda item: (item.record_type, item.domain_id, item.asset_id or "", item.record_key))
         candidate = PresentationPublication(
             publication_id=base.publication_id,
@@ -168,16 +234,20 @@ def main() -> int:
         validate_publication_bundle(candidate)
         generic_surface_counts = assert_required_presentation_surfaces(candidate)
         assert_unique_records(candidate)
+        vehicle_implementation_summary = assert_metals_vehicle_implementation_semantics(candidate.records)
 
         counts = Counter((record.domain_id, record.record_type) for record in candidate.records)
         metals_expected = expected_metals_counts(artifact_roots["metals"])
         observed_metals = {record_type: counts[("metals", record_type)] for record_type in metals_expected}
         observed_mtg = {record_type: counts[("mtg", record_type)] for record_type in MTG_RICH_EXPECTED_COUNTS}
+        implementation_count = counts[("metals", METALS_VEHICLE_IMPLEMENTATION_RECORD_TYPE)]
 
         if observed_metals != metals_expected:
             raise RuntimeError(f"Metals rich candidate counts do not match certified inputs: {observed_metals} != {metals_expected}")
         if observed_mtg != MTG_RICH_EXPECTED_COUNTS:
             raise RuntimeError(f"MTG rich candidate counts do not match certified inputs: {observed_mtg} != {MTG_RICH_EXPECTED_COUNTS}")
+        if implementation_count != 10:
+            raise RuntimeError(f"Metals vehicle implementation candidate count must be 10, observed {implementation_count}")
         if candidate.publication_status != "STAGED":
             raise RuntimeError("Candidate publication did not remain STAGED in memory")
 
@@ -192,6 +262,8 @@ def main() -> int:
             "generic_surface_counts": generic_surface_counts,
             "metals_rich_family_count": len(metals_expected),
             "metals_rich_record_counts": observed_metals,
+            "metals_vehicle_implementation_record_count": implementation_count,
+            "metals_vehicle_implementation_summary": vehicle_implementation_summary,
             "mtg_rich_record_counts": observed_mtg,
             "mtg_sidecar_paths": mtg_sidecars,
             "postgres_connection_opened": False,
@@ -199,6 +271,7 @@ def main() -> int:
             "publication_persisted": False,
             "publication_activated": False,
             "automatic_schedule_modified": False,
+            "central_publication_cron_restored": False,
             "failure_policy": "NO_POSTGRES_PERSISTENCE_OR_ACTIVATION_DURING_RICH_CANDIDATE_REHEARSAL",
         }
 
