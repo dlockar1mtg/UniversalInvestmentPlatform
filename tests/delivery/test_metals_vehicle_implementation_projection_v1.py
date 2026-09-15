@@ -56,19 +56,40 @@ def test_silver_remains_defensive_and_preferred_label_is_suppressed():
     assert all(r.payload["presentation_label"] is None for r in silver)
 
 
-def test_projection_carries_governed_identity_cost_and_score_evidence():
-    records = _records()
-    by_ticker = {r.payload["ticker"]: r.payload for r in records}
-
-    assert by_ticker["GLD"]["vehicle_id"] == "metals:vehicle:GLD"
-    assert by_ticker["GLD"]["vehicle_type"] == "physical_backed_etf"
-    assert by_ticker["GLD"]["expense_ratio_pct"] == 0.40
-    assert by_ticker["GLD"]["certified_implementation_score"] == 85.48544649732895
+def test_projection_carries_governed_identity_cost_score_and_component_evidence():
+    by_ticker = {r.payload["ticker"]: r.payload for r in _records()}
+    gld = by_ticker["GLD"]
+    assert gld["vehicle_id"] == "metals:vehicle:GLD"
+    assert gld["vehicle_type"] == "physical_backed_etf"
+    assert gld["expense_ratio_pct"] == 0.40
+    assert gld["certified_implementation_score"] == 85.48544649732895
+    assert gld["ranking_component_evidence_authority_id"] == "UIP_NATIVE_METALS_VEHICLE_RANKING_COMPONENT_EVIDENCE_V1"
+    assert gld["ranking_weights"] == {
+        "exposure_fidelity": 0.35,
+        "cost_efficiency": 0.25,
+        "liquidity_implementation_friction": 0.25,
+        "risk_efficiency": 0.15,
+    }
+    assert gld["exposure_fidelity_score"] == 100.0
+    assert gld["cost_efficiency_score"] == 42.5
+    assert gld["liquidity_implementation_friction_score"] == 100.0
+    assert gld["risk_efficiency_score"] == 99.06964331552635
+    assert gld["average_dollar_volume_usd"] == 3758288420.8526664
+    assert gld["bid_ask_spread_bps"] == 0.4896385164486847
+    assert gld["volatility"] == 0.29271263
+    assert gld["maximum_drawdown_magnitude"] == 0.26404518
 
     assert by_ticker["COPX"]["vehicle_type"] == "miners_etf"
     assert by_ticker["CPER"]["vehicle_type"] == "futures_fund"
     assert by_ticker["URA"]["vehicle_type"] == "thematic_equity_etf"
-    assert by_ticker["PPLT"]["certified_implementation_score"] is None
+
+    pplt = by_ticker["PPLT"]
+    assert pplt["certified_implementation_score"] is None
+    assert pplt["cost_efficiency_score"] is None
+    assert pplt["liquidity_implementation_friction_score"] is None
+    assert pplt["risk_efficiency_score"] is None
+    assert pplt["average_dollar_volume_usd"] == 41783537.960130624
+    assert pplt["bid_ask_spread_bps"] == 6.06428194019866
 
 
 def test_projection_preserves_non_authorizations_and_paused_cron():
