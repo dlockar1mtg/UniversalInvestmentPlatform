@@ -32,26 +32,29 @@ def main() -> int:
         if not row.get("source_authority") or not row.get("source_as_of"):
             raise RuntimeError(f"Missing provenance for {row['ticker']}")
 
-    unresolved_tickers = sorted(row["ticker"] for row in unresolved)
-    if unresolved_tickers != ["CPER"]:
-        raise RuntimeError(f"Unexpected unresolved cost evidence: {unresolved_tickers}")
-    if unresolved[0].get("expense_ratio_pct") is not None:
-        raise RuntimeError("CPER unresolved cost must remain missing")
+    if unresolved:
+        raise RuntimeError(f"Unexpected unresolved cost evidence: {sorted(row['ticker'] for row in unresolved)}")
+
+    cper = next(row for row in rows if row["ticker"] == "CPER")
+    if cper.get("expense_ratio_pct") != 0.88:
+        raise RuntimeError("CPER total annual fund operating expenses must equal 0.88%")
+    if cper.get("management_fee_pct") != 0.65 or cper.get("other_fund_expenses_pct") != 0.23:
+        raise RuntimeError("CPER prospectus component expenses are inconsistent")
+    if "sec.gov/Archives/edgar/data/1479247/" not in cper.get("source_url", ""):
+        raise RuntimeError("CPER recurring cost must retain the fund-authoritative SEC-filed prospectus source")
 
     evidence = {
         "status": "METALS_VEHICLE_COST_EVIDENCE_REHEARSAL_PASS",
         "authority_id": doc["authority_id"],
         "registered_vehicle_count": 10,
         "issuer_cost_observed_count": len(observed),
-        "issuer_cost_unresolved_count": len(unresolved),
-        "unresolved_tickers": unresolved_tickers,
+        "issuer_cost_unresolved_count": 0,
+        "unresolved_tickers": [],
+        "cost_evidence_complete_for_exact_10_tickers": True,
         "cost_evidence_collection_pass": True,
         "preferred_vehicle_ranking_ready": False,
-        "preferred_vehicle_ranking_state": "FAIL_CLOSED_INSUFFICIENT_EVIDENCE",
+        "preferred_vehicle_ranking_state": "FAIL_CLOSED_REMAINING_EVIDENCE",
         "missing_remaining_evidence_families": [
-            "CPER_expense_ratio",
-            "average_dollar_volume",
-            "bid_ask_spread",
             "tracking_quality_or_explicit_not_applicable_state"
         ],
         "network_collection_performed": False,
