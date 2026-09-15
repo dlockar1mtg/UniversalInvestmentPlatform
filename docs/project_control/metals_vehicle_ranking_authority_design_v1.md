@@ -160,7 +160,7 @@ This authority explicitly prohibits:
 
 - copying representative test scores into live ranking authority;
 - using vehicle returns to manufacture commodity forecasts;
-- using vehicle Risk V1 as commodity risk;
+- Vehicle Risk V1 as commodity risk;
 - projecting commodity expected return onto a vehicle as a vehicle-specific forecast;
 - filling missing required cost, liquidity, spread, or risk evidence with zero/default values;
 - substituting unauthorized tracking proxies into either the score or presentation as if they were exact benchmark tracking;
