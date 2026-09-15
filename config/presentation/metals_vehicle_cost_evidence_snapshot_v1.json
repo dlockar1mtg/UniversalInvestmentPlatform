@@ -1,7 +1,7 @@
 {
   "authority_id": "UIP_NATIVE_METALS_VEHICLE_COST_EVIDENCE_SNAPSHOT_V1",
   "schema_version": "1.0.0",
-  "collected_at_utc": "2026-09-14T20:20:00Z",
+  "collected_at_utc": "2026-09-15T12:25:00Z",
   "source_policy": "ISSUER_OR_FUND_AUTHORITY_ONLY",
   "ranking_authority": false,
   "vehicles": [
@@ -11,7 +11,7 @@
     {"ticker":"SLV","expense_ratio_pct":0.50,"cost_basis":"sponsor_fee","status":"CERTIFIED_SOURCE_OBSERVED","source_url":"https://www.ishares.com/us/products/239855/ishares-silver-trust-fund","source_authority":"BlackRock / iShares Silver Trust","source_as_of":"2026-09-09"},
     {"ticker":"SIVR","expense_ratio_pct":0.30,"gross_expense_ratio_pct":0.45,"cost_basis":"net_expense_ratio_with_voluntary_waiver","waiver_note":"Sponsor voluntary fee waiver currently reduces 0.45% gross to 0.30%; current issuer material states waiver through 2027-02-28 and may be withdrawn subject to issuer terms.","status":"CERTIFIED_SOURCE_OBSERVED","source_url":"https://www.aberdeeninvestments.com/en-us/investor/investment-solutions/commodities/sivr","source_authority":"Aberdeen Investments","source_as_of":"2026-09-11"},
     {"ticker":"PPLT","expense_ratio_pct":0.60,"cost_basis":"total_expense_ratio","status":"CERTIFIED_SOURCE_OBSERVED","source_url":"https://www.aberdeeninvestments.com/en-us/investor/funds/view-all-funds/-us0032601066","source_authority":"Aberdeen Investments","source_as_of":"2026-09-11"},
-    {"ticker":"CPER","expense_ratio_pct":null,"cost_basis":null,"status":"UNRESOLVED_OFFICIAL_RENDERED_VALUE","source_url":"https://www.uscfinvestments.com/cper","source_authority":"USCF Investments","source_as_of":"2026-09-14","note":"Official CPER page exposes the Total Expense Ratio label but the rendered value is blank. Missing remains missing."},
+    {"ticker":"CPER","expense_ratio_pct":0.88,"management_fee_pct":0.65,"other_fund_expenses_pct":0.23,"cost_basis":"total_annual_fund_operating_expenses","status":"CERTIFIED_SOURCE_OBSERVED","source_url":"https://www.sec.gov/Archives/edgar/data/1479247/000207187626000122/i26205_cper-424b3.htm","source_authority":"United States Copper Index Fund / USCF — SEC-filed prospectus","source_as_of":"2026-04-24","note":"Current prospectus states 0.65% management fees plus 0.23% other fund expenses = 0.88% Total Annual Fund Operating Expenses. Prior USCF product-page collection rendered the Total Expense Ratio label without a numeric value; that earlier gap is preserved here as provenance rather than silently overwritten."},
     {"ticker":"COPX","expense_ratio_pct":0.65,"cost_basis":"total_expense_ratio","status":"CERTIFIED_SOURCE_OBSERVED","source_url":"https://www.globalxetfs.com/funds/copx","source_authority":"Global X","source_as_of":"2026-09-09"},
     {"ticker":"URA","expense_ratio_pct":0.69,"cost_basis":"total_expense_ratio","status":"CERTIFIED_SOURCE_OBSERVED","source_url":"https://www.globalxetfs.com/funds/ura","source_authority":"Global X","source_as_of":"2026-09-11"},
     {"ticker":"URNM","expense_ratio_pct":0.75,"cost_basis":"net_total_expense_ratio","status":"CERTIFIED_SOURCE_OBSERVED","source_url":"https://sprottetfs.com/urnm-sprott-uranium-miners-etf","source_authority":"Sprott","source_as_of":"2026-09-09"}
