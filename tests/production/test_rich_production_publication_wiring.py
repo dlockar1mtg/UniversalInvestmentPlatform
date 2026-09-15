@@ -33,6 +33,17 @@ def test_rich_production_script_bootstraps_repository_before_local_imports():
     assert root < path_insert < foundation_import
 
 
+def test_rich_production_v2_bootstraps_repository_before_local_imports():
+    text = SCRIPT_V2.read_text(encoding="utf-8")
+
+    assert "import sys" in text
+    root = text.index('ROOT = Path(__file__).resolve().parents[1]')
+    path_insert = text.index("sys.path.insert(0, str(ROOT))")
+    publisher_import = text.index("import scripts.publish_rehearsed_rich_candidate as publisher")
+    foundation_import = text.index("from foundation.presentation.metals_rich_projection import")
+    assert root < path_insert < publisher_import < foundation_import
+
+
 def test_rich_production_script_validates_complete_candidate_before_postgres():
     text = SCRIPT.read_text(encoding="utf-8")
 
