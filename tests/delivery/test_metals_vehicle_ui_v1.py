@@ -17,6 +17,38 @@ def test_vehicle_ui_consumes_only_governed_implementation_records():
     assert "expense_ratio_pct" in text
     assert "vehicle_type" in text
     assert "source_authority" in text
+    assert "ranking_component_evidence_authority_id" in text
+
+
+def test_vehicle_ui_renders_certified_ranking_breakdown_and_evidence():
+    text = VEHICLE_UI.read_text(encoding="utf-8")
+    for field in (
+        "exposure_fidelity_score",
+        "cost_efficiency_score",
+        "liquidity_implementation_friction_score",
+        "risk_efficiency_score",
+        "average_dollar_volume_usd",
+        "bid_ask_spread_bps",
+        "volatility",
+        "downside_volatility",
+        "maximum_drawdown_magnitude",
+        "value_at_risk",
+    ):
+        assert field in text
+    assert "Why this ranks here" in text
+    assert "Certified implementation evidence" in text
+    assert "30-session ADV" in text
+    assert "Bid/ask spread" in text
+    assert "Annualized volatility" in text
+    assert "Historical 95% VaR" in text
+    assert "Not competitively scored" in text
+
+
+def test_vehicle_ui_marks_indirect_equity_exposure():
+    text = VEHICLE_UI.read_text(encoding="utf-8")
+    assert '"miners_etf","thematic_equity_etf"' in text
+    assert "Indirect equity exposure." in text
+    assert "does not represent direct physical or futures ownership" in text
 
 
 def test_vehicle_ui_preserves_upstream_thesis_and_silver_suppression():
