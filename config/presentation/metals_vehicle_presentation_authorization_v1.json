@@ -1,0 +1,87 @@
+{
+  "authority_id": "UIP_NATIVE_METALS_VEHICLE_PRESENTATION_AUTHORIZATION_V1",
+  "schema_version": "1.0.0",
+  "scope": "METALS_COMMODITY_DETAIL_IMPLEMENTATION_PRESENTATION_ONLY",
+  "ranking_evidence_authority_id": "UIP_NATIVE_METALS_VEHICLE_RANKING_EVIDENCE_V1",
+  "ranking_methodology_version": "1.2.0",
+  "ranking_source_run_id": 34983030032,
+  "ranking_source_artifact_id": 10402526066,
+  "ranking_source_artifact_digest": "sha256:708a76c8defea92b89c30618608d802d6399b17309a6fed70d02358a5df5d015",
+  "commodity_state_authority_id": "UIP_NATIVE_METALS_TACTICAL_STATE_V1",
+  "commodity_state_methodology_version": "1.0.0",
+  "commodity_state_source_production_run_id": 34849676771,
+  "commodity_state_source_artifact_id": 10349591580,
+  "commodity_state_source_artifact_digest": "sha256:8c15699f4fa89f53039b4d1c4a5ea06882e7a9ea4ece4c1c984b69d7ae8edb7f",
+  "commodity_state_output_sha256": "615757072a8efc23b4553870abc439583e6a8723bdad4f286c3e991f33e19b0e",
+  "actionability_gate": {
+    "preferred_label_requires_recommendation": ["BUY", "STRONG_BUY"],
+    "preferred_label_requires_tactical_state": ["TACTICAL_SUPPORTIVE"],
+    "defensive_or_nonpositive_state_may_not_receive_preferred_buy_label": true,
+    "missing_or_conflicting_state_behavior": "FAIL_CLOSED",
+    "ranking_may_not_override_commodity_recommendation": true
+  },
+  "identity_boundary": {
+    "raw_tactical_source_contains_legacy_doubled_commodity_prefix": true,
+    "presentation_must_use_governed_metals_identity_bridge": true,
+    "incidental_source_id_normalization_authorized": false
+  },
+  "commodities": [
+    {
+      "commodity_id": "metals:commodity:gold",
+      "recommendation": "STRONG_BUY",
+      "tactical_state": "TACTICAL_SUPPORTIVE",
+      "adjusted_expected_return_12m": 0.0826327744,
+      "certified_vehicle_order": ["GLD", "SGOL", "IAU"],
+      "presentation_state": "PREFERRED_IMPLEMENTATION_AUTHORIZED",
+      "authorized_preferred_vehicle": "GLD",
+      "authorized_label": "PREFERRED_IMPLEMENTATION_CANDIDATE"
+    },
+    {
+      "commodity_id": "metals:commodity:silver",
+      "recommendation": "REDUCE",
+      "tactical_state": "TACTICAL_DEFENSIVE",
+      "adjusted_expected_return_12m": -0.0697335512,
+      "certified_vehicle_order": ["SLV", "SIVR"],
+      "presentation_state": "RANKING_INFORMATIONAL_ONLY_UPSTREAM_DEFENSIVE",
+      "authorized_preferred_vehicle": null,
+      "authorized_label": null
+    },
+    {
+      "commodity_id": "metals:commodity:platinum",
+      "recommendation": "BUY",
+      "tactical_state": "TACTICAL_SUPPORTIVE",
+      "adjusted_expected_return_12m": 0.0577360512,
+      "certified_vehicle_order": ["PPLT"],
+      "presentation_state": "ONLY_REGISTERED_IMPLEMENTATION_AUTHORIZED",
+      "authorized_preferred_vehicle": null,
+      "authorized_label": "ONLY_REGISTERED_IMPLEMENTATION"
+    },
+    {
+      "commodity_id": "metals:commodity:copper",
+      "recommendation": "STRONG_BUY",
+      "tactical_state": "TACTICAL_SUPPORTIVE",
+      "adjusted_expected_return_12m": 0.1131678848,
+      "certified_vehicle_order": ["COPX", "CPER"],
+      "presentation_state": "PREFERRED_IMPLEMENTATION_AUTHORIZED",
+      "authorized_preferred_vehicle": "COPX",
+      "authorized_label": "PREFERRED_IMPLEMENTATION_CANDIDATE"
+    },
+    {
+      "commodity_id": "metals:commodity:uranium",
+      "recommendation": "STRONG_BUY",
+      "tactical_state": "TACTICAL_SUPPORTIVE",
+      "adjusted_expected_return_12m": 0.305,
+      "certified_vehicle_order": ["URA", "URNM"],
+      "presentation_state": "PREFERRED_IMPLEMENTATION_AUTHORIZED",
+      "authorized_preferred_vehicle": "URA",
+      "authorized_label": "PREFERRED_IMPLEMENTATION_CANDIDATE"
+    }
+  ],
+  "preferred_vehicle_labels_authorized_for_presentation": true,
+  "production_ranking_write_authorized": false,
+  "portfolio_allocation_authorized": false,
+  "position_sizing_authorized": false,
+  "automatic_execution_authorized": false,
+  "source_collection_schedule_change_authorized": false,
+  "central_publication_cron_restoration_authorized": false
+}
