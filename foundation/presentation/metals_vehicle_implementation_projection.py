@@ -17,11 +17,13 @@ RECORD_TYPE = "metals_vehicle_implementation"
 
 AUTH_PATH = Path("config/presentation/metals_vehicle_presentation_authorization_v1.json")
 RANKING_PATH = Path("config/presentation/metals_vehicle_ranking_evidence_v1.json")
+COMPONENT_PATH = Path("config/presentation/metals_vehicle_ranking_component_evidence_v1.json")
 COST_PATH = Path("config/presentation/metals_vehicle_cost_evidence_snapshot_v1.json")
 VEHICLES_PATH = Path("config/metals/vehicles.json")
 
 EXPECTED_AUTHORITY = "UIP_NATIVE_METALS_VEHICLE_PRESENTATION_AUTHORIZATION_V1"
 EXPECTED_RANKING_AUTHORITY = "UIP_NATIVE_METALS_VEHICLE_RANKING_EVIDENCE_V1"
+EXPECTED_COMPONENT_AUTHORITY = "UIP_NATIVE_METALS_VEHICLE_RANKING_COMPONENT_EVIDENCE_V1"
 EXPECTED_COST_AUTHORITY = "UIP_NATIVE_METALS_VEHICLE_COST_EVIDENCE_SNAPSHOT_V1"
 EXPECTED_TICKERS = {
     "GLD", "IAU", "SGOL", "SLV", "SIVR", "PPLT", "CPER", "COPX", "URA", "URNM"
@@ -57,6 +59,7 @@ def build_metals_vehicle_implementation_records(repository_root: Path) -> list[P
     root = repository_root.resolve()
     auth = _load(root, AUTH_PATH)
     ranking = _load(root, RANKING_PATH)
+    component = _load(root, COMPONENT_PATH)
     cost = _load(root, COST_PATH)
     registry = _load(root, VEHICLES_PATH)
 
@@ -64,12 +67,24 @@ def build_metals_vehicle_implementation_records(repository_root: Path) -> list[P
         raise RuntimeError("Unexpected Metals vehicle presentation authorization authority")
     if ranking.get("authority_id") != EXPECTED_RANKING_AUTHORITY:
         raise RuntimeError("Unexpected Metals vehicle ranking evidence authority")
+    if component.get("authority_id") != EXPECTED_COMPONENT_AUTHORITY:
+        raise RuntimeError("Unexpected Metals vehicle ranking component evidence authority")
     if cost.get("authority_id") != EXPECTED_COST_AUTHORITY:
         raise RuntimeError("Unexpected Metals vehicle cost evidence authority")
     if auth.get("ranking_evidence_authority_id") != ranking.get("authority_id"):
         raise RuntimeError("Presentation authorization is not bound to certified ranking evidence")
     if auth.get("ranking_source_artifact_digest") != ranking.get("source_artifact_digest"):
         raise RuntimeError("Presentation authorization ranking digest does not match certified evidence")
+    if component.get("ranking_authority_id") != ranking.get("ranking_authority_id"):
+        raise RuntimeError("Component evidence ranking authority differs from ranking certificate")
+    if component.get("ranking_methodology_version") != ranking.get("ranking_methodology_version"):
+        raise RuntimeError("Component evidence methodology differs from ranking certificate")
+    if component.get("source_artifact_digest") != ranking.get("source_artifact_digest"):
+        raise RuntimeError("Component evidence artifact digest differs from ranking certificate")
+    if component.get("status") != "METALS_VEHICLE_RANKING_COMPONENT_EVIDENCE_CERTIFIED":
+        raise RuntimeError("Metals vehicle component evidence is not certified")
+    if component.get("presentation_only") is not True or component.get("ranking_recalculated") is not False:
+        raise RuntimeError("Metals vehicle component evidence must be presentation-only and non-recalculated")
     if auth.get("central_publication_cron_restoration_authorized") is not False:
         raise RuntimeError("Metals vehicle projection refuses cron-restoration authority")
     if auth.get("automatic_execution_authorized") is not False:
@@ -83,26 +98,38 @@ def build_metals_vehicle_implementation_records(repository_root: Path) -> list[P
     vehicles = _unique_index(registered_rows, "ticker", "Metals vehicle registry")
     costs = _unique_index([dict(row) for row in cost.get("vehicles", [])], "ticker", "Metals cost evidence")
     groups = _unique_index([dict(row) for row in ranking.get("groups", [])], "commodity_id", "Metals ranking evidence")
+    component_groups = _unique_index([dict(row) for row in component.get("groups", [])], "commodity_id", "Metals ranking component evidence")
     authorizations = _unique_index([dict(row) for row in auth.get("commodities", [])], "commodity_id", "Metals presentation authorization")
 
     if set(vehicles) != EXPECTED_TICKERS:
         raise RuntimeError(f"Registered ranked Metals ticker set mismatch: {sorted(vehicles)}")
     if set(costs) != EXPECTED_TICKERS:
         raise RuntimeError(f"Certified Metals cost ticker set mismatch: {sorted(costs)}")
-    if set(groups) != set(authorizations):
-        raise RuntimeError("Ranking and presentation commodity groups differ")
+    if set(groups) != set(authorizations) or set(component_groups) != set(authorizations):
+        raise RuntimeError("Ranking, component evidence, and presentation commodity groups differ")
 
     emitted: list[PresentationRecord] = []
     seen_tickers: set[str] = set()
+    ranking_weights = dict(component.get("weights") or {})
 
     for commodity_id in sorted(authorizations):
         authorization = authorizations[commodity_id]
         ranking_group = groups[commodity_id]
+        component_group = component_groups[commodity_id]
         ordered = list(authorization.get("certified_vehicle_order") or [])
         if ordered != list(ranking_group.get("certified_order") or []):
             raise RuntimeError(f"Certified vehicle order mismatch for {commodity_id}")
+        if ordered != list(component_group.get("certified_order") or []):
+            raise RuntimeError(f"Component evidence vehicle order mismatch for {commodity_id}")
         if not ordered:
             raise RuntimeError(f"Empty certified vehicle order for {commodity_id}")
+        component_vehicles = _unique_index(
+            [dict(row) for row in component_group.get("vehicles", [])],
+            "ticker",
+            f"Metals ranking component evidence {commodity_id}",
+        )
+        if set(component_vehicles) != set(ordered):
+            raise RuntimeError(f"Component evidence ticker set mismatch for {commodity_id}")
 
         recommendation = str(authorization.get("recommendation", ""))
         tactical_state = str(authorization.get("tactical_state", ""))
@@ -129,6 +156,13 @@ def build_metals_vehicle_implementation_records(repository_root: Path) -> list[P
 
             vehicle = vehicles[ticker]
             cost_row = costs[ticker]
+            component_row = component_vehicles[ticker]
+            certified_score = scores.get(ticker)
+            if certified_score is not None and component_row.get("total_score") != certified_score:
+                raise RuntimeError(f"Component evidence total score drifted for {ticker}")
+            if certified_score is None and component_row.get("total_score") is not None:
+                raise RuntimeError(f"Singleton vehicle {ticker} unexpectedly gained a competitive total score")
+
             label = None
             if preferred == ticker:
                 label = PREFERRED_LABEL
@@ -138,6 +172,7 @@ def build_metals_vehicle_implementation_records(repository_root: Path) -> list[P
             payload = {
                 "authority_id": EXPECTED_AUTHORITY,
                 "ranking_evidence_authority_id": EXPECTED_RANKING_AUTHORITY,
+                "ranking_component_evidence_authority_id": EXPECTED_COMPONENT_AUTHORITY,
                 "commodity_id": commodity_id,
                 "ticker": ticker,
                 "vehicle_id": vehicle["vehicle_id"],
@@ -146,7 +181,18 @@ def build_metals_vehicle_implementation_records(repository_root: Path) -> list[P
                 "role": vehicle["role"],
                 "official_url": vehicle["official_url"],
                 "certified_rank_within_commodity": rank,
-                "certified_implementation_score": scores.get(ticker),
+                "certified_implementation_score": certified_score,
+                "ranking_weights": ranking_weights,
+                "exposure_fidelity_score": component_row.get("exposure_fidelity_score"),
+                "cost_efficiency_score": component_row.get("cost_efficiency_score"),
+                "liquidity_implementation_friction_score": component_row.get("liquidity_implementation_friction_score"),
+                "risk_efficiency_score": component_row.get("risk_efficiency_score"),
+                "average_dollar_volume_usd": component_row.get("average_dollar_volume_usd"),
+                "bid_ask_spread_bps": component_row.get("bid_ask_spread_bps"),
+                "volatility": component_row.get("volatility"),
+                "downside_volatility": component_row.get("downside_volatility"),
+                "maximum_drawdown_magnitude": component_row.get("maximum_drawdown_magnitude"),
+                "value_at_risk": component_row.get("value_at_risk"),
                 "expense_ratio_pct": cost_row.get("expense_ratio_pct"),
                 "cost_basis": cost_row.get("cost_basis"),
                 "cost_evidence_status": cost_row.get("status"),
