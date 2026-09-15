@@ -93,7 +93,7 @@ This remains an implementation choice inside an already-positive Copper thesis. 
 - upstream: `REDUCE`, `TACTICAL_DEFENSIVE`
 - certified order: `SLV > SIVR`
 - vehicle evidence may be displayed as informational implementation research;
-- **no** `PREFERRED_IMPLEMENTATION_CANDIDATE` label is authorized;
+- no `PREFERRED_IMPLEMENTATION_CANDIDATE` label is authorized;
 - the presentation must retain the defensive Silver recommendation prominently enough that the vehicle ordering cannot reasonably be read as a buy instruction.
 
 ## Identity boundary
