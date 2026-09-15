@@ -7,7 +7,12 @@ publisher. No ranking is recalculated here.
 """
 from __future__ import annotations
 
+import sys
 from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
 import scripts.publish_rehearsed_rich_candidate as publisher
 from foundation.presentation.metals_rich_projection import build_metals_rich_records as build_core_metals_rich_records
@@ -17,7 +22,6 @@ from foundation.presentation.metals_vehicle_implementation_projection import (
 )
 from scripts.rehearse_rich_publication_candidate import expected_metals_counts as expected_core_metals_counts
 
-ROOT = Path(__file__).resolve().parents[1]
 EXPECTED_IMPLEMENTATION_RECORD_COUNT = 10
 
 
