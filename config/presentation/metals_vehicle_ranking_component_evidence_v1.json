@@ -1,0 +1,231 @@
+{
+  "authority_id": "UIP_NATIVE_METALS_VEHICLE_RANKING_COMPONENT_EVIDENCE_V1",
+  "schema_version": "1.0.0",
+  "ranking_authority_id": "UIP_NATIVE_METALS_VEHICLE_RANKING_V1",
+  "ranking_methodology_version": "1.2.0",
+  "source_run_id": 34983030032,
+  "source_artifact_id": 10402526066,
+  "source_artifact_digest": "sha256:708a76c8defea92b89c30618608d802d6399b17309a6fed70d02358a5df5d015",
+  "rehearsal_json_sha256": "e2499f90ade51d1f396af327ee196baaf46ad7522d88fc1228fa5c99b49705b7",
+  "risk_output_sha256": "e44ffa3b57e55f0a36482db057fa6f4cf34d8f0cdf34cc67a6096d9feab59f09",
+  "adv_output_sha256": "7ea64b5b975fea4c51c8fdb3e00fec83bcf1527e6b65a2eb2a23f64775913d65",
+  "status": "METALS_VEHICLE_RANKING_COMPONENT_EVIDENCE_CERTIFIED",
+  "weights": {
+    "exposure_fidelity": 0.35,
+    "cost_efficiency": 0.25,
+    "liquidity_implementation_friction": 0.25,
+    "risk_efficiency": 0.15
+  },
+  "groups": [
+    {
+      "commodity_id": "metals:commodity:gold",
+      "certified_order": ["GLD", "SGOL", "IAU"],
+      "certified_leader": "GLD",
+      "vehicles": [
+        {
+          "ticker": "GLD",
+          "vehicle_id": "metals:vehicle:GLD",
+          "vehicle_type": "physical_backed_etf",
+          "total_score": 85.48544649732895,
+          "exposure_fidelity_score": 100.0,
+          "cost_efficiency_score": 42.5,
+          "liquidity_implementation_friction_score": 100.0,
+          "risk_efficiency_score": 99.06964331552635,
+          "average_dollar_volume_usd": 3758288420.8526664,
+          "bid_ask_spread_bps": 0.4896385164486847,
+          "expense_ratio_pct": 0.4,
+          "volatility": 0.29271263,
+          "downside_volatility": 0.23971165,
+          "maximum_drawdown_magnitude": 0.26404518,
+          "value_at_risk": 0.03086385
+        },
+        {
+          "ticker": "SGOL",
+          "vehicle_id": "metals:vehicle:SGOL",
+          "vehicle_type": "physical_backed_etf",
+          "total_score": 77.88981280050356,
+          "exposure_fidelity_score": 100.0,
+          "cost_efficiency_score": 99.99999999999999,
+          "liquidity_implementation_friction_score": 11.559251202014277,
+          "risk_efficiency_score": 100.0,
+          "average_dollar_volume_usd": 90640087.31908683,
+          "bid_ask_spread_bps": 2.3646307930811252,
+          "expense_ratio_pct": 0.17,
+          "volatility": 0.2899233,
+          "downside_volatility": 0.23596766,
+          "maximum_drawdown_magnitude": 0.26317835,
+          "value_at_risk": 0.03059276
+        },
+        {
+          "ticker": "IAU",
+          "vehicle_id": "metals:vehicle:IAU",
+          "vehicle_type": "physical_backed_etf",
+          "total_score": 73.67619141270399,
+          "exposure_fidelity_score": 100.0,
+          "cost_efficiency_score": 68.0,
+          "liquidity_implementation_friction_score": 26.915909758525444,
+          "risk_efficiency_score": 99.64809315381748,
+          "average_dollar_volume_usd": 486221704.3635422,
+          "bid_ask_spread_bps": 1.1973211358820681,
+          "expense_ratio_pct": 0.25,
+          "volatility": 0.29059383,
+          "downside_volatility": 0.23726568,
+          "maximum_drawdown_magnitude": 0.26356204,
+          "value_at_risk": 0.03074162
+        }
+      ]
+    },
+    {
+      "commodity_id": "metals:commodity:silver",
+      "certified_order": ["SLV", "SIVR"],
+      "certified_leader": "SLV",
+      "vehicles": [
+        {
+          "ticker": "SLV",
+          "vehicle_id": "metals:vehicle:SLV",
+          "vehicle_type": "physical_backed_etf",
+          "total_score": 89.53498202268918,
+          "exposure_fidelity_score": 100.0,
+          "cost_efficiency_score": 60.0,
+          "liquidity_implementation_friction_score": 98.21646590910376,
+          "risk_efficiency_score": 99.8724369694216,
+          "average_dollar_volume_usd": 1001778772.435924,
+          "bid_ask_spread_bps": 1.6668056134387286,
+          "expense_ratio_pct": 0.5,
+          "volatility": 0.62536194,
+          "downside_volatility": 0.57471814,
+          "maximum_drawdown_magnitude": 0.52282197,
+          "value_at_risk": 0.05405071
+        },
+        {
+          "ticker": "SIVR",
+          "vehicle_id": "metals:vehicle:SIVR",
+          "vehicle_type": "physical_backed_etf",
+          "total_score": 88.48041654419333,
+          "exposure_fidelity_score": 100.0,
+          "cost_efficiency_score": 100.0,
+          "liquidity_implementation_friction_score": 53.92166617677331,
+          "risk_efficiency_score": 100.0,
+          "average_dollar_volume_usd": 78572838.56942901,
+          "bid_ask_spread_bps": 1.607349520749425,
+          "expense_ratio_pct": 0.3,
+          "volatility": 0.62511827,
+          "downside_volatility": 0.57356897,
+          "maximum_drawdown_magnitude": 0.52268425,
+          "value_at_risk": 0.05391829
+        }
+      ]
+    },
+    {
+      "commodity_id": "metals:commodity:platinum",
+      "state": "ONLY_REGISTERED_IMPLEMENTATION",
+      "certified_order": ["PPLT"],
+      "certified_leader": null,
+      "vehicles": [
+        {
+          "ticker": "PPLT",
+          "vehicle_id": "metals:vehicle:PPLT",
+          "vehicle_type": "physical_backed_etf",
+          "exposure_fidelity_score": 100.0,
+          "average_dollar_volume_usd": 41783537.960130624,
+          "bid_ask_spread_bps": 6.06428194019866,
+          "expense_ratio_pct": 0.6,
+          "volatility": 0.51340338,
+          "downside_volatility": 0.41069519,
+          "maximum_drawdown_magnitude": 0.43984143,
+          "value_at_risk": 0.04934739
+        }
+      ]
+    },
+    {
+      "commodity_id": "metals:commodity:copper",
+      "certified_order": ["COPX", "CPER"],
+      "certified_leader": "COPX",
+      "vehicles": [
+        {
+          "ticker": "COPX",
+          "vehicle_id": "metals:vehicle:COPX",
+          "vehicle_type": "miners_etf",
+          "total_score": 80.070548441811,
+          "exposure_fidelity_score": 60.0,
+          "cost_efficiency_score": 100.0,
+          "liquidity_implementation_friction_score": 100.0,
+          "risk_efficiency_score": 60.47032294540669,
+          "average_dollar_volume_usd": 272036934.2466222,
+          "bid_ask_spread_bps": 2.170928037276172,
+          "expense_ratio_pct": 0.65,
+          "volatility": 0.47762932,
+          "downside_volatility": 0.33124395,
+          "maximum_drawdown_magnitude": 0.27816088,
+          "value_at_risk": 0.04793305
+        },
+        {
+          "ticker": "CPER",
+          "vehicle_id": "metals:vehicle:CPER",
+          "vehicle_type": "futures_fund",
+          "total_score": 76.77609981066686,
+          "exposure_fidelity_score": 90.0,
+          "cost_efficiency_score": 73.86363636363636,
+          "liquidity_implementation_friction_score": 47.24076287903111,
+          "risk_efficiency_score": 100.0,
+          "average_dollar_volume_usd": 21238532.465157572,
+          "bid_ask_spread_bps": 2.504696305572451,
+          "expense_ratio_pct": 0.88,
+          "volatility": 0.28834761,
+          "downside_volatility": 0.20519266,
+          "maximum_drawdown_magnitude": 0.16429865,
+          "value_at_risk": 0.02899881
+        }
+      ]
+    },
+    {
+      "commodity_id": "metals:commodity:uranium",
+      "certified_order": ["URA", "URNM"],
+      "certified_leader": "URA",
+      "vehicles": [
+        {
+          "ticker": "URA",
+          "vehicle_id": "metals:vehicle:URA",
+          "vehicle_type": "thematic_equity_etf",
+          "total_score": 84.25,
+          "exposure_fidelity_score": 55.0,
+          "cost_efficiency_score": 100.00000000000001,
+          "liquidity_implementation_friction_score": 100.0,
+          "risk_efficiency_score": 100.0,
+          "average_dollar_volume_usd": 143698813.12792435,
+          "bid_ask_spread_bps": 2.19491228149447,
+          "expense_ratio_pct": 0.69,
+          "volatility": 0.5381414,
+          "downside_volatility": 0.31150569,
+          "maximum_drawdown_magnitude": 0.39297849,
+          "value_at_risk": 0.05328264
+        },
+        {
+          "ticker": "URNM",
+          "vehicle_id": "metals:vehicle:URNM",
+          "vehicle_type": "thematic_equity_etf",
+          "total_score": 60.9395767763326,
+          "exposure_fidelity_score": 55.0,
+          "cost_efficiency_score": 92.0,
+          "liquidity_implementation_friction_score": 17.05053808669618,
+          "risk_efficiency_score": 96.17961503105707,
+          "average_dollar_volume_usd": 26342220.873327892,
+          "bid_ask_spread_bps": 13.918695866057366,
+          "expense_ratio_pct": 0.75,
+          "volatility": 0.54323774,
+          "downside_volatility": 0.31720985,
+          "maximum_drawdown_magnitude": 0.43886174,
+          "value_at_risk": 0.05442008
+        }
+      ]
+    }
+  ],
+  "presentation_only": true,
+  "ranking_recalculated": false,
+  "preferred_vehicle_labels_authorized": false,
+  "publication_write_authorized": false,
+  "allocation_authorized": false,
+  "position_sizing_authorized": false,
+  "automatic_execution_authorized": false,
+  "central_publication_cron_restoration_authorized": false
+}
