@@ -57,12 +57,15 @@ def test_missing_exact_prior_month_fails_closed(tmp_path: Path) -> None:
         writer = csv.DictWriter(handle, fieldnames=["asset_id", "observation_date", "value"])
         writer.writeheader()
         for asset in module.SUPPORTED:
-            for observed, value in (("2026-01-01", 80), ("2026-04-01", 100), ("2026-06-01", 120), ("2026-07-01", 100)):
+            # Latest is July. April and January exist for exact 3M/6M comparisons,
+            # but June is deliberately absent so the exact 1M comparison must fail closed.
+            for observed, value in (("2026-01-01", 80), ("2026-04-01", 100), ("2026-05-01", 110), ("2026-07-01", 100)):
                 writer.writerow({"asset_id": asset, "observation_date": observed, "value": value})
     try:
         module.build_rows(path)
     except RuntimeError as exc:
         assert "missing exact prior calendar month" in str(exc)
+        assert "2026-06-01" in str(exc)
     else:
         raise AssertionError("missing exact month did not fail closed")
 
