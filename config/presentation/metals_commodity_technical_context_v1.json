@@ -1,0 +1,97 @@
+{
+  "authority_id": "UIP_NATIVE_METALS_COMMODITY_TECHNICAL_CONTEXT_V1",
+  "schema_version": "1.0.0",
+  "methodology_version": "1.0.0",
+  "legacy_equivalent": false,
+  "scope": "BENCHMARK_COMMODITY_MONTHLY_TECHNICAL_CONTEXT",
+  "source_state_mode": "CURRENT_CERTIFIED_WORLD_BANK_MONTHLY_HISTORY_ONLY",
+  "presentation_semantics": "DESCRIPTIVE_COMMODITY_TECHNICAL_CONTEXT_NOT_RECOMMENDATION_NOT_EXECUTION",
+  "supported_assets": [
+    "metals:commodity:aluminum",
+    "metals:commodity:copper",
+    "metals:commodity:gold",
+    "metals:commodity:nickel",
+    "metals:commodity:platinum",
+    "metals:commodity:silver",
+    "metals:commodity:tin",
+    "metals:commodity:zinc"
+  ],
+  "unsupported_assets": {
+    "metals:commodity:uranium": "CERTIFIED_EIA_SOURCE_IS_ANNUAL_AND_CANNOT_SUPPORT_MONTHLY_TECHNICAL_CONTEXT_V1"
+  },
+  "source_contract": {
+    "provider": "world_bank",
+    "provider_product": "World Bank Pink Sheet monthly commodity history",
+    "required_frequency": "MONTHLY",
+    "required_identity": "DIRECT_COMMODITY_BENCHMARK",
+    "vehicle_proxy_allowed": false,
+    "interpolation_allowed": false,
+    "forward_fill_allowed": false,
+    "cross_source_substitution_allowed": false
+  },
+  "metrics": {
+    "return_1m": {
+      "formula": "latest_value / exact_calendar_month_minus_1_value - 1",
+      "minimum_history_months": 1,
+      "missing_behavior": "UNAVAILABLE_IF_EXACT_PRIOR_MONTH_IS_MISSING"
+    },
+    "return_3m": {
+      "formula": "latest_value / exact_calendar_month_minus_3_value - 1",
+      "minimum_history_months": 3,
+      "missing_behavior": "UNAVAILABLE_IF_EXACT_PRIOR_MONTH_IS_MISSING"
+    },
+    "return_6m": {
+      "formula": "latest_value / exact_calendar_month_minus_6_value - 1",
+      "minimum_history_months": 6,
+      "missing_behavior": "UNAVAILABLE_IF_EXACT_PRIOR_MONTH_IS_MISSING"
+    },
+    "current_drawdown": {
+      "formula": "latest_value / maximum_available_value_through_latest_observation - 1",
+      "minimum_observation_count": 2,
+      "interpretation": "CURRENT_DRAWNDOWN_FROM_HIGHEST_AVAILABLE_OFFICIAL_MONTHLY_BENCHMARK_OBSERVATION"
+    }
+  },
+  "moving_average_policy": {
+    "ma50_authorized": false,
+    "ma200_authorized": false,
+    "reason": "MONTHLY_WORLD_BANK_HISTORY_DOES_NOT_SUPPORT_50_DAY_OR_200_DAY_MOVING_AVERAGE_CLAIMS",
+    "presentation_behavior": "SHOW_UNSUPPORTED_BY_SOURCE_CADENCE_OR_HIDE_FIELD;DO_NOT_RENDER_NUMERIC_VALUE"
+  },
+  "required_output_fields": [
+    "universal_asset_id",
+    "as_of_date",
+    "source_provider",
+    "source_series_id",
+    "source_frequency",
+    "observation_count",
+    "return_1m",
+    "return_3m",
+    "return_6m",
+    "current_drawdown",
+    "historical_peak_value",
+    "historical_peak_date",
+    "authority_id",
+    "methodology_version",
+    "presentation_semantics"
+  ],
+  "forbidden_semantics": [
+    "VEHICLE_TO_COMMODITY_PROXY_WITHOUT_SEPARATE_AUTHORITY",
+    "DAILY_MOVING_AVERAGE_FROM_MONTHLY_SOURCE",
+    "INTERPOLATED_MONTHLY_RETURN",
+    "FORWARD_FILLED_MONTHLY_RETURN",
+    "CROSS_SOURCE_IMPUTATION",
+    "URANIUM_MONTHLY_TECHNICAL_CONTEXT_FROM_ANNUAL_EIA_SOURCE",
+    "RECOMMENDATION_OVERRIDE",
+    "CROSS_ASSET_RANKING",
+    "PORTFOLIO_ALLOCATION",
+    "POSITION_SIZING",
+    "AUTOMATIC_EXECUTION",
+    "CENTRAL_PUBLICATION_CRON_RESTORATION"
+  ],
+  "publication_policy": {
+    "source_collection_schedule_change_authorized": false,
+    "postgres_write_authorized": false,
+    "presentation_activation_authorized": false,
+    "central_publication_cron_restoration_authorized": false
+  }
+}
