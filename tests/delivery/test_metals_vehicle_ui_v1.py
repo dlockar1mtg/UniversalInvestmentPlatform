@@ -11,7 +11,6 @@ def test_vehicle_ui_consumes_only_governed_implementation_records():
     assert 'RECORD_TYPE="metals_vehicle_implementation"' in text
     assert 'PREFERRED_LABEL="PREFERRED_IMPLEMENTATION_CANDIDATE"' in text
     assert 'ONLY_LABEL="ONLY_REGISTERED_IMPLEMENTATION"' in text
-    assert 'detail?.records?.[RECORD_TYPE]' in text
     assert "certified_rank_within_commodity" in text
     assert "certified_implementation_score" in text
     assert "expense_ratio_pct" in text
@@ -70,6 +69,41 @@ def test_vehicle_ui_refuses_execution_allocation_sizing_and_cron_authority():
     ):
         assert field in text
     assert "refuses execution, allocation, sizing, or cron-restoration authority" in text
+
+
+def test_vehicle_ui_renders_governed_commodity_forecast_evidence():
+    text = VEHICLE_UI.read_text(encoding="utf-8")
+    assert 'MODEL_COMPONENT_TYPE="metals_model_component"' in text
+    assert 'UNCERTAINTY_TYPE="metals_uncertainty_adjusted"' in text
+    assert 'REGIME_TYPE="metals_regime_probability"' in text
+    assert "UIP_NATIVE_METALS_MODEL_COMPONENT_V1" in text
+    assert "UIP_NATIVE_METALS_UNCERTAINTY_ADJUSTED_V1" in text
+    assert "UIP_NATIVE_METALS_REGIME_PROBABILITY_V1" in text
+    assert "uip_native_benchmark_momentum" in text
+    assert "uip_native_vehicle_confirmation" in text
+    assert "uip_native_data_completeness_adjustment" in text
+    assert "Certified forecast evidence" in text
+    assert "Benchmark momentum" in text
+    assert "Vehicle confirmation" in text
+    assert "Data completeness adjustment" in text
+    assert "Raw expected return" in text
+    assert "Uncertainty haircut" in text
+    assert "Adjusted expected return" in text
+    assert "Current regime support" in text
+
+
+def test_commodity_forecast_evidence_is_fail_closed_and_semantically_bounded():
+    text = VEHICLE_UI.read_text(encoding="utf-8")
+    assert "components.length!==9||uncertainty.length!==3||regimes.length!==3" in text
+    assert "Metals research evidence record count mismatch." in text
+    assert "Duplicate Metals model component evidence." in text
+    assert "Missing Metals model component evidence." in text
+    assert "Metals uncertainty-adjusted identity mismatch." in text
+    assert "Metals regime identity mismatch." in text
+    assert "one-sided confidence haircut, not a bear/bull interval" in text
+    assert "not statistically calibrated probabilities" in text
+    assert "Vehicle Risk V1 remains vehicle-only" in text
+    assert "do not create a separate recommendation" in text
 
 
 def test_dashboard_serves_and_loads_vehicle_ui_asset():
