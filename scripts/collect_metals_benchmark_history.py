@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import csv
+import importlib.util
 from io import BytesIO
 from pathlib import Path
 import sys
@@ -10,7 +11,30 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from foundation.production.providers import WorldBankCommodityProvider, _decimal, _request_bytes
+
+def _load_provider_module():
+    """
+    Load providers.py directly without importing foundation.production.
+
+    foundation.production.__init__ eagerly imports dashboard/delivery surfaces that
+    require optional web-service dependencies such as FastAPI. This collector only
+    needs the standalone World Bank provider implementation, so loading the module
+    directly preserves the narrow rehearsal dependency boundary.
+    """
+    path = ROOT / "foundation" / "production" / "providers.py"
+    spec = importlib.util.spec_from_file_location("uip_metals_provider_module", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError("Unable to load Metals provider module")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+_PROVIDER_MODULE = _load_provider_module()
+WorldBankCommodityProvider = _PROVIDER_MODULE.WorldBankCommodityProvider
+_decimal = _PROVIDER_MODULE._decimal
+_request_bytes = _PROVIDER_MODULE._request_bytes
 
 
 def collect_rows() -> list[dict[str, object]]:
