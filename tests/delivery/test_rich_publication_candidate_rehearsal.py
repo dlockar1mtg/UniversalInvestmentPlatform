@@ -16,12 +16,13 @@ def _load_projection():
     return module
 
 
-def test_projection_covers_exactly_ten_certified_metals_families():
+def test_projection_covers_exactly_eleven_certified_metals_families():
     module = _load_projection()
     assert set(module.FAMILY_PROJECTION) == {
         "current_price",
         "price_history",
         "data_freshness",
+        "commodity_technical_context",
         "platform_health",
         "model_component",
         "risk",
@@ -37,6 +38,9 @@ def test_projection_covers_exactly_ten_certified_metals_families():
         "observation_date",
         "source_run_id",
     )
+    assert module.FAMILY_PROJECTION["commodity_technical_context"]["record_type"] == "metals_commodity_technical_context"
+    assert module.FAMILY_PROJECTION["commodity_technical_context"]["asset_field"] == "universal_asset_id"
+    assert module.FAMILY_PROJECTION["commodity_technical_context"]["key_fields"] == ("universal_asset_id",)
     assert module.FAMILY_PROJECTION["risk"]["record_type"] == "risk"
     assert module.FAMILY_PROJECTION["tactical_state"]["record_type"] == "tactical_state"
 
@@ -82,7 +86,7 @@ def test_workflow_is_manual_only_and_never_receives_postgres_dsn():
     assert "UIIP_DATABASE_URL" not in text
     assert "scripts/audit_rich_publication_source_contract.py" in text
     assert "scripts/rehearse_rich_publication_candidate.py" in text
-    assert 'assert source["metals_certified_family_count"] == 10' in text
+    assert 'assert source["metals_certified_family_count"] == 11' in text
     assert 'assert source["metals_remaining_family_count"] == 0' in text
     assert 'assert candidate["publication_activated"] is False' in text
     assert "RICH_PUBLICATION_CANDIDATE_REHEARSAL=PASS" in text
