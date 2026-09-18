@@ -7,6 +7,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[2]
 BUILDER = ROOT / "scripts" / "build_metals_commodity_technical_context_sidecar.py"
+COLLECTOR = ROOT / "scripts" / "collect_metals_benchmark_history.py"
 WORKFLOW = ROOT / ".github" / "workflows" / "metals-commodity-technical-context-v1-rehearsal.yml"
 
 
@@ -68,6 +69,14 @@ def test_missing_exact_prior_month_fails_closed(tmp_path: Path) -> None:
         assert "2026-06-01" in str(exc)
     else:
         raise AssertionError("missing exact month did not fail closed")
+
+
+def test_history_collector_does_not_import_eager_production_package() -> None:
+    text = COLLECTOR.read_text(encoding="utf-8")
+    assert "from foundation.production.providers import" not in text
+    assert 'spec_from_file_location("uip_metals_provider_module"' in text
+    assert 'ROOT / "foundation" / "production" / "providers.py"' in text
+    assert "sys.modules[spec.name] = module" in text
 
 
 def test_rehearsal_is_manual_read_only_and_keeps_publication_closed() -> None:
