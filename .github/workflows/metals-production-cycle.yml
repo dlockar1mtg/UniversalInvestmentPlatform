@@ -70,6 +70,10 @@ jobs:
           exit "$collection_status"
       - name: Collect official benchmark input
         run: python scripts/collect_metals_benchmark_input.py
+      - name: Collect full World Bank monthly commodity history
+        run: >-
+          python scripts/collect_metals_benchmark_history.py
+          --output data/operations/metals/commodity_benchmark_history.csv
       - name: Collect daily market input
         run: python scripts/collect_metals_daily_market_input.py
       - name: Ingest UIP-native observations
@@ -148,6 +152,12 @@ jobs:
           --uncertainty-adjusted-csv data/operations/metals/native_uncertainty_adjusted_v1/metals_uncertainty_adjusted.csv
           --uncertainty-adjusted-manifest data/operations/metals/native_uncertainty_adjusted_v1/manifest.json
           --output-root data/operations/metals/native_tactical_state_v1
+      - name: Build UIP-native commodity technical context V1 sidecar
+        run: >-
+          python scripts/build_metals_commodity_technical_context_sidecar.py
+          --history data/operations/metals/commodity_benchmark_history.csv
+          --contract config/presentation/metals_commodity_technical_context_v1.json
+          --output-root data/operations/metals/native_commodity_technical_context_v1
       - name: Publish UIP-native package
         run: python scripts/publish_metals_uip_native_package.py --run-id "gha-${{ github.run_id }}" --strict
       - name: Resolve latest package root
@@ -170,6 +180,7 @@ jobs:
           name: metals-production-${{ github.run_id }}
           path: |
             data/operations/metals/benchmark_input.csv
+            data/operations/metals/commodity_benchmark_history.csv
             data/operations/metals/daily_market_input.csv
             data/operations/metals/native_cycle/
             data/operations/metals/native_readiness/
@@ -182,5 +193,6 @@ jobs:
             data/operations/metals/native_regime_probability_v1/
             data/operations/metals/native_uncertainty_adjusted_v1/
             data/operations/metals/native_tactical_state_v1/
+            data/operations/metals/native_commodity_technical_context_v1/
             data/integration/metals/uip_native_packages/
           retention-days: 30
