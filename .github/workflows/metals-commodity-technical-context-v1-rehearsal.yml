@@ -32,27 +32,55 @@ jobs:
         run: >-
           python scripts/build_metals_commodity_technical_context_sidecar.py
           --history data/operations/metals/commodity_benchmark_history.csv
+          --contract config/presentation/metals_commodity_technical_context_v1.json
           --output-root data/operations/metals/native_commodity_technical_context_v1_rehearsal
 
-      - name: Verify publication remains closed
+      - name: Verify authority conformance and publication remains closed
         shell: bash
         run: |
           set -euo pipefail
           python - <<'PY'
+          import csv
           import json
           from pathlib import Path
+
           root = Path("data/operations/metals/native_commodity_technical_context_v1_rehearsal")
+          contract = json.loads(Path("config/presentation/metals_commodity_technical_context_v1.json").read_text())
           manifest = json.loads((root / "manifest.json").read_text())
+          with (root / "metals_commodity_technical_context.csv").open(newline="", encoding="utf-8") as handle:
+              rows = list(csv.DictReader(handle))
+
           assert manifest["status"] == "METALS_NATIVE_COMMODITY_TECHNICAL_CONTEXT_V1_PASS"
           assert manifest["authority_id"] == "UIP_NATIVE_METALS_COMMODITY_TECHNICAL_CONTEXT_V1"
+          assert manifest["schema_version"] == contract["schema_version"]
+          assert manifest["methodology_version"] == contract["methodology_version"]
+          assert manifest["legacy_equivalent"] is False
+          assert manifest["scope"] == contract["scope"]
+          assert manifest["source_state_mode"] == contract["source_state_mode"]
           assert manifest["row_count"] == 8
           assert manifest["supported_asset_count"] == 8
+          assert manifest["source_history_row_count"] == 6400
           assert manifest["ma50_supported"] is False
           assert manifest["ma200_supported"] is False
           assert manifest["publication_staged"] is False
           assert manifest["publication_activated"] is False
-          assert manifest["postgres_write"] is False
-          assert "uranium" in manifest["unsupported_assets"]
+          assert manifest["postgres_write_performed"] is False
+          assert set(manifest["unsupported_assets"]) == {"metals:commodity:uranium"}
+
+          required = set(contract["required_output_fields"])
+          assert len(rows) == 8
+          assert {row["universal_asset_id"] for row in rows} == set(contract["supported_assets"])
+          for row in rows:
+              assert required.issubset(row)
+              assert row["source_provider"] == "world_bank"
+              assert row["source_frequency"] == "monthly"
+              assert row["source_series_id"].startswith("WORLD_BANK::")
+              assert int(row["observation_count"]) == 800
+              assert row["authority_id"] == contract["authority_id"]
+              assert row["methodology_version"] == contract["methodology_version"]
+              assert row["presentation_semantics"] == contract["presentation_semantics"]
+              assert row["ma50_supported"] == "False"
+              assert row["ma200_supported"] == "False"
           PY
 
       - name: Upload rehearsal evidence
