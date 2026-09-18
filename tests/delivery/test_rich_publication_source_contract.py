@@ -26,13 +26,14 @@ def test_mtg_contracts_pin_exact_certified_hashes():
     assert expected["precollector_scenario"]["sha256"] == "74caad4f8d39ce255455854ab5a5459779f6e73adc0afebc8269e769858aed0a"
 
 
-def test_metals_native_contracts_cover_exactly_ten_certified_families():
+def test_metals_native_contracts_cover_exactly_eleven_certified_families():
     module = _load_module()
     contracts = module.NATIVE_METALS_CERTIFIED_CONTRACTS
     assert set(contracts) == {
         "current_price",
         "price_history",
         "data_freshness",
+        "commodity_technical_context",
         "platform_health",
         "model_component",
         "risk",
@@ -43,6 +44,7 @@ def test_metals_native_contracts_cover_exactly_ten_certified_families():
     }
     assert contracts["current_price"]["expected_rows"] == 11
     assert contracts["data_freshness"]["expected_rows"] == 20
+    assert contracts["commodity_technical_context"]["expected_rows"] == 8
     assert contracts["platform_health"]["expected_rows"] == 1
     assert contracts["model_component"]["expected_rows"] == 81
     assert contracts["risk"]["expected_rows"] == 11
@@ -51,6 +53,7 @@ def test_metals_native_contracts_cover_exactly_ten_certified_families():
     assert contracts["uncertainty_adjusted"]["expected_rows"] == 27
     assert contracts["tactical_state"]["expected_rows"] == 9
     assert contracts["data_freshness"]["manifest_authority"] == "UIP_NATIVE_METALS_DATA_FRESHNESS_V1"
+    assert contracts["commodity_technical_context"]["manifest_authority"] == "UIP_NATIVE_METALS_COMMODITY_TECHNICAL_CONTEXT_V1"
     assert contracts["platform_health"]["manifest_authority"] == "UIP_NATIVE_METALS_PLATFORM_HEALTH_V1"
     assert contracts["model_component"]["manifest_authority"] == "UIP_NATIVE_METALS_MODEL_COMPONENT_V1"
     assert contracts["model_component"]["expected_source_model_ids"] == ["uip-metals-native-trend-v1"]
@@ -59,6 +62,18 @@ def test_metals_native_contracts_cover_exactly_ten_certified_families():
     assert contracts["regime_probability"]["manifest_authority"] == "UIP_NATIVE_METALS_REGIME_PROBABILITY_V1"
     assert contracts["uncertainty_adjusted"]["manifest_authority"] == "UIP_NATIVE_METALS_UNCERTAINTY_ADJUSTED_V1"
     assert contracts["tactical_state"]["manifest_authority"] == "UIP_NATIVE_METALS_TACTICAL_STATE_V1"
+
+    expected_technical = contracts["commodity_technical_context"]["expected_manifest_values"]
+    assert expected_technical["methodology_version"] == "1.0.0"
+    assert expected_technical["scope"] == "BENCHMARK_COMMODITY_MONTHLY_TECHNICAL_CONTEXT"
+    assert expected_technical["source_state_mode"] == "CURRENT_CERTIFIED_WORLD_BANK_MONTHLY_HISTORY_ONLY"
+    assert expected_technical["presentation_semantics"] == "DESCRIPTIVE_COMMODITY_TECHNICAL_CONTEXT_NOT_RECOMMENDATION_NOT_EXECUTION"
+    assert expected_technical["supported_asset_count"] == 8
+    assert expected_technical["source_history_row_count"] == 6400
+    assert expected_technical["ma50_supported"] is False
+    assert expected_technical["ma200_supported"] is False
+    assert expected_technical["source_collection_performed"] is True
+    assert set(expected_technical["unsupported_assets"]) == {"metals:commodity:uranium"}
 
     expected_risk = contracts["risk"]["expected_manifest_values"]
     assert expected_risk["methodology_version"] == "1.0.2"
@@ -135,6 +150,7 @@ def test_metals_native_contracts_require_publication_safety_flags():
     )
     for family in (
         "data_freshness",
+        "commodity_technical_context",
         "platform_health",
         "model_component",
         "risk",
@@ -146,18 +162,19 @@ def test_metals_native_contracts_require_publication_safety_flags():
         assert module.NATIVE_METALS_CERTIFIED_CONTRACTS[family]["require_nonlegacy"] is True
 
 
-def test_rehearsal_certifies_ten_of_ten_without_activating_publication():
+def test_rehearsal_certifies_eleven_of_eleven_without_activating_publication():
     workflow = WORKFLOW.read_text(encoding="utf-8")
     assert 'assert evidence["status"] == "PASS"' in workflow
     assert 'assert evidence["metals_rich_source_contract_pass"] is True' in workflow
-    assert 'assert evidence["metals_certified_family_count"] == 10' in workflow
-    assert 'assert evidence["metals_required_family_count"] == 10' in workflow
+    assert 'assert evidence["metals_certified_family_count"] == 11' in workflow
+    assert 'assert evidence["metals_required_family_count"] == 11' in workflow
     assert 'assert evidence["metals_remaining_family_count"] == 0' in workflow
     assert '"risk",' in workflow
     assert '"recommendation_change",' in workflow
     assert '"regime_probability",' in workflow
     assert '"uncertainty_adjusted",' in workflow
     assert '"tactical_state",' in workflow
+    assert '"commodity_technical_context",' in workflow
     assert 'test "${{ steps.rich_audit.outputs.audit_status }}" = "0"' in workflow
-    assert "RICH_PUBLICATION_RECOVERY_STATE=10_OF_10_SOURCE_CONTRACT_PASS" in workflow
+    assert "RICH_PUBLICATION_RECOVERY_STATE=11_OF_11_SOURCE_CONTRACT_PASS" in workflow
     assert "production-publication-cycle" not in workflow
