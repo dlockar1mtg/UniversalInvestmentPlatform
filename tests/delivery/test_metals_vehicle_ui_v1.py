@@ -120,3 +120,45 @@ def test_vehicle_ui_is_read_only_and_uses_existing_asset_detail_endpoint():
     assert 'method:"POST"' not in text
     assert "allocation" in text.lower()
     assert "execution" in text.lower()
+
+
+def test_vehicle_ui_renders_certified_commodity_technical_context_v1():
+    text = VEHICLE_UI.read_text(encoding="utf-8")
+    assert 'TECHNICAL_CONTEXT_TYPE="metals_commodity_technical_context"' in text
+    assert "UIP_NATIVE_METALS_COMMODITY_TECHNICAL_CONTEXT_V1" in text
+    assert "Official monthly benchmark context" in text
+    assert "1 month return" in text
+    assert "3 month return" in text
+    assert "6 month return" in text
+    assert "Current drawdown" in text
+    assert "historical_peak_value" in text
+    assert "historical_peak_date" in text
+    assert "source_series_id" in text
+    assert "observation_count" in text
+    assert "World Bank Pink Sheet monthly benchmark" in text
+
+
+def test_commodity_technical_context_is_fail_closed_and_does_not_fake_daily_moving_averages():
+    text = VEHICLE_UI.read_text(encoding="utf-8")
+    assert "must contain exactly one record for supported commodities" in text
+    assert "Metals commodity technical context identity mismatch." in text
+    assert "must use World Bank source authority." in text
+    assert "source frequency mismatch." in text
+    assert "refuses unauthorized daily moving averages." in text
+    assert "Unsupported by monthly source cadence" in text
+    assert "Exact-calendar-month comparisons only." in text
+    assert "No interpolation, forward fill, vehicle proxy, or cross-provider imputation is used." in text
+
+
+def test_uranium_commodity_technical_context_remains_unavailable_without_proxy():
+    text = VEHICLE_UI.read_text(encoding="utf-8")
+    assert 'assetId==="metals:commodity:uranium"' in text
+    assert "Uranium is unavailable in V1." in text
+    assert "certified EIA source is annual" in text
+    assert "No vehicle proxy, interpolation, or cross-provider substitution is used." in text
+
+
+def test_commodity_technical_context_preserves_recommendation_boundary():
+    text = VEHICLE_UI.read_text(encoding="utf-8")
+    assert "DESCRIPTIVE_COMMODITY_TECHNICAL_CONTEXT_NOT_RECOMMENDATION_NOT_EXECUTION" in text
+    assert "do not change the commodity recommendation or authorize execution" in text
