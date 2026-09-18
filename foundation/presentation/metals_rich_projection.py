@@ -1,4 +1,4 @@
-"""Project the ten certified UIP-native Metals rich sidecars into presentation records.
+"""Project the eleven certified UIP-native Metals rich sidecars into presentation records.
 
 This module performs no discovery and no persistence. The caller supplies an explicit
 Metals production-artifact root. Each family must independently pass the same certified
@@ -34,6 +34,11 @@ FAMILY_PROJECTION = {
         "record_type": "metals_data_freshness",
         "asset_field": "series_key",
         "key_fields": ("series_key",),
+    },
+    "commodity_technical_context": {
+        "record_type": "metals_commodity_technical_context",
+        "asset_field": "universal_asset_id",
+        "key_fields": ("universal_asset_id",),
     },
     "platform_health": {
         "record_type": "metals_platform_health",
@@ -93,7 +98,7 @@ def _record_key(row: dict[str, str], fields: tuple[str, ...], family: str) -> st
 
 
 def build_metals_rich_records(artifact_root: Path) -> list[PresentationRecord]:
-    """Validate and project exactly the ten certified Metals rich families."""
+    """Validate and project exactly the eleven certified Metals rich families."""
     root = artifact_root.resolve()
     if not root.is_dir():
         raise RuntimeError(f"Metals artifact root is missing: {root}")
