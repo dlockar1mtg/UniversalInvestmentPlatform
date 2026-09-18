@@ -5,6 +5,7 @@ const RECORD_TYPE="metals_vehicle_implementation";
 const MODEL_COMPONENT_TYPE="metals_model_component";
 const UNCERTAINTY_TYPE="metals_uncertainty_adjusted";
 const REGIME_TYPE="metals_regime_probability";
+const TECHNICAL_CONTEXT_TYPE="metals_commodity_technical_context";
 const PREFERRED_LABEL="PREFERRED_IMPLEMENTATION_CANDIDATE";
 const ONLY_LABEL="ONLY_REGISTERED_IMPLEMENTATION";
 const EXPECTED_COMPONENTS=["uip_native_benchmark_momentum","uip_native_vehicle_confirmation","uip_native_data_completeness_adjustment"];
@@ -36,7 +37,8 @@ function ensureStyles(){
     .metals-research-signal-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}.metals-research-signal{border-top:1px solid rgba(36,65,59,.55);padding-top:8px}.metals-research-signal span{display:block;color:var(--muted);font-size:8px;line-height:1.35}.metals-research-signal strong{display:block;margin-top:3px;font-size:11px}
     .metals-research-adjusted{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.metals-research-adjusted div{border:1px solid rgba(36,65,59,.55);border-radius:9px;padding:8px;background:rgba(18,37,34,.38)}.metals-research-adjusted span{display:block;color:var(--muted);font-size:8px}.metals-research-adjusted strong{display:block;margin-top:3px;font-size:11px}
     .metals-regime-evidence{margin-top:14px;border-top:1px solid rgba(36,65,59,.75);padding-top:14px}.metals-regime-evidence h5{margin:0 0 8px;font-size:12px}.metals-regime-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.metals-regime-cell{border:1px solid rgba(36,65,59,.7);border-radius:10px;padding:10px;background:rgba(7,19,16,.42)}.metals-regime-cell span{display:block;color:var(--muted);font-size:8px}.metals-regime-cell strong{display:block;margin-top:4px;font-size:14px}.metals-regime-cell.is-dominant{border-color:rgba(99,230,190,.45);background:rgba(99,230,190,.05)}
-    @media(max-width:1000px){.metals-vehicle-grid,.metals-research-horizons{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:780px){.metals-research-signal-grid,.metals-research-adjusted,.metals-regime-grid{grid-template-columns:1fr 1fr}}@media(max-width:680px){.metals-vehicle-grid,.metals-research-horizons{grid-template-columns:1fr}.metals-vehicle-panel-head,.metals-research-evidence-head{display:grid}.metals-research-signal-grid,.metals-research-adjusted,.metals-regime-grid{grid-template-columns:1fr}}
+    .metals-technical-context-panel{margin:14px 0;border:1px solid var(--line);border-radius:16px;padding:18px;background:linear-gradient(145deg,rgba(18,37,34,.96),rgba(8,22,20,.98));box-shadow:var(--shadow)}.metals-technical-context-head{display:flex;justify-content:space-between;gap:14px;align-items:flex-start;margin-bottom:14px}.metals-technical-context-head h4{margin:4px 0 0;font-size:18px}.metals-technical-context-head p{margin:5px 0 0;color:var(--muted);font-size:9px;line-height:1.5;max-width:820px}.metals-technical-grid{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:8px}.metals-technical-metric{border:1px solid rgba(36,65,59,.65);border-radius:10px;padding:10px;background:rgba(7,19,16,.42)}.metals-technical-metric span{display:block;color:var(--muted);font-size:8px;line-height:1.35}.metals-technical-metric strong{display:block;margin-top:4px;font-size:13px}.metals-technical-context-source{margin-top:12px;color:var(--muted);font-size:8px;line-height:1.5}.metals-technical-context-note{margin-top:12px;border:1px dashed rgba(255,207,102,.38);border-radius:10px;padding:10px 12px;background:rgba(255,207,102,.045);font-size:9px;color:var(--muted);line-height:1.5}.metals-technical-context-note strong{color:var(--text)}
+    @media(max-width:1000px){.metals-vehicle-grid,.metals-research-horizons{grid-template-columns:repeat(2,minmax(0,1fr))}.metals-technical-grid{grid-template-columns:repeat(3,minmax(0,1fr))}}@media(max-width:780px){.metals-research-signal-grid,.metals-research-adjusted,.metals-regime-grid{grid-template-columns:1fr 1fr}.metals-technical-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:680px){.metals-vehicle-grid,.metals-research-horizons,.metals-technical-grid{grid-template-columns:1fr}.metals-vehicle-panel-head,.metals-research-evidence-head,.metals-technical-context-head{display:grid}.metals-research-signal-grid,.metals-research-adjusted,.metals-regime-grid{grid-template-columns:1fr}}
   `;document.head.appendChild(style);
 }
 
@@ -122,6 +124,36 @@ function researchHorizonCard(evidence,horizon){
   return `<article class="metals-research-horizon"><div><h5>${horizon} month forecast evidence</h5><div class="metals-research-horizon-sub">Certified explanatory decomposition of uip-metals-native-trend-v1.</div></div><div class="metals-research-signal-grid">${signal("Benchmark momentum",benchmark)}${signal("Vehicle confirmation",vehicle)}${signal("Data completeness adjustment",completeness)}</div><div class="metals-research-adjusted"><div><span>Raw expected return</span><strong>${escapeHtml(fmtPctFraction(u?.raw_expected_return))}</strong></div><div><span>Confidence</span><strong>${escapeHtml(fmtPctFraction(u?.confidence,0))}</strong></div><div><span>Uncertainty haircut</span><strong>${escapeHtml(fmtPctFraction(u?.uncertainty_penalty))}</strong></div><div><span>Adjusted expected return</span><strong>${escapeHtml(fmtPctFraction(u?.adjusted_expected_return))}</strong></div></div></article>`;
 }
 
+function falseFlag(value){return value===false||String(value??"").toLowerCase()==="false";}
+function technicalContext(detail,assetId){
+  const rows=payloads(detail,TECHNICAL_CONTEXT_TYPE);
+  if(assetId==="metals:commodity:uranium"){
+    if(rows.length!==0)throw new Error("Uranium technical context must remain unavailable under V1.");
+    return {unavailable:true};
+  }
+  if(rows.length!==1)throw new Error("Metals commodity technical context must contain exactly one record for supported commodities.");
+  const row=rows[0];
+  if(row.authority_id!=="UIP_NATIVE_METALS_COMMODITY_TECHNICAL_CONTEXT_V1")throw new Error("Unexpected Metals commodity technical context authority.");
+  if(row.universal_asset_id!==assetId)throw new Error("Metals commodity technical context identity mismatch.");
+  if(String(row.source_provider||"").toLowerCase()!=="world_bank")throw new Error("Metals commodity technical context must use World Bank source authority.");
+  if(String(row.source_frequency||"").toLowerCase()!=="monthly")throw new Error("Metals commodity technical context source frequency mismatch.");
+  if(!falseFlag(row.ma50_supported)||!falseFlag(row.ma200_supported))throw new Error("Metals commodity technical context refuses unauthorized daily moving averages.");
+  if(row.presentation_semantics!=="DESCRIPTIVE_COMMODITY_TECHNICAL_CONTEXT_NOT_RECOMMENDATION_NOT_EXECUTION")throw new Error("Metals commodity technical context presentation semantics mismatch.");
+  return {unavailable:false,row};
+}
+function technicalMetric(label,value){return `<div class="metals-technical-metric"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`;}
+function renderTechnicalContext(detail,assetId){
+  const context=technicalContext(detail,assetId);const host=document.querySelector("#recommendations .rec-detail");const hero=host?.querySelector(".metals-hero");if(!host||!hero||host.querySelector(".metals-technical-context-panel"))return;ensureStyles();
+  const anchor=host.querySelector(".metals-research-evidence-panel")||host.querySelector(".metals-vehicle-panel")||hero;
+  if(context.unavailable){
+    anchor.insertAdjacentHTML("afterend",`<section class="metals-technical-context-panel" aria-label="Commodity technical context"><div class="metals-technical-context-head"><div><span class="eyebrow">COMMODITY TECHNICAL CONTEXT</span><h4>Commodity technical context</h4><p>Direct commodity-benchmark technical context is shown only when the certified source cadence can support it.</p></div><span class="metals-status">Unavailable</span></div><div class="metals-technical-context-note"><strong>Uranium is unavailable in V1.</strong> The certified EIA source is annual and cannot support governed monthly 1M / 3M / 6M technical context. No vehicle proxy, interpolation, or cross-provider substitution is used.</div></section>`);
+    return;
+  }
+  const row=context.row;const asOf=row.as_of_date?String(row.as_of_date):"—";const observations=row.observation_count===null||row.observation_count===undefined||row.observation_count===""?"—":fmtNumber(row.observation_count,0);
+  const sourceSeries=row.source_series_id?String(row.source_series_id):"—";
+  anchor.insertAdjacentHTML("afterend",`<section class="metals-technical-context-panel" aria-label="Commodity technical context"><div class="metals-technical-context-head"><div><span class="eyebrow">COMMODITY TECHNICAL CONTEXT</span><h4>Official monthly benchmark context</h4><p>Descriptive World Bank monthly commodity-benchmark context. These measurements explain recent benchmark behavior and do not change the commodity recommendation or authorize execution.</p></div><span class="metals-status">As of ${escapeHtml(asOf)}</span></div><div class="metals-technical-grid">${technicalMetric("1 month return",fmtPctFraction(row.return_1m))}${technicalMetric("3 month return",fmtPctFraction(row.return_3m))}${technicalMetric("6 month return",fmtPctFraction(row.return_6m))}${technicalMetric("Current drawdown",fmtPctFraction(row.current_drawdown))}${technicalMetric("MA50","Unsupported by monthly source cadence")}${technicalMetric("MA200","Unsupported by monthly source cadence")}</div><div class="metals-technical-context-source">World Bank Pink Sheet monthly benchmark · ${escapeHtml(sourceSeries)} · ${escapeHtml(observations)} official monthly observations · historical peak ${escapeHtml(fmtNumber(row.historical_peak_value,4))} on ${escapeHtml(row.historical_peak_date||"—")}</div><div class="metals-technical-context-note"><strong>Interpretation boundary.</strong> Exact-calendar-month comparisons only. No interpolation, forward fill, vehicle proxy, or cross-provider imputation is used. MA50 and MA200 are intentionally not calculated from monthly data.</div></section>`);
+}
+
 function renderResearchEvidence(detail,assetId){
   const evidence=validateResearchEvidence(detail,assetId);if(!evidence)return;const host=document.querySelector("#recommendations .rec-detail");const hero=host?.querySelector(".metals-hero");if(!host||!hero||host.querySelector(".metals-research-evidence-panel"))return;ensureStyles();
   const regimeRows=EXPECTED_REGIMES.map(name=>evidence.regimeByName.get(name));const dominant=String(regimeRows[0]?.dominant_regime||regimeRows[1]?.dominant_regime||regimeRows[2]?.dominant_regime||"");
@@ -132,10 +164,10 @@ function renderResearchEvidence(detail,assetId){
 
 async function loadAndRender(assetId){
   const serial=++requestSerial;const key=sessionStorage.getItem("uiip-dashboard-key")||"";if(!key||!assetId)return;
-  try{const response=await fetch(`/v1/presentation/assets/metals/${encodeURIComponent(assetId)}`,{headers:{"X-API-Key":key,"Accept":"application/json"}});if(!response.ok)return;const detail=await response.json();if(serial!==requestSerial||lastMetalsAssetId!==assetId)return;renderPanel(detail,assetId);renderResearchEvidence(detail,assetId);}catch(_){}
+  try{const response=await fetch(`/v1/presentation/assets/metals/${encodeURIComponent(assetId)}`,{headers:{"X-API-Key":key,"Accept":"application/json"}});if(!response.ok)return;const detail=await response.json();if(serial!==requestSerial||lastMetalsAssetId!==assetId)return;renderPanel(detail,assetId);renderResearchEvidence(detail,assetId);renderTechnicalContext(detail,assetId);}catch(_){}
 }
-function maybeRender(){if(!lastMetalsAssetId)return;const detail=document.querySelector("#recommendations .rec-detail .metals-hero");if(!detail)return;const hasVehicles=document.querySelector("#recommendations .metals-vehicle-panel");const hasResearch=document.querySelector("#recommendations .metals-research-evidence-panel");if(hasVehicles&&hasResearch)return;loadAndRender(lastMetalsAssetId);}
+function maybeRender(){if(!lastMetalsAssetId)return;const detail=document.querySelector("#recommendations .rec-detail .metals-hero");if(!detail)return;const hasVehicles=document.querySelector("#recommendations .metals-vehicle-panel");const hasResearch=document.querySelector("#recommendations .metals-research-evidence-panel");const hasTechnical=document.querySelector("#recommendations .metals-technical-context-panel");if(hasVehicles&&hasResearch&&hasTechnical)return;loadAndRender(lastMetalsAssetId);}
 document.addEventListener("click",event=>{const button=event.target.closest?.(".rec-metals-detail");if(button?.dataset?.assetId){lastMetalsAssetId=button.dataset.assetId;setTimeout(maybeRender,0);}const back=event.target.closest?.("#rec-back-metals");if(back){lastMetalsAssetId=null;requestSerial+=1;}},true);
 const observer=new MutationObserver(()=>maybeRender());observer.observe(document.documentElement,{childList:true,subtree:true});
-window.UIPMetalsVehicleImplementation={recordType:RECORD_TYPE,renderPanel,renderResearchEvidence};
+window.UIPMetalsVehicleImplementation={recordType:RECORD_TYPE,technicalContextType:TECHNICAL_CONTEXT_TYPE,renderPanel,renderResearchEvidence,renderTechnicalContext};
 })();
