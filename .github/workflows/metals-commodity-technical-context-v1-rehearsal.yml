@@ -1,0 +1,67 @@
+name: Metals Commodity Technical Context V1 Rehearsal
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  rehearse:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout UIP
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Collect full World Bank monthly commodity history
+        run: >-
+          python scripts/collect_metals_benchmark_history.py
+          --output data/operations/metals/commodity_benchmark_history.csv
+
+      - name: Build read-only commodity technical context sidecar
+        run: >-
+          python scripts/build_metals_commodity_technical_context_sidecar.py
+          --history data/operations/metals/commodity_benchmark_history.csv
+          --output-root data/operations/metals/native_commodity_technical_context_v1_rehearsal
+
+      - name: Verify publication remains closed
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          root = Path("data/operations/metals/native_commodity_technical_context_v1_rehearsal")
+          manifest = json.loads((root / "manifest.json").read_text())
+          assert manifest["status"] == "METALS_NATIVE_COMMODITY_TECHNICAL_CONTEXT_V1_PASS"
+          assert manifest["authority_id"] == "UIP_NATIVE_METALS_COMMODITY_TECHNICAL_CONTEXT_V1"
+          assert manifest["row_count"] == 8
+          assert manifest["supported_asset_count"] == 8
+          assert manifest["ma50_supported"] is False
+          assert manifest["ma200_supported"] is False
+          assert manifest["publication_staged"] is False
+          assert manifest["publication_activated"] is False
+          assert manifest["postgres_write"] is False
+          assert "uranium" in manifest["unsupported_assets"]
+          PY
+
+      - name: Upload rehearsal evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: metals-commodity-technical-context-v1-${{ github.run_id }}
+          path: |
+            data/operations/metals/commodity_benchmark_history.csv
+            data/operations/metals/native_commodity_technical_context_v1_rehearsal/metals_commodity_technical_context.csv
+            data/operations/metals/native_commodity_technical_context_v1_rehearsal/manifest.json
+          if-no-files-found: error
+          retention-days: 30
