@@ -49,7 +49,7 @@ EXPECTED_GENERIC_COUNTS = {
     "crypto": {
         "asset": 6,
         "domain_health": 1,
-        "forecast": 127,
+        "forecast": 129,
         "recommendation": 6,
         "risk": 6,
     },

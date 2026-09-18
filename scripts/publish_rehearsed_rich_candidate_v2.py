@@ -2,7 +2,7 @@
 
 This wrapper preserves the certified production publisher and injects only the already-
 rehearsed Metals vehicle implementation projection. It exists so the production path
-matches the 14,238-record read-only candidate without rewriting the prior bounded
+matches the governed rehearsed rich candidate without rewriting the prior bounded
 publisher. No ranking is recalculated here.
 """
 from __future__ import annotations
