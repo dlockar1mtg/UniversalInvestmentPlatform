@@ -136,12 +136,12 @@ jobs:
           assert source["status"] == "PASS"
           assert source["mtg_rich_source_contract_pass"] is True
           assert source["metals_rich_source_contract_pass"] is True
-          assert source["metals_certified_family_count"] == 10
+          assert source["metals_certified_family_count"] == 11
           assert source["metals_remaining_family_count"] == 0
 
           assert candidate["status"] == "UIP_RICH_PUBLICATION_CANDIDATE_REHEARSAL_PASS"
           assert candidate["publication_status"] == "STAGED"
-          assert candidate["metals_rich_family_count"] == 10
+          assert candidate["metals_rich_family_count"] == 11
           assert candidate["postgres_connection_opened"] is False
           assert candidate["postgres_write_performed"] is False
           assert candidate["publication_persisted"] is False
@@ -157,6 +157,7 @@ jobs:
           }
           assert candidate["metals_rich_record_counts"]["metals_current_price"] == 11
           assert candidate["metals_rich_record_counts"]["metals_data_freshness"] == 20
+          assert candidate["metals_rich_record_counts"]["metals_commodity_technical_context"] == 8
           assert candidate["metals_rich_record_counts"]["metals_platform_health"] == 1
           assert candidate["metals_rich_record_counts"]["metals_model_component"] == 81
           assert candidate["metals_rich_record_counts"]["risk"] == 11
