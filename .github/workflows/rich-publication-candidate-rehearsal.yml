@@ -110,6 +110,7 @@ jobs:
       - name: Re-certify rich source contracts
         run: >-
           python scripts/audit_rich_publication_source_contract.py
+          --crypto-artifact incoming/crypto
           --metals-artifact incoming/metals
           --mtg-repo source_repos/mtg
           --evidence-output data/operations/publication/rich_candidate_source_contract.json
@@ -134,6 +135,9 @@ jobs:
           candidate = json.loads(Path("data/operations/publication/rich_publication_candidate_rehearsal.json").read_text())
 
           assert source["status"] == "PASS"
+          assert source["crypto_current_price_source_contract_pass"] is True
+          assert source["crypto_current_price"]["rows"] == 6
+          assert candidate["crypto_current_price_record_count"] == 6
           assert source["mtg_rich_source_contract_pass"] is True
           assert source["metals_rich_source_contract_pass"] is True
           assert source["metals_certified_family_count"] == 11
