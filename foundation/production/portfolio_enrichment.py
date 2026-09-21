@@ -6,6 +6,7 @@ from dataclasses import dataclass
 from decimal import Decimal
 from typing import Protocol
 
+from foundation.production.metals_registry import load_metals_registry
 from foundation.production.portfolio_accounting import PortfolioAccountingResult, PortfolioPosition
 
 
@@ -131,7 +132,13 @@ def _recommendation(payload: dict[str, object] | None) -> tuple[str | None, str 
 
 
 def _freshness(asset: dict[str, object]) -> str | None:
-    for field in ("last_updated_at_utc", "last_observed_date", "_imported_at_utc"):
+    for field in (
+        "last_updated_at_utc",
+        "last_observed_date",
+        "_imported_at_utc",
+        "observation_date",
+        "collected_at_utc",
+    ):
         value = asset.get(field)
         if value is not None and str(value).strip():
             return str(value)
@@ -149,15 +156,70 @@ def _enrich_position(
             f"{position.domain_id}/{position.asset_id}"
         )
     asset = _first_payload(detail, "asset")
-    if asset is None:
-        raise ValueError(
-            f"holding has no active certified asset record: {position.domain_id}/{position.asset_id}"
-        )
     recommendation_payload = _first_payload(detail, "recommendation")
     recommendation, recommendation_field = _recommendation(recommendation_payload)
 
-    authority = asset.get("current_price_authority_available") is True
-    raw_price = asset.get("current_price_usd")
+    if asset is not None:
+        asset_name = str(asset.get("asset_name") or position.asset_id)
+        asset_symbol = None if asset.get("asset_symbol") is None else str(asset.get("asset_symbol"))
+        asset_subclass = (
+            None if asset.get("asset_subclass") is None else str(asset.get("asset_subclass"))
+        )
+        authority = asset.get("current_price_authority_available") is True
+        raw_price = asset.get("current_price_usd")
+        freshness = _freshness(asset)
+    elif position.domain_id == "metals" and position.asset_id.startswith("metals:vehicle:"):
+        registry = load_metals_registry()
+        vehicle = next(
+            (
+                item
+                for item in registry.vehicles
+                if item.vehicle_id == position.asset_id and item.enabled
+            ),
+            None,
+        )
+        if vehicle is None:
+            raise ValueError(
+                f"holding is not an enabled governed Metals vehicle: {position.asset_id}"
+            )
+        current_price_record = _first_payload(detail, "metals_current_price")
+        asset_name = vehicle.name
+        asset_symbol = vehicle.ticker
+        asset_subclass = vehicle.vehicle_type
+        recommendation = None
+        recommendation_field = None
+        if current_price_record is None:
+            authority = False
+            raw_price = None
+            freshness = None
+        else:
+            if current_price_record.get("asset_id") != position.asset_id:
+                raise ValueError(
+                    f"certified Metals current-price identity mismatch: {position.asset_id}"
+                )
+            if current_price_record.get("ticker") != vehicle.ticker:
+                raise ValueError(
+                    f"certified Metals current-price ticker mismatch: {position.asset_id}"
+                )
+            if (
+                current_price_record.get("source_authority")
+                != "UIP_NATIVE_METALS_VEHICLE_OBSERVATIONS_V1"
+            ):
+                raise ValueError(
+                    f"unexpected Metals current-price authority: {position.asset_id}"
+                )
+            if current_price_record.get("price_semantics") != "UNADJUSTED_CLOSE":
+                raise ValueError(
+                    f"unexpected Metals current-price semantics: {position.asset_id}"
+                )
+            authority = True
+            raw_price = current_price_record.get("current_price_usd")
+            freshness = _freshness(current_price_record)
+    else:
+        raise ValueError(
+            f"holding has no active certified asset record: {position.domain_id}/{position.asset_id}"
+        )
+
     if not authority:
         current_price = None
         pricing_status = "UNPRICED_NO_CERTIFIED_CURRENT_PRICE_AUTHORITY"
@@ -181,9 +243,9 @@ def _enrich_position(
     return EnrichedPortfolioPosition(
         domain_id=position.domain_id,
         asset_id=position.asset_id,
-        asset_name=str(asset.get("asset_name") or position.asset_id),
-        asset_symbol=None if asset.get("asset_symbol") is None else str(asset.get("asset_symbol")),
-        asset_subclass=None if asset.get("asset_subclass") is None else str(asset.get("asset_subclass")),
+        asset_name=asset_name,
+        asset_symbol=asset_symbol,
+        asset_subclass=asset_subclass,
         account_id=position.account_id,
         currency=position.currency,
         quantity=position.quantity,
@@ -198,7 +260,7 @@ def _enrich_position(
         unrealized_pl=unrealized,
         recommendation=recommendation,
         recommendation_source_field=recommendation_field,
-        freshness=_freshness(asset),
+        freshness=freshness,
     )
 
 
