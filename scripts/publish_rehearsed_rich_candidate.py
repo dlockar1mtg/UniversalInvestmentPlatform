@@ -30,6 +30,7 @@ from foundation.presentation.metals_rich_projection import build_metals_rich_rec
 from foundation.presentation.postgres_read_model import PostgresPresentationRepository
 from foundation.presentation.publication_model import PresentationPublication, build_presentation_publication
 from foundation.presentation.publication_service import publish_presentation_bundle, validate_publication_bundle
+from foundation.presentation.rich_candidate_composition import compose_rich_candidate
 from scripts.publish_latest_domain_artifacts import (
     assert_required_presentation_surfaces,
     find_package,
@@ -156,24 +157,8 @@ def main() -> int:
         finally:
             duck.close()
 
-        metals_rich = build_metals_rich_records(artifact_roots["metals"])
-        combined = list(base.records) + metals_rich
-        combined.sort(
-            key=lambda item: (
-                item.record_type,
-                item.domain_id,
-                item.asset_id or "",
-                item.record_key,
-            )
-        )
-        publication = PresentationPublication(
-            publication_id=base.publication_id,
-            publication_version=base.publication_version,
-            source_database_sha256=base.source_database_sha256,
-            source_database_classification=base.source_database_classification,
-            published_at_utc=base.published_at_utc,
-            publication_status="STAGED",
-            records=tuple(combined),
+        publication = compose_rich_candidate(
+            base, artifact_roots["crypto"], artifact_roots["metals"], ROOT
         )
 
         validate_publication_bundle(publication)
@@ -195,6 +180,11 @@ def main() -> int:
             record_type: counts[("mtg", record_type)]
             for record_type in MTG_RICH_EXPECTED_COUNTS
         }
+        crypto_current_price_count = counts[("crypto", "crypto_current_price")]
+        if crypto_current_price_count != 6:
+            raise RuntimeError(f"Crypto current-price count drifted: {crypto_current_price_count}")
+        if counts[("metals", "metals_vehicle_implementation")] != 10:
+            raise RuntimeError("Metals implementation count drifted")
         if metals_observed != metals_expected:
             raise RuntimeError(
                 f"Metals rich presentation counts drifted: {metals_observed} != {metals_expected}"
@@ -215,6 +205,7 @@ def main() -> int:
             "content_fingerprint": publication.content_fingerprint,
             "generic_surface_counts": generic_counts,
             "metals_rich_record_counts": metals_observed,
+            "crypto_current_price_record_count": crypto_current_price_count,
             "mtg_rich_record_counts": mtg_observed,
             "mtg_head": observed_mtg_head,
             "source_run_ids": {
@@ -243,6 +234,7 @@ def main() -> int:
             "content_fingerprint": publication.content_fingerprint,
             "source_database_sha256": database_hash,
             "record_count": len(publication.records),
+            "crypto_current_price_record_count": crypto_current_price_count,
             "previous_active_publication_id": None if not previous else previous.get("publication_id"),
             "active_publication_id": active.get("publication_id"),
             "imports": imports,
