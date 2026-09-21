@@ -320,3 +320,38 @@ def test_dashboard_domain_health_tolerates_premium_recommendations_dom_ownership
         'payload.native_recommendation??null):nativeStatus(item)'
         in recommendations
     )
+
+
+def test_rec_ui_metals_summary_surfaces_use_certified_monthly_technical_context():
+    javascript = read("foundation/production/dashboard_assets/recommendation_ui.js")
+
+    assert 'payloads(detail,"metals_commodity_technical_context")' in javascript
+    assert "UIP_NATIVE_METALS_COMMODITY_TECHNICAL_CONTEXT_V1" in javascript
+    assert 'row.universal_asset_id||""' in javascript
+    assert '"world_bank"' in javascript
+    assert '"monthly"' in javascript
+    assert "Daily moving averages are not authorized by the monthly commodity technical-context source." in javascript
+    assert "<span>1M return</span>" in javascript
+    assert "<span>3M return</span>" in javascript
+    assert "<span>6M return</span>" in javascript
+    assert "Monthly commodity technical context" in javascript
+    assert "MA50 and MA200 are unsupported by monthly source cadence." in javascript
+    assert "No interpolation, forward fill, vehicle proxy, or cross-provider imputation is used." in javascript
+
+
+def test_rec_ui_metals_summary_keeps_uranium_monthly_context_unavailable():
+    javascript = read("foundation/production/dashboard_assets/recommendation_ui.js")
+
+    assert 'assetId==="metals:commodity:uranium"' in javascript
+    assert "Uranium monthly commodity technical context must remain unavailable under V1." in javascript
+    assert "certified EIA source is annual" in javascript
+    assert "No vehicle proxy is used." in javascript
+
+
+def test_rec_ui_metals_summary_no_longer_reads_monthly_returns_from_tactical_state():
+    javascript = read("foundation/production/dashboard_assets/recommendation_ui.js")
+
+    assert "t.return_1m_pct" not in javascript
+    assert "t.return_3m_pct" not in javascript
+    assert "t.return_6m_pct" not in javascript
+    assert "t.current_drawdown_pct" not in javascript
