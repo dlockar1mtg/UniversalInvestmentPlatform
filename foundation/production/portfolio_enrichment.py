@@ -168,6 +168,38 @@ def _enrich_position(
         authority = asset.get("current_price_authority_available") is True
         raw_price = asset.get("current_price_usd")
         freshness = _freshness(asset)
+        if position.domain_id == "crypto" and not authority:
+            crypto_price = _first_payload(detail, "crypto_current_price")
+            if crypto_price is not None:
+                if crypto_price.get("universal_asset_id") != position.asset_id:
+                    raise ValueError(
+                        f"certified Crypto current-price identity mismatch: {position.asset_id}"
+                    )
+                if (
+                    crypto_price.get("authority_id")
+                    != "CRYPTO_CANONICAL_MARKET_DAILY_CURRENT_PRICE_V1"
+                ):
+                    raise ValueError(
+                        f"unexpected Crypto current-price authority: {position.asset_id}"
+                    )
+                if crypto_price.get("source_table") != "canonical_market_daily":
+                    raise ValueError(
+                        f"unexpected Crypto current-price source table: {position.asset_id}"
+                    )
+                if crypto_price.get("price_semantics") != "DAILY_CANONICAL_MARKET_CLOSE":
+                    raise ValueError(
+                        f"unexpected Crypto current-price semantics: {position.asset_id}"
+                    )
+                if (
+                    crypto_price.get("presentation_semantics")
+                    != "CURRENT_PRICE_FOR_PORTFOLIO_VALUATION_NOT_EXECUTION_QUOTE"
+                ):
+                    raise ValueError(
+                        f"unexpected Crypto current-price presentation semantics: {position.asset_id}"
+                    )
+                authority = True
+                raw_price = crypto_price.get("current_price_usd")
+                freshness = _freshness(crypto_price)
     elif position.domain_id == "metals" and position.asset_id.startswith("metals:vehicle:"):
         registry = load_metals_registry()
         vehicle = next(
