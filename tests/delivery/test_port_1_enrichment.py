@@ -298,3 +298,79 @@ def test_registered_metals_vehicle_rejects_wrong_price_semantics():
     })
     with pytest.raises(ValueError, match="unexpected Metals current-price semantics"):
         enrich_portfolio(accounting, reader)
+
+
+def crypto_current_price_detail(
+    *,
+    asset_id="crypto:bitcoin",
+    current_price="85877.0",
+    authority_id="CRYPTO_CANONICAL_MARKET_DAILY_CURRENT_PRICE_V1",
+    source_table="canonical_market_daily",
+    price_semantics="DAILY_CANONICAL_MARKET_CLOSE",
+    presentation_semantics="CURRENT_PRICE_FOR_PORTFOLIO_VALUATION_NOT_EXECUTION_QUOTE",
+):
+    base = detail(authority=False, current_price=None, recommendation="accumulate")
+    base["domain_id"] = "crypto"
+    base["asset_id"] = asset_id
+    base["records"]["asset"][0]["payload"].update({
+        "asset_name": "Bitcoin",
+        "asset_symbol": "BTC",
+        "asset_subclass": "large_cap_crypto",
+    })
+    base["records"]["crypto_current_price"] = [{
+        "record_key": asset_id,
+        "payload": {
+            "universal_asset_id": asset_id,
+            "asset_id": "bitcoin",
+            "observation_date": "2026-09-21",
+            "current_price_usd": current_price,
+            "price_source": "coingecko",
+            "source_priority": "1",
+            "collected_at_utc": "2026-09-21 17:35:57.124460+00:00",
+            "source_table": source_table,
+            "authority_id": authority_id,
+            "schema_version": "1.0.0",
+            "methodology_version": "1.0.0",
+            "price_semantics": price_semantics,
+            "presentation_semantics": presentation_semantics,
+        },
+    }]
+    return base
+
+
+def test_crypto_holding_uses_separate_governed_current_price_without_mutating_generic_asset():
+    accounting = derive_portfolio((transaction(asset_id="crypto:bitcoin", domain_id="crypto", price="60495.45"),))
+    reader = FakePresentationReader({
+        ("crypto", "crypto:bitcoin"): crypto_current_price_detail(),
+    })
+    position = enrich_portfolio(accounting, reader).positions[0]
+    assert position.asset_name == "Bitcoin"
+    assert position.asset_symbol == "BTC"
+    assert position.current_price == Decimal("85877.0")
+    assert position.current_price_authority_available is True
+    assert position.pricing_status == "PRICED_CERTIFIED_CURRENT_AUTHORITY"
+    assert position.recommendation == "accumulate"
+    assert position.freshness == "2026-09-21"
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "message"),
+    [
+        ("authority_id", "UNAUTHORIZED", "unexpected Crypto current-price authority"),
+        ("source_table", "forecasts", "unexpected Crypto current-price source table"),
+        ("price_semantics", "INTRADAY_QUOTE", "unexpected Crypto current-price semantics"),
+        (
+            "presentation_semantics",
+            "EXECUTION_QUOTE",
+            "unexpected Crypto current-price presentation semantics",
+        ),
+    ],
+)
+def test_crypto_current_price_binding_fails_closed_on_contract_drift(field, value, message):
+    accounting = derive_portfolio((transaction(asset_id="crypto:bitcoin", domain_id="crypto", price="60495.45"),))
+    kwargs = {field: value}
+    reader = FakePresentationReader({
+        ("crypto", "crypto:bitcoin"): crypto_current_price_detail(**kwargs),
+    })
+    with pytest.raises(ValueError, match=message):
+        enrich_portfolio(accounting, reader)
