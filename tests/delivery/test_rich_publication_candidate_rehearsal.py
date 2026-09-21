@@ -67,6 +67,7 @@ def test_price_history_revision_key_preserves_same_day_source_revisions():
 
 def test_candidate_script_is_non_persistent_and_binds_rich_sources_explicitly():
     text = SCRIPT.read_text(encoding="utf-8")
+    assert "build_crypto_current_price_records" in text
     assert "build_metals_rich_records" in text
     assert "UIP_MTG_PREMIUM_SIDECAR_PATH" in text
     assert "UIP_MTG_COLLECTOR_RESEARCH_PATH" in text
@@ -88,6 +89,8 @@ def test_workflow_is_manual_only_and_never_receives_postgres_dsn():
     assert "scripts/rehearse_rich_publication_candidate.py" in text
     assert 'assert source["metals_certified_family_count"] == 11' in text
     assert 'assert source["metals_remaining_family_count"] == 0' in text
+    assert 'assert candidate["crypto_rich_record_counts"] == {' in text
+    assert '"crypto_current_price": 6' in text
     assert 'assert candidate["publication_activated"] is False' in text
     assert "RICH_PUBLICATION_CANDIDATE_REHEARSAL=PASS" in text
 
