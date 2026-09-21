@@ -27,6 +27,10 @@ import duckdb
 from foundation.import_engine.audit import apply_audit_registry_migration
 from foundation.import_engine.config import ImportEngineConfig
 from foundation.import_engine.database import initialize_database
+from foundation.presentation.crypto_current_price_projection import (
+    RECORD_TYPE as CRYPTO_CURRENT_PRICE_RECORD_TYPE,
+    build_crypto_current_price_records,
+)
 from foundation.presentation.metals_rich_projection import (
     FAMILY_PROJECTION,
     build_metals_rich_records,
@@ -217,9 +221,15 @@ def main() -> int:
         finally:
             duck.close()
 
+        crypto_current_price = build_crypto_current_price_records(artifact_roots["crypto"])
         metals_rich = build_metals_rich_records(artifact_roots["metals"])
         metals_vehicle_implementation = build_metals_vehicle_implementation_records(config.repository_root)
-        combined = list(base.records) + metals_rich + metals_vehicle_implementation
+        combined = (
+            list(base.records)
+            + list(crypto_current_price)
+            + metals_rich
+            + metals_vehicle_implementation
+        )
         combined.sort(key=lambda item: (item.record_type, item.domain_id, item.asset_id or "", item.record_key))
         candidate = PresentationPublication(
             publication_id=base.publication_id,
@@ -241,7 +251,13 @@ def main() -> int:
         observed_metals = {record_type: counts[("metals", record_type)] for record_type in metals_expected}
         observed_mtg = {record_type: counts[("mtg", record_type)] for record_type in MTG_RICH_EXPECTED_COUNTS}
         implementation_count = counts[("metals", METALS_VEHICLE_IMPLEMENTATION_RECORD_TYPE)]
+        crypto_current_price_count = counts[("crypto", CRYPTO_CURRENT_PRICE_RECORD_TYPE)]
 
+        if crypto_current_price_count != 6:
+            raise RuntimeError(
+                "Crypto current-price candidate count must be 6, "
+                f"observed {crypto_current_price_count}"
+            )
         if observed_metals != metals_expected:
             raise RuntimeError(f"Metals rich candidate counts do not match certified inputs: {observed_metals} != {metals_expected}")
         if observed_mtg != MTG_RICH_EXPECTED_COUNTS:
@@ -260,6 +276,7 @@ def main() -> int:
             "source_database_sha256": candidate.source_database_sha256,
             "imports": imports,
             "generic_surface_counts": generic_surface_counts,
+            "crypto_current_price_record_count": crypto_current_price_count,
             "metals_rich_family_count": len(metals_expected),
             "metals_rich_record_counts": observed_metals,
             "metals_vehicle_implementation_record_count": implementation_count,
