@@ -162,3 +162,13 @@ def test_commodity_technical_context_preserves_recommendation_boundary():
     text = VEHICLE_UI.read_text(encoding="utf-8")
     assert "DESCRIPTIVE_COMMODITY_TECHNICAL_CONTEXT_NOT_RECOMMENDATION_NOT_EXECUTION" in text
     assert "do not change the commodity recommendation or authorize execution" in text
+
+
+def test_metals_ui_validates_against_presentation_identity_bridge_without_mutating_raw_source_id():
+    text = VEHICLE_UI.read_text(encoding="utf-8")
+    assert 'function presentationAssetId(row)' in text
+    assert 'row?._presentation_asset_id||row?.universal_asset_id' in text
+    assert 'const presentationId=presentationAssetId(row);if(presentationId&&presentationId!==assetId)' in text
+    assert 'if(presentationAssetId(row)!==assetId)' in text
+    assert '.replace("metals:commodity:metals:commodity:"' not in text
+    assert '.replaceAll("metals:commodity:metals:commodity:"' not in text
