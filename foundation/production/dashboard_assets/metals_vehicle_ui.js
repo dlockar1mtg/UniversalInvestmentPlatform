@@ -22,6 +22,7 @@ function fmtUsd(value){if(value===null||value===undefined||value==="")return "â€
 function clean(value){return String(value??"").replaceAll("_"," ");}
 function title(value){return clean(value).toLowerCase().replace(/(^|\s)\S/g,m=>m.toUpperCase());}
 function payloads(detail,type){const rows=Array.isArray(detail?.records?.[type])?detail.records[type]:[];return rows.map(record=>record?.payload||{});}
+function presentationAssetId(row){return String(row?._presentation_asset_id||row?.universal_asset_id||"");}
 
 function ensureStyles(){
   if(document.getElementById("metals-vehicle-ui-styles"))return;
@@ -105,13 +106,13 @@ function validateResearchEvidence(detail,assetId){
   const uncertaintyByHorizon=new Map();
   for(const row of uncertainty){
     if(row.authority_id&&row.authority_id!=="UIP_NATIVE_METALS_UNCERTAINTY_ADJUSTED_V1")throw new Error("Unexpected Metals uncertainty-adjusted authority.");
-    if(row.universal_asset_id&&row.universal_asset_id!==assetId)throw new Error("Metals uncertainty-adjusted identity mismatch.");
+    const presentationId=presentationAssetId(row);if(presentationId&&presentationId!==assetId)throw new Error("Metals uncertainty-adjusted identity mismatch.");
     const horizon=Number(row.horizon_months);if(!EXPECTED_HORIZONS.includes(horizon)||uncertaintyByHorizon.has(horizon))throw new Error("Unexpected Metals uncertainty-adjusted grain.");uncertaintyByHorizon.set(horizon,row);
   }
   const regimeByName=new Map();
   for(const row of regimes){
     if(row.authority_id&&row.authority_id!=="UIP_NATIVE_METALS_REGIME_PROBABILITY_V1")throw new Error("Unexpected Metals regime authority.");
-    if(row.universal_asset_id&&row.universal_asset_id!==assetId)throw new Error("Metals regime identity mismatch.");
+    const presentationId=presentationAssetId(row);if(presentationId&&presentationId!==assetId)throw new Error("Metals regime identity mismatch.");
     const regime=String(row.regime||"");if(!EXPECTED_REGIMES.includes(regime)||regimeByName.has(regime))throw new Error("Unexpected Metals regime probability grain.");regimeByName.set(regime,row);
   }
   return {components,uncertaintyByHorizon,regimeByName};
@@ -134,7 +135,7 @@ function technicalContext(detail,assetId){
   if(rows.length!==1)throw new Error("Metals commodity technical context must contain exactly one record for supported commodities.");
   const row=rows[0];
   if(row.authority_id!=="UIP_NATIVE_METALS_COMMODITY_TECHNICAL_CONTEXT_V1")throw new Error("Unexpected Metals commodity technical context authority.");
-  if(row.universal_asset_id!==assetId)throw new Error("Metals commodity technical context identity mismatch.");
+  if(presentationAssetId(row)!==assetId)throw new Error("Metals commodity technical context identity mismatch.");
   if(String(row.source_provider||"").toLowerCase()!=="world_bank")throw new Error("Metals commodity technical context must use World Bank source authority.");
   if(String(row.source_frequency||"").toLowerCase()!=="monthly")throw new Error("Metals commodity technical context source frequency mismatch.");
   if(!falseFlag(row.ma50_supported)||!falseFlag(row.ma200_supported))throw new Error("Metals commodity technical context refuses unauthorized daily moving averages.");
