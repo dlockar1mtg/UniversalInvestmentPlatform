@@ -100,6 +100,7 @@
 
               <section class="panel transaction-history-panel">
                 <div class="section-title"><div><h3>Transaction history</h3><span id="txn-history-count">Loading…</span></div><button id="txn-history-refresh" class="secondary" type="button">Refresh</button></div>
+                <div class="transaction-filters"><input id="txn-filter-search" type="search" placeholder="Search asset, account, notes, or ID" aria-label="Search transactions"><select id="txn-filter-type" aria-label="Filter by transaction type"><option value="">All types</option><option>BUY</option><option>SELL</option><option>TRANSFER</option><option>GIFT</option><option>ADJUSTMENT</option></select><select id="txn-filter-domain" aria-label="Filter by domain"><option value="">All domains</option></select><button id="txn-filter-clear" class="secondary" type="button">Clear</button></div>
                 <div id="txn-history-empty" class="empty">No transactions have been recorded yet.</div>
                 <div id="txn-history" class="transaction-history"></div>
               </section>
@@ -155,4 +156,5 @@
   <script src="/dashboard/assets/governed_asset_picker.js" defer></script>
 </body>
 </html>
+
 
