@@ -42,11 +42,14 @@
     return `${item.asset_name||item.asset_id}${symbol}${subtype} · ${item.asset_id}`;
   };
 
+  const announceSelected=item=>document.dispatchEvent(new CustomEvent("uip:asset-selected",{detail:{domainId:String(item.domain_id),assetId:String(item.asset_id),assetName:String(item.asset_name||item.asset_id)}}));
+
   const clearAssets=()=>{
     matches=new Map();
     dataList.innerHTML="";
     assetInput.value="";
     assetInput.dataset.assetId="";
+    document.dispatchEvent(new CustomEvent("uip:asset-cleared"));
   };
 
   const loadDomains=async()=>{
@@ -75,6 +78,7 @@
     const exactExisting=matches.get(query);
     if(exactExisting&&String(exactExisting.domain_id)===domain){
       assetInput.dataset.assetId=String(exactExisting.asset_id);
+      announceSelected(exactExisting);
       return;
     }
     const generation=++searchGeneration;
@@ -93,6 +97,7 @@
       matches=next;
       const exact=matches.get(assetInput.value.trim());
       assetInput.dataset.assetId=exact?String(exact.asset_id):"";
+      if(exact)announceSelected(exact);
     }catch(error){
       if(generation!==searchGeneration)return;
       dataList.innerHTML="";
@@ -115,6 +120,7 @@
       assetInput.dataset.assetId=String(exact.asset_id);
       message.className="form-message";
       message.textContent="Governed asset selected.";
+      announceSelected(exact);
       return;
     }
     assetInput.dataset.assetId="";
@@ -124,6 +130,30 @@
   assetInput.addEventListener("change",()=>{
     const exact=matches.get(assetInput.value.trim());
     assetInput.dataset.assetId=exact?String(exact.asset_id):"";
+    if(exact)announceSelected(exact);else document.dispatchEvent(new CustomEvent("uip:asset-cleared"));
+  });
+
+  document.addEventListener("uip:select-asset",async event=>{
+    const domainId=String(event.detail?.domainId||"");
+    const assetId=String(event.detail?.assetId||"");
+    if(!domainId||!assetId)return;
+    try{
+      if(!Array.from(domainSelect.options).some(option=>option.value===domainId))await loadDomains();
+      domainSelect.value=domainId;
+      clearAssets();
+      domainSelect.value=domainId;
+      assetInput.value=assetId;
+      await searchAssets();
+      const selected=matches.get(assetId);
+      if(!selected)throw new Error("The portfolio asset is not available in the active certified catalog.");
+      assetInput.dataset.assetId=String(selected.asset_id);
+      announceSelected(selected);
+      message.className="form-message";
+      message.textContent="Governed asset selected from Portfolio.";
+    }catch(error){
+      message.className="form-message bad";
+      message.textContent=error.message;
+    }
   });
 
   document.addEventListener("submit",event=>{
