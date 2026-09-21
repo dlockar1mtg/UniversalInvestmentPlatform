@@ -74,15 +74,33 @@ jobs:
             local runs_json run_id artifacts_json artifact_id artifact_name
             runs_json="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/workflows/${workflow}/runs?branch=main&status=success&per_page=30")"
             run_id="$(printf '%s' "$runs_json" | jq -r '[.workflow_runs[] | select(.event == "schedule" or .event == "workflow_dispatch")][0].id // empty')"
+            if test "$repo" = "dlockar1mtg/CryptoIntelligencePlatform"; then
+              run_id="35628894423"
+              run_json="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/runs/${run_id}")"
+              test "$(printf '%s' "$run_json" | jq -r '.status + ":" + .conclusion + ":" + .head_sha')" = "completed:success:924c675bcebe1b7a6f14477a0a432fe43255e6b0" || {
+                echo "Pinned Crypto run is not successful at the certified head" >&2; exit 1;
+              }
+            fi
             test -n "$run_id" || { echo "No successful production run found for ${repo}/${workflow}"; exit 1; }
 
             artifacts_json="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/runs/${run_id}/artifacts?per_page=100")"
             artifact_id="$(printf '%s' "$artifacts_json" | jq -r --arg prefix "$artifact_prefix" '[.artifacts[] | select(.expired == false and (.name | startswith($prefix)))][0].id // empty')"
             artifact_name="$(printf '%s' "$artifacts_json" | jq -r --arg prefix "$artifact_prefix" '[.artifacts[] | select(.expired == false and (.name | startswith($prefix)))][0].name // empty')"
             test -n "$artifact_id" || { echo "No unexpired artifact matching ${artifact_prefix} for run ${run_id}"; exit 1; }
+            if test "$repo" = "dlockar1mtg/CryptoIntelligencePlatform"; then
+              test "$artifact_id" = "10655476013" || { echo "Crypto artifact ID drifted" >&2; exit 1; }
+              test "$(printf '%s' "$artifacts_json" | jq -r --argjson id "$artifact_id" '.artifacts[] | select(.id == $id) | .digest')" = "sha256:5860052ab8e54bf077e97addda4a49c1bf1630461ce73f2ba1174eafd25ccdec" || {
+                echo "Crypto artifact digest drifted" >&2; exit 1;
+              }
+            fi
 
             echo "SOURCE repo=${repo} workflow=${workflow} run_id=${run_id} artifact=${artifact_name}"
             api_get "$token" "https://api.github.com/repos/${repo}/actions/artifacts/${artifact_id}/zip" > "${destination}.zip"
+            if test "$repo" = "dlockar1mtg/CryptoIntelligencePlatform"; then
+              echo "5860052ab8e54bf077e97addda4a49c1bf1630461ce73f2ba1174eafd25ccdec  ${destination}.zip" | sha256sum --check --status || {
+                echo "Crypto artifact ZIP digest mismatch" >&2; exit 1;
+              }
+            fi
             unzip -q "${destination}.zip" -d "$destination"
           }
 
@@ -142,6 +160,7 @@ jobs:
           assert candidate["status"] == "UIP_RICH_PUBLICATION_CANDIDATE_REHEARSAL_PASS"
           assert candidate["publication_status"] == "STAGED"
           assert candidate["metals_rich_family_count"] == 11
+          assert candidate["crypto_current_price_record_count"] == 6
           assert candidate["postgres_connection_opened"] is False
           assert candidate["postgres_write_performed"] is False
           assert candidate["publication_persisted"] is False

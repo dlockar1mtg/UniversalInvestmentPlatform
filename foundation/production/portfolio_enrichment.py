@@ -7,6 +7,13 @@ from decimal import Decimal
 from typing import Protocol
 
 from foundation.production.metals_registry import load_metals_registry
+from foundation.presentation.crypto_current_price_projection import (
+    AUTHORITY as CRYPTO_PRICE_AUTHORITY,
+    CSV_SHA256 as CRYPTO_PRICE_CSV_SHA256,
+    PRESENTATION_SEMANTICS as CRYPTO_PRESENTATION_SEMANTICS,
+    PRICE_SEMANTICS as CRYPTO_PRICE_SEMANTICS,
+    SOURCE_TABLE as CRYPTO_PRICE_SOURCE_TABLE,
+)
 from foundation.production.portfolio_accounting import PortfolioAccountingResult, PortfolioPosition
 
 
@@ -168,6 +175,26 @@ def _enrich_position(
         authority = asset.get("current_price_authority_available") is True
         raw_price = asset.get("current_price_usd")
         freshness = _freshness(asset)
+        if position.domain_id == "crypto" and not authority:
+            certified_price = _first_payload(detail, "crypto_current_price")
+            if certified_price is not None:
+                expected = {
+                    "universal_asset_id": position.asset_id,
+                    "asset_id": position.asset_id.removeprefix("crypto:"),
+                    "authority_id": CRYPTO_PRICE_AUTHORITY,
+                    "source_table": CRYPTO_PRICE_SOURCE_TABLE,
+                    "price_semantics": CRYPTO_PRICE_SEMANTICS,
+                    "presentation_semantics": CRYPTO_PRESENTATION_SEMANTICS,
+                    "schema_version": "1.0.0",
+                    "methodology_version": "1.0.0",
+                    "_certified_csv_sha256": CRYPTO_PRICE_CSV_SHA256,
+                    "_certified_manifest_status": "CRYPTO_CURRENT_PRICE_V1_PASS",
+                }
+                if any(certified_price.get(key) != value for key, value in expected.items()):
+                    raise ValueError(f"certified Crypto current-price authority mismatch: {position.asset_id}")
+                authority = True
+                raw_price = certified_price.get("current_price_usd")
+                freshness = _freshness(certified_price)
     elif position.domain_id == "metals" and position.asset_id.startswith("metals:vehicle:"):
         registry = load_metals_registry()
         vehicle = next(
@@ -228,7 +255,7 @@ def _enrich_position(
         pricing_status = "UNPRICED_CERTIFIED_AUTHORITY_HAS_NO_VALUE"
     else:
         current_price = _decimal(raw_price)
-        if current_price is None or current_price < 0:
+        if current_price is None or not current_price.is_finite() or current_price <= 0:
             raise ValueError(
                 f"invalid certified current price for {position.domain_id}/{position.asset_id}"
             )

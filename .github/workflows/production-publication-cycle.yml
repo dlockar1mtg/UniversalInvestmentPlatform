@@ -24,7 +24,10 @@ jobs:
     env:
       UIIP_DATABASE_URL: ${{ secrets.UIIP_DATABASE_URL }}
       SOURCE_TOKEN: ${{ secrets.UIP_SOURCE_ARTIFACTS_TOKEN }}
-      EXPECTED_CRYPTO_RUN_ID: "35359634438"
+      EXPECTED_CRYPTO_RUN_ID: "35628894423"
+      EXPECTED_CRYPTO_HEAD: "924c675bcebe1b7a6f14477a0a432fe43255e6b0"
+      EXPECTED_CRYPTO_ARTIFACT_ID: "10655476013"
+      EXPECTED_CRYPTO_ARTIFACT_DIGEST: "5860052ab8e54bf077e97addda4a49c1bf1630461ce73f2ba1174eafd25ccdec"
       EXPECTED_MTG_RUN_ID: "35369497590"
       EXPECTED_METALS_RUN_ID: "35377147561"
       EXPECTED_MTG_HEAD: "2e8b1a77c1bdd3b79141fffc94f84d91222e4266"
@@ -108,6 +111,11 @@ jobs:
               echo "Pinned source run is not from main: ${repo}/${run_id}" >&2
               exit 1
             }
+            if test "$repo" = "dlockar1mtg/CryptoIntelligencePlatform"; then
+              test "$(printf '%s' "$run_json" | jq -r '.head_sha')" = "$EXPECTED_CRYPTO_HEAD" || {
+                echo "Crypto source run head drifted" >&2; exit 1;
+              }
+            fi
             event="$(printf '%s' "$run_json" | jq -r '.event')"
             test "$event" = "schedule" -o "$event" = "workflow_dispatch" || {
               echo "Pinned source run has unauthorized event: ${repo}/${run_id} event=${event}" >&2
@@ -121,9 +129,22 @@ jobs:
               echo "Pinned source artifact is unavailable: ${repo}/${run_id}/${artifact_prefix}" >&2
               exit 1
             }
+            if test "$repo" = "dlockar1mtg/CryptoIntelligencePlatform"; then
+              test "$artifact_id" = "$EXPECTED_CRYPTO_ARTIFACT_ID" || {
+                echo "Crypto artifact ID drifted" >&2; exit 1;
+              }
+              test "$(printf '%s' "$artifacts_json" | jq -r --argjson id "$artifact_id" '.artifacts[] | select(.id == $id) | .digest')" = "sha256:${EXPECTED_CRYPTO_ARTIFACT_DIGEST}" || {
+                echo "Crypto artifact digest drifted" >&2; exit 1;
+              }
+            fi
 
             echo "PINNED_SOURCE repo=${repo} run_id=${run_id} artifact=${artifact_name}"
             api_get "$token" "https://api.github.com/repos/${repo}/actions/artifacts/${artifact_id}/zip" > "${destination}.zip"
+            if test "$repo" = "dlockar1mtg/CryptoIntelligencePlatform"; then
+              echo "${EXPECTED_CRYPTO_ARTIFACT_DIGEST}  ${destination}.zip" | sha256sum --check --status || {
+                echo "Crypto ZIP digest mismatch" >&2; exit 1;
+              }
+            fi
             unzip -q "${destination}.zip" -d "$destination"
           }
 

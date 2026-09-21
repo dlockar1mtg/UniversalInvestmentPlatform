@@ -13,7 +13,7 @@ def test_first_rich_production_publication_is_manual_and_exactly_pinned():
     assert "workflow_dispatch:" in text
     assert "schedule:" not in text
     assert "PUBLISH_REHEARSED_RICH_CANDIDATE" in text
-    assert 'EXPECTED_CRYPTO_RUN_ID: "35359634438"' in text
+    assert 'EXPECTED_CRYPTO_RUN_ID: "35628894423"' in text
     assert 'EXPECTED_MTG_RUN_ID: "35369497590"' in text
     assert 'EXPECTED_METALS_RUN_ID: "35377147561"' in text
     assert 'EXPECTED_MTG_HEAD: "2e8b1a77c1bdd3b79141fffc94f84d91222e4266"' in text
@@ -40,8 +40,7 @@ def test_rich_production_v2_bootstraps_repository_before_local_imports():
     root = text.index('ROOT = Path(__file__).resolve().parents[1]')
     path_insert = text.index("sys.path.insert(0, str(ROOT))")
     publisher_import = text.index("import scripts.publish_rehearsed_rich_candidate as publisher")
-    foundation_import = text.index("from foundation.presentation.metals_rich_projection import")
-    assert root < path_insert < publisher_import < foundation_import
+    assert root < path_insert < publisher_import
 
 
 def test_rich_production_script_validates_complete_candidate_before_postgres():
@@ -66,15 +65,12 @@ def test_rich_production_script_validates_complete_candidate_before_postgres():
     assert '"automatic_schedule_modified": False' in text
 
 
-def test_v2_extends_only_metals_implementation_projection_before_legacy_publisher():
+def test_v2_uses_shared_rich_candidate_composition():
     text = SCRIPT_V2.read_text(encoding="utf-8")
-
-    assert "build_metals_vehicle_implementation_records" in text
-    assert 'EXPECTED_IMPLEMENTATION_RECORD_COUNT = 10' in text
-    assert "build_metals_rich_records_with_implementation" in text
-    assert "expected_metals_counts_with_implementation" in text
-    assert "publisher.build_metals_rich_records = build_metals_rich_records_with_implementation" in text
-    assert "publisher.expected_metals_counts = expected_metals_counts_with_implementation" in text
+    rehearsal = (ROOT / "scripts" / "rehearse_rich_publication_candidate.py").read_text(encoding="utf-8")
+    publisher = SCRIPT.read_text(encoding="utf-8")
+    assert "compose_rich_candidate(" in rehearsal
+    assert "compose_rich_candidate(" in publisher
     assert "return publisher.main()" in text
     assert "automatic_execution" not in text
 

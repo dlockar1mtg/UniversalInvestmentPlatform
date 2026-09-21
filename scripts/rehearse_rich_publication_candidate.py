@@ -42,6 +42,7 @@ from foundation.presentation.publication_model import (
     build_presentation_publication,
 )
 from foundation.presentation.publication_service import validate_publication_bundle
+from foundation.presentation.rich_candidate_composition import compose_rich_candidate
 from scripts.audit_rich_publication_source_contract import NATIVE_METALS_CERTIFIED_CONTRACTS
 from scripts.publish_latest_domain_artifacts import (
     assert_required_presentation_surfaces,
@@ -217,18 +218,8 @@ def main() -> int:
         finally:
             duck.close()
 
-        metals_rich = build_metals_rich_records(artifact_roots["metals"])
-        metals_vehicle_implementation = build_metals_vehicle_implementation_records(config.repository_root)
-        combined = list(base.records) + metals_rich + metals_vehicle_implementation
-        combined.sort(key=lambda item: (item.record_type, item.domain_id, item.asset_id or "", item.record_key))
-        candidate = PresentationPublication(
-            publication_id=base.publication_id,
-            publication_version=base.publication_version,
-            source_database_sha256=base.source_database_sha256,
-            source_database_classification=base.source_database_classification,
-            published_at_utc=base.published_at_utc,
-            publication_status="STAGED",
-            records=tuple(combined),
+        candidate = compose_rich_candidate(
+            base, artifact_roots["crypto"], artifact_roots["metals"], config.repository_root
         )
 
         validate_publication_bundle(candidate)
@@ -241,6 +232,7 @@ def main() -> int:
         observed_metals = {record_type: counts[("metals", record_type)] for record_type in metals_expected}
         observed_mtg = {record_type: counts[("mtg", record_type)] for record_type in MTG_RICH_EXPECTED_COUNTS}
         implementation_count = counts[("metals", METALS_VEHICLE_IMPLEMENTATION_RECORD_TYPE)]
+        crypto_current_price_count = counts[("crypto", "crypto_current_price")]
 
         if observed_metals != metals_expected:
             raise RuntimeError(f"Metals rich candidate counts do not match certified inputs: {observed_metals} != {metals_expected}")
@@ -248,6 +240,8 @@ def main() -> int:
             raise RuntimeError(f"MTG rich candidate counts do not match certified inputs: {observed_mtg} != {MTG_RICH_EXPECTED_COUNTS}")
         if implementation_count != 10:
             raise RuntimeError(f"Metals vehicle implementation candidate count must be 10, observed {implementation_count}")
+        if crypto_current_price_count != 6:
+            raise RuntimeError(f"Crypto current-price candidate count must be 6, observed {crypto_current_price_count}")
         if candidate.publication_status != "STAGED":
             raise RuntimeError("Candidate publication did not remain STAGED in memory")
 
@@ -263,6 +257,7 @@ def main() -> int:
             "metals_rich_family_count": len(metals_expected),
             "metals_rich_record_counts": observed_metals,
             "metals_vehicle_implementation_record_count": implementation_count,
+            "crypto_current_price_record_count": crypto_current_price_count,
             "metals_vehicle_implementation_summary": vehicle_implementation_summary,
             "mtg_rich_record_counts": observed_mtg,
             "mtg_sidecar_paths": mtg_sidecars,
