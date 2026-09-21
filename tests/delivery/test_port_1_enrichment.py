@@ -181,3 +181,120 @@ def test_enriched_endpoint_fails_closed_when_identity_not_in_active_presentation
     response = client.get("/v1/portfolio/enriched", headers={"X-API-Key": "view-key"})
     assert response.status_code == 409
     assert response.json()["error"]["code"] == "PORTFOLIO_ENRICHMENT_BLOCKED"
+
+
+def metals_vehicle_transaction(asset_id="metals:vehicle:BIL", price="91.51"):
+    return create_transaction(
+        transaction_id="metals-vehicle-buy",
+        transaction_type="BUY",
+        domain_id="metals",
+        asset_id=asset_id,
+        occurred_at=NOW,
+        quantity="0.081962",
+        price_per_unit=price,
+        fees="0",
+        currency="USD",
+        account_id="brokerage",
+        recorded_by="test",
+        recorded_at=NOW,
+    )
+
+
+def metals_current_price_detail(
+    *,
+    asset_id="metals:vehicle:BIL",
+    ticker="BIL",
+    current_price="91.55999755859375",
+    source_authority="UIP_NATIVE_METALS_VEHICLE_OBSERVATIONS_V1",
+    price_semantics="UNADJUSTED_CLOSE",
+):
+    return {
+        "domain_id": "metals",
+        "asset_id": asset_id,
+        "records": {
+            "metals_current_price": [{
+                "record_key": asset_id,
+                "payload": {
+                    "asset_id": asset_id,
+                    "ticker": ticker,
+                    "observation_date": "2026-09-18",
+                    "current_price_usd": current_price,
+                    "price_semantics": price_semantics,
+                    "source_system": "universal-market-provider",
+                    "source_authority": source_authority,
+                    "source_package_id": "metals-native-history-2026-09-18",
+                    "source_run_id": "gha-35377147561",
+                    "collected_at_utc": "2026-09-18T17:56:04.289629+00:00",
+                },
+            }],
+        },
+    }
+
+
+def test_registered_metals_vehicle_can_be_enriched_from_certified_rich_price_without_generic_asset():
+    accounting = derive_portfolio((metals_vehicle_transaction(),))
+    reader = FakePresentationReader({
+        ("metals", "metals:vehicle:BIL"): metals_current_price_detail(),
+    })
+    position = enrich_portfolio(accounting, reader).positions[0]
+    assert position.asset_name == "SPDR Bloomberg 1-3 Month T-Bill ETF"
+    assert position.asset_symbol == "BIL"
+    assert position.asset_subclass == "cash_proxy"
+    assert position.current_price == Decimal("91.55999755859375")
+    assert position.current_price_authority_available is True
+    assert position.pricing_status == "PRICED_CERTIFIED_CURRENT_AUTHORITY"
+    assert position.recommendation is None
+    assert position.recommendation_source_field is None
+    assert position.freshness == "2026-09-18"
+
+
+def test_registered_metals_vehicle_without_current_price_remains_unpriced_not_blocked():
+    accounting = derive_portfolio((metals_vehicle_transaction(),))
+    reader = FakePresentationReader({
+        ("metals", "metals:vehicle:BIL"): {
+            "domain_id": "metals",
+            "asset_id": "metals:vehicle:BIL",
+            "records": {"risk": [{"record_key": "metals:vehicle:BIL", "payload": {}}]},
+        },
+    })
+    position = enrich_portfolio(accounting, reader).positions[0]
+    assert position.asset_name == "SPDR Bloomberg 1-3 Month T-Bill ETF"
+    assert position.current_price is None
+    assert position.market_value is None
+    assert position.pricing_status == "UNPRICED_NO_CERTIFIED_CURRENT_PRICE_AUTHORITY"
+    assert position.recommendation is None
+
+
+def test_unknown_metals_vehicle_still_fails_closed_even_with_spoofed_current_price():
+    asset_id = "metals:vehicle:NOT_REGISTERED"
+    accounting = derive_portfolio((metals_vehicle_transaction(asset_id=asset_id),))
+    reader = FakePresentationReader({
+        ("metals", asset_id): metals_current_price_detail(
+            asset_id=asset_id,
+            ticker="NOT_REGISTERED",
+        ),
+    })
+    with pytest.raises(ValueError, match="not an enabled governed Metals vehicle"):
+        enrich_portfolio(accounting, reader)
+
+
+def test_registered_metals_vehicle_rejects_wrong_current_price_authority():
+    accounting = derive_portfolio((metals_vehicle_transaction(),))
+    reader = FakePresentationReader({
+        ("metals", "metals:vehicle:BIL"): metals_current_price_detail(
+            source_authority="UNAUTHORIZED_SOURCE",
+        ),
+    })
+    with pytest.raises(ValueError, match="unexpected Metals current-price authority"):
+        enrich_portfolio(accounting, reader)
+
+
+def test_registered_metals_vehicle_rejects_wrong_price_semantics():
+    accounting = derive_portfolio((metals_vehicle_transaction(),))
+    reader = FakePresentationReader({
+        ("metals", "metals:vehicle:BIL"): metals_current_price_detail(
+            price_semantics="ADJUSTED_CLOSE",
+        ),
+    })
+    with pytest.raises(ValueError, match="unexpected Metals current-price semantics"):
+        enrich_portfolio(accounting, reader)
