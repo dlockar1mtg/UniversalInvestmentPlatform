@@ -4,6 +4,7 @@ import importlib.util
 
 ROOT = Path(__file__).resolve().parents[2]
 PROJECTION = ROOT / "foundation" / "presentation" / "metals_rich_projection.py"
+CRYPTO_PROJECTION = ROOT / "foundation" / "presentation" / "crypto_current_price_projection.py"
 SCRIPT = ROOT / "scripts" / "rehearse_rich_publication_candidate.py"
 WORKFLOW = ROOT / ".github" / "workflows" / "rich-publication-candidate-rehearsal.yml"
 
@@ -67,6 +68,8 @@ def test_price_history_revision_key_preserves_same_day_source_revisions():
 
 def test_candidate_script_is_non_persistent_and_binds_rich_sources_explicitly():
     text = SCRIPT.read_text(encoding="utf-8")
+    assert "build_crypto_current_price_records" in text
+    assert '"crypto_current_price_record_count": crypto_current_price_count' in text
     assert "build_metals_rich_records" in text
     assert "UIP_MTG_PREMIUM_SIDECAR_PATH" in text
     assert "UIP_MTG_COLLECTOR_RESEARCH_PATH" in text
@@ -85,6 +88,9 @@ def test_workflow_is_manual_only_and_never_receives_postgres_dsn():
     assert "schedule:" not in text
     assert "UIIP_DATABASE_URL" not in text
     assert "scripts/audit_rich_publication_source_contract.py" in text
+    assert "--crypto-artifact incoming/crypto" in text
+    assert 'assert source["crypto_current_price_source_contract_pass"] is True' in text
+    assert 'assert candidate["crypto_current_price_record_count"] == 6' in text
     assert "scripts/rehearse_rich_publication_candidate.py" in text
     assert 'assert source["metals_certified_family_count"] == 11' in text
     assert 'assert source["metals_remaining_family_count"] == 0' in text
@@ -96,3 +102,15 @@ def test_candidate_rehearsal_does_not_modify_central_publisher():
     central = (ROOT / ".github" / "workflows" / "production-publication-cycle.yml").read_text(encoding="utf-8")
     assert "workflow_dispatch:" in central
     assert "schedule:" not in central
+
+
+def test_crypto_current_price_projection_contract_is_explicit_and_non_execution():
+    text = CRYPTO_PROJECTION.read_text(encoding="utf-8")
+    assert 'AUTHORITY_ID = "CRYPTO_CANONICAL_MARKET_DAILY_CURRENT_PRICE_V1"' in text
+    assert 'RECORD_TYPE = "crypto_current_price"' in text
+    assert 'SOURCE_TABLE = "canonical_market_daily"' in text
+    assert 'PRICE_SEMANTICS = "DAILY_CANONICAL_MARKET_CLOSE"' in text
+    assert 'PRESENTATION_SEMANTICS = "CURRENT_PRICE_FOR_PORTFOLIO_VALUATION_NOT_EXECUTION_QUOTE"' in text
+    assert '"forecast_not_reused"' in text
+    assert '"intraday_quote_not_claimed"' in text
+    assert '"execution_authority_not_granted"' in text
