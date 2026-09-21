@@ -14,10 +14,10 @@ def test_first_rich_production_publication_is_manual_and_exactly_pinned():
     assert "schedule:" not in text
     assert "PUBLISH_REHEARSED_RICH_CANDIDATE" in text
     assert 'EXPECTED_CRYPTO_RUN_ID: "35628894423"' in text
-    assert 'EXPECTED_MTG_RUN_ID: "35369497590"' in text
-    assert 'EXPECTED_METALS_RUN_ID: "35377147561"' in text
+    assert 'EXPECTED_MTG_RUN_ID: "35637210918"' in text
+    assert 'EXPECTED_METALS_RUN_ID: "35637019717"' in text
     assert 'EXPECTED_MTG_HEAD: "2e8b1a77c1bdd3b79141fffc94f84d91222e4266"' in text
-    assert 'EXPECTED_RICH_RECORD_COUNT: "14292"' in text
+    assert 'EXPECTED_RICH_RECORD_COUNT: "14309"' in text
     assert "download_exact" in text
     assert "scripts/audit_rich_publication_source_contract.py" in text
     assert "scripts/publish_rehearsed_rich_candidate_v2.py" in text
