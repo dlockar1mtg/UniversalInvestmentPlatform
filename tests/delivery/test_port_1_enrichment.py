@@ -298,3 +298,95 @@ def test_registered_metals_vehicle_rejects_wrong_price_semantics():
     })
     with pytest.raises(ValueError, match="unexpected Metals current-price semantics"):
         enrich_portfolio(accounting, reader)
+
+
+def crypto_transaction(price="60500"):
+    return create_transaction(
+        transaction_id="crypto-buy",
+        transaction_type="BUY",
+        domain_id="crypto",
+        asset_id="crypto:bitcoin",
+        occurred_at=NOW,
+        quantity="0.012355",
+        price_per_unit=price,
+        fees="0",
+        currency="USD",
+        account_id="brokerage",
+        recorded_by="test",
+        recorded_at=NOW,
+    )
+
+
+def crypto_detail(*, current_price="86067.0", authority="CRYPTO_CANONICAL_MARKET_DAILY_CURRENT_PRICE_V1"):
+    return {
+        "domain_id": "crypto",
+        "asset_id": "crypto:bitcoin",
+        "records": {
+            "asset": [{
+                "record_key": "crypto:bitcoin",
+                "payload": {
+                    "asset_name": "Bitcoin",
+                    "asset_symbol": "BTC",
+                    "asset_subclass": "large_cap_crypto",
+                    "current_price_usd": None,
+                    "current_price_authority_available": False,
+                    "last_updated_at_utc": "2026-09-21T17:00:00+00:00",
+                },
+            }],
+            "recommendation": [{
+                "record_key": "crypto:bitcoin",
+                "payload": {"native_recommendation": "accumulate"},
+            }],
+            "crypto_current_price": [{
+                "record_key": "crypto:bitcoin",
+                "payload": {
+                    "universal_asset_id": "crypto:bitcoin",
+                    "asset_id": "bitcoin",
+                    "observation_date": "2026-09-21",
+                    "current_price_usd": current_price,
+                    "price_source": "coingecko",
+                    "source_priority": "1",
+                    "collected_at_utc": "2026-09-21 16:59:13+00:00",
+                    "source_table": "canonical_market_daily",
+                    "authority_id": authority,
+                    "schema_version": "1.0.0",
+                    "methodology_version": "1.0.0",
+                    "price_semantics": "DAILY_CANONICAL_MARKET_CLOSE",
+                    "presentation_semantics": "CURRENT_PRICE_FOR_PORTFOLIO_VALUATION_NOT_EXECUTION_QUOTE",
+                },
+            }],
+        },
+    }
+
+
+def test_crypto_portfolio_uses_separate_certified_current_price_authority_when_present():
+    accounting = derive_portfolio((crypto_transaction(),))
+    reader = FakePresentationReader({("crypto", "crypto:bitcoin"): crypto_detail()})
+    position = enrich_portfolio(accounting, reader).positions[0]
+    assert position.asset_name == "Bitcoin"
+    assert position.asset_symbol == "BTC"
+    assert position.current_price == Decimal("86067.0")
+    assert position.current_price_authority_available is True
+    assert position.pricing_status == "PRICED_CERTIFIED_CURRENT_AUTHORITY"
+    assert position.recommendation == "accumulate"
+    assert position.freshness == "2026-09-21"
+
+
+def test_crypto_portfolio_remains_unpriced_when_separate_authority_is_absent():
+    detail_without_price = crypto_detail()
+    detail_without_price["records"].pop("crypto_current_price")
+    accounting = derive_portfolio((crypto_transaction(),))
+    reader = FakePresentationReader({("crypto", "crypto:bitcoin"): detail_without_price})
+    position = enrich_portfolio(accounting, reader).positions[0]
+    assert position.current_price is None
+    assert position.market_value is None
+    assert position.pricing_status == "UNPRICED_NO_CERTIFIED_CURRENT_PRICE_AUTHORITY"
+
+
+def test_crypto_portfolio_rejects_wrong_current_price_authority():
+    accounting = derive_portfolio((crypto_transaction(),))
+    reader = FakePresentationReader({
+        ("crypto", "crypto:bitcoin"): crypto_detail(authority="UNAUTHORIZED"),
+    })
+    with pytest.raises(ValueError, match="unexpected Crypto current-price authority"):
+        enrich_portfolio(accounting, reader)
