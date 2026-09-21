@@ -141,6 +141,9 @@ jobs:
 
           assert candidate["status"] == "UIP_RICH_PUBLICATION_CANDIDATE_REHEARSAL_PASS"
           assert candidate["publication_status"] == "STAGED"
+          assert candidate["crypto_rich_record_counts"] == {
+              "crypto_current_price": 6,
+          }
           assert candidate["metals_rich_family_count"] == 11
           assert candidate["postgres_connection_opened"] is False
           assert candidate["postgres_write_performed"] is False
