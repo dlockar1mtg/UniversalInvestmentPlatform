@@ -10,6 +10,8 @@ import hashlib
 import json
 from pathlib import Path
 
+from foundation.presentation.crypto_current_price_projection import audit_crypto_current_price_v1
+
 
 EXPECTED_MTG = {
     "premium": {
@@ -426,13 +428,17 @@ def audit_certified_metals_family(root: Path, family: str, spec: dict) -> dict:
 
 def main() -> int:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--crypto-artifact", type=Path)
     parser.add_argument("--metals-artifact", type=Path, required=True)
     parser.add_argument("--mtg-repo", type=Path, required=True)
     parser.add_argument("--evidence-output", type=Path, required=True)
     args = parser.parse_args()
 
+    crypto_root = args.crypto_artifact.resolve() if args.crypto_artifact else None
     metals_root = args.metals_artifact.resolve()
     mtg_root = args.mtg_repo.resolve()
+    if crypto_root is not None and not crypto_root.is_dir():
+        raise RuntimeError(f"Crypto artifact root missing: {crypto_root}")
     if not metals_root.is_dir():
         raise RuntimeError(f"Metals artifact root missing: {metals_root}")
     if not mtg_root.is_dir():
@@ -494,11 +500,21 @@ def main() -> int:
             certified_count += 1
 
     metals_pass = certified_count == len(REQUIRED_METALS_RICH_FAMILIES)
+    crypto_current_price = (
+        audit_crypto_current_price_v1(crypto_root)
+        if crypto_root is not None
+        else None
+    )
+    crypto_pass = True if crypto_current_price is None else bool(crypto_current_price["pass"])
     evidence = {
-        "status": "PASS" if mtg_pass and metals_pass else "FAIL_CLOSED",
+        "status": "PASS" if mtg_pass and metals_pass and crypto_pass else "FAIL_CLOSED",
         "postgres_write_performed": False,
         "publication_staged": False,
         "publication_activated": False,
+        "crypto_current_price_source_contract_pass": (
+            None if crypto_current_price is None else bool(crypto_current_price["pass"])
+        ),
+        "crypto_current_price": crypto_current_price,
         "mtg_rich_source_contract_pass": mtg_pass,
         "mtg": mtg,
         "metals_rich_source_contract_pass": metals_pass,
