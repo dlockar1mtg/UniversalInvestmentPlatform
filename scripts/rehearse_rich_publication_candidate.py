@@ -2,7 +2,7 @@
 
 The rehearsal consumes the latest certified domain artifacts, uses a temporary local
 DuckDB import database, binds the already-certified MTG research sidecars explicitly,
-projects the ten certified Metals rich families and the governed Metals vehicle
+projects the certified Metals rich families, governed Crypto current-price family, and Metals vehicle
 implementation records explicitly, and stops before any staging or activation against
 PostgreSQL.
 """
