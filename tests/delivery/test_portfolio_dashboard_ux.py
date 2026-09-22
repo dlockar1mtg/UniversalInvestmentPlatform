@@ -37,7 +37,9 @@ def test_remaining_reserved_workflows_are_explicit_while_txn_portfolio_and_rec_u
     html, _, javascript = assets()
     assert "REC-UI-1 · certified catalog" in html
     assert "REC-UI-1 reserved" not in html
-    assert "REFRESH-UI-1 reserved" in html
+    assert "REFRESH-UI-1 · observability" in html
+    assert "REFRESH-UI-1 reserved" not in html
+    assert 'request("/v1/refresh/status")' in javascript
     assert "TXN-1 · guided entry + retained ledger" in html
     assert "append-only application state" in html.lower()
     assert 'id="transaction-form"' in html
