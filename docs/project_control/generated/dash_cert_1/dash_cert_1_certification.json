@@ -1,0 +1,63 @@
+{
+  "certification_id": "DASH-CERT-1",
+  "status": "DASH_CERT_1_ACCEPTED_COMPLETE",
+  "accepted_at_utc": "2026-09-22T16:56:22Z",
+  "accepted_application_commit": "e26181e3d328d453aee1581c79e14f68dac3d40f",
+  "active_publication": {
+    "publication_id": "uip-rich-production-20260921T200442Z-2ed557a8e134",
+    "version": "1.0.0",
+    "record_count": 14309,
+    "content_fingerprint": "90de48bf27cce58de2f7e4c7ba7e936d0d5c26a800b95a4a0ea323128abfbd70",
+    "source_database_sha256": "2ed557a8e134cd29812579e0fa220e36c17c593b0b27190e4e5339d9a8ce169b"
+  },
+  "accepted_surfaces": [
+    "Home",
+    "Recommendations",
+    "Portfolio",
+    "Transactions",
+    "Refresh & Data Health",
+    "Operations"
+  ],
+  "portfolio_acceptance": {
+    "tracked_components": 30,
+    "overall_current_value_usd": "6802.39",
+    "overall_cost_basis_usd": "6232.54",
+    "overall_gain_loss_usd": "569.84",
+    "overall_return_pct": "9.14",
+    "certified_port1_positions": 25,
+    "effective_transactions": 27,
+    "superseded_transactions": 5,
+    "retained_transactions": 32,
+    "pricing_coverage": "25/25",
+    "basis_coverage": "25/25",
+    "manual_stock_etf_positions": 4,
+    "acorns_accounts": 1
+  },
+  "refresh_acceptance": {
+    "operational_domains_healthy": 3,
+    "freshness_review_count": 2,
+    "crypto_freshness": "CURRENT",
+    "metals_freshness": "STALE",
+    "mtg_freshness": "UNKNOWN",
+    "last_good_state_preserved": true,
+    "source_owned_refresh_preserved": true,
+    "manual_hosted_dispatch_exposed": false
+  },
+  "known_non_blocking_deferred_items": [
+    "Metals governed data-as-of metadata currently reports 2026-08-01.",
+    "MTG active authority does not currently publish governed data-as-of metadata.",
+    "Hosted Refresh does not yet dispatch source-owned workflows.",
+    "Operational request/event counters are in-memory since service start."
+  ],
+  "governance_assertions": {
+    "no_universal_cross_domain_rank": true,
+    "no_universal_allocation_policy": true,
+    "no_automatic_trading": true,
+    "missing_stays_missing": true,
+    "append_only_transaction_corrections": true,
+    "manual_external_holdings_not_analytical_authority": true,
+    "legacy_csv_not_ownership_authority": true,
+    "refresh_fail_closed_last_good_preserved": true
+  },
+  "next_gate": "UIP_REMOTE_PRODUCTION_CERTIFIED"
+}
