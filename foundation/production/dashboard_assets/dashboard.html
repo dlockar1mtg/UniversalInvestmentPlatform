@@ -45,21 +45,40 @@
           </section>
 
           <section id="home" class="page active-page">
-            <div class="page-heading"><div><span class="eyebrow">TODAY</span><h2>What needs your attention</h2></div><span class="page-note">Certified authority only</span></div>
-            <div class="hero-grid">
+            <div class="page-heading"><div><span class="eyebrow">TODAY</span><h2>Your investment dashboard</h2></div><span class="page-note">Personal portfolio + certified authority</span></div>
+            <section class="panel home-overview-panel">
+              <div class="section-title"><div><h3>Portfolio at a glance</h3><span id="home-portfolio-meta">Loading tracked holdings…</span></div><span id="home-portfolio-status" class="pill good">TRACKED</span></div>
+              <div class="portfolio-cards home-portfolio-cards">
+                <article><span>Total current value</span><strong id="home-total-value">—</strong><small>Certified + external tracked holdings</small></article>
+                <article><span>Total cost basis</span><strong id="home-total-basis">—</strong><small>Known/user-entered basis</small></article>
+                <article><span>Total gain / loss</span><strong id="home-total-gain">—</strong><small id="home-total-return">Return —</small></article>
+                <article><span>Tracked positions</span><strong id="home-position-count">—</strong><small id="home-largest-allocation">Largest allocation —</small></article>
+              </div>
+              <div class="home-quick-actions" aria-label="Quick actions">
+                <button type="button" class="home-action" data-home-page="transactions" data-home-transaction="BUY">Record Buy</button>
+                <button type="button" class="secondary home-action" data-home-page="transactions" data-home-transaction="SELL">Record Sell</button>
+                <button type="button" class="secondary home-action" data-home-page="recommendations">View Recommendations</button>
+                <button type="button" class="secondary home-action" data-home-page="refresh-page">Check Data Health</button>
+              </div>
+            </section>
+            <div class="hero-grid home-decision-grid">
               <article class="decision-panel">
-                <span class="eyebrow">CERTIFIED PLATFORM STATUS</span>
-                <h3 id="home-authority-title">Loading active publication…</h3>
-                <p id="home-authority-copy">UIP is reading the active hosted presentation publication.</p>
-                <div class="hero-meta"><span id="home-record-count">— records</span><span id="home-source-sha">Source —</span></div>
+                <span class="eyebrow">WHAT NEEDS ATTENTION</span>
+                <h3 id="home-attention-title">Loading current state…</h3>
+                <p id="home-attention-copy">UIP is evaluating portfolio coverage and certified data health.</p>
+                <div class="hero-meta"><span id="home-attention-domain">—</span><span id="home-attention-freshness">—</span></div>
               </article>
               <article class="panel attention-panel">
-                <div class="section-title"><h3>System attention</h3><span>Current hosted state</span></div>
+                <div class="section-title"><h3>System & portfolio attention</h3><span>Decision-impacting items</span></div>
                 <div id="attention-items" class="attention-list"></div>
               </article>
             </div>
             <div class="section-title home-health-title"><div><h3>Certified domains</h3><span>Domain-native authority is preserved</span></div><span id="home-health-updated">—</span></div>
             <div id="domain-cards" class="domain-cards"></div>
+            <section class="panel home-authority-panel">
+              <div class="section-title"><div><h3 id="home-authority-title">Loading active publication…</h3><span id="home-authority-copy">UIP is reading the active hosted presentation publication.</span></div><span class="pill good">CERTIFIED</span></div>
+              <div class="history"><div class="history-row"><strong>Presentation records</strong><span id="home-record-count">— records</span></div><div class="history-row"><strong>Source authority</strong><span id="home-source-sha">Source —</span></div></div>
+            </section>
           </section>
 
           <section id="recommendations" class="page">
@@ -140,37 +159,71 @@
           </section>
 
           <section id="operations" class="page">
-            <div class="page-heading"><div><span class="eyebrow">OPERATIONS</span><h2>Technical diagnostics</h2></div><span class="page-note">Existing Render capability preserved</span></div>
-            <div class="cards">
-              <article class="card"><span>API requests</span><strong id="request-count">—</strong><small>Since service start</small></article>
-              <article class="card"><span>Recorded events</span><strong id="event-count">—</strong><small>Redacted audit activity</small></article>
-              <article class="card"><span>Legacy portfolio snapshot</span><strong id="portfolio-status">—</strong><small>Setup/reconciliation only</small></article>
-              <article class="card"><span>Providers</span><strong id="provider-status">—</strong><small>Operational integrations</small></article>
+            <div class="page-heading"><div><span class="eyebrow">OPERATIONS</span><h2>Technical evidence & diagnostics</h2></div><span class="page-note">OPS-1 · production evidence</span></div>
+            <div class="cards operations-summary-cards">
+              <article class="card"><span>API service</span><strong id="ops-api-health">—</strong><small>Live / ready state</small></article>
+              <article class="card"><span>Database</span><strong id="ops-db-health">—</strong><small>Hosted application persistence</small></article>
+              <article class="card"><span>Read model</span><strong id="ops-publication-health">—</strong><small id="ops-publication-meta">Active publication</small></article>
+              <article class="card"><span>Providers</span><strong id="provider-status">—</strong><small>Configured operational integrations</small></article>
             </div>
 
-            <section id="portfolio-panel" class="panel portfolio-panel">
-              <div class="section-title"><div><h3>Legacy hosted portfolio snapshot</h3><span id="portfolio-meta">No persisted snapshot</span></div><span id="portfolio-fingerprint"></span></div>
-              <p class="governance-note">This CSV snapshot surface is preserved for setup/reconciliation/recovery. It is not the future transaction-ledger source of ownership.</p>
-              <div id="portfolio-empty" class="empty">No hosted portfolio snapshot is available.</div>
-              <div id="portfolio-data" hidden>
-                <div class="portfolio-cards">
-                  <article><span>Market value</span><strong id="portfolio-market">—</strong></article>
-                  <article><span>Cost basis</span><strong id="portfolio-cost">—</strong></article>
-                  <article><span>Gain / loss</span><strong id="portfolio-gain">—</strong><small id="portfolio-return">—</small></article>
-                  <article><span>Positions</span><strong id="portfolio-count">—</strong></article>
-                </div>
-                <div class="portfolio-layout">
-                  <section><h4>Allocation by group</h4><div id="portfolio-allocation" class="allocation"></div></section>
-                  <section><h4>Snapshot history</h4><div id="portfolio-history" class="history"></div></section>
-                </div>
-                <div class="table-wrap"><table><thead><tr><th>Position</th><th>Group</th><th>Quantity</th><th>Cost basis</th><th>Market value</th><th>Gain / loss</th></tr></thead><tbody id="portfolio-positions"></tbody></table></div>
-              </div>
+            <div class="operations-grid">
+              <section class="panel operations-evidence-panel">
+                <div class="section-title"><div><h3>Active certified publication</h3><span>Versioned analytical read model</span></div><span id="ops-publication-status" class="pill good">ACTIVE</span></div>
+                <dl class="operations-details">
+                  <dt>Publication ID</dt><dd id="ops-publication-id">—</dd>
+                  <dt>Version</dt><dd id="ops-publication-version">—</dd>
+                  <dt>Activated</dt><dd id="ops-publication-activated">—</dd>
+                  <dt>Records</dt><dd id="ops-publication-records">—</dd>
+                  <dt>Content fingerprint</dt><dd id="ops-publication-fingerprint">—</dd>
+                  <dt>Source database SHA</dt><dd id="ops-source-sha">—</dd>
+                </dl>
+              </section>
+              <section class="panel operations-evidence-panel">
+                <div class="section-title"><div><h3>Domain registry</h3><span>Current certification/import state</span></div><span id="ops-domain-summary">—</span></div>
+                <div id="ops-domain-registry" class="operations-domain-registry"></div>
+              </section>
+            </div>
+
+            <section class="panel operations-evidence-panel">
+              <div class="section-title"><div><h3>Refresh operations</h3><span>Source-owned schedules and last-good authority</span></div><button id="ops-refresh-status" class="secondary" type="button">Reload refresh evidence</button></div>
+              <div id="ops-refresh-runs" class="operations-refresh-runs"></div>
             </section>
 
-            <div class="grid">
-              <section class="panel"><div class="section-title"><h3>Recent activity</h3><span>Newest first</span></div><div id="events" class="events"></div></section>
+            <div class="cards operations-activity-cards">
+              <article class="card"><span>API requests</span><strong id="request-count">—</strong><small>Since service start</small></article>
+              <article class="card"><span>Recorded events</span><strong id="event-count">—</strong><small>In-memory redacted audit activity</small></article>
+              <article class="card"><span>Latest event</span><strong id="ops-latest-event">—</strong><small>Since service start</small></article>
+              <article class="card"><span>Refresh review</span><strong id="ops-refresh-review">—</strong><small>Stale, unknown, or unhealthy domains</small></article>
+            </div>
+
+            <div class="grid operations-observability-grid">
+              <section class="panel"><div class="section-title"><h3>Recent audit activity</h3><span>Newest first</span></div><div id="events" class="events"></div></section>
               <section class="panel"><div class="section-title"><h3>API metrics</h3><span>By method and status</span></div><div id="metrics" class="metrics"></div></section>
             </div>
+
+            <details id="legacy-portfolio-reconciliation" class="panel operations-legacy-panel">
+              <summary><strong>Advanced recovery / legacy reconciliation</strong><span>Historical CSV snapshot · not live ownership authority</span></summary>
+              <div class="operations-legacy-content">
+                <div class="section-title"><div><h3>Legacy hosted portfolio snapshot</h3><span id="portfolio-meta">No persisted snapshot</span></div><span id="portfolio-fingerprint"></span></div>
+                <p class="governance-note">This CSV snapshot is retained only for setup, reconciliation, recovery, and audit comparison. Current Portfolio ownership is transaction-derived.</p>
+                <span id="portfolio-status" hidden>—</span>
+                <div id="portfolio-empty" class="empty">No hosted portfolio snapshot is available.</div>
+                <div id="portfolio-data" hidden>
+                  <div class="portfolio-cards">
+                    <article><span>Market value</span><strong id="portfolio-market">—</strong></article>
+                    <article><span>Cost basis</span><strong id="portfolio-cost">—</strong></article>
+                    <article><span>Gain / loss</span><strong id="portfolio-gain">—</strong><small id="portfolio-return">—</small></article>
+                    <article><span>Positions</span><strong id="portfolio-count">—</strong></article>
+                  </div>
+                  <div class="portfolio-layout">
+                    <section><h4>Allocation by group</h4><div id="portfolio-allocation" class="allocation"></div></section>
+                    <section><h4>Snapshot history</h4><div id="portfolio-history" class="history"></div></section>
+                  </div>
+                  <div class="table-wrap"><table><thead><tr><th>Position</th><th>Group</th><th>Quantity</th><th>Cost basis</th><th>Market value</th><th>Gain / loss</th></tr></thead><tbody id="portfolio-positions"></tbody></table></div>
+                </div>
+              </div>
+            </details>
           </section>
         </section>
       </main>
