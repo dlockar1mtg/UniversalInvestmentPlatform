@@ -7,8 +7,8 @@
 3. Build the dashboard product on the certified hosted presentation/read-model boundary.
 4. Complete transaction, portfolio, recommendation, refresh, and operations workflows.
 5. Add Stocks/ETF through the approved domain-neutral contracts.
-6. Complete end-to-end dashboard certification.
-7. Finalize remote production infrastructure and laptop-independent operation.
+6. Complete end-to-end dashboard certification — **CERTIFIED COMPLETE**.
+7. Finalize remote production infrastructure and laptop-independent operation — **CURRENT**.
 
 ## Dashboard-first product interlock
 
@@ -45,7 +45,7 @@ Mandatory product constraints:
 6. `REFRESH-UI-1` — refresh/data-health orchestration experience.
 7. `OPS-1` — preserve and move existing Render technical dashboard capability under Operations.
 8. `UIP_E1_STOCKS_ETF_EXTENSION_BOUNDARY` — integrate Stocks/ETF against the approved contracts.
-9. `DASH-CERT-1` — end-to-end Render usability and authority certification.
+9. `DASH-CERT-1` — end-to-end Render usability and authority certification — **CERTIFIED COMPLETE**.
 
 ## Completed foundation
 
@@ -91,7 +91,34 @@ Active hosted publication:
 
 Hosted Render certification proved `LIVE`, `READY`, authenticated active-publication reads, certified three-domain health, expected recommendation populations, asset detail, lineage, native MTG semantics, fail-closed unauthenticated access, and rejection of the uncertified Stocks domain.
 
-## Current milestone — DASH-SHELL-1
+## DASH-CERT-1 permanent authority
+
+Status:
+
+`DASH_CERT_1_ACCEPTED_COMPLETE`
+
+Permanent evidence:
+
+- `docs/project_control/DASH_CERT_1_CERTIFICATION.md`
+- `docs/project_control/generated/dash_cert_1/dash_cert_1_certification.json`
+
+Accepted application commit:
+
+`e26181e3d328d453aee1581c79e14f68dac3d40f`
+
+Accepted active publication:
+
+- ID: `uip-rich-production-20260921T200442Z-2ed557a8e134`
+- version: `1.0.0`
+- fingerprint: `90de48bf27cce58de2f7e4c7ba7e936d0d5c26a800b95a4a0ea323128abfbd70`
+- records: `14309`
+- source authority SHA-256: `2ed557a8e134cd29812579e0fa220e36c17c593b0b27190e4e5339d9a8ce169b`
+
+The six accepted application surfaces are Home, Recommendations, Portfolio, Transactions, Refresh & Data Health, and Operations.
+
+Known non-blocking follow-up remains Metals/MTG freshness metadata, governed hosted refresh dispatch, and persistent operational instrumentation.
+
+## Prior milestone — DASH-SHELL-1
 
 Milestone:
 
@@ -144,23 +171,23 @@ Final gate:
 
 Active phase:
 
-`Dashboard product implementation on certified hosted authority`
+`Remote production hardening on accepted dashboard baseline`
 
 Current milestone:
 
-`DASH_SHELL_1_APPROVED_V7_APPLICATION_SHELL`
+`UIP_REMOTE_PRODUCTION_CERTIFICATION`
 
-Current certified multi-domain production baseline:
+Current accepted dashboard application baseline:
 
-`9af5e52882bdf61fed550a2ced9bc83ba1529c422633a7817660cf61d0e15a98`
+`e26181e3d328d453aee1581c79e14f68dac3d40f`
 
 Current implementation branch:
 
-`phase-uip-dash-shell-1`
+`main`
 
 Next authorized action:
 
-`IMPLEMENT_DASH_SHELL_1_APPROVED_V7_APPLICATION_SHELL`
+`BEGIN_REMOTE_PRODUCTION_HARDENING_FROM_DASH_CERT_1_BASELINE`
 
 ## Recovery restriction
 
