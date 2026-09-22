@@ -26,7 +26,7 @@ class FakePresentationRepository:
                 "import_registry_status": "ACTIVE",
                 "last_import_status": "IMPORTED",
                 "last_imported_at_utc": "2026-09-21T19:00:00+00:00",
-                "last_data_as_of_date": "2026-09-20",
+                "last_data_as_of_date": "2026-08-01",
                 "last_package_id": "metals-package",
                 "last_run_id": "metals-run",
                 "last_import_id": "metals-import",
@@ -57,6 +57,8 @@ def test_refresh_status_combines_active_authority_with_locked_cadence():
         now=datetime(2026, 9, 22, 9, 0, tzinfo=timezone.utc),
     )
     assert document["status"] == "HEALTHY"
+    assert document["freshness_status"] == "REVIEW"
+    assert document["freshness_review_count"] == 2
     assert document["refresh_execution_owner"] == "GITHUB_ACTIONS_SOURCE_OWNED"
     assert document["manual_dispatch_available"] is False
     assert document["lifecycle"] == [
@@ -72,6 +74,11 @@ def test_refresh_status_combines_active_authority_with_locked_cadence():
     assert by_domain["metals"]["next_scheduled_run_utc"] == "2026-09-22T12:23:00+00:00"
     assert by_domain["mtg"]["next_scheduled_run_utc"] == "2026-09-22T12:15:00+00:00"
     assert by_domain["crypto"]["data_age_days"] == 1
+    assert by_domain["crypto"]["freshness_state"] == "CURRENT"
+    assert by_domain["crypto"]["freshness_max_age_days"] == 2
+    assert by_domain["metals"]["data_age_days"] == 52
+    assert by_domain["metals"]["freshness_state"] == "STALE"
+    assert by_domain["mtg"]["freshness_state"] == "UNKNOWN"
     assert by_domain["mtg"]["data_age_days"] is None
     assert by_domain["mtg"]["data_as_of"] is None
 
