@@ -42,3 +42,10 @@ def test_refresh_page_does_not_misrepresent_refresh_as_retraining_or_local_colle
     assert "manual source-workflow dispatch is not yet exposed here" in html
     assert "Manual refresh available" in javascript
     assert "Manual dispatch not exposed in hosted UI" in javascript
+
+
+def test_refresh_renderer_does_not_shadow_browser_document_object():
+    javascript = (ASSETS / "dashboard.js").read_text(encoding="utf-8")
+    assert "function renderRefreshStatus(refreshDocument)" in javascript
+    assert "function renderRefreshStatus(document)" not in javascript
+    assert 'document.querySelectorAll(".refresh-domain-reload")' in javascript
