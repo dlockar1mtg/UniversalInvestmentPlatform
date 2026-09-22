@@ -38,7 +38,8 @@ def test_remaining_reserved_workflows_are_explicit_while_txn_portfolio_and_rec_u
     assert "REC-UI-1 · certified catalog" in html
     assert "REC-UI-1 reserved" not in html
     assert "REFRESH-UI-1 reserved" in html
-    assert "TXN-1 · retained in Neon" in html
+    assert "TXN-1 · guided entry + retained ledger" in html
+    assert "append-only application state" in html.lower()
     assert 'id="transaction-form"' in html
     assert 'request("/v1/transactions"' in javascript
     assert "corrects_transaction_id" in javascript
