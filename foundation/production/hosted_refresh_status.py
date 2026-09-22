@@ -93,6 +93,24 @@ def _age_days(value: object, now: datetime) -> int | None:
         return None
 
 
+def _freshness_classification(age_days: int | None, config: dict) -> tuple[str, int | None, str]:
+    if config.get("daily_schedule_utc"):
+        max_age_days = 2
+        policy = "DAILY_CADENCE_PLUS_ONE_DAY_GRACE"
+    elif config.get("weekly_full_refresh_schedule_utc"):
+        max_age_days = 8
+        policy = "WEEKLY_CADENCE_PLUS_ONE_DAY_GRACE"
+    else:
+        max_age_days = None
+        policy = "NO_GOVERNED_CADENCE_THRESHOLD"
+
+    if age_days is None:
+        return "UNKNOWN", max_age_days, policy
+    if max_age_days is None:
+        return "UNKNOWN", None, policy
+    return ("CURRENT" if age_days <= max_age_days else "STALE"), max_age_days, policy
+
+
 def build_refresh_status(repository: PresentationReadRepository, *, now: datetime | None = None) -> dict:
     now = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
     registry = _load_registry()
@@ -109,6 +127,8 @@ def build_refresh_status(repository: PresentationReadRepository, *, now: datetim
             and int(health.get("error_count") or 0) == 0
         )
         schedule = _domain_schedule(domain_id, config, now)
+        data_age_days = _age_days(health.get("last_data_as_of_date"), now)
+        freshness_state, freshness_max_age_days, freshness_policy = _freshness_classification(data_age_days, config)
         warnings = int(health.get("warning_count") or 0)
         errors = int(health.get("error_count") or 0)
         failure_summary = None
@@ -130,7 +150,10 @@ def build_refresh_status(repository: PresentationReadRepository, *, now: datetim
             "last_run_id": health.get("last_run_id"),
             "last_import_id": health.get("last_import_id"),
             "data_as_of": health.get("last_data_as_of_date"),
-            "data_age_days": _age_days(health.get("last_data_as_of_date"), now),
+            "data_age_days": data_age_days,
+            "freshness_state": freshness_state,
+            "freshness_max_age_days": freshness_max_age_days,
+            "freshness_policy": freshness_policy,
             "artifact_or_package_reference": health.get("last_package_id"),
             "authority_version": (
                 health.get("contract_version")
@@ -153,6 +176,8 @@ def build_refresh_status(repository: PresentationReadRepository, *, now: datetim
     return {
         "generated_at_utc": now.isoformat(),
         "status": "HEALTHY" if items and all(item["health_state"] == "HEALTHY" for item in items) else "REVIEW",
+        "freshness_status": "CURRENT" if items and all(item["freshness_state"] == "CURRENT" for item in items) else "REVIEW",
+        "freshness_review_count": sum(1 for item in items if item["freshness_state"] != "CURRENT" or item["health_state"] != "HEALTHY"),
         "items": items,
         "lifecycle": [
             "Requested",
