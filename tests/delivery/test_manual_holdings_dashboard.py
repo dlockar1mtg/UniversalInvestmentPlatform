@@ -61,3 +61,20 @@ def test_unified_overview_combines_values_without_erasing_source_authority():
     assert "each underlying section keeps its own authority" in javascript
     assert 'allocation["Stocks & ETFs"]' in javascript
     assert 'allocation["Acorns"]' in javascript
+
+
+def test_manual_holdings_can_be_updated_from_current_row_without_retyping():
+    javascript = (ASSETS / "dashboard.js").read_text(encoding="utf-8")
+    css = (ASSETS / "dashboard.css").read_text(encoding="utf-8")
+    for marker in (
+        "Update value",
+        "manual-holding-update",
+        "Save updated \${item.symbol} snapshot",
+        "The prior snapshot stays in history.",
+        '$("manual-current-value").focus()',
+        '$("manual-shares").value=item.shares',
+        '$("manual-cost-basis").value=item.cost_basis',
+        '$("manual-current-value").value=item.current_value',
+    ):
+        assert marker in javascript
+    assert ".manual-holding-update{" in css
