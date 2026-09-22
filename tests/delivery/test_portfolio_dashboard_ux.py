@@ -88,7 +88,8 @@ def test_transaction_derived_portfolio_preserves_missing_and_currency_semantics(
 def test_acorns_external_account_renders_with_populated_transaction_portfolio():
     _, _, javascript = assets()
     assert "function renderExternalAccount(document)" in javascript
-    assert 'renderExternalAccount(externalAccount)}' in javascript
+    assert 'renderExternalAccount(externalAccount)' in javascript
+    assert 'renderManualHoldings(manualHoldings)' in javascript
     assert 'page.querySelector(".external-account-panel")?.remove()' in javascript
     assert "Acorns · manual snapshot" in javascript
     assert 'request("/v1/external-accounts/performance"' in javascript

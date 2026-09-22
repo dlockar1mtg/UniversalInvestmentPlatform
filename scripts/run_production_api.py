@@ -14,6 +14,8 @@ from foundation.production.hosted_portfolio_accounting import install_transactio
 from foundation.production.hosted_transactions import install_hosted_transaction_routes
 from foundation.production.hosted_external_accounts import install_external_account_performance_routes
 from foundation.production.external_account_performance import PostgresExternalAccountPerformanceRepository
+from foundation.production.hosted_manual_holdings import install_manual_holding_routes
+from foundation.production.manual_holdings import PostgresManualHoldingRepository
 from foundation.production.portfolio_persistence import PostgresPortfolioSnapshotRepository
 from foundation.production.transaction_persistence import PostgresTransactionRepository
 from foundation.presentation.asset_catalog import GovernedAssetCatalogRepository, install_governed_asset_catalog_routes
@@ -23,6 +25,7 @@ repository = None
 portfolio_repository = None
 transaction_repository = None
 external_account_repository = None
+manual_holding_repository = None
 presentation_repository = None
 asset_catalog_repository = None
 if os.getenv("RENDER_EXTERNAL_HOSTNAME"):
@@ -35,6 +38,8 @@ if os.getenv("RENDER_EXTERNAL_HOSTNAME"):
     transaction_repository.initialize()
     external_account_repository = PostgresExternalAccountPerformanceRepository.from_dsn(free_settings.database_url)
     external_account_repository.initialize()
+    manual_holding_repository = PostgresManualHoldingRepository.from_dsn(free_settings.database_url)
+    manual_holding_repository.initialize()
     presentation_repository = PresentationReadRepository.from_dsn(free_settings.database_url)
     asset_catalog_repository = GovernedAssetCatalogRepository.from_dsn(free_settings.database_url)
 settings = HTTPServiceSettings.from_environment()
@@ -47,6 +52,8 @@ if asset_catalog_repository is not None:
     install_governed_asset_catalog_routes(app, settings.credentials, asset_catalog_repository)
 if external_account_repository is not None:
     install_external_account_performance_routes(app, settings, external_account_repository)
+if manual_holding_repository is not None:
+    install_manual_holding_routes(app, settings, manual_holding_repository)
 if transaction_repository is not None:
     install_hosted_transaction_routes(
         app,
