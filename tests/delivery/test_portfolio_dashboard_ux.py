@@ -85,6 +85,15 @@ def test_transaction_derived_portfolio_preserves_missing_and_currency_semantics(
     assert "Allocation unavailable until UIP has a governed FX conversion layer" in javascript
 
 
+def test_acorns_external_account_renders_with_populated_transaction_portfolio():
+    _, _, javascript = assets()
+    assert "function renderExternalAccount(document)" in javascript
+    assert 'renderExternalAccount(externalAccount)}' in javascript
+    assert 'page.querySelector(".external-account-panel")?.remove()' in javascript
+    assert "Acorns · manual snapshot" in javascript
+    assert 'request("/v1/external-accounts/performance"' in javascript
+
+
 def test_dashboard_preserves_legacy_operations_portfolio_for_reconciliation_only():
     html, _, javascript = assets()
     for identity in (
