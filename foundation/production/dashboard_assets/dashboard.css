@@ -8,3 +8,5 @@
 .manual-holdings-panel{padding:20px;margin-bottom:14px}.manual-holding-form{margin-top:16px}.manual-holding-cards{margin:16px 0}.manual-holdings-table{min-width:1200px}.manual-holdings-empty{margin-top:14px}
 
 .overall-portfolio-panel{padding:20px;margin-bottom:14px;border-color:rgba(99,230,190,.28);background:linear-gradient(180deg,rgba(99,230,190,.055),rgba(8,24,21,.96))}.overall-portfolio-panel .section-title{align-items:flex-start}.overall-portfolio-panel .section-title .eyebrow{display:block;margin-bottom:5px}.overall-portfolio-cards{grid-template-columns:repeat(4,1fr);margin-bottom:16px}.overall-portfolio-layout{display:grid;grid-template-columns:1.35fr 1fr;gap:22px}.overall-portfolio-panel h4{font-size:12px;margin:0 0 11px;color:var(--muted);font-weight:650}.overall-allocation-row{grid-template-columns:105px 1fr 60px}@media(max-width:760px){.overall-portfolio-layout{grid-template-columns:1fr}.overall-portfolio-cards{grid-template-columns:1fr 1fr}}@media(max-width:520px){.overall-portfolio-cards{grid-template-columns:1fr}}
+
+.manual-holding-update{white-space:nowrap;padding:6px 9px;font-size:10px}
