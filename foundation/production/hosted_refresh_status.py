@@ -177,7 +177,7 @@ def build_refresh_status(repository: PresentationReadRepository, *, now: datetim
         "generated_at_utc": now.isoformat(),
         "status": "HEALTHY" if items and all(item["health_state"] == "HEALTHY" for item in items) else "REVIEW",
         "freshness_status": "CURRENT" if items and all(item["freshness_state"] == "CURRENT" for item in items) else "REVIEW",
-        "freshness_review_count": sum(1 for item in items if item["freshness_state"] != "CURRENT"),
+        "freshness_review_count": sum(1 for item in items if item["freshness_state"] != "CURRENT" or item["health_state"] != "HEALTHY"),
         "items": items,
         "lifecycle": [
             "Requested",
