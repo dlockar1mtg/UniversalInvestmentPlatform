@@ -19,7 +19,7 @@ def test_refresh_page_exposes_operational_health_and_lifecycle():
         assert marker in html
     for marker in (
         'request("/v1/refresh/status")',
-        "function renderRefreshStatus(document)",
+        "function renderRefreshStatus(refreshDocument)",
         "Last certified import",
         "Data age",
         "Next scheduled run",
