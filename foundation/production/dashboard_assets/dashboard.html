@@ -122,9 +122,21 @@
           </section>
 
           <section id="refresh-page" class="page">
-            <div class="page-heading"><div><span class="eyebrow">REFRESH &amp; DATA HEALTH</span><h2>Certified data lifecycle</h2></div><span class="page-note">REFRESH-UI-1 reserved</span></div>
-            <div id="refresh-domain-cards" class="domain-cards"></div>
-            <article class="panel governed-empty compact"><h3>Refresh execution remains source-owned</h3><p>`REFRESH-UI-1` will expose request → source refresh → certification → UIP import → activation → complete, while preserving last-good certified state on failure. Refresh remains separate from model retraining.</p></article>
+            <div class="page-heading"><div><span class="eyebrow">REFRESH &amp; DATA HEALTH</span><h2>Can I trust the displayed data right now?</h2></div><span class="page-note">REFRESH-UI-1 · observability</span></div>
+            <section class="panel refresh-overview">
+              <div class="section-title"><div><h3>Certified refresh state</h3><span id="refresh-generated-at">Loading current operational evidence…</span></div><button id="refresh-health-reload" type="button" class="secondary">Reload health</button></div>
+              <div class="cards refresh-summary-cards">
+                <article class="card"><span>Domains healthy</span><strong id="refresh-healthy-count">—</strong><small>Certified active authority</small></article>
+                <article class="card"><span>Needs attention</span><strong id="refresh-review-count">—</strong><small>Warnings, errors, or inactive state</small></article>
+                <article class="card"><span>Refresh owner</span><strong id="refresh-owner">—</strong><small>Production execution boundary</small></article>
+              </div>
+            </section>
+            <div id="refresh-domain-cards" class="refresh-domain-cards"></div>
+            <section class="panel refresh-lifecycle-panel">
+              <div class="section-title"><div><h3>Governed lifecycle</h3><span>Failed cycles never replace the last-good certified state</span></div><span id="refresh-last-good" class="pill good">PRESERVED</span></div>
+              <div id="refresh-lifecycle" class="refresh-lifecycle"></div>
+              <p class="governance-note">Refresh is source-owned and separate from model retraining. The hosted UI currently exposes operational status and schedule evidence; manual source-workflow dispatch is not yet exposed here.</p>
+            </section>
           </section>
 
           <section id="operations" class="page">

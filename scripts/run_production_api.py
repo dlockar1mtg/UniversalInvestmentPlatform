@@ -15,6 +15,7 @@ from foundation.production.hosted_transactions import install_hosted_transaction
 from foundation.production.hosted_external_accounts import install_external_account_performance_routes
 from foundation.production.external_account_performance import PostgresExternalAccountPerformanceRepository
 from foundation.production.hosted_manual_holdings import install_manual_holding_routes
+from foundation.production.hosted_refresh_status import install_refresh_status_routes
 from foundation.production.manual_holdings import PostgresManualHoldingRepository
 from foundation.production.portfolio_persistence import PostgresPortfolioSnapshotRepository
 from foundation.production.transaction_persistence import PostgresTransactionRepository
@@ -48,6 +49,7 @@ if portfolio_repository is not None:
     install_hosted_portfolio_routes(app, settings, portfolio_repository)
 if presentation_repository is not None:
     install_presentation_read_routes(app, settings.credentials, presentation_repository)
+    install_refresh_status_routes(app, settings.credentials, presentation_repository)
 if asset_catalog_repository is not None:
     install_governed_asset_catalog_routes(app, settings.credentials, asset_catalog_repository)
 if external_account_repository is not None:

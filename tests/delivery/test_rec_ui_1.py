@@ -309,7 +309,8 @@ def test_dashboard_domain_health_tolerates_premium_recommendations_dom_ownership
     assert guarded_write in dashboard
 
     assert '$("domain-cards").innerHTML=html' in dashboard
-    assert '$("refresh-domain-cards").innerHTML=html' in dashboard
+    assert '$("refresh-domain-cards").innerHTML=items.map' in dashboard
+    assert "function renderRefreshStatus(document)" in dashboard
 
     assert 'const page=node("recommendations")' in recommendations
     assert 'page.innerHTML=' in recommendations
