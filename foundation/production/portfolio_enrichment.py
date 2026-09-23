@@ -9,7 +9,6 @@ from typing import Protocol
 from foundation.production.metals_registry import load_metals_registry
 from foundation.presentation.crypto_current_price_projection import (
     AUTHORITY as CRYPTO_PRICE_AUTHORITY,
-    CSV_SHA256 as CRYPTO_PRICE_CSV_SHA256,
     PRESENTATION_SEMANTICS as CRYPTO_PRESENTATION_SEMANTICS,
     PRICE_SEMANTICS as CRYPTO_PRICE_SEMANTICS,
     SOURCE_TABLE as CRYPTO_PRICE_SOURCE_TABLE,
@@ -187,10 +186,17 @@ def _enrich_position(
                     "presentation_semantics": CRYPTO_PRESENTATION_SEMANTICS,
                     "schema_version": "1.0.0",
                     "methodology_version": "1.0.0",
-                    "_certified_csv_sha256": CRYPTO_PRICE_CSV_SHA256,
                     "_certified_manifest_status": "CRYPTO_CURRENT_PRICE_V1_PASS",
                 }
-                if any(certified_price.get(key) != value for key, value in expected.items()):
+                certified_digest = str(certified_price.get("_certified_csv_sha256") or "").strip().lower()
+                valid_digest = (
+                    len(certified_digest) == 64
+                    and all(ch in "0123456789abcdef" for ch in certified_digest)
+                )
+                if (
+                    any(certified_price.get(key) != value for key, value in expected.items())
+                    or not valid_digest
+                ):
                     raise ValueError(f"certified Crypto current-price authority mismatch: {position.asset_id}")
                 authority = True
                 raw_price = certified_price.get("current_price_usd")

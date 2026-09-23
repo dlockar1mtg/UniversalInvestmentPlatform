@@ -11,7 +11,6 @@ from foundation.presentation.publication_model import PresentationRecord
 
 RECORD_TYPE = "crypto_current_price"
 AUTHORITY = "CRYPTO_CANONICAL_MARKET_DAILY_CURRENT_PRICE_V1"
-CSV_SHA256 = "82416bdc94aa3aa82b1ac8aea8340b3e900609c0a8b3fc876863e1acb0c59315"
 ASSETS = frozenset(f"crypto:{asset}" for asset in (
     "bitcoin", "ethereum", "solana", "chainlink", "xrp", "avalanche"
 ))
@@ -42,7 +41,6 @@ def build_crypto_current_price_records(artifact_root: Path) -> list[Presentation
         "row_count": 6,
         "price_semantics": PRICE_SEMANTICS,
         "presentation_semantics": PRESENTATION_SEMANTICS,
-        "output_sha256": CSV_SHA256,
         "forecast_input_reused_as_price_authority": False,
         "intraday_quote_claimed": False,
         "execution_authority_granted": False,
@@ -55,7 +53,10 @@ def build_crypto_current_price_records(artifact_root: Path) -> list[Presentation
 
     csv_path = manifest_path.with_name("crypto_current_price_v1.csv")
     raw = csv_path.read_bytes()
-    if hashlib.sha256(raw).hexdigest() != CSV_SHA256:
+    certified_sha256 = str(manifest.get("output_sha256") or "").strip().lower()
+    if len(certified_sha256) != 64 or any(ch not in "0123456789abcdef" for ch in certified_sha256):
+        raise RuntimeError("Crypto Current Price V1 manifest mismatch: output_sha256")
+    if hashlib.sha256(raw).hexdigest() != certified_sha256:
         raise RuntimeError("Crypto Current Price V1 CSV SHA-256 mismatch")
     with csv_path.open(encoding="utf-8-sig", newline="") as handle:
         reader = csv.DictReader(handle)
@@ -78,11 +79,14 @@ def build_crypto_current_price_records(artifact_root: Path) -> list[Presentation
             "methodology_version": "1.0.0",
             "price_semantics": PRICE_SEMANTICS,
             "presentation_semantics": PRESENTATION_SEMANTICS,
-            "price_source": "coingecko",
-            "source_priority": "1",
-            "observation_date": "2026-09-21",
         }
-        if any(row[key] != value for key, value in fields.items()) or not row["collected_at_utc"]:
+        if (
+            any(row[key] != value for key, value in fields.items())
+            or not row["collected_at_utc"]
+            or not row["observation_date"]
+            or not row["price_source"]
+            or not row["source_priority"]
+        ):
             raise RuntimeError(f"Crypto Current Price V1 row authority mismatch: {identity}")
         try:
             price = Decimal(row["current_price_usd"])
@@ -93,7 +97,7 @@ def build_crypto_current_price_records(artifact_root: Path) -> list[Presentation
         records.append(PresentationRecord(
             record_type=RECORD_TYPE, domain_id="crypto", asset_id=identity,
             record_key=identity,
-            payload={**row, "_certified_csv_sha256": CSV_SHA256,
+            payload={**row, "_certified_csv_sha256": certified_sha256,
                      "_certified_manifest_status": manifest["status"]},
         ))
     if seen != ASSETS:
