@@ -58,10 +58,9 @@ def test_publisher_records_automated_schedule_and_governed_failure_policy():
     assert 'temporary' in text and 'DuckDB before any PostgreSQL connection is opened' in text
 
 
-def test_production_publication_workflow_yaml_block_scalar_remains_indented():
+def test_production_publication_freshness_check_avoids_shell_heredoc():
     text = WORKFLOW.read_text(encoding="utf-8")
-    assert '\nimport sys\n' not in text
-    assert '\nfrom datetime import datetime, timezone\n' not in text
+    assert "<<'PY'" not in text
     assert '\nPY\n' not in text
-    assert '            import sys\n' in text
-    assert '            PY\n' in text
+    assert "python -c 'import sys; from datetime import datetime, timezone;" in text
+    assert 'age_hours > 30' in text
