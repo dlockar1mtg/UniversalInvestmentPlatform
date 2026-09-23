@@ -56,3 +56,12 @@ def test_publisher_records_automated_schedule_and_governed_failure_policy():
     assert 'automated_publication_triggered' in text
     assert 'NO_POSTGRES_CONNECTION_UNTIL_GOVERNED_SOURCE_CONTRACTS_COUNTS_AND_AUTHORITIES_PASS' in text
     assert 'temporary' in text and 'DuckDB before any PostgreSQL connection is opened' in text
+
+
+def test_production_publication_workflow_yaml_block_scalar_remains_indented():
+    text = WORKFLOW.read_text(encoding="utf-8")
+    assert '\nimport sys\n' not in text
+    assert '\nfrom datetime import datetime, timezone\n' not in text
+    assert '\nPY\n' not in text
+    assert '            import sys\n' in text
+    assert '            PY\n' in text
