@@ -92,7 +92,10 @@ def test_workflow_is_manual_only_and_never_receives_postgres_dsn():
     assert "RICH_PUBLICATION_CANDIDATE_REHEARSAL=PASS" in text
 
 
-def test_candidate_rehearsal_does_not_modify_central_publisher():
+def test_candidate_rehearsal_remains_non_persistent_while_central_publisher_is_now_scheduled():
     central = (ROOT / ".github" / "workflows" / "production-publication-cycle.yml").read_text(encoding="utf-8")
     assert "workflow_dispatch:" in central
-    assert "schedule:" not in central
+    assert "schedule:" in central
+    assert 'cron: "0 14 * * *"' in central
+    assert "Resolve current governed source runs" in central
+    assert "Re-certify current rich source contracts before any PostgreSQL connection" in central
