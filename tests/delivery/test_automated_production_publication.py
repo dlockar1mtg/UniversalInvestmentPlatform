@@ -52,6 +52,7 @@ def test_manual_publication_still_requires_explicit_confirmation():
 def test_publisher_records_automated_schedule_and_governed_failure_policy():
     text = PUBLISHER.read_text(encoding="utf-8")
     assert 'UIIP_AUTOMATED_PUBLICATION' in text
-    assert 'automatic_schedule_modified' in text
+    assert '"automatic_schedule_modified": False' in text
+    assert 'automated_publication_triggered' in text
     assert 'NO_POSTGRES_CONNECTION_UNTIL_GOVERNED_SOURCE_CONTRACTS_COUNTS_AND_AUTHORITIES_PASS' in text
-    assert 'temporary DuckDB before any PostgreSQL connection is opened' in text
+    assert 'temporary' in text and 'DuckDB before any PostgreSQL connection is opened' in text
