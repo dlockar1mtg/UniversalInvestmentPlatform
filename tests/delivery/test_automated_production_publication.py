@@ -7,7 +7,7 @@ PUBLISHER = ROOT / "scripts" / "publish_rehearsed_rich_candidate.py"
 
 def test_production_publication_runs_daily_after_source_cycles():
     text = WORKFLOW.read_text(encoding="utf-8")
-    assert 'cron: "15 13 * * *"' in text
+    assert 'cron: "0 14 * * *"' in text
     assert "workflow_dispatch:" in text
     assert "Resolve current governed source runs" in text
     assert "crypto-production-cycle.yml" in text
