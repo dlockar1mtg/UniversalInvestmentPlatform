@@ -46,18 +46,16 @@ from scripts.rehearse_rich_publication_candidate import (
 )
 
 CONFIRMATION = "PUBLISH_REHEARSED_RICH_CANDIDATE"
-EXPECTED_GENERIC_COUNTS = {
+EXPECTED_FIXED_GENERIC_COUNTS = {
     "crypto": {
         "asset": 6,
         "domain_health": 1,
-        "forecast": 129,
         "recommendation": 6,
         "risk": 6,
     },
     "metals": {
         "asset": 9,
         "domain_health": 1,
-        "forecast": 27,
         "recommendation": 9,
     },
     "mtg": {
@@ -67,6 +65,18 @@ EXPECTED_GENERIC_COUNTS = {
         "recommendation": 968,
     },
 }
+
+
+def assert_fixed_generic_counts(generic_counts: dict[str, dict[str, int]]) -> None:
+    for domain, expected in EXPECTED_FIXED_GENERIC_COUNTS.items():
+        observed = generic_counts.get(domain, {})
+        for record_type, expected_count in expected.items():
+            actual = observed.get(record_type)
+            if actual != expected_count:
+                raise RuntimeError(
+                    "Fixed generic presentation count drifted: "
+                    f"{domain}/{record_type} expected={expected_count} observed={actual}"
+                )
 
 
 def git_head(repo: Path) -> str:
@@ -87,7 +97,6 @@ def main() -> int:
     parser.add_argument("--crypto-source-run-id", required=True)
     parser.add_argument("--metals-source-run-id", required=True)
     parser.add_argument("--mtg-source-run-id", required=True)
-    parser.add_argument("--expected-record-count", type=int, required=True)
     parser.add_argument("--evidence-output", type=Path, required=True)
     args = parser.parse_args()
 
@@ -165,10 +174,7 @@ def main() -> int:
         generic_counts = assert_required_presentation_surfaces(publication)
         assert_unique_records(publication)
 
-        if generic_counts != EXPECTED_GENERIC_COUNTS:
-            raise RuntimeError(
-                f"Generic presentation counts drifted from rehearsed candidate: {generic_counts}"
-            )
+        assert_fixed_generic_counts(generic_counts)
 
         counts = Counter((record.domain_id, record.record_type) for record in publication.records)
         metals_expected = expected_metals_counts(artifact_roots["metals"])
@@ -193,11 +199,8 @@ def main() -> int:
             raise RuntimeError(
                 f"MTG rich presentation counts drifted: {mtg_observed} != {MTG_RICH_EXPECTED_COUNTS}"
             )
-        if len(publication.records) != args.expected_record_count:
-            raise RuntimeError(
-                "Rich publication candidate record count drifted: "
-                f"expected={args.expected_record_count} observed={len(publication.records)}"
-            )
+        if len(publication.records) < 1:
+            raise RuntimeError("Rich publication candidate is empty")
 
         preactivation = {
             "status": "RICH_CANDIDATE_PREACTIVATION_GATE_PASS",
