@@ -1,11 +1,13 @@
 name: UIP Production Publication Cycle
 
 on:
+  schedule:
+    - cron: "0 14 * * *"
   workflow_dispatch:
     inputs:
       confirmation:
-        description: Type PUBLISH_REHEARSED_RICH_CANDIDATE to authorize the exact rehearsed rich publication
-        required: true
+        description: Type PUBLISH_REHEARSED_RICH_CANDIDATE to authorize a manual publication cycle
+        required: false
         type: string
 
 permissions:
@@ -24,26 +26,11 @@ jobs:
     env:
       UIIP_DATABASE_URL: ${{ secrets.UIIP_DATABASE_URL }}
       SOURCE_TOKEN: ${{ secrets.UIP_SOURCE_ARTIFACTS_TOKEN }}
-      EXPECTED_CRYPTO_RUN_ID: "35628894423"
-      EXPECTED_CRYPTO_HEAD: "924c675bcebe1b7a6f14477a0a432fe43255e6b0"
-      EXPECTED_CRYPTO_ARTIFACT_ID: "10655476013"
-      EXPECTED_CRYPTO_ARTIFACT_DIGEST: "5860052ab8e54bf077e97addda4a49c1bf1630461ce73f2ba1174eafd25ccdec"
-      EXPECTED_MTG_RUN_ID: "35637210918"
-      EXPECTED_METALS_RUN_ID: "35637019717"
-      EXPECTED_MTG_HEAD: "2e8b1a77c1bdd3b79141fffc94f84d91222e4266"
       EXPECTED_RICH_RECORD_COUNT: "14309"
+      UIIP_AUTOMATED_PUBLICATION: "1"
     steps:
       - name: Checkout UIP
         uses: actions/checkout@v4
-
-      - name: Checkout exact rehearsed MTG authority
-        uses: actions/checkout@v4
-        with:
-          repository: dlockar1mtg/mtg-investment-terminal
-          ref: ${{ env.EXPECTED_MTG_HEAD }}
-          token: ${{ secrets.UIP_SOURCE_ARTIFACTS_TOKEN }}
-          path: source_repos/mtg
-          persist-credentials: false
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -54,25 +41,149 @@ jobs:
       - name: Install UIP dependencies
         run: pip install -r requirements.txt -r requirements/phase_7_3.txt
 
-      - name: Validate exact bounded activation authorization
+      - name: Validate publication authorization
         shell: bash
         env:
           CONFIRMATION: ${{ inputs.confirmation }}
         run: |
           set -euo pipefail
-          test "$CONFIRMATION" = "PUBLISH_REHEARSED_RICH_CANDIDATE" || {
-            echo "Exact rich-publication confirmation token was not provided" >&2
-            exit 1
-          }
           test -n "$UIIP_DATABASE_URL" || { echo "UIIP_DATABASE_URL is missing" >&2; exit 1; }
           test -n "$SOURCE_TOKEN" || { echo "UIP_SOURCE_ARTIFACTS_TOKEN is missing" >&2; exit 1; }
+
+          if [ "$GITHUB_EVENT_NAME" = "workflow_dispatch" ]; then
+            test "$CONFIRMATION" = "PUBLISH_REHEARSED_RICH_CANDIDATE" || {
+              echo "Exact manual publication confirmation token was not provided" >&2
+              exit 1
+            }
+          elif [ "$GITHUB_EVENT_NAME" != "schedule" ]; then
+            echo "Unauthorized publication event: $GITHUB_EVENT_NAME" >&2
+            exit 1
+          fi
+
+      - name: Resolve current governed source runs
+        id: sources
+        shell: bash
+        env:
+          UIP_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+
+          api_get() {
+            local token="$1"
+            local url="$2"
+            curl --fail-with-body --silent --show-error --location \
+              --header "Accept: application/vnd.github+json" \
+              --header "Authorization: Bearer ${token}" \
+              --header "X-GitHub-Api-Version: 2022-11-28" \
+              "$url"
+          }
+
+          resolve_source() {
+            local key="$1"
+            local repo="$2"
+            local workflow="$3"
+            local artifact_prefix="$4"
+            local token="$5"
+
+            local runs_json run_json status conclusion event head_sha run_id started_at
+            runs_json="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/workflows/${workflow}/runs?branch=main&per_page=10")"
+            run_json="$(printf '%s' "$runs_json" | jq -c '[.workflow_runs[] | select(.event == "schedule" or .event == "workflow_dispatch")][0] // empty')"
+            test -n "$run_json" || {
+              echo "No governed source run found for ${repo}/${workflow}" >&2
+              exit 1
+            }
+
+            status="$(printf '%s' "$run_json" | jq -r '.status')"
+            conclusion="$(printf '%s' "$run_json" | jq -r '.conclusion // ""')"
+            event="$(printf '%s' "$run_json" | jq -r '.event')"
+            head_sha="$(printf '%s' "$run_json" | jq -r '.head_sha')"
+            run_id="$(printf '%s' "$run_json" | jq -r '.id')"
+            started_at="$(printf '%s' "$run_json" | jq -r '.run_started_at // .created_at')"
+
+            test "$status" = "completed" || {
+              echo "Latest governed source run is not complete: ${repo}/${run_id} status=${status}" >&2
+              exit 1
+            }
+            test "$conclusion" = "success" || {
+              echo "Latest governed source run failed: ${repo}/${run_id} conclusion=${conclusion}" >&2
+              exit 1
+            }
+
+            python - "$started_at" <<'PY'
+import sys
+from datetime import datetime, timezone
+started = datetime.fromisoformat(sys.argv[1].replace("Z", "+00:00"))
+age_hours = (datetime.now(timezone.utc) - started.astimezone(timezone.utc)).total_seconds() / 3600
+if age_hours > 30:
+    raise SystemExit(f"Latest successful governed source run is too old: {age_hours:.1f} hours")
+PY
+
+            local artifacts_json artifact_json artifact_id artifact_name artifact_digest
+            artifacts_json="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/runs/${run_id}/artifacts?per_page=100")"
+            artifact_json="$(printf '%s' "$artifacts_json" | jq -c --arg prefix "$artifact_prefix" '[.artifacts[] | select(.expired == false and (.name | startswith($prefix)))][0] // empty')"
+            test -n "$artifact_json" || {
+              echo "No current source artifact found for ${repo}/${run_id}/${artifact_prefix}" >&2
+              exit 1
+            }
+            artifact_id="$(printf '%s' "$artifact_json" | jq -r '.id')"
+            artifact_name="$(printf '%s' "$artifact_json" | jq -r '.name')"
+            artifact_digest="$(printf '%s' "$artifact_json" | jq -r '.digest // ""')"
+
+            {
+              echo "${key}_repo=${repo}"
+              echo "${key}_workflow=${workflow}"
+              echo "${key}_run_id=${run_id}"
+              echo "${key}_head_sha=${head_sha}"
+              echo "${key}_event=${event}"
+              echo "${key}_artifact_id=${artifact_id}"
+              echo "${key}_artifact_name=${artifact_name}"
+              echo "${key}_artifact_digest=${artifact_digest}"
+            } >> "$GITHUB_OUTPUT"
+
+            echo "CURRENT_SOURCE domain=${key} repo=${repo} run=${run_id} head=${head_sha} artifact=${artifact_name}"
+          }
+
+          resolve_source \
+            crypto \
+            "dlockar1mtg/CryptoIntelligencePlatform" \
+            "crypto-production-cycle.yml" \
+            "crypto-production-" \
+            "$SOURCE_TOKEN"
+
+          resolve_source \
+            metals \
+            "dlockar1mtg/UniversalInvestmentPlatform" \
+            "metals-production-cycle.yml" \
+            "metals-production-" \
+            "$UIP_TOKEN"
+
+          resolve_source \
+            mtg \
+            "dlockar1mtg/mtg-investment-terminal" \
+            "mtg-marketplace-production.yml" \
+            "mtg-marketplace-production-" \
+            "$SOURCE_TOKEN"
+
+      - name: Checkout current governed MTG authority
+        uses: actions/checkout@v4
+        with:
+          repository: dlockar1mtg/mtg-investment-terminal
+          ref: ${{ steps.sources.outputs.mtg_head_sha }}
+          token: ${{ secrets.UIP_SOURCE_ARTIFACTS_TOKEN }}
+          path: source_repos/mtg
+          persist-credentials: false
+
+      - name: Verify resolved MTG authority
+        shell: bash
+        run: |
+          set -euo pipefail
           observed_mtg_head="$(git -C source_repos/mtg rev-parse HEAD)"
-          test "$observed_mtg_head" = "$EXPECTED_MTG_HEAD" || {
-            echo "MTG authority head drifted: $observed_mtg_head" >&2
+          test "$observed_mtg_head" = "${{ steps.sources.outputs.mtg_head_sha }}" || {
+            echo "MTG authority head drifted: ${observed_mtg_head}" >&2
             exit 1
           }
 
-      - name: Download exact rehearsed source artifacts
+      - name: Download current governed source artifacts
         shell: bash
         env:
           UIP_TOKEN: ${{ github.token }}
@@ -90,93 +201,59 @@ jobs:
               "$url"
           }
 
-          download_exact() {
+          download_current() {
             local repo="$1"
-            local run_id="$2"
-            local artifact_prefix="$3"
+            local artifact_id="$2"
+            local expected_digest="$3"
             local token="$4"
             local destination="$5"
 
-            local run_json artifacts_json artifact_id artifact_name
-            run_json="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/runs/${run_id}")"
-            test "$(printf '%s' "$run_json" | jq -r '.status')" = "completed" || {
-              echo "Pinned source run is not completed: ${repo}/${run_id}" >&2
-              exit 1
-            }
-            test "$(printf '%s' "$run_json" | jq -r '.conclusion')" = "success" || {
-              echo "Pinned source run is not successful: ${repo}/${run_id}" >&2
-              exit 1
-            }
-            test "$(printf '%s' "$run_json" | jq -r '.head_branch')" = "main" || {
-              echo "Pinned source run is not from main: ${repo}/${run_id}" >&2
-              exit 1
-            }
-            if test "$repo" = "dlockar1mtg/CryptoIntelligencePlatform"; then
-              test "$(printf '%s' "$run_json" | jq -r '.head_sha')" = "$EXPECTED_CRYPTO_HEAD" || {
-                echo "Crypto source run head drifted" >&2; exit 1;
-              }
-            fi
-            event="$(printf '%s' "$run_json" | jq -r '.event')"
-            test "$event" = "schedule" -o "$event" = "workflow_dispatch" || {
-              echo "Pinned source run has unauthorized event: ${repo}/${run_id} event=${event}" >&2
-              exit 1
-            }
-
-            artifacts_json="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/runs/${run_id}/artifacts?per_page=100")"
-            artifact_id="$(printf '%s' "$artifacts_json" | jq -r --arg prefix "$artifact_prefix" '[.artifacts[] | select(.expired == false and (.name | startswith($prefix)))][0].id // empty')"
-            artifact_name="$(printf '%s' "$artifacts_json" | jq -r --arg prefix "$artifact_prefix" '[.artifacts[] | select(.expired == false and (.name | startswith($prefix)))][0].name // empty')"
-            test -n "$artifact_id" || {
-              echo "Pinned source artifact is unavailable: ${repo}/${run_id}/${artifact_prefix}" >&2
-              exit 1
-            }
-            if test "$repo" = "dlockar1mtg/CryptoIntelligencePlatform"; then
-              test "$artifact_id" = "$EXPECTED_CRYPTO_ARTIFACT_ID" || {
-                echo "Crypto artifact ID drifted" >&2; exit 1;
-              }
-              test "$(printf '%s' "$artifacts_json" | jq -r --argjson id "$artifact_id" '.artifacts[] | select(.id == $id) | .digest')" = "sha256:${EXPECTED_CRYPTO_ARTIFACT_DIGEST}" || {
-                echo "Crypto artifact digest drifted" >&2; exit 1;
-              }
-            fi
-
-            echo "PINNED_SOURCE repo=${repo} run_id=${run_id} artifact=${artifact_name}"
             api_get "$token" "https://api.github.com/repos/${repo}/actions/artifacts/${artifact_id}/zip" > "${destination}.zip"
-            if test "$repo" = "dlockar1mtg/CryptoIntelligencePlatform"; then
-              echo "${EXPECTED_CRYPTO_ARTIFACT_DIGEST}  ${destination}.zip" | sha256sum --check --status || {
-                echo "Crypto ZIP digest mismatch" >&2; exit 1;
-              }
+
+            if [ -n "$expected_digest" ] && [ "$expected_digest" != "null" ]; then
+              case "$expected_digest" in
+                sha256:*)
+                  digest="${expected_digest#sha256:}"
+                  echo "${digest}  ${destination}.zip" | sha256sum --check --status || {
+                    echo "Artifact digest mismatch: ${repo}/${artifact_id}" >&2
+                    exit 1
+                  }
+                  ;;
+              esac
             fi
+
             unzip -q "${destination}.zip" -d "$destination"
           }
 
-          download_exact \
+          download_current \
             "dlockar1mtg/CryptoIntelligencePlatform" \
-            "$EXPECTED_CRYPTO_RUN_ID" \
-            "crypto-production-" \
+            "${{ steps.sources.outputs.crypto_artifact_id }}" \
+            "${{ steps.sources.outputs.crypto_artifact_digest }}" \
             "$SOURCE_TOKEN" \
             "incoming/crypto"
 
-          download_exact \
+          download_current \
             "dlockar1mtg/mtg-investment-terminal" \
-            "$EXPECTED_MTG_RUN_ID" \
-            "mtg-marketplace-production-" \
+            "${{ steps.sources.outputs.mtg_artifact_id }}" \
+            "${{ steps.sources.outputs.mtg_artifact_digest }}" \
             "$SOURCE_TOKEN" \
             "incoming/mtg"
 
-          download_exact \
+          download_current \
             "dlockar1mtg/UniversalInvestmentPlatform" \
-            "$EXPECTED_METALS_RUN_ID" \
-            "metals-production-" \
+            "${{ steps.sources.outputs.metals_artifact_id }}" \
+            "${{ steps.sources.outputs.metals_artifact_digest }}" \
             "$UIP_TOKEN" \
             "incoming/metals"
 
-      - name: Re-certify exact rich source contracts before any PostgreSQL connection
+      - name: Re-certify current rich source contracts before any PostgreSQL connection
         run: >-
           python scripts/audit_rich_publication_source_contract.py
           --metals-artifact incoming/metals
           --mtg-repo source_repos/mtg
           --evidence-output data/operations/publication/rich_production_source_contract.json
 
-      - name: Publish exact rehearsed rich candidate atomically
+      - name: Publish current governed rich candidate atomically
         run: >-
           python scripts/publish_rehearsed_rich_candidate_v2.py
           --confirm PUBLISH_REHEARSED_RICH_CANDIDATE
@@ -184,10 +261,10 @@ jobs:
           --metals-artifact incoming/metals
           --mtg-artifact incoming/mtg
           --mtg-repo source_repos/mtg
-          --expected-mtg-head "$EXPECTED_MTG_HEAD"
-          --crypto-source-run-id "$EXPECTED_CRYPTO_RUN_ID"
-          --metals-source-run-id "$EXPECTED_METALS_RUN_ID"
-          --mtg-source-run-id "$EXPECTED_MTG_RUN_ID"
+          --expected-mtg-head "${{ steps.sources.outputs.mtg_head_sha }}"
+          --crypto-source-run-id "${{ steps.sources.outputs.crypto_run_id }}"
+          --metals-source-run-id "${{ steps.sources.outputs.metals_run_id }}"
+          --mtg-source-run-id "${{ steps.sources.outputs.mtg_run_id }}"
           --expected-record-count "$EXPECTED_RICH_RECORD_COUNT"
           --evidence-output data/operations/publication/latest_rich_publication.json
 
