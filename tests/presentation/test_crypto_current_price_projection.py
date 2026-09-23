@@ -33,7 +33,6 @@ def certified_delivery(tmp_path, monkeypatch):
         writer.writeheader()
         writer.writerows(rows)
     digest = hashlib.sha256(csv_path.read_bytes()).hexdigest()
-    monkeypatch.setattr(projection, "CSV_SHA256", digest)
     manifest = {
         "status": "CRYPTO_CURRENT_PRICE_V1_PASS", "authority_id": projection.AUTHORITY,
         "schema_version": "1.0.0", "methodology_version": "1.0.0",
@@ -75,8 +74,8 @@ def test_portfolio_uses_certified_price_and_preserves_asset_recommendation(tmp_p
     certified_delivery(tmp_path, monkeypatch)
     price = next(r.payload for r in projection.build_crypto_current_price_records(tmp_path)
                  if r.asset_id == "crypto:bitcoin")
-    # Portfolio enforces the production pin, independently of projection preflight.
-    price["_certified_csv_sha256"] = "82416bdc94aa3aa82b1ac8aea8340b3e900609c0a8b3fc876863e1acb0c59315"
+    # Portfolio accepts the digest certified by the current manifest/projection.
+    assert len(price["_certified_csv_sha256"]) == 64
     class Reader:
         def asset_detail(self, domain_id, asset_id):
             return {"records": {
@@ -93,3 +92,53 @@ def test_portfolio_uses_certified_price_and_preserves_asset_recommendation(tmp_p
     assert enriched.current_price == Decimal("86067.0")
     assert enriched.recommendation == "HOLD"
     assert enriched.market_value == Decimal("0.012355") * Decimal("86067.0")
+
+
+def test_current_crypto_authority_accepts_new_certified_digest_and_observation_date(tmp_path, monkeypatch):
+    delivery = tmp_path / "uip_delivery" / "current"
+    delivery.mkdir(parents=True)
+    rows = []
+    for name, price in (
+        ("bitcoin", "91000.0"), ("ethereum", "3100.0"), ("solana", "135.0"),
+        ("chainlink", "14.5"), ("xrp", "1.65"), ("avalanche", "12.4"),
+    ):
+        rows.append({
+            "universal_asset_id": f"crypto:{name}", "asset_id": name,
+            "observation_date": "2026-09-23", "current_price_usd": price,
+            "price_source": "coingecko", "source_priority": "1",
+            "collected_at_utc": "2026-09-23 15:00:00+00:00",
+            "source_table": projection.SOURCE_TABLE, "authority_id": projection.AUTHORITY,
+            "schema_version": "1.0.0", "methodology_version": "1.0.0",
+            "price_semantics": projection.PRICE_SEMANTICS,
+            "presentation_semantics": projection.PRESENTATION_SEMANTICS,
+        })
+    csv_path = delivery / "crypto_current_price_v1.csv"
+    with csv_path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=projection.COLUMNS)
+        writer.writeheader()
+        writer.writerows(rows)
+    digest = hashlib.sha256(csv_path.read_bytes()).hexdigest()
+    manifest = {
+        "status": "CRYPTO_CURRENT_PRICE_V1_PASS",
+        "authority_id": projection.AUTHORITY,
+        "schema_version": "1.0.0",
+        "methodology_version": "1.0.0",
+        "scope": "SIX_ASSET_LATEST_DAILY_CANONICAL_MARKET_PRICE",
+        "source_table": projection.SOURCE_TABLE,
+        "row_count": 6,
+        "supported_assets": list(projection.ASSETS),
+        "price_semantics": projection.PRICE_SEMANTICS,
+        "presentation_semantics": projection.PRESENTATION_SEMANTICS,
+        "output_sha256": digest,
+        "forecast_input_reused_as_price_authority": False,
+        "intraday_quote_claimed": False,
+        "execution_authority_granted": False,
+    }
+    (delivery / "crypto_current_price_v1_manifest.json").write_text(
+        json.dumps(manifest), encoding="utf-8"
+    )
+
+    records = projection.build_crypto_current_price_records(tmp_path)
+    bitcoin = next(record for record in records if record.asset_id == "crypto:bitcoin")
+    assert bitcoin.payload["observation_date"] == "2026-09-23"
+    assert bitcoin.payload["_certified_csv_sha256"] == digest
