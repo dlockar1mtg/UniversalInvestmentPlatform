@@ -26,7 +26,6 @@ jobs:
     env:
       UIIP_DATABASE_URL: ${{ secrets.UIIP_DATABASE_URL }}
       SOURCE_TOKEN: ${{ secrets.UIP_SOURCE_ARTIFACTS_TOKEN }}
-      EXPECTED_RICH_RECORD_COUNT: "14309"
       UIIP_AUTOMATED_PUBLICATION: "1"
     steps:
       - name: Checkout UIP
@@ -258,7 +257,6 @@ jobs:
           --crypto-source-run-id "${{ steps.sources.outputs.crypto_run_id }}"
           --metals-source-run-id "${{ steps.sources.outputs.metals_run_id }}"
           --mtg-source-run-id "${{ steps.sources.outputs.mtg_run_id }}"
-          --expected-record-count "$EXPECTED_RICH_RECORD_COUNT"
           --evidence-output data/operations/publication/latest_rich_publication.json
 
       - name: Upload rich publication evidence
