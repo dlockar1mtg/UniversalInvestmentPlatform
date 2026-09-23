@@ -109,14 +109,7 @@ jobs:
               exit 1
             }
 
-            python - "$started_at" <<'PY'
-            import sys
-            from datetime import datetime, timezone
-            started = datetime.fromisoformat(sys.argv[1].replace("Z", "+00:00"))
-            age_hours = (datetime.now(timezone.utc) - started.astimezone(timezone.utc)).total_seconds() / 3600
-            if age_hours > 30:
-                raise SystemExit(f"Latest successful governed source run is too old: {age_hours:.1f} hours")
-            PY
+            python -c 'import sys; from datetime import datetime, timezone; started=datetime.fromisoformat(sys.argv[1].replace("Z","+00:00")); age_hours=(datetime.now(timezone.utc)-started.astimezone(timezone.utc)).total_seconds()/3600; (_ for _ in ()).throw(SystemExit(f"Latest successful governed source run is too old: {age_hours:.1f} hours")) if age_hours > 30 else None' "$started_at"
 
             local artifacts_json artifact_json artifact_id artifact_name artifact_digest
             artifacts_json="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/runs/${run_id}/artifacts?per_page=100")"
