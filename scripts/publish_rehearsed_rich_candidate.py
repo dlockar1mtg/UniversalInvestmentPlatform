@@ -243,7 +243,8 @@ def main() -> int:
             "postgres_connection_opened_after_full_validation": True,
             "publication_persisted": True,
             "publication_activated": True,
-            "automatic_schedule_modified": os.getenv("UIIP_AUTOMATED_PUBLICATION", "").strip() == "1",
+            "automatic_schedule_modified": False,
+            "automated_publication_triggered": os.getenv("UIIP_AUTOMATED_PUBLICATION", "").strip() == "1",
             "failure_policy": "NO_POSTGRES_CONNECTION_UNTIL_GOVERNED_SOURCE_CONTRACTS_COUNTS_AND_AUTHORITIES_PASS",
         }
 
