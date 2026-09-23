@@ -1,9 +1,9 @@
-"""Publish exactly the previously rehearsed rich UIP candidate.
+"""Publish a governed rich UIP candidate from explicitly resolved source artifacts.
 
-This is a bounded, fail-closed activation path for the first rich publication after the
-September 2026 publication regression. It is intentionally source-run pinned. All rich
-sources are validated and the complete presentation candidate is built and certified in
-a temporary DuckDB before any PostgreSQL connection is opened.
+The caller supplies exact source artifacts and run identifiers. All rich sources are
+validated and the complete presentation candidate is built and certified in a temporary
+DuckDB before any PostgreSQL connection is opened. Scheduled automation therefore stays
+fail-closed: a source-resolution or validation failure cannot replace the active state.
 """
 from __future__ import annotations
 
@@ -243,8 +243,8 @@ def main() -> int:
             "postgres_connection_opened_after_full_validation": True,
             "publication_persisted": True,
             "publication_activated": True,
-            "automatic_schedule_modified": False,
-            "failure_policy": "NO_POSTGRES_CONNECTION_UNTIL_EXACT_REHEARSED_RICH_CANDIDATE_COUNTS_AND_AUTHORITIES_PASS",
+            "automatic_schedule_modified": os.getenv("UIIP_AUTOMATED_PUBLICATION", "").strip() == "1",
+            "failure_policy": "NO_POSTGRES_CONNECTION_UNTIL_GOVERNED_SOURCE_CONTRACTS_COUNTS_AND_AUTHORITIES_PASS",
         }
 
     output = args.evidence_output.resolve()
