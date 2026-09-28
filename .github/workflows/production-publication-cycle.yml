@@ -85,8 +85,21 @@ jobs:
             local token="$5"
 
             local runs_json run_json status conclusion event head_sha run_id started_at
-            runs_json="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/workflows/${workflow}/runs?branch=main&per_page=10")"
-            run_json="$(printf '%s' "$runs_json" | jq -c '[.workflow_runs[] | select(.event == "schedule" or .event == "workflow_dispatch")][0] // empty')"
+            runs_json="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/runs?branch=main&per_page=50")"
+            run_json="$(
+              printf '%s' "$runs_json" |
+                jq -c --arg path ".github/workflows/${workflow}" '
+                  [
+                    .workflow_runs[]
+                    | select(.head_branch == "main")
+                    | select(.path == $path)
+                    | select(.event == "schedule" or .event == "workflow_dispatch")
+                  ]
+                  | sort_by(.run_started_at // .created_at)
+                  | reverse
+                  | .[0] // empty
+                '
+            )"
             test -n "$run_json" || {
               echo "No governed source run found for ${repo}/${workflow}" >&2
               exit 1
@@ -99,6 +112,8 @@ jobs:
             run_id="$(printf '%s' "$run_json" | jq -r '.id')"
             started_at="$(printf '%s' "$run_json" | jq -r '.run_started_at // .created_at')"
 
+            echo "SOURCE_CANDIDATE domain=${key} repo=${repo} workflow=${workflow} run=${run_id} event=${event} status=${status} conclusion=${conclusion} started_at=${started_at}"
+
             test "$status" = "completed" || {
               echo "Latest governed source run is not complete: ${repo}/${run_id} status=${status}" >&2
               exit 1
@@ -108,7 +123,7 @@ jobs:
               exit 1
             }
 
-            python -c 'import sys; from datetime import datetime, timezone; started=datetime.fromisoformat(sys.argv[1].replace("Z","+00:00")); age_hours=(datetime.now(timezone.utc)-started.astimezone(timezone.utc)).total_seconds()/3600; (_ for _ in ()).throw(SystemExit(f"Latest successful governed source run is too old: {age_hours:.1f} hours")) if age_hours > 30 else None' "$started_at"
+            python -c 'import sys; from datetime import datetime, timezone; started=datetime.fromisoformat(sys.argv[1].replace("Z","+00:00")); age_hours=(datetime.now(timezone.utc)-started.astimezone(timezone.utc)).total_seconds()/3600; (_ for _ in ()).throw(SystemExit(f"Governed source run {sys.argv[2]} is too old: {age_hours:.1f} hours")) if age_hours > 30 else None' "$started_at" "${repo}/${run_id}"
 
             local artifacts_json artifact_json artifact_id artifact_name artifact_digest
             artifacts_json="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/runs/${run_id}/artifacts?per_page=100")"

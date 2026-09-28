@@ -64,3 +64,13 @@ def test_production_publication_freshness_check_avoids_shell_heredoc():
     assert '\nPY\n' not in text
     assert "python -c 'import sys; from datetime import datetime, timezone;" in text
     assert 'age_hours > 30' in text
+
+
+def test_source_resolution_uses_repository_runs_and_explicit_workflow_path():
+    text = WORKFLOW.read_text(encoding="utf-8")
+    assert 'actions/runs?branch=main&per_page=50' in text
+    assert 'actions/workflows/${workflow}/runs' not in text
+    assert 'select(.path == $path)' in text
+    assert 'sort_by(.run_started_at // .created_at)' in text
+    assert 'SOURCE_CANDIDATE domain=' in text
+    assert 'Governed source run {sys.argv[2]} is too old' in text
