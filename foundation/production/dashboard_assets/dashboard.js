@@ -6,7 +6,7 @@ function money(value,currency){return new Intl.NumberFormat(undefined,{style:"cu
 function number(value,maximum=6){return new Intl.NumberFormat(undefined,{maximumFractionDigits:maximum}).format(Number(value))}
 function signedMoney(value,currency){const amount=Number(value);return `${amount>0?"+":""}${money(amount,currency)}`}
 function compactSha(value){return value?`${String(value).slice(0,12)}…`:"—"}
-function dateLabel(value){if(!value)return "—";const text=String(value);if(/^\d{4}-\d{2}-\d{2}$/.test(text))return text;const parsed=new Date(value);return Number.isNaN(parsed.getTime())?text:parsed.toLocaleString()}
+function dateLabel(value){if(!value)return "—";const text=String(value);if(/^\d{4}-\d{2}-\d{2}$/.test(text))return text;const parsed=new Date(/^\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}(:\d{2}(\.\d+)?)?$/.test(text)?`${text.replace(" ","T")}Z`:value);return Number.isNaN(parsed.getTime())?text:parsed.toLocaleString()}
 function quantityLabel(value){return value===null||value===undefined?"—":String(value)}
 function showPage(pageId){document.querySelectorAll(".page").forEach(page=>page.classList.toggle("active-page",page.id===pageId));document.querySelectorAll(".nav-item").forEach(item=>item.classList.toggle("active",item.dataset.page===pageId));$("page-title").textContent=titles[pageId]||"Dashboard";history.replaceState(null,"",`#${pageId}`)}
 function renderEvents(items){$("events").innerHTML=items.length?items.map(item=>`<div class="event"><div class="event-head"><strong>${esc(item.event_type)}</strong><time>${esc(new Date(item.occurred_at).toLocaleString())}</time></div><code>${esc(item.correlation_id)}</code></div>`).join(""):`<div class="empty">No operational events recorded yet.</div>`}
