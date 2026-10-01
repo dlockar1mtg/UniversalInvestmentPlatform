@@ -179,7 +179,7 @@ def test_recommendation_and_status_headers_match_governed_contracts(
     assert status["error_count"] == "0"
 
 
-def test_native_avoid_is_preserved_while_universal_action_is_not_ready(
+def test_native_avoid_is_preserved_while_universal_action_is_sell(
     tmp_path: Path,
 ):
     cycle_path = tmp_path / "cycle.json"
@@ -200,7 +200,9 @@ def test_native_avoid_is_preserved_while_universal_action_is_not_ready(
     ).open(newline="", encoding="utf-8") as handle:
         row = next(csv.DictReader(handle))
 
-    assert row["recommendation"] == "not_ready"
+    # AVOID is a bearish call; it maps to sell like Crypto's native AVOID,
+    # not to the data-readiness value not_ready.
+    assert row["recommendation"] == "sell"
     assert row["platform_native_label"] == "AVOID"
     assert row["normalized_score"] == "0.0"
     assert row["confidence_score"] == "70.0"
