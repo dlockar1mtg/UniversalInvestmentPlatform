@@ -18,7 +18,7 @@ function fmtPriceBound(value){if(value===null||value===undefined||value==="")ret
 function fmtPercent(value){if(value===null||value===undefined||value==="")return "—";const parsed=Number(value);return Number.isFinite(parsed)?`${(parsed*100).toFixed(1)}%`:String(value)}
 function fmtPctPoint(value){if(value===null||value===undefined||value==="")return "—";const parsed=Number(value);return Number.isFinite(parsed)?`${parsed.toFixed(1)}%`:String(value)}
 function nativeStatus(item){const payload=item.payload||{};return item.domain_id==="mtg"?(payload.native_purchase_status??null):(payload.native_recommendation??payload.recommendation??null)}
-function displayStatus(item){const payload=item.payload||{};return item.domain_id==="metals"?(payload.final_action??payload.native_recommendation??payload.recommendation??null):nativeStatus(item)}
+function displayStatus(item){const payload=item.payload||{};return item.domain_id==="metals"?(payload.final_action??payload.recommendation??payload.native_recommendation??null):nativeStatus(item)}
 function statusFilterLabel(domain){return domain==="metals"?"Decision status":"Native status"}
 function statusFilterAllLabel(domain){return domain==="metals"?"All decision statuses":"All native statuses"}
 function recommendationColumnLabel(domain){return domain==="metals"?"Final decision":"Native recommendation"}
