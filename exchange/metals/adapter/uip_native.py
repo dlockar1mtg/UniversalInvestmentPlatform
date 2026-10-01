@@ -62,7 +62,9 @@ def _standard_recommendation(value: object) -> tuple[str, str]:
         "BUY": "buy",
         "HOLD": "hold",
         "REDUCE": "reduce",
-        "AVOID": "not_ready",
+        # AVOID is a bearish call, not a data-readiness state; map it the way
+        # the Crypto domain does (normalization._RECOMMENDATION_MAP).
+        "AVOID": "sell",
     }
     try:
         return mapping[native], native
