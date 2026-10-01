@@ -66,11 +66,16 @@ def test_production_publication_freshness_check_avoids_shell_heredoc():
     assert 'age_hours > 30' in text
 
 
-def test_source_resolution_uses_repository_runs_and_explicit_workflow_path():
+def test_source_resolution_uses_unfiltered_workflow_runs_and_explicit_workflow_path():
     text = WORKFLOW.read_text(encoding="utf-8")
-    assert 'actions/runs?branch=main&per_page=50' in text
-    assert 'actions/workflows/${workflow}/runs' not in text
+    # Branch-filtered run listings returned stale runs (Crypto on 9/28, MTG on 9/30 and 10/1),
+    # so the query is unfiltered and main is enforced in jq instead.
+    assert 'actions/workflows/${workflow}/runs?per_page=50' in text
+    assert 'actions/runs?branch=main' not in text
+    assert '/runs?branch=main' not in text
+    assert 'select(.head_branch == "main")' in text
     assert 'select(.path == $path)' in text
     assert 'sort_by(.run_started_at // .created_at)' in text
+    assert 'RUN_CANDIDATE domain=' in text
     assert 'SOURCE_CANDIDATE domain=' in text
     assert 'Governed source run {sys.argv[2]} is too old' in text
