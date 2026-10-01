@@ -11,6 +11,7 @@ from fastapi.responses import JSONResponse
 
 from foundation.production.security import APIKeyAuthenticator, Permission
 from foundation.presentation.read_api import PresentationReadRepository
+from foundation.production.publication_outcomes import latest_outcome
 
 ROOT = Path(__file__).resolve().parents[2]
 REGISTRY_PATH = ROOT / "config" / "orchestration" / "r4_refresh_operations_registry.json"
@@ -115,6 +116,13 @@ def build_refresh_status(repository: PresentationReadRepository, *, now: datetim
     now = (now or datetime.now(timezone.utc)).astimezone(timezone.utc)
     registry = _load_registry()
     health_by_domain = {str(item["domain_id"]): dict(item) for item in repository.domain_health()}
+    connection_factory = getattr(repository, "connection_factory", None)
+    last_publication = latest_outcome(connection_factory) if connection_factory is not None else None
+    publication_failure = (
+        last_publication
+        if last_publication is not None and last_publication["outcome"] != "SUCCESS"
+        else None
+    )
     items = []
 
     for domain_id, config in sorted(registry["domains"].items()):
@@ -134,6 +142,12 @@ def build_refresh_status(repository: PresentationReadRepository, *, now: datetim
         failure_summary = None
         if errors or warnings:
             failure_summary = str(health.get("status_message") or f"{errors} errors · {warnings} warnings")
+        if publication_failure is not None and failure_summary is None:
+            failure_summary = (
+                f"Latest publication run {str(publication_failure['outcome']).lower()} "
+                f"at {publication_failure['recorded_at_utc']}: "
+                f"{publication_failure['reason'] or 'see the run log'}"
+            )
 
         workflow = (
             config.get("workflow")
@@ -142,7 +156,7 @@ def build_refresh_status(repository: PresentationReadRepository, *, now: datetim
         )
         items.append({
             "domain_id": domain_id,
-            "health_state": "HEALTHY" if healthy else "REVIEW",
+            "health_state": "HEALTHY" if healthy and publication_failure is None else "REVIEW",
             "certification_state": health.get("certification_state"),
             "import_registry_status": health.get("import_registry_status"),
             "last_import_status": health.get("last_import_status"),
@@ -164,7 +178,7 @@ def build_refresh_status(repository: PresentationReadRepository, *, now: datetim
             "next_scheduled_run_utc": schedule["next_scheduled_run_utc"],
             "schedules": schedule["schedules"],
             "failure_summary": failure_summary,
-            "last_good_state_status": "ACTIVE_CERTIFIED_STATE_PRESERVED" if healthy else "LAST_GOOD_STATE_REMAINS_ACTIVE",
+            "last_good_state_status": "ACTIVE_CERTIFIED_STATE_PRESERVED" if healthy and publication_failure is None else "LAST_GOOD_STATE_REMAINS_ACTIVE",
             "recommendations_usable": bool(healthy),
             "warning_count": warnings,
             "error_count": errors,
@@ -175,6 +189,7 @@ def build_refresh_status(repository: PresentationReadRepository, *, now: datetim
 
     return {
         "generated_at_utc": now.isoformat(),
+        "last_publication_outcome": last_publication,
         "status": "HEALTHY" if items and all(item["health_state"] == "HEALTHY" for item in items) else "REVIEW",
         "freshness_status": "CURRENT" if items and all(item["freshness_state"] == "CURRENT" for item in items) else "REVIEW",
         "freshness_review_count": sum(1 for item in items if item["freshness_state"] != "CURRENT" or item["health_state"] != "HEALTHY"),

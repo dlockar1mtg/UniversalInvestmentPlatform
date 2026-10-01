@@ -46,6 +46,7 @@ jobs:
           CONFIRMATION: ${{ inputs.confirmation }}
         run: |
           set -euo pipefail
+          exec 2> >(tee -a "$RUNNER_TEMP/publication_errors.log" >&2)
           test -n "$UIIP_DATABASE_URL" || { echo "UIIP_DATABASE_URL is missing" >&2; exit 1; }
           test -n "$SOURCE_TOKEN" || { echo "UIP_SOURCE_ARTIFACTS_TOKEN is missing" >&2; exit 1; }
 
@@ -66,6 +67,7 @@ jobs:
           UIP_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          exec 2> >(tee -a "$RUNNER_TEMP/publication_errors.log" >&2)
 
           api_get() {
             local token="$1"
@@ -186,6 +188,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          exec 2> >(tee -a "$RUNNER_TEMP/publication_errors.log" >&2)
           observed_mtg_head="$(git -C source_repos/mtg rev-parse HEAD)"
           test "$observed_mtg_head" = "${{ steps.sources.outputs.mtg_head_sha }}" || {
             echo "MTG authority head drifted: ${observed_mtg_head}" >&2
@@ -198,6 +201,7 @@ jobs:
           UIP_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          exec 2> >(tee -a "$RUNNER_TEMP/publication_errors.log" >&2)
           mkdir -p incoming/crypto incoming/metals incoming/mtg
 
           api_get() {
@@ -261,6 +265,7 @@ jobs:
           --metals-artifact incoming/metals
           --mtg-repo source_repos/mtg
           --evidence-output data/operations/publication/rich_production_source_contract.json
+          2> >(tee -a "$RUNNER_TEMP/publication_errors.log" >&2)
 
       - name: Publish current governed rich candidate atomically
         run: >-
@@ -275,6 +280,7 @@ jobs:
           --metals-source-run-id "${{ steps.sources.outputs.metals_run_id }}"
           --mtg-source-run-id "${{ steps.sources.outputs.mtg_run_id }}"
           --evidence-output data/operations/publication/latest_rich_publication.json
+          2> >(tee -a "$RUNNER_TEMP/publication_errors.log" >&2)
 
       - name: Upload rich publication evidence
         if: always()
@@ -286,3 +292,14 @@ jobs:
             data/operations/publication/latest_rich_publication.json
           if-no-files-found: warn
           retention-days: 30
+
+      - name: Record publication outcome
+        if: always()
+        continue-on-error: true
+        run: >-
+          python scripts/record_publication_outcome.py
+          --job-status "${{ job.status }}"
+          --run-id "${{ github.run_id }}-${{ github.run_attempt }}"
+          --workflow "${{ github.workflow }}"
+          --run-url "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+          --error-log "${{ runner.temp }}/publication_errors.log"
