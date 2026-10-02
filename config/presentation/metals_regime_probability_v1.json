@@ -29,7 +29,7 @@
   "confidence_policy": "MULTIPLY_DIRECTIONAL_SUPPORT_BY_NATIVE_CONFIDENCE_AND_ASSIGN_REMAINDER_TO_NEUTRAL",
   "minimum_evidence": {
     "benchmark_observation_count": 2,
-    "vehicle_series_count": 1,
+    "vehicle_series_count": 0,
     "insufficient_evidence_behavior": "FAIL_CLOSED"
   },
   "normalization": {
