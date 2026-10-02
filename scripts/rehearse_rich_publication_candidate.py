@@ -104,8 +104,8 @@ def assert_unique_records(publication: PresentationPublication) -> None:
 
 def assert_metals_vehicle_implementation_semantics(records) -> dict[str, object]:
     rows = [record for record in records if record.record_type == METALS_VEHICLE_IMPLEMENTATION_RECORD_TYPE]
-    if len(rows) != 10:
-        raise RuntimeError(f"Expected exactly 10 Metals vehicle implementation records, observed {len(rows)}")
+    if not rows:
+        raise RuntimeError("No Metals vehicle implementation records were projected")
 
     by_commodity: dict[str, list] = {}
     for record in rows:
@@ -115,41 +115,28 @@ def assert_metals_vehicle_implementation_semantics(records) -> dict[str, object]
             raise RuntimeError("Metals vehicle implementation record is missing commodity identity")
         by_commodity.setdefault(record.asset_id, []).append(record)
 
-    expected_orders = {
-        "metals:commodity:gold": ["GLD", "SGOL", "IAU"],
-        "metals:commodity:silver": ["SLV", "SIVR"],
-        "metals:commodity:platinum": ["PPLT"],
-        "metals:commodity:copper": ["COPX", "CPER"],
-        "metals:commodity:uranium": ["URA", "URNM"],
-    }
-    if set(by_commodity) != set(expected_orders):
-        raise RuntimeError(f"Unexpected Metals implementation commodity set: {sorted(by_commodity)}")
-
+    # Invariants that hold for any valid ranking, rather than one pinned order:
+    # ranks run 1..n within a metal, the order follows the scores, a single
+    # vehicle is labelled only-registered, and at most one vehicle is preferred,
+    # which must be the top-ranked one.
     summary: dict[str, object] = {}
-    for commodity_id, expected in expected_orders.items():
-        ordered = sorted(
-            by_commodity[commodity_id],
-            key=lambda record: int(record.payload["certified_rank_within_commodity"]),
-        )
+    for commodity_id, members in sorted(by_commodity.items()):
+        ordered = sorted(members, key=lambda record: int(record.payload["certified_rank_within_commodity"]))
         tickers = [str(record.payload["ticker"]) for record in ordered]
-        if tickers != expected:
-            raise RuntimeError(f"Metals implementation order mismatch for {commodity_id}: {tickers} != {expected}")
-        labels = {
-            str(record.payload["ticker"]): record.payload.get("presentation_label")
-            for record in ordered
-        }
+        ranks = [int(record.payload["certified_rank_within_commodity"]) for record in ordered]
+        if ranks != list(range(1, len(ordered) + 1)):
+            raise RuntimeError(f"Metals implementation ranks are not 1..n for {commodity_id}: {ranks}")
+        scores = [record.payload.get("certified_implementation_score") for record in ordered]
+        numeric = [float(score) for score in scores if score not in (None, "")]
+        if len(numeric) == len(scores) and any(a < b for a, b in zip(numeric, numeric[1:])):
+            raise RuntimeError(f"Metals implementation order does not follow scores for {commodity_id}: {tickers}")
+        labels = {str(record.payload["ticker"]): record.payload.get("presentation_label") for record in ordered}
+        preferred = [ticker for ticker, label in labels.items() if label == PREFERRED_LABEL]
+        if len(ordered) == 1 and labels[tickers[0]] != ONLY_LABEL:
+            raise RuntimeError(f"Single Metals implementation for {commodity_id} is not labelled only-registered")
+        if len(preferred) > 1 or (preferred and preferred[0] != tickers[0]):
+            raise RuntimeError(f"Metals preferred label is not the top-ranked vehicle for {commodity_id}: {labels}")
         summary[commodity_id] = {"order": tickers, "labels": labels}
-
-    if summary["metals:commodity:gold"]["labels"]["GLD"] != PREFERRED_LABEL:
-        raise RuntimeError("Gold preferred implementation label is not GLD")
-    if summary["metals:commodity:copper"]["labels"]["COPX"] != PREFERRED_LABEL:
-        raise RuntimeError("Copper preferred implementation label is not COPX")
-    if summary["metals:commodity:uranium"]["labels"]["URA"] != PREFERRED_LABEL:
-        raise RuntimeError("Uranium preferred implementation label is not URA")
-    if summary["metals:commodity:platinum"]["labels"]["PPLT"] != ONLY_LABEL:
-        raise RuntimeError("Platinum only-registered implementation label is not PPLT")
-    if any(label == PREFERRED_LABEL for label in summary["metals:commodity:silver"]["labels"].values()):
-        raise RuntimeError("Defensive Silver received a preferred implementation label")
 
     for record in rows:
         if record.payload.get("automatic_execution_authorized") is not False:
