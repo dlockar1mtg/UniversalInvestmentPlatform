@@ -69,6 +69,8 @@ def _registered_vehicle_count() -> int:
 
 # Follows the registry, so adding a vehicle needs no audit edit.
 REGISTERED_VEHICLE_COUNT = _registered_vehicle_count()
+# Freshness rows: one per commodity benchmark series plus one per registered vehicle.
+FRESHNESS_BENCHMARK_SUBJECTS = 9
 
 
 NATIVE_METALS_CERTIFIED_CONTRACTS = {
@@ -99,7 +101,7 @@ NATIVE_METALS_CERTIFIED_CONTRACTS = {
         "manifest_authority_key": "authority_id",
         "manifest_authority": "UIP_NATIVE_METALS_DATA_FRESHNESS_V1",
         "row_count_key": "row_count",
-        "expected_rows": 20,
+        "expected_rows": FRESHNESS_BENCHMARK_SUBJECTS + REGISTERED_VEHICLE_COUNT,
         "require_nonlegacy": True,
         "output_sha_key": "output_sha256",
     },
