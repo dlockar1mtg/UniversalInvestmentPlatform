@@ -40,6 +40,7 @@
     "metals": {
       "repository": "dlockar1mtg/UniversalInvestmentPlatform",
       "workflow": ".github/workflows/metals-production-cycle.yml",
+      "source_data_cadence": "MONTHLY",
       "daily_schedule_utc": "23 12 * * *",
       "daily_mode": "production_refresh",
       "latest_certified_rehearsal": {
