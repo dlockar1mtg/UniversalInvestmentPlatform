@@ -46,6 +46,14 @@ from scripts.rehearse_rich_publication_candidate import (
 )
 
 CONFIRMATION = "PUBLISH_REHEARSED_RICH_CANDIDATE"
+
+
+def ranked_metals_vehicle_count() -> int:
+    """One implementation record per vehicle the committed ranking evidence covers."""
+    ranking = json.loads(
+        (ROOT / "config" / "presentation" / "metals_vehicle_ranking_evidence_v1.json").read_text(encoding="utf-8-sig")
+    )
+    return sum(len(group.get("certified_order") or []) for group in ranking.get("groups", []))
 EXPECTED_FIXED_GENERIC_COUNTS = {
     "crypto": {
         "asset": 6,
@@ -196,8 +204,12 @@ def main() -> int:
         crypto_current_price_count = counts[("crypto", "crypto_current_price")]
         if crypto_current_price_count != 6:
             raise RuntimeError(f"Crypto current-price count drifted: {crypto_current_price_count}")
-        if counts[("metals", "metals_vehicle_implementation")] != 10:
-            raise RuntimeError("Metals implementation count drifted")
+        implementation_count = counts[("metals", "metals_vehicle_implementation")]
+        expected_implementations = ranked_metals_vehicle_count()
+        if implementation_count != expected_implementations:
+            raise RuntimeError(
+                f"Metals implementation count drifted: {implementation_count} != {expected_implementations}"
+            )
         if metals_observed != metals_expected:
             raise RuntimeError(
                 f"Metals rich presentation counts drifted: {metals_observed} != {metals_expected}"
