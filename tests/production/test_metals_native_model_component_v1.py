@@ -79,4 +79,5 @@ def test_native_model_component_v1_contract_and_builder(tmp_path: Path) -> None:
     first_by_name = {row["model_name"]: row for row in rows if row["metal"] == "METAL_0" and row["horizon_months"] == "12"}
     assert float(first_by_name["uip_native_benchmark_momentum"]["model_forecast"]) == 0.10
     assert float(first_by_name["uip_native_vehicle_confirmation"]["model_forecast"]) == 0.20
-    assert float(first_by_name["uip_native_data_completeness_adjustment"]["model_forecast"]) == 0.05
+    # v2: the 0.20 slot is a zero-valued anchor; completeness no longer moves the return.
+    assert float(first_by_name["uip_native_data_completeness_adjustment"]["model_forecast"]) == 0.0
