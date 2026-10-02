@@ -24,7 +24,7 @@ def _registered_benchmarks() -> dict[str, str]:
 BENCHMARKS = _registered_benchmarks()
 
 
-def _history_pair(ticker: str) -> tuple[str, float, float]:
+def _history_pair(ticker: str) -> tuple[str, float, float, float | None]:
     import yfinance as yf
 
     history = yf.Ticker(ticker).history(period="10d", interval="1d", auto_adjust=False)
@@ -34,7 +34,14 @@ def _history_pair(ticker: str) -> tuple[str, float, float]:
     previous = float(history.iloc[-2]["Close"])
     current = float(history.iloc[-1]["Close"])
     trading_date = history.index[-1].date().isoformat()
-    return trading_date, current, previous
+    # The session's real traded volume (the metadata ADV snapshot is a fixed July figure).
+    try:
+        volume = float(history.iloc[-1]["Volume"])
+    except (KeyError, TypeError, ValueError):
+        volume = None
+    if volume is not None and (volume != volume or volume < 0):
+        volume = None
+    return trading_date, current, previous, volume
 
 
 def main() -> int:
@@ -49,13 +56,14 @@ def main() -> int:
         benchmark = BENCHMARKS.get(ticker)
         if benchmark is None:
             raise RuntimeError(f"No benchmark_symbol registered for {ticker} in config/metals/vehicles.json")
-        trading_date, close_price, previous_close_price = _history_pair(ticker)
-        _, benchmark_close, benchmark_previous = _history_pair(benchmark)
+        trading_date, close_price, previous_close_price, volume = _history_pair(ticker)
+        _, benchmark_close, benchmark_previous, _ = _history_pair(benchmark)
         output_rows.append({
             "ticker": ticker,
             "trading_date": trading_date,
             "close_price": close_price,
             "previous_close_price": previous_close_price,
+            "volume": "" if volume is None else volume,
             "benchmark_symbol": benchmark,
             "benchmark_close_price": benchmark_close,
             "benchmark_previous_close_price": benchmark_previous,
