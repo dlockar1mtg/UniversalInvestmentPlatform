@@ -7,14 +7,14 @@
   "session_window_local": "15:50:00-16:00:00 America/New_York",
   "session_aggregation": "median relative spread within each session",
   "cross_session_aggregation": "median of the latest 20 session medians",
-  "source_run_id": 37038577687,
-  "source_head_sha": "37363a2f373b864c5310aa9c96784698bfe101b9",
+  "source_run_id": 37059575132,
+  "source_head_sha": "83d6dc63c2930b58f732aaec32335977df397e02",
   "artifact_id": 10395879669,
   "artifact_digest": "sha256:15ed4d1bdd06cee6e9e50eadced3f332dc21be6144b6a58f2ce932366820db6d",
   "first_session": "2026-09-03",
   "last_session": "2026-10-01",
-  "required_ticker_count": 10,
-  "resolved_ticker_count": 10,
+  "required_ticker_count": 11,
+  "resolved_ticker_count": 11,
   "minimum_distinct_sessions_required": 20,
   "vehicles": {
     "GLD": {
@@ -25,6 +25,9 @@
     },
     "SGOL": {
       "median_bid_ask_spread_bps": 2.438156884769168
+    },
+    "GLDM": {
+      "median_bid_ask_spread_bps": 1.173100243748169
     },
     "SLV": {
       "median_bid_ask_spread_bps": 1.7205781269806075

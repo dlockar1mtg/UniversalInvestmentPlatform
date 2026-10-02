@@ -3,17 +3,17 @@
   "schema_version": "1.0.0",
   "ranking_authority_id": "UIP_NATIVE_METALS_VEHICLE_RANKING_V1",
   "ranking_methodology_version": "1.3.0",
-  "source_run_id": 37038577687,
-  "source_head_sha": "37363a2f373b864c5310aa9c96784698bfe101b9",
+  "source_run_id": 37059575132,
+  "source_head_sha": "83d6dc63c2930b58f732aaec32335977df397e02",
   "source_artifact_id": null,
-  "source_artifact_name": "metals-vehicle-evidence-refresh-37038577687",
-  "source_artifact_digest": "sha256:bf3e19dcb344ea834bc6705089834617180457bc5b40b988f3166bc1ad50f775",
-  "source_production_run_id": 37034744381,
+  "source_artifact_name": "metals-vehicle-evidence-refresh-37059575132",
+  "source_artifact_digest": "sha256:0d8f52b78e9252de7c1e8033b6ff99bdce1a9697d29f8e1d3c5a5d4370e7495f",
+  "source_production_run_id": 37059399093,
   "source_production_artifact_id": null,
   "source_production_artifact_digest": null,
-  "risk_output_sha256": "b191675aae1a19015616646f56eb3469687968ab6d4736d78e472e349e0a85e1",
+  "risk_output_sha256": "01b4cca6fa643f276a0815c3f3bbf99625941dd9e28ba7c7bd8c81e3263d5622",
   "status": "METALS_FOUR_FACTOR_RANKING_EVIDENCE_CERTIFIED",
-  "registered_vehicle_count": 10,
+  "registered_vehicle_count": 11,
   "commodity_group_count": 5,
   "weights": {
     "cost_efficiency": 0.45,
@@ -31,21 +31,23 @@
       "certified_leader": "CPER",
       "scores": {
         "CPER": 84.60930295423734,
-        "COPX": 78.08453764176551
+        "COPX": 78.08740660561233
       }
     },
     {
       "commodity_id": "metals:commodity:gold",
       "certified_order": [
+        "GLDM",
         "SGOL",
         "IAU",
         "GLD"
       ],
-      "certified_leader": "SGOL",
+      "certified_leader": "GLDM",
       "scores": {
-        "SGOL": 100.0,
-        "IAU": 90.78291269359306,
-        "GLD": 78.85000717790288
+        "GLDM": 99.92413136691549,
+        "SGOL": 80.3897594084944,
+        "IAU": 75.16357406827359,
+        "GLD": 68.38504868695456
       }
     },
     {
@@ -65,7 +67,7 @@
       "certified_leader": "SIVR",
       "scores": {
         "SIVR": 100.0,
-        "SLV": 82.99902661707765
+        "SLV": 82.9989785823193
       }
     },
     {
@@ -77,7 +79,7 @@
       "certified_leader": "URA",
       "scores": {
         "URA": 82.0,
-        "URNM": 68.35654112106442
+        "URNM": 68.35639382136029
       }
     }
   ],
