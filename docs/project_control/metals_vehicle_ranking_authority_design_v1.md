@@ -12,7 +12,7 @@ The commodity thesis remains the upstream investment authority. Vehicle ranking 
 
 - authority id: `UIP_NATIVE_METALS_VEHICLE_RANKING_V1`
 - schema version: `1.0.0`
-- methodology version: `1.2.0`
+- methodology version: `1.3.0`
 - scope: `REGISTERED_METALS_IMPLEMENTATION_VEHICLES_ONLY`
 - ranking grain: one row per registered enabled vehicle, grouped within one underlying commodity
 - cross-domain ranking: prohibited
@@ -43,9 +43,9 @@ Tracking quality is not a required scoring input. Exact benchmark identities rem
 
 The score is 0-100 and uses:
 
-- exposure fidelity: **35%**
-- cost efficiency: **25%**
-- liquidity / implementation friction: **25%**
+- exposure fidelity: **40%**
+- cost efficiency (cost of ownership): **45%**
+- liquidity / implementation friction: **0%** (a minimum floor, not a scored factor)
 - risk efficiency: **15%**
 
 All component scores must be visible independently from the total.
@@ -65,7 +65,11 @@ No vehicle type may be relabeled as direct commodity exposure.
 
 Within a commodity group, lower certified recurring cost is better.
 
-`cost_score = 100 * group_min_expense_ratio / vehicle_expense_ratio`
+`cost_of_ownership_pct = expense_ratio_pct + (bid_ask_spread_bps / 100) * (12 / holding_period_months)`
+
+`cost_score = 100 * group_min_cost_of_ownership / vehicle_cost_of_ownership`
+
+The holding period is `6` months, matching how the owner holds Metals vehicles (a few months to many months, following mid- to long-term trends).
 
 All required cost inputs must be positive. Zero, negative, or missing values fail closed.
 
@@ -100,7 +104,13 @@ Vehicle Risk V1 as commodity risk is forbidden. Risk values remain vehicle-speci
 
 ### Total score
 
-`total_score = 0.35*exposure + 0.25*cost + 0.25*liquidity + 0.15*risk`
+`total_score = 0.40*exposure + 0.45*cost + 0.00*liquidity + 0.15*risk`
+
+Liquidity floor: a vehicle needs at least `$10,000,000` average daily dollar volume and a spread of at most `25` bps. Vehicles below the floor rank after every vehicle that clears it. The liquidity score above is still computed and reported for transparency.
+
+### Why 1.3.0 (2026-10-02)
+
+Under 1.2.0 a 25% weight on liquidity, scaled to the most-traded fund in the group, ranked GLD (0.40% fee) above SGOL (0.17%) and SLV (0.50%) above SIVR (0.30%). Every registered vehicle trades far more than a small holder needs, so liquidity is now a floor and cost is the fee plus spread over a 6-month hold.
 
 Full precision is retained for ordering. Rounding is display-only.
 
