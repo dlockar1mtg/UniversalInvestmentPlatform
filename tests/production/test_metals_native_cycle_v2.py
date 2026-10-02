@@ -150,3 +150,20 @@ def test_uip_observation_wins_over_history_on_the_same_date():
     forecast, _ = _components(report, "GOLD")
     assert forecast.current_value == 9999.0
     assert forecast.as_of_date == "2026-09-01"
+
+
+def test_forecasts_keep_the_source_identity_while_matching_on_the_metal():
+    history = _monthly("gold", 2020, 80, 1500.0, 0.01)
+    recent = [NativeObservation("metals:commodity:gold", "2026-09-01", 3400.0, "wb")]
+    vehicles = _daily("GLD", 200.0, 0.001)
+    report = evaluate_native_cycle(
+        recent,
+        vehicles,
+        _methodology(),
+        history_observations=history,
+        vehicle_underlying={"GLD": "metals:commodity:gold"},
+    )
+    forecast, components = _components(report, "METALS:COMMODITY:GOLD")
+    assert {f.asset_id for f in report.forecasts} == {"METALS:COMMODITY:GOLD"}
+    assert components["benchmark_observation_count"] > 12
+    assert components["confirming_vehicles"] == ["GLD"]
