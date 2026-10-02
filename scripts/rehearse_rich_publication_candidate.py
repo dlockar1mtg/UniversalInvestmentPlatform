@@ -68,6 +68,14 @@ MTG_ENV_PATHS = {
 }
 
 
+
+def ranked_metals_vehicle_count() -> int:
+    """One implementation record per vehicle the committed ranking evidence covers."""
+    ranking = json.loads(
+        (ROOT / "config" / "presentation" / "metals_vehicle_ranking_evidence_v1.json").read_text(encoding="utf-8-sig")
+    )
+    return sum(len(group.get("certified_order") or []) for group in ranking.get("groups", []))
+
 def csv_rows(path: Path) -> int:
     with path.open("r", encoding="utf-8-sig", newline="") as handle:
         return sum(1 for _ in csv.reader(handle)) - 1
@@ -225,8 +233,12 @@ def main() -> int:
             raise RuntimeError(f"Metals rich candidate counts do not match certified inputs: {observed_metals} != {metals_expected}")
         if observed_mtg != MTG_RICH_EXPECTED_COUNTS:
             raise RuntimeError(f"MTG rich candidate counts do not match certified inputs: {observed_mtg} != {MTG_RICH_EXPECTED_COUNTS}")
-        if implementation_count != 10:
-            raise RuntimeError(f"Metals vehicle implementation candidate count must be 10, observed {implementation_count}")
+        expected_implementations = ranked_metals_vehicle_count()
+        if implementation_count != expected_implementations:
+            raise RuntimeError(
+                f"Metals vehicle implementation candidate count must be {expected_implementations}, "
+                f"observed {implementation_count}"
+            )
         if crypto_current_price_count != 6:
             raise RuntimeError(f"Crypto current-price candidate count must be 6, observed {crypto_current_price_count}")
         if candidate.publication_status != "STAGED":
