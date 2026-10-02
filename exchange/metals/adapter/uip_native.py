@@ -104,6 +104,7 @@ def publish_uip_native_metals_package(
     assets: dict[str, dict[str, object]] = {}
     forecast_rows: list[dict[str, object]] = []
     recommendation_rows: list[dict[str, object]] = []
+    risk_rows: dict[str, dict[str, object]] = {}
     for row in forecasts:
         asset_id = str(row["asset_id"]).strip()
         native_key = asset_id.lower()
@@ -119,6 +120,29 @@ def publish_uip_native_metals_package(
                 f"Native Metals forecast asset is not a governed commodity: {asset_id}"
             )
         universal_id = canonical_asset.asset_id
+        components = json.loads(str(row.get("component_json") or "{}"))
+        risk = components.get("risk")
+        if int(row["horizon_months"]) == 12 and isinstance(risk, dict) and universal_id not in risk_rows:
+            # Risk of the benchmark itself, from its monthly history (one row per metal).
+            risk_rows[universal_id] = {
+                "contract_version": CONTRACT_VERSION,
+                "platform_id": PLATFORM_ID,
+                "run_id": run,
+                "universal_asset_id": universal_id,
+                "as_of_date": row["as_of_date"],
+                "risk_score": risk["risk_score"],
+                "risk_level": risk["risk_level"],
+                "annualized_volatility": risk["annualized_volatility"],
+                "maximum_drawdown": risk["maximum_drawdown"],
+                "downside_deviation": risk["downside_deviation"],
+                "value_at_risk_95": risk["value_at_risk_95"],
+                "risk_notes": (
+                    f"Monthly benchmark history: {risk['return_observations']} monthly returns "
+                    f"over {risk['lookback_months']} months; VaR is monthly."
+                ),
+                "lookback_days": int(round(int(risk["lookback_months"]) * 30.4375)),
+                "generated_at_utc": generated,
+            }
         assets[asset_id] = {
             "contract_version": CONTRACT_VERSION,
             "platform_id": PLATFORM_ID,
@@ -148,11 +172,14 @@ def publish_uip_native_metals_package(
             "forecast_date": _add_months(str(row["as_of_date"]), int(row["horizon_months"])),
             "current_value": row["current_value"],
             "forecast_value_base": row["projected_value"],
-            "forecast_value_bear": "",
-            "forecast_value_bull": "",
+            "forecast_value_bear": "" if components.get("bear_value") is None else components["bear_value"],
+            "forecast_value_bull": "" if components.get("bull_value") is None else components["bull_value"],
             "expected_total_return": row["expected_return"],
             "expected_cagr": row["annualized_return"],
-            "probability_positive_return": "",
+            "probability_positive_return": (
+                "" if components.get("probability_positive_return") is None
+                else components["probability_positive_return"]
+            ),
             "forecast_confidence": round(float(row["confidence"]) * 100, 2),
             "forecast_method": row["model_id"],
             "scenario_name": "base",
@@ -221,6 +248,9 @@ def publish_uip_native_metals_package(
             "message",
         ]),
     }
+
+    if risk_rows:
+        datasets["risk_metrics"] = (list(risk_rows.values()), list(next(iter(risk_rows.values())).keys()))
 
     manifest_rows: list[dict[str, object]] = []
     for dataset_name, (rows, columns) in datasets.items():
