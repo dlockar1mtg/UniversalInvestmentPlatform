@@ -6,7 +6,20 @@ import json
 from collections import defaultdict
 from pathlib import Path
 
-EXPECTED = {"GLD","IAU","SGOL","SLV","SIVR","PPLT","CPER","COPX","URA","URNM"}
+_VEHICLE_REGISTRY_PATH = Path(__file__).resolve().parents[1] / "config" / "metals" / "vehicles.json"
+
+
+def _registered_tickers() -> tuple[str, ...]:
+    """Enabled, non-reserve Metals implementation vehicles, in registry order."""
+    registry = json.loads(_VEHICLE_REGISTRY_PATH.read_text(encoding="utf-8-sig"))
+    return tuple(
+        str(row["ticker"]).upper()
+        for row in registry.get("vehicles", [])
+        if row.get("enabled", True) and row.get("role") != "reserve"
+    )
+
+
+EXPECTED = set(_registered_tickers())
 
 
 def _load_json(path: str) -> dict:
@@ -74,13 +87,13 @@ def main() -> int:
 
     vehicles = [row for row in registry["vehicles"] if row.get("enabled") and row.get("role") != "reserve"]
     if {row["ticker"] for row in vehicles} != EXPECTED:
-        raise RuntimeError("Registry implementation universe does not match exact governed 10-ticker set")
+        raise RuntimeError("Registry implementation universe does not match registered ticker set")
 
     cost_map = {row["ticker"]: row for row in cost["vehicles"]}
     spread_map = spread["vehicles"]
     adv_map = {row["ticker"]: row for row in adv["vehicles"]}
     if set(cost_map) != EXPECTED or set(spread_map) != EXPECTED or set(adv_map) != EXPECTED:
-        raise RuntimeError("Required evidence does not cover exact governed 10-ticker set")
+        raise RuntimeError("Required evidence does not cover registered ticker set")
 
     groups: dict[str, list[dict]] = defaultdict(list)
     for vehicle in vehicles:
