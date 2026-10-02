@@ -18,7 +18,9 @@ def _load_module():
 
 def test_ranking_rehearsal_pins_governed_methodology_and_exact_universe():
     text = SCRIPT.read_text(encoding="utf-8")
-    assert '"GLD","IAU","SGOL","SLV","SIVR","PPLT","CPER","COPX","URA","URNM"' in text.replace(" ", "").replace("\n", "")
+    # The ranking universe comes from the vehicle registry, not a hard-coded set.
+    assert "EXPECTED = set(_registered_tickers())" in text
+    assert '"config" / "metals" / "vehicles.json"' in text
     assert 'methodology_version") != "1.2.0"' in text
     assert "ranking_authority" in text
     assert "spread_evidence_certified" in text
