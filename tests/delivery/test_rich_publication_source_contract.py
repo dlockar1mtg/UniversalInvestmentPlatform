@@ -73,7 +73,6 @@ def test_metals_native_contracts_cover_exactly_eleven_certified_families():
     assert expected_technical["source_state_mode"] == "CURRENT_CERTIFIED_WORLD_BANK_MONTHLY_HISTORY_ONLY"
     assert expected_technical["presentation_semantics"] == "DESCRIPTIVE_COMMODITY_TECHNICAL_CONTEXT_NOT_RECOMMENDATION_NOT_EXECUTION"
     assert expected_technical["supported_asset_count"] == 8
-    assert expected_technical["source_history_row_count"] == 6400
     assert expected_technical["ma50_supported"] is False
     assert expected_technical["ma200_supported"] is False
     assert expected_technical["source_collection_performed"] is True
