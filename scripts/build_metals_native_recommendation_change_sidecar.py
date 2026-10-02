@@ -143,11 +143,39 @@ def main() -> int:
     parser.add_argument("--methodology", type=Path, required=True)
     parser.add_argument("--native-cycle", type=Path, required=True)
     parser.add_argument("--output-root", type=Path, required=True)
+    parser.add_argument(
+        "--history",
+        type=Path,
+        default=ROOT / "data" / "operations" / "metals" / "commodity_benchmark_history.csv",
+    )
+    parser.add_argument("--vehicle-registry", type=Path, default=ROOT / "config" / "metals" / "vehicles.json")
     args = parser.parse_args()
 
     contract = read_json(args.contract)
     methodology = load_methodology(args.methodology)
     native_cycle = read_json(args.native_cycle)
+    history_rows: list[NativeObservation] = []
+    if args.history.exists():
+        with args.history.open(newline="", encoding="utf-8-sig") as handle:
+            for row in csv.DictReader(handle):
+                try:
+                    value = float(row["value"])
+                except (KeyError, TypeError, ValueError):
+                    continue
+                history_rows.append(
+                    NativeObservation(
+                        str(row["asset_id"]).upper(),
+                        str(row["observation_date"])[:10],
+                        value,
+                        str(row.get("source") or "world_bank"),
+                    )
+                )
+    vehicle_registry = read_json(args.vehicle_registry)
+    vehicle_underlying = {
+        str(item["ticker"]).upper(): str(item["underlying_asset_id"])
+        for item in vehicle_registry.get("vehicles", [])
+        if item.get("enabled", True)
+    }
 
     if contract.get("authority_id") != "UIP_NATIVE_METALS_RECOMMENDATION_CHANGE_V1":
         raise RuntimeError("unexpected recommendation-change authority")
@@ -252,7 +280,15 @@ def main() -> int:
             NativeObservation(str(r["ticker"]), str(r["observation_date"]), float(r["value"]), str(r["source"]))
             for r in vehicle_seen
         ]
-        report = evaluate_native_cycle(benchmark_obs, vehicle_obs, methodology)
+        # Replay only history dated on or before this evaluation date.
+        history_obs = [row for row in history_rows if row.observation_date <= str(evaluation_date)[:10]]
+        report = evaluate_native_cycle(
+            benchmark_obs,
+            vehicle_obs,
+            methodology,
+            history_observations=history_obs,
+            vehicle_underlying=vehicle_underlying,
+        )
         if report.status not in {"PASS", "INCOMPLETE"}:
             raise RuntimeError(f"historical native-cycle replay failed on {evaluation_date}: {report.status}")
         current = recommendations_by_asset(report)

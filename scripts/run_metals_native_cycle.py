@@ -95,10 +95,49 @@ def _load(connection) -> tuple[list[NativeObservation], list[NativeObservation]]
     return benchmarks, vehicles
 
 
+def _load_history(path: Path) -> list[NativeObservation]:
+    """Full World Bank monthly history collected earlier in the same workflow run."""
+    import csv
+
+    rows: list[NativeObservation] = []
+    with path.open(newline="", encoding="utf-8-sig") as handle:
+        for row in csv.DictReader(handle):
+            try:
+                value = float(row["value"])
+            except (KeyError, TypeError, ValueError):
+                continue
+            rows.append(
+                NativeObservation(
+                    str(row["asset_id"]).upper(),
+                    str(row["observation_date"])[:10],
+                    value,
+                    str(row.get("source") or "world_bank"),
+                )
+            )
+    return rows
+
+
+def _load_vehicle_underlying(path: Path) -> dict[str, str]:
+    import json
+
+    registry = json.loads(path.read_text(encoding="utf-8-sig"))
+    return {
+        str(item["ticker"]).upper(): str(item["underlying_asset_id"])
+        for item in registry.get("vehicles", [])
+        if item.get("enabled", True)
+    }
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Run UIP-native Metals forecasts and recommendations.")
     parser.add_argument("--methodology", type=Path, default=ROOT / "config" / "metals" / "model_methodology_registry.json")
     parser.add_argument("--output-root", type=Path, default=ROOT / "data" / "operations" / "metals" / "native_cycle")
+    parser.add_argument(
+        "--history",
+        type=Path,
+        default=ROOT / "data" / "operations" / "metals" / "commodity_benchmark_history.csv",
+    )
+    parser.add_argument("--vehicle-registry", type=Path, default=ROOT / "config" / "metals" / "vehicles.json")
     parser.add_argument("--strict", action="store_true")
     args = parser.parse_args()
 
@@ -108,7 +147,24 @@ def main() -> int:
     finally:
         connection.close()
 
-    report = evaluate_native_cycle(benchmarks, vehicles, load_methodology(args.methodology))
+    history: list[NativeObservation] = []
+    if args.history.exists():
+        history = _load_history(args.history)
+    elif args.strict:
+        raise SystemExit(f"benchmark history is missing: {args.history}")
+    else:
+        print(f"WARNING: benchmark history missing at {args.history}; using UIP observations only")
+    vehicle_underlying = _load_vehicle_underlying(args.vehicle_registry)
+    print(f"History observations: {len(history)}")
+    print(f"Registered vehicles: {len(vehicle_underlying)}")
+
+    report = evaluate_native_cycle(
+        benchmarks,
+        vehicles,
+        load_methodology(args.methodology),
+        history_observations=history,
+        vehicle_underlying=vehicle_underlying,
+    )
     json_path, csv_path = publish_native_cycle(report, args.output_root)
     print(f"METALS NATIVE CYCLE: {report.status}")
     print(f"Forecasts: {report.forecast_count}")
