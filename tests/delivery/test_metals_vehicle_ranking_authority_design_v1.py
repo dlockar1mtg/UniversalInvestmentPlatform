@@ -10,12 +10,15 @@ DESIGN = ROOT / "docs" / "project_control" / "metals_vehicle_ranking_authority_d
 def test_vehicle_ranking_weights_and_fail_closed_contract():
     config = json.loads(CONFIG.read_text(encoding="utf-8"))
     assert config["authority_id"] == "UIP_NATIVE_METALS_VEHICLE_RANKING_V1"
-    assert config["methodology_version"] == "1.2.0"
+    assert config["methodology_version"] == "1.3.0"
+    assert config["holding_period_months"] == 6
+    assert config["liquidity_floor"]["minimum_average_dollar_volume_usd"] == 10000000
+    assert config["liquidity_floor"]["maximum_bid_ask_spread_bps"] == 25
     assert abs(sum(config["weights"].values()) - 1.0) < 1e-9
     assert config["weights"] == {
-        "exposure_fidelity": 0.35,
-        "cost_efficiency": 0.25,
-        "liquidity_implementation_friction": 0.25,
+        "exposure_fidelity": 0.40,
+        "cost_efficiency": 0.45,
+        "liquidity_implementation_friction": 0.0,
         "risk_efficiency": 0.15,
     }
     assert config["optional_informational_evidence"] == ["tracking_quality"]
@@ -30,7 +33,8 @@ def test_normalization_formulas_are_explicit_and_bounded():
     norm = config["normalization"]
     assert norm["comparison_scope"] == "WITHIN_SAME_COMMODITY_GROUP_ONLY"
     assert norm["score_range"] == [0.0, 100.0]
-    assert "group_min_expense_ratio" in norm["cost_efficiency"]["formula"]
+    assert "group_min_cost_of_ownership" in norm["cost_efficiency"]["formula"]
+    assert "holding_period_months" in norm["cost_efficiency"]["formula"]
     liquidity = norm["liquidity_implementation_friction"]
     assert liquidity["adv_subweight"] == 0.50
     assert liquidity["spread_subweight"] == 0.50
@@ -53,8 +57,9 @@ def test_exposure_types_are_not_relabelled_as_direct_commodity_exposure():
 
 def test_design_records_normalization_and_forbidden_shortcuts():
     text = DESIGN.read_text(encoding="utf-8")
-    assert "methodology version: `1.2.0`" in text
-    assert "cost_score = 100 * group_min_expense_ratio / vehicle_expense_ratio" in text
+    assert "methodology version: `1.3.0`" in text
+    assert "cost_score = 100 * group_min_cost_of_ownership / vehicle_cost_of_ownership" in text
+    assert "Liquidity floor" in text
     assert "adv_score = 100 * vehicle_ADV / group_max_ADV" in text
     assert "spread_score = 100 * group_min_spread / vehicle_spread" in text
     assert "Vehicle Risk V1 as commodity risk" in text

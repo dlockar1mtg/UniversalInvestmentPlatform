@@ -74,7 +74,7 @@ def main() -> int:
     adv = _load_json(args.adv)
     risk = _risk_rows(args.risk)
 
-    if config.get("authority_id") != "UIP_NATIVE_METALS_VEHICLE_RANKING_V1" or config.get("methodology_version") != "1.2.0":
+    if config.get("authority_id") != "UIP_NATIVE_METALS_VEHICLE_RANKING_V1" or config.get("methodology_version") != "1.3.0":
         raise RuntimeError("Unexpected ranking authority or methodology version")
     if abs(sum(config["weights"].values()) - 1.0) > 1e-12:
         raise RuntimeError("Ranking weights do not sum to one")
@@ -144,19 +144,35 @@ def main() -> int:
         risk_fields = ["volatility", "downside_volatility", "maximum_drawdown_magnitude", "value_at_risk"]
         risk_mins = {field: min(row[field] for row in raw) for field in risk_fields}
 
+        weights = config["weights"]
+        floor = config["liquidity_floor"]
+        holding_months = float(config["holding_period_months"])
+        # Cost of ownership (% per year): the fee plus the bid/ask spread paid once per
+        # holding period, annualised over the assumed hold.
+        for row in raw:
+            row["cost_of_ownership_pct"] = row["expense_ratio_pct"] + (row["bid_ask_spread_bps"] / 100.0) * (
+                12.0 / holding_months
+            )
+        min_ownership_cost = min(row["cost_of_ownership_pct"] for row in raw)
+
         scored = []
         for row in raw:
-            cost_score = 100.0 * min_cost / row["expense_ratio_pct"]
+            cost_score = 100.0 * min_ownership_cost / row["cost_of_ownership_pct"]
             adv_score = 100.0 * row["average_dollar_volume_usd"] / max_adv
             spread_score = 100.0 * min_spread / row["bid_ask_spread_bps"]
             liquidity_score = 0.5 * adv_score + 0.5 * spread_score
+            # Liquidity is a minimum bar for a months-long holder, not a scored advantage.
+            floor_passed = (
+                row["average_dollar_volume_usd"] >= float(floor["minimum_average_dollar_volume_usd"])
+                and row["bid_ask_spread_bps"] <= float(floor["maximum_bid_ask_spread_bps"])
+            )
             risk_subscores = {field: 100.0 * risk_mins[field] / row[field] for field in risk_fields}
             risk_score = sum(risk_subscores.values()) / 4.0
             total = (
-                0.35 * row["exposure_fidelity_score"]
-                + 0.25 * cost_score
-                + 0.25 * liquidity_score
-                + 0.15 * risk_score
+                float(weights["exposure_fidelity"]) * row["exposure_fidelity_score"]
+                + float(weights["cost_efficiency"]) * cost_score
+                + float(weights["liquidity_implementation_friction"]) * liquidity_score
+                + float(weights["risk_efficiency"]) * risk_score
             )
             scored.append({
                 **row,
@@ -164,12 +180,14 @@ def main() -> int:
                 "adv_score": adv_score,
                 "spread_score": spread_score,
                 "liquidity_implementation_friction_score": liquidity_score,
+                "liquidity_floor_passed": floor_passed,
                 "risk_subscores": risk_subscores,
                 "risk_efficiency_score": risk_score,
                 "total_score": total,
             })
 
-        ordered = sorted(scored, key=_tie_key)
+        # Vehicles below the liquidity floor rank after every vehicle that clears it.
+        ordered = sorted(scored, key=lambda row: (not row["liquidity_floor_passed"], *_tie_key(row)))
         results.append({
             "commodity_id": commodity_id,
             "state": "READ_ONLY_REHEARSAL_ORDERING_COMPLETE",
