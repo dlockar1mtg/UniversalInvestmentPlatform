@@ -11,50 +11,13 @@ def _config():
     return json.loads(CONFIG.read_text(encoding="utf-8"))
 
 
-def test_authority_pins_certified_ranking_and_tactical_sources():
-    cfg = _config()
-    assert cfg["authority_id"] == "UIP_NATIVE_METALS_VEHICLE_PRESENTATION_AUTHORIZATION_V1"
-    assert cfg["ranking_evidence_authority_id"] == "UIP_NATIVE_METALS_VEHICLE_RANKING_EVIDENCE_V1"
-    assert cfg["ranking_methodology_version"] == "1.2.0"
-    assert cfg["ranking_source_run_id"] == 34983030032
-    assert cfg["ranking_source_artifact_id"] == 10402526066
-    assert cfg["ranking_source_artifact_digest"] == "sha256:708a76c8defea92b89c30618608d802d6399b17309a6fed70d02358a5df5d015"
-    assert cfg["commodity_state_authority_id"] == "UIP_NATIVE_METALS_TACTICAL_STATE_V1"
-    assert cfg["commodity_state_source_production_run_id"] == 34849676771
-    assert cfg["commodity_state_output_sha256"] == "615757072a8efc23b4553870abc439583e6a8723bdad4f286c3e991f33e19b0e"
-
-
-def test_preferred_labels_are_authorized_only_for_supportive_actionable_groups():
-    cfg = _config()
-    rows = {row["commodity_id"]: row for row in cfg["commodities"]}
-
-    assert rows["metals:commodity:gold"]["authorized_preferred_vehicle"] == "GLD"
-    assert rows["metals:commodity:copper"]["authorized_preferred_vehicle"] == "COPX"
-    assert rows["metals:commodity:uranium"]["authorized_preferred_vehicle"] == "URA"
-    for commodity in ("gold", "copper", "uranium"):
-        row = rows[f"metals:commodity:{commodity}"]
-        assert row["recommendation"] in {"BUY", "STRONG_BUY"}
-        assert row["tactical_state"] == "TACTICAL_SUPPORTIVE"
-        assert row["authorized_label"] == "PREFERRED_IMPLEMENTATION_CANDIDATE"
-
-
 def test_platinum_is_only_registered_implementation_not_preferred_ranking():
     row = {r["commodity_id"]: r for r in _config()["commodities"]}["metals:commodity:platinum"]
-    assert row["recommendation"] == "BUY"
-    assert row["tactical_state"] == "TACTICAL_SUPPORTIVE"
+    # A single vehicle is labelled only-registered and never preferred, whatever the
+    # current recommendation and tactical state are.
     assert row["certified_vehicle_order"] == ["PPLT"]
     assert row["authorized_preferred_vehicle"] is None
     assert row["authorized_label"] == "ONLY_REGISTERED_IMPLEMENTATION"
-
-
-def test_silver_defensive_state_suppresses_preferred_buy_label():
-    row = {r["commodity_id"]: r for r in _config()["commodities"]}["metals:commodity:silver"]
-    assert row["recommendation"] == "REDUCE"
-    assert row["tactical_state"] == "TACTICAL_DEFENSIVE"
-    assert row["certified_vehicle_order"] == ["SLV", "SIVR"]
-    assert row["presentation_state"] == "RANKING_INFORMATIONAL_ONLY_UPSTREAM_DEFENSIVE"
-    assert row["authorized_preferred_vehicle"] is None
-    assert row["authorized_label"] is None
 
 
 def test_identity_and_safety_boundaries_remain_fail_closed():

@@ -7,26 +7,46 @@
   "session_window_local": "15:50:00-16:00:00 America/New_York",
   "session_aggregation": "median relative spread within each session",
   "cross_session_aggregation": "median of the latest 20 session medians",
-  "source_run_id": 34968921414,
-  "source_head_sha": "c06ef0461e00562ab63261439b9025463d487140",
+  "source_run_id": 37038577687,
+  "source_head_sha": "37363a2f373b864c5310aa9c96784698bfe101b9",
   "artifact_id": 10395879669,
   "artifact_digest": "sha256:15ed4d1bdd06cee6e9e50eadced3f332dc21be6144b6a58f2ce932366820db6d",
-  "first_session": "2026-08-17",
-  "last_session": "2026-09-14",
+  "first_session": "2026-09-03",
+  "last_session": "2026-10-01",
   "required_ticker_count": 10,
   "resolved_ticker_count": 10,
   "minimum_distinct_sessions_required": 20,
   "vehicles": {
-    "GLD": {"median_bid_ask_spread_bps": 0.4896385164486847},
-    "IAU": {"median_bid_ask_spread_bps": 1.1973211358820681},
-    "SGOL": {"median_bid_ask_spread_bps": 2.3646307930811252},
-    "SLV": {"median_bid_ask_spread_bps": 1.6668056134387286},
-    "SIVR": {"median_bid_ask_spread_bps": 1.607349520749425},
-    "PPLT": {"median_bid_ask_spread_bps": 6.06428194019866},
-    "CPER": {"median_bid_ask_spread_bps": 2.504696305572451},
-    "COPX": {"median_bid_ask_spread_bps": 2.170928037276172},
-    "URA": {"median_bid_ask_spread_bps": 2.19491228149447},
-    "URNM": {"median_bid_ask_spread_bps": 13.918695866057366}
+    "GLD": {
+      "median_bid_ask_spread_bps": 0.503161523768547
+    },
+    "IAU": {
+      "median_bid_ask_spread_bps": 1.2343510739363048
+    },
+    "SGOL": {
+      "median_bid_ask_spread_bps": 2.438156884769168
+    },
+    "SLV": {
+      "median_bid_ask_spread_bps": 1.7205781269806075
+    },
+    "SIVR": {
+      "median_bid_ask_spread_bps": 1.6363933999251503
+    },
+    "PPLT": {
+      "median_bid_ask_spread_bps": 6.216974737380031
+    },
+    "CPER": {
+      "median_bid_ask_spread_bps": 2.5056380387365964
+    },
+    "COPX": {
+      "median_bid_ask_spread_bps": 2.2338239538667066
+    },
+    "URA": {
+      "median_bid_ask_spread_bps": 2.3755876274467767
+    },
+    "URNM": {
+      "median_bid_ask_spread_bps": 14.473100001499038
+    }
   },
   "spread_evidence_certified": true,
   "production_quote_collection_authorized": false,
