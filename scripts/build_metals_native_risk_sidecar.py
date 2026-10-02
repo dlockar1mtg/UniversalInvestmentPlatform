@@ -21,6 +21,15 @@ SOURCE_STATUS = "METALS_NATIVE_HISTORY_SIDECARS_PASS"
 PRICE_SEMANTICS = "UNADJUSTED_CLOSE"
 
 
+_VEHICLE_REGISTRY_PATH = Path(__file__).resolve().parents[1] / "config" / "metals" / "vehicles.json"
+
+
+def _registered_vehicle_count() -> int:
+    """Enabled vehicles in the registry (the cash reserve included), the single source for the universe."""
+    registry = json.loads(_VEHICLE_REGISTRY_PATH.read_text(encoding="utf-8-sig"))
+    return sum(1 for row in registry.get("vehicles", []) if row.get("enabled", True))
+
+
 def read_json(path: Path) -> dict:
     return json.loads(path.read_text(encoding="utf-8-sig"))
 
@@ -215,7 +224,8 @@ def main() -> int:
     lookback = int(contract["lookback_observations"])
     minimum = int(contract["minimum_observations"])
     annualization = int(contract["annualization_factor"])
-    expected_vehicle_count = int(contract["expected_vehicle_count"])
+    # The expected universe follows the registry, so adding a vehicle needs no contract edit.
+    expected_vehicle_count = _registered_vehicle_count()
     confidence = float(contract["var"]["confidence_level"])
     if minimum < lookback:
         raise RuntimeError("minimum observations cannot be less than lookback observations")
