@@ -59,12 +59,22 @@ def build_metals_vehicle_implementation_records(repository_root: Path) -> list[P
     component = _load(root, COMPONENT_PATH)
     cost = _load(root, COST_PATH)
     registry = _load(root, VEHICLES_PATH)
-    # The implementation universe is whatever the registry lists as enabled and not a reserve.
-    expected_tickers = {
+    registered_tickers = {
         str(row.get("ticker", "")).strip()
         for row in registry.get("vehicles", [])
         if bool(row.get("enabled")) and row.get("role") != "reserve"
     }
+    # A registered vehicle is presented once the ranking evidence covers it. A newly
+    # added fund is simply not shown until its first evidence refresh, instead of
+    # failing publication; a ranked vehicle must always be registered.
+    expected_tickers = {
+        str(ticker).strip()
+        for group in ranking.get("groups", [])
+        for ticker in (group.get("certified_order") or [])
+    }
+    unregistered = sorted(expected_tickers - registered_tickers)
+    if unregistered:
+        raise RuntimeError(f"Ranking evidence includes vehicles that are not registered: {unregistered}")
 
     if auth.get("authority_id") != EXPECTED_AUTHORITY:
         raise RuntimeError("Unexpected Metals vehicle presentation authorization authority")
@@ -106,8 +116,8 @@ def build_metals_vehicle_implementation_records(repository_root: Path) -> list[P
 
     if set(vehicles) != expected_tickers:
         raise RuntimeError(f"Registered ranked Metals ticker set mismatch: {sorted(vehicles)}")
-    if set(costs) != expected_tickers:
-        raise RuntimeError(f"Certified Metals cost ticker set mismatch: {sorted(costs)}")
+    if not expected_tickers <= set(costs):
+        raise RuntimeError(f"Certified Metals cost evidence is missing ranked vehicles: {sorted(expected_tickers - set(costs))}")
     if set(groups) != set(authorizations) or set(component_groups) != set(authorizations):
         raise RuntimeError("Ranking, component evidence, and presentation commodity groups differ")
 
