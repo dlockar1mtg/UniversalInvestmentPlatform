@@ -3,25 +3,30 @@
 from __future__ import annotations
 
 import csv
+import json
 from dataclasses import dataclass, asdict
 from datetime import date
 from pathlib import Path
 from typing import Callable, Mapping
 
 
-ISSUER_EXPENSE_RATIOS: dict[str, float] = {
-    "BIL": 0.1353,
-    "COPX": 0.65,
-    "CPER": 1.06,
-    "GLD": 0.40,
-    "IAU": 0.25,
-    "PPLT": 0.60,
-    "SGOL": 0.17,
-    "SIVR": 0.30,
-    "SLV": 0.50,
-    "URA": 0.69,
-    "URNM": 0.75,
-}
+_COST_EVIDENCE_PATH = (
+    Path(__file__).resolve().parents[2] / "config" / "presentation" / "metals_vehicle_cost_evidence_snapshot_v1.json"
+)
+# BIL is the cash reserve, not an implementation vehicle, so it is not in the cost evidence.
+_RESERVE_EXPENSE_RATIOS: dict[str, float] = {"BIL": 0.1353}
+
+
+def _issuer_expense_ratios() -> dict[str, float]:
+    """Issuer expense ratios from the dated cost evidence, the single source for fees."""
+    evidence = json.loads(_COST_EVIDENCE_PATH.read_text(encoding="utf-8-sig"))
+    ratios = dict(_RESERVE_EXPENSE_RATIOS)
+    for row in evidence.get("vehicles", []):
+        ratios[str(row["ticker"]).upper()] = float(row["expense_ratio_pct"])
+    return ratios
+
+
+ISSUER_EXPENSE_RATIOS: dict[str, float] = _issuer_expense_ratios()
 
 # Issuer-published 30-day median bid/ask spreads used only when the market-data
 # provider does not return a usable spread or bid/ask pair. Values remain dated

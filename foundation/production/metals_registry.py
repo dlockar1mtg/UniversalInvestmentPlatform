@@ -38,6 +38,8 @@ class MetalsVehicle:
     official_url: str
     expense_ratio_pct: float | None
     expense_ratio_as_of: str | None
+    # Tracking benchmark used by the daily market collector (e.g. GC=F for gold funds).
+    benchmark_symbol: str | None = None
 
 
 @dataclass(frozen=True)

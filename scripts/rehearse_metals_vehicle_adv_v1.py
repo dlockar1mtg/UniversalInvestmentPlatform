@@ -8,18 +8,20 @@ from datetime import datetime
 from pathlib import Path
 from statistics import fmean
 
-EXPECTED_TICKERS = (
-    "GLD",
-    "IAU",
-    "SGOL",
-    "SLV",
-    "SIVR",
-    "PPLT",
-    "CPER",
-    "COPX",
-    "URA",
-    "URNM",
-)
+_VEHICLE_REGISTRY_PATH = Path(__file__).resolve().parents[1] / "config" / "metals" / "vehicles.json"
+
+
+def _registered_tickers() -> tuple[str, ...]:
+    """Enabled, non-reserve Metals implementation vehicles, in registry order."""
+    registry = json.loads(_VEHICLE_REGISTRY_PATH.read_text(encoding="utf-8-sig"))
+    return tuple(
+        str(row["ticker"]).upper()
+        for row in registry.get("vehicles", [])
+        if row.get("enabled", True) and row.get("role") != "reserve"
+    )
+
+
+EXPECTED_TICKERS = _registered_tickers()
 SOURCE_AUTHORITY = "UIP_NATIVE_METALS_VEHICLE_OBSERVATIONS_V1"
 WINDOW_SESSIONS = 30
 

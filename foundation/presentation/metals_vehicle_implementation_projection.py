@@ -25,9 +25,6 @@ EXPECTED_AUTHORITY = "UIP_NATIVE_METALS_VEHICLE_PRESENTATION_AUTHORIZATION_V1"
 EXPECTED_RANKING_AUTHORITY = "UIP_NATIVE_METALS_VEHICLE_RANKING_EVIDENCE_V1"
 EXPECTED_COMPONENT_AUTHORITY = "UIP_NATIVE_METALS_VEHICLE_RANKING_COMPONENT_EVIDENCE_V1"
 EXPECTED_COST_AUTHORITY = "UIP_NATIVE_METALS_VEHICLE_COST_EVIDENCE_SNAPSHOT_V1"
-EXPECTED_TICKERS = {
-    "GLD", "IAU", "SGOL", "SLV", "SIVR", "PPLT", "CPER", "COPX", "URA", "URNM"
-}
 PREFERRED_LABEL = "PREFERRED_IMPLEMENTATION_CANDIDATE"
 ONLY_LABEL = "ONLY_REGISTERED_IMPLEMENTATION"
 
@@ -62,6 +59,12 @@ def build_metals_vehicle_implementation_records(repository_root: Path) -> list[P
     component = _load(root, COMPONENT_PATH)
     cost = _load(root, COST_PATH)
     registry = _load(root, VEHICLES_PATH)
+    # The implementation universe is whatever the registry lists as enabled and not a reserve.
+    expected_tickers = {
+        str(row.get("ticker", "")).strip()
+        for row in registry.get("vehicles", [])
+        if bool(row.get("enabled")) and row.get("role") != "reserve"
+    }
 
     if auth.get("authority_id") != EXPECTED_AUTHORITY:
         raise RuntimeError("Unexpected Metals vehicle presentation authorization authority")
@@ -93,7 +96,7 @@ def build_metals_vehicle_implementation_records(repository_root: Path) -> list[P
     registered_rows = [
         dict(row)
         for row in registry.get("vehicles", [])
-        if bool(row.get("enabled")) and str(row.get("ticker", "")).strip() in EXPECTED_TICKERS
+        if bool(row.get("enabled")) and str(row.get("ticker", "")).strip() in expected_tickers
     ]
     vehicles = _unique_index(registered_rows, "ticker", "Metals vehicle registry")
     costs = _unique_index([dict(row) for row in cost.get("vehicles", [])], "ticker", "Metals cost evidence")
@@ -101,9 +104,9 @@ def build_metals_vehicle_implementation_records(repository_root: Path) -> list[P
     component_groups = _unique_index([dict(row) for row in component.get("groups", [])], "commodity_id", "Metals ranking component evidence")
     authorizations = _unique_index([dict(row) for row in auth.get("commodities", [])], "commodity_id", "Metals presentation authorization")
 
-    if set(vehicles) != EXPECTED_TICKERS:
+    if set(vehicles) != expected_tickers:
         raise RuntimeError(f"Registered ranked Metals ticker set mismatch: {sorted(vehicles)}")
-    if set(costs) != EXPECTED_TICKERS:
+    if set(costs) != expected_tickers:
         raise RuntimeError(f"Certified Metals cost ticker set mismatch: {sorted(costs)}")
     if set(groups) != set(authorizations) or set(component_groups) != set(authorizations):
         raise RuntimeError("Ranking, component evidence, and presentation commodity groups differ")
@@ -220,7 +223,7 @@ def build_metals_vehicle_implementation_records(repository_root: Path) -> list[P
                 )
             )
 
-    if seen_tickers != EXPECTED_TICKERS or len(emitted) != 10:
+    if seen_tickers != expected_tickers or len(emitted) != len(expected_tickers):
         raise RuntimeError("Metals vehicle implementation projection did not emit exact ranked universe")
 
     silver = [r for r in emitted if r.asset_id == "metals:commodity:silver"]

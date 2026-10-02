@@ -7,7 +7,9 @@ WORKFLOW = ROOT / ".github" / "workflows" / "metals-alpaca-quote-suitability-v1-
 
 def test_script_targets_exact_required_tickers_and_sip_only():
     text = SCRIPT.read_text(encoding="utf-8")
-    assert 'TICKERS = ("GLD", "IAU", "SGOL", "SLV", "SIVR", "PPLT", "CPER", "COPX", "URA", "URNM")' in text
+    # The universe comes from the vehicle registry, not a hard-coded tuple.
+    assert 'TICKERS = _registered_tickers()' in text
+    assert '"config" / "metals" / "vehicles.json"' in text
     assert '"feed": "sip"' in text
     assert 'MIN_SESSIONS = 20' in text
     assert 'ask < bid' in text
