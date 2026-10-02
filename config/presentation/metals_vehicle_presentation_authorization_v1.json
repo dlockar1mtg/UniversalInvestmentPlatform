@@ -6,7 +6,7 @@
   "ranking_methodology_version": "1.2.0",
   "ranking_source_run_id": 34983030032,
   "ranking_source_artifact_id": 10402526066,
-  "ranking_source_artifact_digest": "sha256:bf3e19dcb344ea834bc6705089834617180457bc5b40b988f3166bc1ad50f775",
+  "ranking_source_artifact_digest": "sha256:0d8f52b78e9252de7c1e8033b6ff99bdce1a9697d29f8e1d3c5a5d4370e7495f",
   "commodity_state_authority_id": "UIP_NATIVE_METALS_TACTICAL_STATE_V1",
   "commodity_state_methodology_version": "1.0.0",
   "commodity_state_source_production_run_id": 34849676771,
@@ -35,7 +35,7 @@
       "commodity_id": "metals:commodity:copper",
       "recommendation": "BUY",
       "tactical_state": "TACTICAL_POSITIVE_BUT_MIXED",
-      "adjusted_expected_return_12m": 0.088861013456,
+      "adjusted_expected_return_12m": 0.087967723974,
       "certified_vehicle_order": [
         "CPER",
         "COPX"
@@ -46,15 +46,16 @@
     },
     {
       "commodity_id": "metals:commodity:gold",
-      "recommendation": "BUY",
-      "tactical_state": "TACTICAL_POSITIVE_BUT_MIXED",
-      "adjusted_expected_return_12m": 0.066683989469,
+      "recommendation": "HOLD",
+      "tactical_state": "TACTICAL_NEUTRAL",
+      "adjusted_expected_return_12m": 0.042885975632,
       "certified_vehicle_order": [
+        "GLDM",
         "SGOL",
         "IAU",
         "GLD"
       ],
-      "presentation_state": "RANKING_INFORMATIONAL_ONLY_UPSTREAM_NOT_SUPPORTIVE",
+      "presentation_state": "RANKING_INFORMATIONAL_ONLY_UPSTREAM_NOT_BUY",
       "authorized_preferred_vehicle": null,
       "authorized_label": null
     },
@@ -62,7 +63,7 @@
       "commodity_id": "metals:commodity:platinum",
       "recommendation": "HOLD",
       "tactical_state": "TACTICAL_NEUTRAL",
-      "adjusted_expected_return_12m": 0.043288068116,
+      "adjusted_expected_return_12m": 0.034797212562,
       "certified_vehicle_order": [
         "PPLT"
       ],
@@ -72,9 +73,9 @@
     },
     {
       "commodity_id": "metals:commodity:silver",
-      "recommendation": "STRONG_BUY",
+      "recommendation": "BUY",
       "tactical_state": "TACTICAL_POSITIVE_BUT_MIXED",
-      "adjusted_expected_return_12m": 0.136630782557,
+      "adjusted_expected_return_12m": 0.108145870723,
       "certified_vehicle_order": [
         "SIVR",
         "SLV"
