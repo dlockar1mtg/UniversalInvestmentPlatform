@@ -96,3 +96,6 @@
 .rec-tactical-meta{display:flex;flex-wrap:wrap;gap:6px}
 .rec-tactical-meta span{border:1px solid var(--line);border-radius:999px;padding:3px 8px;font-size:10px;color:var(--muted)}
 @media (max-width:760px){.metals-vehicle-panel-head,.metals-research-evidence-head,.metals-technical-context-head{flex-direction:column}}
+
+/* Metals model validation note (inserted by dashboard.js next to Metals calls). */
+.metals-model-note{margin:0 0 14px;padding:10px 14px;border:1px solid rgba(230,180,80,.45);border-left:4px solid #e6b450;border-radius:10px;background:rgba(230,180,80,.08);color:inherit;font-size:13px;line-height:1.5}
