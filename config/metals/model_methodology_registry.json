@@ -25,7 +25,7 @@
         "basis": "DIRECTIONAL_BACKTEST_HIT_RATE",
         "backtest_lookback_months": 240,
         "minimum_backtest_samples": 24,
-        "long_horizon_confidence_factor": 0.5
+        "long_horizon_confidence_factor": 1.0
       },
       "recommendation_policy": {
         "strong_buy_min_return": 0.12,
