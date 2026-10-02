@@ -178,8 +178,15 @@ def main() -> int:
 
         counts = Counter((record.domain_id, record.record_type) for record in publication.records)
         metals_expected = expected_metals_counts(artifact_roots["metals"])
+        # Sidecar families are checked against their sidecar CSVs. Generic records of
+        # the same type (e.g. commodity risk from risk_metrics) are not sidecar rows.
+        rich_counts = Counter(
+            (record.domain_id, record.record_type)
+            for record in publication.records
+            if (record.payload or {}).get("_rich_source_family")
+        )
         metals_observed = {
-            record_type: counts[("metals", record_type)]
+            record_type: rich_counts[("metals", record_type)]
             for record_type in metals_expected
         }
         mtg_observed = {
