@@ -167,3 +167,23 @@ def test_forecasts_keep_the_source_identity_while_matching_on_the_metal():
     assert {f.asset_id for f in report.forecasts} == {"METALS:COMMODITY:GOLD"}
     assert components["benchmark_observation_count"] > 12
     assert components["confirming_vehicles"] == ["GLD"]
+
+
+def test_recommendation_uses_the_confidence_adjusted_return():
+    import math
+
+    # Choppy history: the backtest is near a coin flip, so confidence sits near the minimum.
+    choppy = [
+        NativeObservation("silver", row.observation_date, 20.0 * (1 + 0.5 * math.sin(i / 3.0)), "history")
+        for i, row in enumerate(_monthly("silver", 2000, 320, 1.0, 0.0))
+    ]
+    # A big latest print makes the raw 12-month return large.
+    recent = [NativeObservation("SILVER", "2026-09-01", 40.0, "wb")]
+    report = evaluate_native_cycle(recent, [], _methodology(), history_observations=choppy)
+    forecast, components = _components(report, "SILVER")
+    assert forecast.annualized_return >= 0.12  # raw return alone would be STRONG_BUY
+    adjusted = components["confidence_adjusted_return"]
+    assert abs(adjusted - forecast.annualized_return * forecast.confidence) < 1e-6
+    assert components["recommendation_basis"] == "CONFIDENCE_ADJUSTED_12M"
+    expected = "BUY" if adjusted >= 0.06 else ("HOLD" if adjusted >= -0.02 else "REDUCE")
+    assert adjusted < 0.12 and forecast.recommendation == expected
