@@ -1,3 +1,4 @@
+import json
 from pathlib import Path
 import importlib.util
 
@@ -42,12 +43,15 @@ def test_metals_native_contracts_cover_exactly_eleven_certified_families():
         "uncertainty_adjusted",
         "tactical_state",
     }
-    assert contracts["current_price"]["expected_rows"] == 11
-    assert contracts["data_freshness"]["expected_rows"] == 20
+    registry = json.loads((ROOT / "config" / "metals" / "vehicles.json").read_text(encoding="utf-8-sig"))
+    registered = sum(1 for row in registry["vehicles"] if row.get("enabled", True))
+    assert module.REGISTERED_VEHICLE_COUNT == registered
+    assert contracts["current_price"]["expected_rows"] == registered
+    assert contracts["data_freshness"]["expected_rows"] == module.FRESHNESS_BENCHMARK_SUBJECTS + registered
     assert contracts["commodity_technical_context"]["expected_rows"] == 8
     assert contracts["platform_health"]["expected_rows"] == 1
     assert contracts["model_component"]["expected_rows"] == 81
-    assert contracts["risk"]["expected_rows"] == 11
+    assert contracts["risk"]["expected_rows"] == registered
     assert contracts["recommendation_change"]["minimum_rows"] == 1
     assert contracts["regime_probability"]["expected_rows"] == 27
     assert contracts["uncertainty_adjusted"]["expected_rows"] == 27
