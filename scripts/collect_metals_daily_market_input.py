@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import csv
+import json
 import sys
 from datetime import date
 from pathlib import Path
@@ -9,19 +10,18 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-BENCHMARKS = {
-    "BIL": "^IRX",
-    "COPX": "HG=F",
-    "CPER": "HG=F",
-    "GLD": "GC=F",
-    "IAU": "GC=F",
-    "PPLT": "PL=F",
-    "SGOL": "GC=F",
-    "SIVR": "SI=F",
-    "SLV": "SI=F",
-    "URA": "URA",
-    "URNM": "URA",
-}
+
+def _registered_benchmarks() -> dict[str, str]:
+    """Each vehicle's tracking benchmark symbol from config/metals/vehicles.json."""
+    registry = json.loads((ROOT / "config" / "metals" / "vehicles.json").read_text(encoding="utf-8-sig"))
+    return {
+        str(row["ticker"]).strip().upper(): str(row["benchmark_symbol"])
+        for row in registry.get("vehicles", [])
+        if row.get("benchmark_symbol")
+    }
+
+
+BENCHMARKS = _registered_benchmarks()
 
 
 def _history_pair(ticker: str) -> tuple[str, float, float]:
@@ -46,7 +46,9 @@ def main() -> int:
     output_rows: list[dict[str, object]] = []
     for row in metadata_rows:
         ticker = row["ticker"].strip().upper()
-        benchmark = BENCHMARKS[ticker]
+        benchmark = BENCHMARKS.get(ticker)
+        if benchmark is None:
+            raise RuntimeError(f"No benchmark_symbol registered for {ticker} in config/metals/vehicles.json")
         trading_date, close_price, previous_close_price = _history_pair(ticker)
         _, benchmark_close, benchmark_previous = _history_pair(benchmark)
         output_rows.append({
