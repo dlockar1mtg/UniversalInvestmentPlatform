@@ -232,6 +232,9 @@ def evaluate_native_cycle(
     forecasts: list[NativeForecast] = []
 
     for asset_id, rows in sorted(recent.items()):
+        # Forecasts keep the source identity (e.g. METALS:COMMODITY:GOLD) that downstream
+        # sidecars and the presentation bridge expect; the short key is only for matching.
+        source_asset_id = rows[-1].asset_id.upper()
         # History first, then UIP's own observations, so UIP's value wins on the same date.
         points = _series([*history.get(asset_id, []), *rows])
         latest_date, current = points[-1]
@@ -302,7 +305,7 @@ def evaluate_native_cycle(
                 components["horizon_basis"] = "MODEL_12M"
             forecasts.append(
                 NativeForecast(
-                    asset_id=asset_id,
+                    asset_id=source_asset_id,
                     horizon_months=horizon_months,
                     as_of_date=latest_date.isoformat(),
                     current_value=round(current, 8),
