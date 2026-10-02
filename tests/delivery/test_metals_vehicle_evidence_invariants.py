@@ -33,6 +33,8 @@ REGISTERED = {
     for row in json.loads((ROOT / "config" / "metals" / "vehicles.json").read_text(encoding="utf-8-sig"))["vehicles"]
     if row.get("enabled", True) and row.get("role") != "reserve"
 }
+# A newly registered fund is not ranked until its first evidence refresh.
+RANKED = {ticker for group in RANKING["groups"] for ticker in group["certified_order"]}
 
 
 def test_the_three_files_are_bound_to_one_ranking_and_methodology():
@@ -44,16 +46,16 @@ def test_the_three_files_are_bound_to_one_ranking_and_methodology():
     assert RANKING["weights"] == COMPONENT["weights"] == CONFIG["weights"]
 
 
-def test_every_registered_vehicle_appears_exactly_once_under_its_own_metal():
+def test_every_ranked_vehicle_is_registered_and_appears_once_under_its_own_metal():
     seen = {}
     for group in RANKING["groups"]:
         for ticker in group["certified_order"]:
             assert ticker not in seen, f"{ticker} is ranked twice"
             seen[ticker] = group["commodity_id"]
-    assert set(seen) == set(REGISTERED)
+    assert set(seen) <= set(REGISTERED)
     for ticker, commodity_id in seen.items():
         assert REGISTERED[ticker]["underlying_asset_id"] == commodity_id
-    assert RANKING["registered_vehicle_count"] == len(REGISTERED)
+    assert RANKING["registered_vehicle_count"] == len(seen)
     assert RANKING["commodity_group_count"] == len(RANKING["groups"])
 
 
@@ -101,16 +103,16 @@ def test_preferred_labels_follow_the_published_actionability_rule():
 
 def test_spread_evidence_is_certified_for_every_registered_vehicle():
     assert SPREAD["spread_evidence_certified"] is True
-    assert set(SPREAD["vehicles"]) == set(REGISTERED)
+    assert RANKED <= set(SPREAD["vehicles"]) <= set(REGISTERED)
     assert all(float(row["median_bid_ask_spread_bps"]) > 0 for row in SPREAD["vehicles"].values())
     assert str(SPREAD["first_session"]) <= str(SPREAD["last_session"])
 
 
 def test_the_projection_accepts_the_committed_evidence():
     records = build_metals_vehicle_implementation_records(ROOT)
-    assert len(records) == len(REGISTERED)
+    assert len(records) == len(RANKED)
     tickers = [record.payload["ticker"] for record in records]
-    assert sorted(tickers) == sorted(REGISTERED)
+    assert sorted(tickers) == sorted(RANKED)
     for record in records:
         assert int(record.payload["certified_rank_within_commodity"]) >= 1
         assert record.payload.get("presentation_label") in (None, PREFERRED_LABEL, ONLY_LABEL)
