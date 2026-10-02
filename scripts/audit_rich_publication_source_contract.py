@@ -58,6 +58,19 @@ REQUIRED_METALS_RICH_FAMILIES = {
     "risk": "risk",
 }
 
+_VEHICLE_REGISTRY_PATH = Path(__file__).resolve().parents[1] / "config" / "metals" / "vehicles.json"
+
+
+def _registered_vehicle_count() -> int:
+    """Enabled Metals vehicles (cash reserve included): one current price and one risk row each."""
+    registry = json.loads(_VEHICLE_REGISTRY_PATH.read_text(encoding="utf-8-sig"))
+    return sum(1 for row in registry.get("vehicles", []) if row.get("enabled", True))
+
+
+# Follows the registry, so adding a vehicle needs no audit edit.
+REGISTERED_VEHICLE_COUNT = _registered_vehicle_count()
+
+
 NATIVE_METALS_CERTIFIED_CONTRACTS = {
     "current_price": {
         "csv": "operations/metals/native_rich_history/metals_current_price.csv",
@@ -66,7 +79,7 @@ NATIVE_METALS_CERTIFIED_CONTRACTS = {
         "manifest_authority_key": "source_authority",
         "manifest_authority": "UIP_NATIVE_METALS_VEHICLE_OBSERVATIONS_V1",
         "row_count_key": "current_price_row_count",
-        "expected_rows": 11,
+        "expected_rows": REGISTERED_VEHICLE_COUNT,
         "manifest_file_key": "metals_current_price.csv",
     },
     "price_history": {
@@ -107,7 +120,6 @@ NATIVE_METALS_CERTIFIED_CONTRACTS = {
             "source_state_mode": "CURRENT_CERTIFIED_WORLD_BANK_MONTHLY_HISTORY_ONLY",
             "presentation_semantics": "DESCRIPTIVE_COMMODITY_TECHNICAL_CONTEXT_NOT_RECOMMENDATION_NOT_EXECUTION",
             "supported_asset_count": 8,
-            "source_history_row_count": 6400,
             "ma50_supported": False,
             "ma200_supported": False,
             "unsupported_assets": {
@@ -151,14 +163,14 @@ NATIVE_METALS_CERTIFIED_CONTRACTS = {
         "manifest_authority_key": "authority_id",
         "manifest_authority": "UIP_NATIVE_METALS_RISK_V1",
         "row_count_key": "row_count",
-        "expected_rows": 11,
+        "expected_rows": REGISTERED_VEHICLE_COUNT,
         "require_nonlegacy": True,
         "output_sha_key": "output_sha256",
         "expected_manifest_values": {
             "schema_version": "1.0.0",
             "methodology_version": "1.0.2",
             "scope": "VEHICLE_ONLY",
-            "vehicle_count": 11,
+            "vehicle_count": REGISTERED_VEHICLE_COUNT,
             "lookback_observations": 252,
             "minimum_observations": 252,
             "return_convention": "SIMPLE_CLOSE_TO_CLOSE_DAILY_RETURN",
