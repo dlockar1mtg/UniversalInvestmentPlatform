@@ -1,21 +1,27 @@
 {
   "authority_id": "UIP_NATIVE_METALS_VEHICLE_RANKING_V1",
   "schema_version": "1.0.0",
-  "methodology_version": "1.2.0",
+  "methodology_version": "1.3.0",
   "scope": "REGISTERED_METALS_IMPLEMENTATION_VEHICLES_ONLY",
   "ranking_grain": "ONE_ROW_PER_REGISTERED_ENABLED_VEHICLE_GROUPED_WITHIN_ONE_COMMODITY",
   "weights": {
-    "exposure_fidelity": 0.35,
-    "cost_efficiency": 0.25,
-    "liquidity_implementation_friction": 0.25,
+    "exposure_fidelity": 0.40,
+    "cost_efficiency": 0.45,
+    "liquidity_implementation_friction": 0.0,
     "risk_efficiency": 0.15
+  },
+  "holding_period_months": 6,
+  "liquidity_floor": {
+    "minimum_average_dollar_volume_usd": 10000000,
+    "maximum_bid_ask_spread_bps": 25,
+    "policy": "VEHICLES_BELOW_THE_FLOOR_RANK_AFTER_ALL_THAT_CLEAR_IT"
   },
   "normalization": {
     "comparison_scope": "WITHIN_SAME_COMMODITY_GROUP_ONLY",
     "score_range": [0.0, 100.0],
     "cost_efficiency": {
       "direction": "LOWER_IS_BETTER",
-      "formula": "100 * group_min_expense_ratio / vehicle_expense_ratio"
+      "formula": "100 * group_min_cost_of_ownership / vehicle_cost_of_ownership; cost_of_ownership_pct = expense_ratio_pct + (bid_ask_spread_bps / 100) * (12 / holding_period_months)"
     },
     "liquidity_implementation_friction": {
       "adv_subweight": 0.50,
