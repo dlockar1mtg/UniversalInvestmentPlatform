@@ -85,7 +85,7 @@ def test_vehicle_ui_renders_governed_commodity_forecast_evidence():
     assert "Certified forecast evidence" in text
     assert "Benchmark momentum" in text
     assert "Vehicle confirmation" in text
-    assert "Data completeness adjustment" in text
+    assert "Neutral anchor (toward 0)" in text
     assert "Raw expected return" in text
     assert "Uncertainty haircut" in text
     assert "Adjusted expected return" in text
