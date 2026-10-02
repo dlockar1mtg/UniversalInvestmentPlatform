@@ -1,0 +1,109 @@
+name: Metals Vehicle Evidence Refresh
+
+# Regenerates the committed Metals vehicle evidence (spreads, ranking, component
+# evidence, presentation authorization) from the latest successful Metals
+# production run and fresh Alpaca spreads, then proposes the change as a pull
+# request for review. Manual only; nothing is published until that PR is merged.
+on:
+  workflow_dispatch:
+
+permissions:
+  actions: read
+  contents: write
+  pull-requests: write
+
+concurrency:
+  group: uiip-metals-vehicle-evidence-refresh
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      GH_TOKEN: ${{ github.token }}
+      ALPACA_API_KEY_ID: ${{ secrets.ALPACA_API_KEY_ID }}
+      ALPACA_API_SECRET_KEY: ${{ secrets.ALPACA_API_SECRET_KEY }}
+      WORK: data/operations/metals/vehicle_evidence_refresh
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+      - name: Install dependencies
+        run: >-
+          pip install
+          -r requirements.txt
+          -r requirements/phase_7_3.txt
+          -r requirements/metals_production.txt
+      - name: Resolve the latest successful Metals production run
+        id: production
+        run: |
+          set -euo pipefail
+          run_id="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow metals-production-cycle.yml --branch main --status success --limit 1 --json databaseId --jq '.[0].databaseId')"
+          test -n "$run_id"
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "Using Metals production run $run_id"
+          mkdir -p "$WORK"
+      - uses: actions/download-artifact@v4
+        with:
+          name: metals-production-${{ steps.production.outputs.run_id }}
+          path: _metals_artifact
+          github-token: ${{ github.token }}
+          run-id: ${{ steps.production.outputs.run_id }}
+      - name: 30-session average dollar volume
+        run: python scripts/rehearse_metals_vehicle_adv_v1.py --artifact-root _metals_artifact --output "$WORK/adv.json"
+      - name: Vehicle risk
+        run: |
+          set -euo pipefail
+          history_csv="$(find _metals_artifact -type f -path '*/native_rich_history/metals_price_history.csv' | head -n 1)"
+          history_manifest="$(find _metals_artifact -type f -path '*/native_rich_history/manifest.json' | head -n 1)"
+          test -n "$history_csv"
+          test -n "$history_manifest"
+          python scripts/build_metals_native_risk_sidecar.py --history "$history_csv" --history-manifest "$history_manifest" --contract config/presentation/metals_risk_v1.json --output-root "$WORK/risk"
+      - name: Alpaca bid/ask spreads
+        run: python scripts/rehearse_metals_alpaca_spread_evidence_v1.py --output "$WORK/alpaca_spread.json"
+      - name: Spread evidence and current commodity state
+        run: |
+          set -euo pipefail
+          printf '{"source_run_id": %s, "source_head_sha": "%s"}\n' "$GITHUB_RUN_ID" "$GITHUB_SHA" > "$WORK/spread_source.json"
+          tactical_csv="$(find _metals_artifact -type f -name metals_tactical_state.csv | head -n 1)"
+          test -n "$tactical_csv"
+          python scripts/prepare_metals_vehicle_evidence_refresh.py --alpaca-evidence "$WORK/alpaca_spread.json" --source "$WORK/spread_source.json" --tactical-csv "$tactical_csv" --commodity-state-output "$WORK/commodity_state.json"
+      - name: Rank vehicles (methodology from config)
+        run: python scripts/rehearse_metals_four_factor_ranking_v1.py --adv "$WORK/adv.json" --risk "$WORK/risk/risk.csv" --output "$WORK/rehearsal.json"
+      - name: Build the committed ranking evidence
+        env:
+          PRODUCTION_RUN_ID: ${{ steps.production.outputs.run_id }}
+        run: |
+          set -euo pipefail
+          risk_sha="$(sha256sum "$WORK/risk/risk.csv" | cut -d' ' -f1)"
+          printf '{"run_id": %s, "head_sha": "%s", "artifact_name": "metals-vehicle-evidence-refresh-%s", "production_run_id": %s, "risk_output_sha256": "%s"}\n' "$GITHUB_RUN_ID" "$GITHUB_SHA" "$GITHUB_RUN_ID" "$PRODUCTION_RUN_ID" "$risk_sha" > "$WORK/source.json"
+          python scripts/build_metals_vehicle_ranking_evidence.py --rehearsal "$WORK/rehearsal.json" --commodity-state "$WORK/commodity_state.json" --source "$WORK/source.json"
+      - name: Show the change
+        run: git --no-pager diff --stat -- config/presentation
+      - uses: actions/upload-artifact@v4
+        with:
+          name: metals-vehicle-evidence-refresh-${{ github.run_id }}
+          path: |
+            config/presentation/metals_vehicle_spread_evidence_v1.json
+            config/presentation/metals_vehicle_ranking_evidence_v1.json
+            config/presentation/metals_vehicle_ranking_component_evidence_v1.json
+            config/presentation/metals_vehicle_presentation_authorization_v1.json
+            data/operations/metals/vehicle_evidence_refresh/
+      - name: Propose the refreshed evidence as a pull request
+        continue-on-error: true
+        env:
+          PRODUCTION_RUN_ID: ${{ steps.production.outputs.run_id }}
+        run: |
+          set -euo pipefail
+          if git diff --quiet -- config/presentation; then echo "No evidence change."; exit 0; fi
+          branch="refresh/metals-vehicle-evidence-$GITHUB_RUN_ID"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add config/presentation/metals_vehicle_spread_evidence_v1.json config/presentation/metals_vehicle_ranking_evidence_v1.json config/presentation/metals_vehicle_ranking_component_evidence_v1.json config/presentation/metals_vehicle_presentation_authorization_v1.json
+          git commit -m "Refresh Metals vehicle evidence from production run $PRODUCTION_RUN_ID"
+          git push origin "$branch"
+          gh pr create --base main --head "$branch" --title "Refresh Metals vehicle evidence (run $GITHUB_RUN_ID)" --body "Regenerated by the Metals Vehicle Evidence Refresh workflow from Metals production run $PRODUCTION_RUN_ID: 30-session ADV, Alpaca spreads, vehicle risk, ranking (methodology in config/presentation/metals_vehicle_ranking_v1.json) and the current recommendation / tactical state per metal. Review order and label changes before merging."
