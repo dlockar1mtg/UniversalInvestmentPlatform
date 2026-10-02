@@ -1,0 +1,64 @@
+name: Metals Model Backtest
+
+# Walk-forward backtest of the production Metals model on the World Bank monthly
+# history in the latest successful Metals run. Read-only: no database, no publication.
+on:
+  workflow_dispatch:
+    inputs:
+      start:
+        description: First month to evaluate (YYYY-MM-DD)
+        required: false
+        default: "2006-01-01"
+        type: string
+
+permissions:
+  actions: read
+  contents: read
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    environment: staging
+    env:
+      GH_TOKEN: ${{ github.token }}
+      UIIP_FRED_API_KEY: ${{ secrets.UIIP_FRED_API_KEY }}
+      BACKTEST_START: ${{ inputs.start }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+      - name: Install dependencies
+        run: >-
+          pip install
+          -r requirements.txt
+          -r requirements/phase_7_3.txt
+          -r requirements/metals_production.txt
+      - name: Resolve the latest successful Metals production run
+        id: production
+        run: |
+          set -euo pipefail
+          run_id="$(gh run list --repo "$GITHUB_REPOSITORY" --workflow metals-production-cycle.yml --branch main --status success --limit 1 --json databaseId --jq '.[0].databaseId')"
+          test -n "$run_id"
+          echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
+          echo "Using Metals production run $run_id"
+      - uses: actions/download-artifact@v4
+        with:
+          name: metals-production-${{ steps.production.outputs.run_id }}
+          path: _metals_artifact
+          github-token: ${{ github.token }}
+          run-id: ${{ steps.production.outputs.run_id }}
+      - name: Backtest the Metals model
+        run: |
+          set -euo pipefail
+          history_csv="$(find _metals_artifact -type f -name commodity_benchmark_history.csv | head -n 1)"
+          test -n "$history_csv"
+          python scripts/backtest_metals_native_model.py --history "$history_csv" --start "$BACKTEST_START" --output-dir data/operations/metals/backtest
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: metals-model-backtest-${{ github.run_id }}
+          path: data/operations/metals/backtest/
+          if-no-files-found: ignore
