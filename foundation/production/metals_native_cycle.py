@@ -12,6 +12,8 @@ Model (v2):
 - Data completeness affects confidence only, never the return.
 - Confidence comes from a backtest: how often the trailing 12-month direction
   matched the following 12 months for this metal.
+- The recommendation uses the confidence-adjusted return (return x confidence);
+  the reported return stays the raw model value.
 - Horizons beyond 12 months compound the 12-month rate and are labelled as
   extrapolations with reduced confidence.
 - A metal with less than a year of history gets a zero return, minimum
@@ -260,6 +262,7 @@ def evaluate_native_cycle(
         if not sufficient_history:
             annual_return = 0.0
             confidence = minimum_confidence
+            confidence_adjusted_return = 0.0
             recommendation = "HOLD"
             reasons.append(f"INSUFFICIENT_HISTORY:{asset_id}")
         else:
@@ -275,7 +278,10 @@ def evaluate_native_cycle(
                 skill = max(0.0, (hit_rate - 0.5) / 0.5)
                 confidence = minimum_confidence + (maximum_confidence - minimum_confidence) * skill
             confidence = _bounded(confidence, minimum_confidence, maximum_confidence)
-            recommendation = _recommendation(annual_return, recommendation_policy)
+            # The call uses the return shrunk toward zero by confidence, so a large move
+            # with coin-flip skill does not become a STRONG_BUY.
+            confidence_adjusted_return = annual_return * confidence
+            recommendation = _recommendation(confidence_adjusted_return, recommendation_policy)
 
         base_components = {
             "model_version": "metals-native-v2",
@@ -291,6 +297,8 @@ def evaluate_native_cycle(
             "backtest_hits": hits,
             "backtest_samples": samples,
             "backtest_hit_rate": hit_rate,
+            "confidence_adjusted_return": confidence_adjusted_return,
+            "recommendation_basis": "CONFIDENCE_ADJUSTED_12M",
         }
         for horizon in horizons:
             horizon_months = int(horizon)
