@@ -13,7 +13,7 @@
       "components": [
         {"component_id": "benchmark_momentum", "weight": 0.45},
         {"component_id": "vehicle_confirmation", "weight": 0.35},
-        {"component_id": "data_completeness", "weight": 0.0}
+        {"component_id": "data_completeness", "weight": 0.20, "transform": "zero", "note": "neutral anchor toward 0; completeness no longer moves the return"}
       ],
       "forecast_bounds": {"minimum_annual_return": -0.35, "maximum_annual_return": 0.50},
       "confidence_policy": {
