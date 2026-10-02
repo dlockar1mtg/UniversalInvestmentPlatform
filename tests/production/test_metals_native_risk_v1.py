@@ -170,7 +170,11 @@ def test_missing_collected_at_fails_closed():
 
 def test_builder_produces_one_vehicle_row_per_series(tmp_path, monkeypatch):
     module = _load_module()
-    tickers = ["BIL", "COPX", "CPER", "GLD", "IAU", "PPLT", "SGOL", "SIVR", "SLV", "URA", "URNM"]
+    # One series per enabled registered vehicle (the builder expects the registry universe).
+    registry = json.loads(
+        (Path(__file__).resolve().parents[2] / "config" / "metals" / "vehicles.json").read_text(encoding="utf-8-sig")
+    )
+    tickers = sorted(row["ticker"] for row in registry["vehicles"] if row.get("enabled", True))
     history_path = tmp_path / "metals_price_history.csv"
     fieldnames = [
         "asset_id", "ticker", "observation_date", "close_usd", "adjusted_close_usd",
@@ -225,14 +229,14 @@ def test_builder_produces_one_vehicle_row_per_series(tmp_path, monkeypatch):
     assert module.main() == 0
     output_rows = list(csv.DictReader((output_root / "risk.csv").open(encoding="utf-8")))
     manifest = json.loads((output_root / "manifest.json").read_text(encoding="utf-8"))
-    assert len(output_rows) == 11
+    assert len(output_rows) == len(tickers)
     assert {row["ticker"] for row in output_rows} == set(tickers)
     assert manifest["status"] == "METALS_NATIVE_RISK_V1_PASS"
     assert manifest["methodology_version"] == "1.0.2"
     assert manifest["legacy_equivalent"] is False
-    assert manifest["row_count"] == 11
+    assert manifest["row_count"] == len(tickers)
     assert manifest["raw_source_history_row_count"] == len(rows)
-    assert manifest["canonical_unique_date_observation_count"] == 11 * 252
+    assert manifest["canonical_unique_date_observation_count"] == len(tickers) * 252
     assert manifest["duplicate_source_rows_collapsed"] == 1
     assert manifest["superseded_conflicting_revision_rows"] == 1
     assert manifest["same_date_multi_source_method"] == "LATEST_COLLECTED_REVISION_WINS"
