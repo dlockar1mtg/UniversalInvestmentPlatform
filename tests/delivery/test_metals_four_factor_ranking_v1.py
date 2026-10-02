@@ -21,7 +21,7 @@ def test_ranking_rehearsal_pins_governed_methodology_and_exact_universe():
     # The ranking universe comes from the vehicle registry, not a hard-coded set.
     assert "EXPECTED = set(_registered_tickers())" in text
     assert '"config" / "metals" / "vehicles.json"' in text
-    assert 'methodology_version") != "1.2.0"' in text
+    assert 'methodology_version") != "1.3.0"' in text
     assert "ranking_authority" in text
     assert "spread_evidence_certified" in text
     assert "adv_evidence_complete" in text
@@ -43,7 +43,7 @@ def test_tie_break_is_deterministic_and_matches_governed_order():
 
 def test_governed_normalization_contract_matches_rehearsal_math():
     config = json.loads(CONFIG.read_text(encoding="utf-8"))
-    assert config["methodology_version"] == "1.2.0"
+    assert config["methodology_version"] == "1.3.0"
     assert config["normalization"]["comparison_scope"] == "WITHIN_SAME_COMMODITY_GROUP_ONLY"
     assert config["normalization"]["single_vehicle_group_policy"] == "DO_NOT_RANK_LABEL_ONLY_REGISTERED_IMPLEMENTATION"
     assert config["normalization"]["missing_required_input_policy"] == "FAIL_CLOSED"
