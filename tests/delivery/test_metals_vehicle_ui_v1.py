@@ -82,7 +82,7 @@ def test_vehicle_ui_renders_governed_commodity_forecast_evidence():
     assert "uip_native_benchmark_momentum" in text
     assert "uip_native_vehicle_confirmation" in text
     assert "uip_native_data_completeness_adjustment" in text
-    assert "Certified forecast evidence" in text
+    assert "Forecast evidence" in text
     assert "Benchmark momentum" in text
     assert "Vehicle confirmation" in text
     assert "Neutral anchor (toward 0)" in text
