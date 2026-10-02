@@ -10,8 +10,14 @@ WORKFLOW = ROOT / ".github" / "workflows" / "metals-vehicle-cost-evidence-v1-reh
 def test_snapshot_covers_exact_vehicle_universe_and_costs_are_complete():
     doc = json.loads(SNAPSHOT.read_text(encoding="utf-8"))
     rows = {row["ticker"]: row for row in doc["vehicles"]}
-    assert set(rows) == {"GLD","IAU","SGOL","SLV","SIVR","PPLT","CPER","COPX","URA","URNM"}
-    assert len(rows) == 10
+    registry = json.loads((SNAPSHOT.parents[1] / "metals" / "vehicles.json").read_text(encoding="utf-8"))
+    registered = {
+        row["ticker"]
+        for row in registry["vehicles"]
+        if row.get("enabled", True) and row.get("role") != "reserve"
+    }
+    # Cost evidence covers exactly the registered implementation vehicles.
+    assert set(rows) == registered
     assert all(row["status"] == "CERTIFIED_SOURCE_OBSERVED" for row in rows.values())
     assert rows["CPER"]["expense_ratio_pct"] == 0.88
     assert rows["CPER"]["management_fee_pct"] == 0.65
