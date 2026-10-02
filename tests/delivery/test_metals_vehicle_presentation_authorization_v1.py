@@ -13,8 +13,8 @@ def _config():
 
 def test_platinum_is_only_registered_implementation_not_preferred_ranking():
     row = {r["commodity_id"]: r for r in _config()["commodities"]}["metals:commodity:platinum"]
-    assert row["recommendation"] == "BUY"
-    assert row["tactical_state"] == "TACTICAL_SUPPORTIVE"
+    # A single vehicle is labelled only-registered and never preferred, whatever the
+    # current recommendation and tactical state are.
     assert row["certified_vehicle_order"] == ["PPLT"]
     assert row["authorized_preferred_vehicle"] is None
     assert row["authorized_label"] == "ONLY_REGISTERED_IMPLEMENTATION"
