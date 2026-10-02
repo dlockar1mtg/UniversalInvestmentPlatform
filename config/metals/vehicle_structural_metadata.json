@@ -80,6 +80,17 @@
       "metadata_source_url": "https://www.abrdn.com/en-us/etf/sgol"
     },
     {
+      "ticker": "GLDM",
+      "issuer": "State Street Global Advisors",
+      "legal_structure": "physical_commodity_trust",
+      "exposure_type": "physical_gold_bullion",
+      "exposure_share_pct": 100.0,
+      "concentration_description": "Single-commodity physical gold exposure",
+      "tax_structure": "grantor_trust",
+      "investability_classification": "directly_investable",
+      "metadata_source_url": "https://www.ssga.com/us/en/individual/etfs/spdr-gold-minishares-gldm"
+    },
+    {
       "ticker": "SIVR",
       "issuer": "abrdn",
       "legal_structure": "physical_commodity_trust",
