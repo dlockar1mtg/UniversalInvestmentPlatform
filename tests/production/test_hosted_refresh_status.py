@@ -58,7 +58,8 @@ def test_refresh_status_combines_active_authority_with_locked_cadence():
     )
     assert document["status"] == "HEALTHY"
     assert document["freshness_status"] == "REVIEW"
-    assert document["freshness_review_count"] == 2
+    # Only MTG (no data-as-of date); monthly Metals data at 52 days is current.
+    assert document["freshness_review_count"] == 1
     assert document["refresh_execution_owner"] == "GITHUB_ACTIONS_SOURCE_OWNED"
     assert document["manual_dispatch_available"] is False
     assert document["lifecycle"] == [
@@ -77,7 +78,8 @@ def test_refresh_status_combines_active_authority_with_locked_cadence():
     assert by_domain["crypto"]["freshness_state"] == "CURRENT"
     assert by_domain["crypto"]["freshness_max_age_days"] == 2
     assert by_domain["metals"]["data_age_days"] == 52
-    assert by_domain["metals"]["freshness_state"] == "STALE"
+    assert by_domain["metals"]["freshness_state"] == "CURRENT"
+    assert by_domain["metals"]["freshness_max_age_days"] == 75
     assert by_domain["mtg"]["freshness_state"] == "UNKNOWN"
     assert by_domain["mtg"]["data_age_days"] is None
     assert by_domain["mtg"]["data_as_of"] is None
