@@ -20,9 +20,9 @@ ADAPTER_CONFIG = Path("exchange/metals/config/adapter_config.json")
 def test_registry_loads_complete_canonical_universe() -> None:
     registry = load_metals_registry()
     assert len(registry.assets) == 10
-    assert len(registry.vehicles) == 11
+    assert len(registry.vehicles) == 12
     assert len(registry.assets_by_id) == 10
-    assert len(registry.vehicles_by_ticker) == 11
+    assert len(registry.vehicles_by_ticker) == 12
     assert {"GLD", "IAU", "SGOL", "SLV", "CPER", "URA", "BIL"} <= set(
         registry.vehicles_by_ticker
     )
@@ -55,7 +55,7 @@ def test_vehicle_underlyings_and_benchmarks_resolve() -> None:
 def test_legacy_vehicle_universe_is_preserved() -> None:
     registry = load_metals_registry()
     assert set(registry.vehicles_by_ticker) == {
-        "GLD", "IAU", "SGOL", "SLV", "SIVR", "PPLT",
+        "GLD", "IAU", "SGOL", "GLDM", "SLV", "SIVR", "PPLT",
         "CPER", "COPX", "URA", "URNM", "BIL",
     }
     assert registry.vehicles_by_ticker["BIL"].role == "reserve"

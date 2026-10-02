@@ -6,6 +6,7 @@ GLD,0.4,130053275648.0,6958793.0,0.137007,2026-07-25,issuer expense ratio + Yaho
 IAU,0.25,60138172416.0,6033604.0,0.078678,2026-07-25,issuer expense ratio + Yahoo Finance market data,https://www.ishares.com/us/products/239561/ishares-gold-trust-fund
 PPLT,0.6,1773133312.0,2443453.0,0.138793,2026-07-25,issuer expense ratio + Yahoo Finance market data,https://www.abrdn.com/en-us/etf/pplt
 SGOL,0.17,6743476736.0,2493217.0,0.02591,2026-07-25,issuer expense ratio + Yahoo Finance market data,https://www.abrdn.com/en-us/etf/sgol
+GLDM,0.1,27370000000.0,4426661.0,0.012,2026-08-27,issuer expense ratio + Yahoo Finance market data (spread provisional: one-cent quote at ~$84; replaced by the metadata collector),https://www.ssga.com/us/en/individual/etfs/spdr-gold-minishares-gldm
 SIVR,0.3,3950569728.0,1348456.0,0.962849,2026-07-25,issuer expense ratio + Yahoo Finance market data,https://www.abrdn.com/en-us/etf/sivr
 SLV,0.5,28194189312.0,20620854.0,0.0,2026-07-25,issuer expense ratio + Yahoo Finance market data,https://www.ishares.com/us/products/239855/ishares-silver-trust-fund
 URA,0.69,5997526528.0,3622861.0,0.525723,2026-07-25,issuer expense ratio + Yahoo Finance market data,https://www.globalxetfs.com/funds/ura
