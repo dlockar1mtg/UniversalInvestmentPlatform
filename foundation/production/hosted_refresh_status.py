@@ -95,7 +95,12 @@ def _age_days(value: object, now: datetime) -> int | None:
 
 
 def _freshness_classification(age_days: int | None, config: dict) -> tuple[str, int | None, str]:
-    if config.get("daily_schedule_utc"):
+    if str(config.get("source_data_cadence", "")).upper() == "MONTHLY":
+        # Monthly sources (World Bank) are dated the 1st and published about a month
+        # later, so the newest month is normally 30-65 days old.
+        max_age_days = 75
+        policy = "MONTHLY_SOURCE_CADENCE_PLUS_PUBLICATION_LAG"
+    elif config.get("daily_schedule_utc"):
         max_age_days = 2
         policy = "DAILY_CADENCE_PLUS_ONE_DAY_GRACE"
     elif config.get("weekly_full_refresh_schedule_utc"):
