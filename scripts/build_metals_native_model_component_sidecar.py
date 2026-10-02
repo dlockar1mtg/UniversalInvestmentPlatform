@@ -24,6 +24,9 @@ def transform(value: float, expression: str) -> float:
         return value
     if expression == "(value - 0.5) * 0.10":
         return (value - 0.5) * 0.10
+    if expression == "zero":
+        # Neutral anchor: the weight pulls the forecast toward 0 and contributes nothing.
+        return 0.0
     raise RuntimeError(f"unsupported governed component transform: {expression}")
 
 
