@@ -1,0 +1,66 @@
+name: Metals Vehicle History Backfill
+
+# Manually load daily price history for newly registered Metals vehicles, so their
+# risk and liquidity evidence is meaningful from the first run. Shares the Metals
+# production concurrency group, so it never writes while the daily cycle runs.
+on:
+  workflow_dispatch:
+    inputs:
+      tickers:
+        description: Comma-separated tickers enabled in config/metals/vehicles.json (e.g. GLDM)
+        required: true
+        type: string
+      period:
+        description: History period to fetch (yfinance), e.g. 3y
+        required: false
+        default: 3y
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: uiip-metals-production-cycle
+  cancel-in-progress: false
+
+jobs:
+  backfill:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    environment: staging
+    env:
+      UIIP_DATABASE_URL: ${{ secrets.UIIP_DATABASE_URL }}
+      BACKFILL_TICKERS: ${{ inputs.tickers }}
+      BACKFILL_PERIOD: ${{ inputs.period }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.14"
+          cache: pip
+      - name: Install dependencies
+        run: >-
+          pip install
+          -r requirements.txt
+          -r requirements/phase_7_3.txt
+          -r requirements/metals_production.txt
+      - name: Validate required secrets
+        run: python -c "import os; assert os.environ.get('UIIP_DATABASE_URL')"
+      - name: Fetch vehicle history
+        run: >-
+          python scripts/backfill_metals_vehicle_history.py
+          --tickers "$BACKFILL_TICKERS"
+          --period "$BACKFILL_PERIOD"
+          --output data/operations/metals/vehicle_history_backfill.csv
+      - name: Ingest vehicle history
+        run: >-
+          python scripts/ingest_metals_native_observations.py
+          --vehicle data/operations/metals/vehicle_history_backfill.csv
+          --run-id "backfill-${{ github.run_id }}"
+          --strict
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: metals-vehicle-history-backfill-${{ github.run_id }}
+          path: data/operations/metals/vehicle_history_backfill.csv
+          if-no-files-found: ignore
