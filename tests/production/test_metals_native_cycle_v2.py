@@ -187,3 +187,38 @@ def test_recommendation_uses_the_confidence_adjusted_return():
     assert components["recommendation_basis"] == "CONFIDENCE_ADJUSTED_12M"
     expected = "BUY" if adjusted >= 0.06 else ("HOLD" if adjusted >= -0.02 else "REDUCE")
     assert adjusted < 0.12 and forecast.recommendation == expected
+
+
+def test_risk_profile_and_ranges_come_from_the_metal_history():
+    import math
+
+    history = [
+        NativeObservation("gold", row.observation_date, 1000.0 * (1.006 ** i) * (1 + 0.06 * math.sin(i / 2.0)), "history")
+        for i, row in enumerate(_monthly("gold", 2000, 320, 1.0, 0.0))
+    ]
+    recent = [NativeObservation("GOLD", "2026-09-01", history[-1].value * 1.01, "wb")]
+    report = evaluate_native_cycle(recent, [], _methodology(), history_observations=history)
+    twelve, twelve_c = _components(report, "GOLD", 12)
+    sixty, sixty_c = _components(report, "GOLD", 60)
+    risk = twelve_c["risk"]
+    assert risk["risk_level"] in {"low", "medium", "high", "extreme"}
+    assert 0 <= risk["risk_score"] <= 100
+    assert risk["annualized_volatility"] > 0
+    assert risk["maximum_drawdown"] <= 0 and risk["value_at_risk_95"] < 0
+    assert 0 < twelve_c["bear_value"] < twelve.projected_value < twelve_c["bull_value"]
+    assert 0 <= twelve_c["probability_positive_return"] <= 1
+    assert twelve_c["range_basis"] == "HISTORICAL_HORIZON_RETURNS_P10_P90"
+    # Longer horizons have a wider historical spread.
+    assert (sixty_c["bull_value"] - sixty_c["bear_value"]) > (twelve_c["bull_value"] - twelve_c["bear_value"])
+
+
+def test_no_range_or_risk_without_enough_history():
+    recent = [
+        NativeObservation("URANIUM", "2026-06-01", 70.0, "eia"),
+        NativeObservation("URANIUM", "2026-08-01", 90.0, "eia"),
+    ]
+    report = evaluate_native_cycle(recent, [], _methodology())
+    _, components = _components(report, "URANIUM")
+    assert components["bear_value"] is None and components["bull_value"] is None
+    assert components["probability_positive_return"] is None
+    assert components["risk"] is None

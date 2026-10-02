@@ -76,6 +76,12 @@ CONTRACT_TO_HISTORY_ALIASES = {
         "message": "status_message",
         "last_successful_run_at_utc": "run_completed_at_utc",
     },
+    "risk_metrics": {
+        "annualized_volatility": "volatility",
+        "downside_deviation": "downside_volatility",
+        "value_at_risk_95": "value_at_risk",
+        "risk_notes": "notes",
+    },
 }
 
 

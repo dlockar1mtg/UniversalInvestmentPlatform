@@ -18,6 +18,9 @@ Model (v2):
   extrapolations with reduced confidence.
 - A metal with less than a year of history gets a zero return, minimum
   confidence and HOLD.
+- Each forecast carries a bear/bull range (historical 10th-90th percentile of
+  returns over that horizon, re-centred on the forecast) and the probability of
+  a positive return; each metal carries a risk profile from its monthly history.
 """
 from __future__ import annotations
 
@@ -185,6 +188,86 @@ def _directional_backtest(points: Sequence[tuple[date, float]], lookback_months:
     return hits, samples
 
 
+def _quantile(sorted_values: Sequence[float], q: float) -> float:
+    """Linear-interpolated quantile of an already sorted list."""
+    position = (len(sorted_values) - 1) * q
+    lower = int(math.floor(position))
+    upper = min(lower + 1, len(sorted_values) - 1)
+    weight = position - lower
+    return sorted_values[lower] * (1.0 - weight) + sorted_values[upper] * weight
+
+
+def _risk_profile(
+    points: Sequence[tuple[date, float]], lookback_months: int, minimum_samples: int
+) -> dict[str, object] | None:
+    """Risk of the benchmark itself from its monthly history over the lookback."""
+    start = _months_back(points[-1][0], lookback_months)
+    returns: list[float] = []
+    for (previous_date, previous), (current_date, value) in zip(points, points[1:]):
+        if current_date < start or previous <= 0 or value <= 0:
+            continue
+        if (current_date - previous_date).days > 45:
+            continue
+        returns.append(value / previous - 1.0)
+    if len(returns) < max(minimum_samples, 2):
+        return None
+    average = math.fsum(returns) / len(returns)
+    volatility = math.sqrt(math.fsum((r - average) ** 2 for r in returns) / (len(returns) - 1)) * math.sqrt(12)
+    downside = math.sqrt(math.fsum(min(r, 0.0) ** 2 for r in returns) / len(returns)) * math.sqrt(12)
+    window = [value for point_date, value in points if point_date >= start and value > 0]
+    peak = window[0]
+    drawdown = 0.0
+    for value in window:
+        peak = max(peak, value)
+        drawdown = min(drawdown, value / peak - 1.0)
+    ordered = sorted(returns)
+    var_95 = _quantile(ordered, 0.05)
+    tail = [r for r in returns if r <= var_95]
+    if volatility < 0.15:
+        level = "low"
+    elif volatility < 0.30:
+        level = "medium"
+    elif volatility < 0.50:
+        level = "high"
+    else:
+        level = "extreme"
+    return {
+        "annualized_volatility": round(volatility, 8),
+        "downside_deviation": round(downside, 8),
+        "maximum_drawdown": round(drawdown, 8),
+        "value_at_risk_95": round(var_95, 8),
+        "expected_shortfall_95": round(math.fsum(tail) / len(tail), 8),
+        "risk_level": level,
+        "risk_score": round(min(100.0, volatility / 0.60 * 100.0), 2),
+        "lookback_months": lookback_months,
+        "return_observations": len(returns),
+        "basis": "MONTHLY_BENCHMARK_HISTORY",
+    }
+
+
+def _horizon_band(
+    points: Sequence[tuple[date, float]], horizon_months: int, lookback_months: int, minimum_samples: int
+) -> list[float] | None:
+    """Sorted historical returns over the horizon, from overlapping monthly start points."""
+    dates = [point_date for point_date, _ in points]
+    start = _months_back(dates[-1], lookback_months)
+    returns: list[float] = []
+    for i, (point_date, value) in enumerate(points):
+        if point_date < start or value <= 0:
+            continue
+        target = _months_back(point_date, -horizon_months)
+        j = bisect_right(dates, target - timedelta(days=1))
+        if j >= len(points):
+            break
+        end_date, end_value = points[j]
+        if (end_date - target).days > 45 or end_value <= 0:
+            continue
+        returns.append(end_value / value - 1.0)
+    if len(returns) < minimum_samples:
+        return None
+    return sorted(returns)
+
+
 def _key(asset_id: str) -> str:
     return str(asset_id).split(":")[-1].upper()
 
@@ -299,6 +382,7 @@ def evaluate_native_cycle(
             "backtest_hit_rate": hit_rate,
             "confidence_adjusted_return": confidence_adjusted_return,
             "recommendation_basis": "CONFIDENCE_ADJUSTED_12M",
+            "risk": _risk_profile(points, lookback, minimum_samples) if sufficient_history else None,
         }
         for horizon in horizons:
             horizon_months = int(horizon)
@@ -311,6 +395,21 @@ def evaluate_native_cycle(
                 horizon_confidence = _bounded(confidence * long_factor, minimum_confidence, maximum_confidence)
             else:
                 components["horizon_basis"] = "MODEL_12M"
+            band = _horizon_band(points, horizon_months, lookback, minimum_samples) if sufficient_history else None
+            if band is None:
+                components["bear_value"] = None
+                components["bull_value"] = None
+                components["probability_positive_return"] = None
+            else:
+                # The historical spread of this metal's returns over the horizon,
+                # re-centred on the model's expected return (10th to 90th percentile).
+                q10, q50, q90 = _quantile(band, 0.10), _quantile(band, 0.50), _quantile(band, 0.90)
+                components["bear_value"] = round(max(0.0, current * (1.0 + expected_return + q10 - q50)), 8)
+                components["bull_value"] = round(current * (1.0 + expected_return + q90 - q50), 8)
+                components["probability_positive_return"] = round(
+                    sum(1 for r in band if r - q50 + expected_return > 0) / len(band), 8
+                )
+                components["range_basis"] = "HISTORICAL_HORIZON_RETURNS_P10_P90"
             forecasts.append(
                 NativeForecast(
                     asset_id=source_asset_id,
