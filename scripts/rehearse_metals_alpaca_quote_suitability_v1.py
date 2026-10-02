@@ -10,7 +10,20 @@ from datetime import date, datetime, time as dt_time, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
-TICKERS = ("GLD", "IAU", "SGOL", "SLV", "SIVR", "PPLT", "CPER", "COPX", "URA", "URNM")
+_VEHICLE_REGISTRY_PATH = Path(__file__).resolve().parents[1] / "config" / "metals" / "vehicles.json"
+
+
+def _registered_tickers() -> tuple[str, ...]:
+    """Enabled, non-reserve Metals implementation vehicles, in registry order."""
+    registry = json.loads(_VEHICLE_REGISTRY_PATH.read_text(encoding="utf-8-sig"))
+    return tuple(
+        str(row["ticker"]).upper()
+        for row in registry.get("vehicles", [])
+        if row.get("enabled", True) and row.get("role") != "reserve"
+    )
+
+
+TICKERS = _registered_tickers()
 BASE_URL = "https://data.alpaca.markets/v2/stocks"
 NY = ZoneInfo("America/New_York")
 MIN_SESSIONS = 20
