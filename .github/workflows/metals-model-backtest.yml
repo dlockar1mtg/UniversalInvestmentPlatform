@@ -56,9 +56,16 @@ jobs:
           history_csv="$(find _metals_artifact -type f -name commodity_benchmark_history.csv | head -n 1)"
           test -n "$history_csv"
           python scripts/backtest_metals_native_model.py --history "$history_csv" --start "$BACKTEST_START" --output-dir data/operations/metals/backtest
+      - name: Signal research (in-sample 1980-2005, out-of-sample 2006 onward)
+        run: |
+          set -euo pipefail
+          history_csv="$(find _metals_artifact -type f -name commodity_benchmark_history.csv | head -n 1)"
+          python scripts/research_metals_signals.py --history "$history_csv" --output-dir data/operations/metals/signal_research
       - uses: actions/upload-artifact@v4
         if: always()
         with:
           name: metals-model-backtest-${{ github.run_id }}
-          path: data/operations/metals/backtest/
+          path: |
+            data/operations/metals/backtest/
+            data/operations/metals/signal_research/
           if-no-files-found: ignore
