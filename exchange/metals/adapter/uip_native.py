@@ -30,6 +30,29 @@ class NativePackageResult:
         return asdict(self)
 
 
+def _descriptive_columns(components: dict[str, object]) -> dict[str, object]:
+    """Valuation, trend and the historical 12-month range as extra forecast columns.
+
+    The importer keeps columns outside the forecast contract in metadata_json
+    (unmapped_contract_fields), which is how they reach the dashboard without a
+    contract change. Every row gets every key, blank when not available.
+    """
+    descriptive = components.get("descriptive") if isinstance(components, dict) else None
+    descriptive = descriptive if isinstance(descriptive, dict) else {}
+    valuation = descriptive.get("valuation") or {}
+    trend = descriptive.get("trend") or {}
+    band = descriptive.get("historical_12m_returns") or {}
+    return {
+        "valuation_gap_10y": valuation.get("gap", ""),
+        "valuation_state": valuation.get("state", ""),
+        "trend_gap_12m": trend.get("gap", ""),
+        "trend_state": trend.get("state", ""),
+        "historical_12m_return_p10": band.get("p10", ""),
+        "historical_12m_return_p50": band.get("p50", ""),
+        "historical_12m_return_p90": band.get("p90", ""),
+        "historical_12m_return_samples": band.get("samples", ""),
+    }
+
 def _sha256(path: Path) -> str:
     digest = hashlib.sha256()
     with path.open("rb") as handle:
@@ -171,6 +194,7 @@ def publish_uip_native_metals_package(
             "forecast_horizon_months": row["horizon_months"],
             "forecast_date": _add_months(str(row["as_of_date"]), int(row["horizon_months"])),
             "current_value": row["current_value"],
+            **_descriptive_columns(components),
             "forecast_value_base": row["projected_value"],
             "forecast_value_bear": "" if components.get("bear_value") is None else components["bear_value"],
             "forecast_value_bull": "" if components.get("bull_value") is None else components["bull_value"],
