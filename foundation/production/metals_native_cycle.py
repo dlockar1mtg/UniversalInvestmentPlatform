@@ -268,6 +268,82 @@ def _horizon_band(
     return sorted(returns)
 
 
+VALUATION_WINDOW_MONTHS = 120
+TREND_WINDOW_MONTHS = 12
+HISTORICAL_RANGE_MONTHS = 240
+
+
+def _month_index(day: date) -> int:
+    return day.year * 12 + day.month - 1
+
+
+def _monthly_closes(points: Sequence[tuple[date, float]]) -> dict[int, float]:
+    """Last positive observation in each calendar month (daily data collapses to one value)."""
+    closes: dict[int, float] = {}
+    for day, value in points:
+        if value > 0:
+            closes[_month_index(day)] = value
+    return closes
+
+
+def _window(closes: Mapping[int, float], end: int, months: int, minimum_share: float) -> list[float] | None:
+    values = [closes[m] for m in range(end - months + 1, end + 1) if m in closes]
+    return values if len(values) >= math.ceil(months * minimum_share) else None
+
+
+def _descriptive_indicators(
+    points: Sequence[tuple[date, float]], minimum_samples: int
+) -> dict[str, object]:
+    """Descriptive context shown instead of calls: valuation, trend and the historical 12-month range.
+
+    Definitions match the out-of-sample signal research (scripts/research_metals_signals.py):
+    valuation = latest price vs the geometric average of the last 10 years of month-end prices;
+    trend = latest price vs the average of the last 12 month-end prices. Neither is a forecast.
+    Each needs genuinely monthly history; annual-only series report None.
+    """
+    closes = _monthly_closes(points)
+    latest_value = points[-1][1] if points else 0.0
+    if not closes or latest_value <= 0:
+        return {"valuation": None, "trend": None, "historical_12m_returns": None}
+    end = max(closes)
+    descriptive: dict[str, object] = {"valuation": None, "trend": None, "historical_12m_returns": None}
+    decade = _window(closes, end, VALUATION_WINDOW_MONTHS, 0.9)
+    if decade:
+        log_average = sum(math.log(v) for v in decade) / len(decade)
+        gap = math.exp(math.log(latest_value) - log_average) - 1.0
+        descriptive["valuation"] = {
+            "basis": "PRICE_VS_10Y_GEOMETRIC_AVERAGE",
+            "window_months": VALUATION_WINDOW_MONTHS,
+            "months_used": len(decade),
+            "gap": gap,
+            "state": "BELOW_LONG_RUN_AVERAGE" if gap < 0 else "ABOVE_LONG_RUN_AVERAGE",
+        }
+    year = _window(closes, end, TREND_WINDOW_MONTHS, 11 / 12)
+    if year:
+        gap = latest_value / (sum(year) / len(year)) - 1.0
+        descriptive["trend"] = {
+            "basis": "PRICE_VS_12M_AVERAGE",
+            "window_months": TREND_WINDOW_MONTHS,
+            "gap": gap,
+            "state": "ABOVE_TREND" if gap > 0 else "BELOW_TREND",
+        }
+    returns = sorted(
+        closes[m] / closes[m - 12] - 1.0
+        for m in range(end - HISTORICAL_RANGE_MONTHS + 1, end + 1)
+        if m in closes and (m - 12) in closes
+    )
+    if len(returns) >= minimum_samples:
+        descriptive["historical_12m_returns"] = {
+            "basis": "TRAILING_12M_RETURNS_NOT_A_FORECAST",
+            "window_months": HISTORICAL_RANGE_MONTHS,
+            "samples": len(returns),
+            "p10": _quantile(returns, 0.10),
+            "p50": _quantile(returns, 0.50),
+            "p90": _quantile(returns, 0.90),
+        }
+    return descriptive
+
+
 def _key(asset_id: str) -> str:
     return str(asset_id).split(":")[-1].upper()
 
@@ -383,6 +459,8 @@ def evaluate_native_cycle(
             "confidence_adjusted_return": confidence_adjusted_return,
             "recommendation_basis": "CONFIDENCE_ADJUSTED_12M",
             "risk": _risk_profile(points, lookback, minimum_samples) if sufficient_history else None,
+            # Valuation, trend and the historical 12-month range: shown instead of calls (#217, #219).
+            "descriptive": _descriptive_indicators(points, minimum_samples),
         }
         for horizon in horizons:
             horizon_months = int(horizon)
