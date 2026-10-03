@@ -99,3 +99,10 @@
 
 /* Metals model validation note (inserted by dashboard.js next to Metals calls). */
 .metals-model-note{margin:0 0 14px;padding:10px 14px;border:1px solid rgba(230,180,80,.45);border-left:4px solid #e6b450;border-radius:10px;background:rgba(230,180,80,.08);color:inherit;font-size:13px;line-height:1.5}
+
+/* Metals descriptive panel: valuation, trend and a typical year (no rating). */
+.metals-descriptive-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:10px 0}
+.metals-descriptive-grid>div{padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.02)}
+.metals-descriptive-grid span{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.7}
+.metals-descriptive-grid strong{display:block;margin:6px 0;font-size:16px}
+.metals-descriptive-grid p{margin:0;font-size:12.5px;line-height:1.45;opacity:.85}

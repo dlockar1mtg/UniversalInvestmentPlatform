@@ -67,7 +67,7 @@ function scoreMetric(label,value,weight){return `<div class="metals-vehicle-metr
 function evidenceMetric(label,value){return `<div class="metals-vehicle-metric"><span>${escapeHtml(label)}</span><strong>${escapeHtml(value)}</strong></div>`;}
 
 function card(row){
-  const preferred=row.presentation_label===PREFERRED_LABEL;const only=row.presentation_label===ONLY_LABEL;const official=validatedUrl(row.official_url);const label=preferred?"Preferred implementation candidate":only?"Only registered implementation":null;const className=preferred?" is-preferred":only?" is-only":"";const w=row.ranking_weights||{};
+  const preferred=row.presentation_label===PREFERRED_LABEL;const only=row.presentation_label===ONLY_LABEL;const official=validatedUrl(row.official_url);const label=only?"Only registered implementation":Number(row.certified_rank_within_commodity)===1?"Lowest cost to hold":null;const className=preferred?" is-preferred":only?" is-only":"";const w=row.ranking_weights||{};
   const indirect=["miners_etf","thematic_equity_etf"].includes(String(row.vehicle_type||""));
   const scoreText=only?"Not competitively scored":fmtNumber(row.certified_implementation_score,2);
   return `<article class="metals-vehicle-card${className}">
@@ -165,7 +165,7 @@ function renderResearchEvidence(detail,assetId){
 
 async function loadAndRender(assetId){
   const serial=++requestSerial;const key=sessionStorage.getItem("uiip-dashboard-key")||"";if(!key||!assetId)return;
-  try{const response=await fetch(`/v1/presentation/assets/metals/${encodeURIComponent(assetId)}`,{headers:{"X-API-Key":key,"Accept":"application/json"}});if(!response.ok)return;const detail=await response.json();if(serial!==requestSerial||lastMetalsAssetId!==assetId)return;renderPanel(detail,assetId);renderResearchEvidence(detail,assetId);renderTechnicalContext(detail,assetId);}catch(_){}
+  try{const response=await fetch(`/v1/presentation/assets/metals/${encodeURIComponent(assetId)}`,{headers:{"X-API-Key":key,"Accept":"application/json"}});if(!response.ok)return;const detail=await response.json();if(serial!==requestSerial||lastMetalsAssetId!==assetId)return;renderPanel(detail,assetId);/* Forecast evidence retired: Metals are described, not rated (#217, #219). */renderTechnicalContext(detail,assetId);}catch(_){}
 }
 function maybeRender(){if(!lastMetalsAssetId)return;const detail=document.querySelector("#recommendations .rec-detail .metals-hero");if(!detail)return;const hasVehicles=document.querySelector("#recommendations .metals-vehicle-panel");const hasResearch=document.querySelector("#recommendations .metals-research-evidence-panel");const hasTechnical=document.querySelector("#recommendations .metals-technical-context-panel");if(hasVehicles&&hasResearch&&hasTechnical)return;loadAndRender(lastMetalsAssetId);}
 document.addEventListener("click",event=>{const button=event.target.closest?.(".rec-metals-detail");if(button?.dataset?.assetId){lastMetalsAssetId=button.dataset.assetId;setTimeout(maybeRender,0);}const back=event.target.closest?.("#rec-back-metals");if(back){lastMetalsAssetId=null;requestSerial+=1;}},true);
