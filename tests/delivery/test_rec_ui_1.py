@@ -146,9 +146,10 @@ def test_rec_ui_metals_final_action_is_primary_while_native_domain_semantics_rem
         'item.domain_id==="mtg"?(payload.native_purchase_status??null):(payload.native_recommendation??payload.recommendation??null)'
         in javascript
     )
-    assert 'const native=cleanStatus(nativeStatus(item));' in javascript
+    # Metals cards are descriptive: no rating or native recommendation (#217, #219).
+    assert '<span class="metals-status">Not rated</span>' in javascript
     assert '<td>${escapeHtml(cleanStatus(nativeStatus(item)))}</td>' in javascript
-    assert '<div><span>Native recommendation</span><p>${escapeHtml(cleanStatus(nativeStatus(item)))}</p></div>' in javascript
+    assert "function metalsDescriptive(detail)" in javascript
     assert javascript.count("displayStatus(") >= 3
 
 def test_rec_ui_metals_premium_research_implementation_contract():
@@ -161,7 +162,8 @@ def test_rec_ui_metals_premium_research_implementation_contract():
 
     assert "[3,6,12,24].includes(Number(row.forecast_horizon_months))" in javascript
     assert 'Number(row.forecast_horizon_months)===24' in javascript
-    assert "Forecast authority unavailable for this asset. No missing forecast is synthesized." in javascript
+    # The forecast panel was replaced by the descriptive panel (valuation, trend, typical year).
+    assert "${metalsDescriptivePanel(detail)}" in javascript
 
     assert "The governed final decision is primary. Native recommendation, forecast, and risk remain supporting evidence." in javascript
     assert "<th>Final decision</th><th>Native recommendation</th>" in javascript
@@ -183,7 +185,7 @@ def test_rec_ui_metals_premium_research_implementation_contract():
     assert 'if(domain==="metals")' in javascript
     assert "await hydrateMetalsResearch()" in javascript
 
-    assert "No missing forecast is synthesized." in javascript
+    assert "What a year has typically looked like" in javascript
     assert "UIP does not manufacture a rank" in javascript
 
 
