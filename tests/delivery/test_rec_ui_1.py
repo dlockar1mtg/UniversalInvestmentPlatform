@@ -146,8 +146,9 @@ def test_rec_ui_metals_final_action_is_primary_while_native_domain_semantics_rem
         'item.domain_id==="mtg"?(payload.native_purchase_status??null):(payload.native_recommendation??payload.recommendation??null)'
         in javascript
     )
-    # Metals cards are descriptive: no rating or native recommendation (#217, #219).
-    assert '<span class="metals-status">Not rated</span>' in javascript
+    # Metals v3.1: ranked leaderboard and decision cards (top three BUY).
+    assert "${metalsLeaderboard(featured)}" in javascript
+    assert "function metalsRanking(items)" in javascript
     assert '<td>${escapeHtml(cleanStatus(nativeStatus(item)))}</td>' in javascript
     assert "function metalsDescriptive(detail)" in javascript
     assert javascript.count("displayStatus(") >= 3
