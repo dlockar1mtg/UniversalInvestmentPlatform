@@ -52,7 +52,7 @@ def test_metals_native_contracts_cover_exactly_eleven_certified_families():
     assert contracts["platform_health"]["expected_rows"] == 1
     assert contracts["model_component"]["expected_rows"] == 81
     assert contracts["risk"]["expected_rows"] == registered
-    assert contracts["recommendation_change"]["minimum_rows"] == 1
+    assert contracts["recommendation_change"]["minimum_rows"] == 0  # no changes is valid
     assert contracts["regime_probability"]["expected_rows"] == 27
     assert contracts["uncertainty_adjusted"]["expected_rows"] == 27
     assert contracts["tactical_state"]["expected_rows"] == 9
