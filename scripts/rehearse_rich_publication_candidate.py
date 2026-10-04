@@ -59,6 +59,11 @@ MTG_RICH_EXPECTED_COUNTS = {
     "mtg_precollector_scenario_horizon": 190,
 }
 
+MTG_OPTIONAL_ENV_PATHS = {
+    "UIP_MTG_SECRET_LAIR_V2_PATH": "data/history/tcgcsv_weekly/secret_lair_v2_decisions.csv",
+    "UIP_MTG_EXPORT_PAYLOAD_PATH": "docs/phase_9/uip_export/mtg_v1_uip_export_payload.csv",
+}
+
 MTG_ENV_PATHS = {
     "UIP_MTG_PREMIUM_SIDECAR_PATH": "docs/phase_9/uip_export/premium_research/mtg_secret_lair_premium_research.csv",
     "UIP_MTG_COLLECTOR_RESEARCH_PATH": "docs/phase_9/uip_export/research_sidecars/mtg_collector_research.csv",
@@ -89,6 +94,15 @@ def configure_mtg_sidecars(mtg_repo: Path) -> dict[str, str]:
             raise RuntimeError(f"Certified MTG rich sidecar is missing: {path}")
         os.environ[env_name] = str(path)
         resolved[env_name] = str(path)
+    # Optional Secret Lair v2 inputs: set only when present, so a missing file falls back to the
+    # certified August research instead of failing publication.
+    for env_name, relative in MTG_OPTIONAL_ENV_PATHS.items():
+        path = (mtg_repo / relative).resolve()
+        if path.is_file():
+            os.environ[env_name] = str(path)
+            resolved[env_name] = str(path)
+        else:
+            os.environ.pop(env_name, None)
     return resolved
 
 
