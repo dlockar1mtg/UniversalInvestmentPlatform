@@ -89,13 +89,13 @@ jobs:
             local runs_json run_json status conclusion event head_sha run_id started_at
             runs_json="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/workflows/${workflow}/runs?per_page=50")"
             printf '%s' "$runs_json" |
-              jq -r --arg key "$key" --arg path ".github/workflows/${workflow}" '[.workflow_runs[] | select(.head_branch == "main") | select(.path == $path)] | sort_by(.run_started_at // .created_at) | reverse | .[0:3][] | "RUN_CANDIDATE domain=\($key) run=\(.id) event=\(.event) status=\(.status) conclusion=\(.conclusion // "") started_at=\(.run_started_at // .created_at)"' || true
+              jq -r --arg key "$key" --arg path ".github/workflows/${workflow}" '[.workflow_runs[] | select(.head_branch == "main") | select(.event != "push") | select(.path == $path)] | sort_by(.run_started_at // .created_at) | reverse | .[0:3][] | "RUN_CANDIDATE domain=\($key) run=\(.id) event=\(.event) status=\(.status) conclusion=\(.conclusion // "") started_at=\(.run_started_at // .created_at)"' || true
             run_json="$(
               printf '%s' "$runs_json" |
                 jq -c --arg path ".github/workflows/${workflow}" '
                   [
                     .workflow_runs[]
-                    | select(.head_branch == "main")
+                    | select(.head_branch == "main") | select(.event != "push")
                     | select(.path == $path)
                     | select(.event == "schedule" or .event == "workflow_dispatch")
                   ]
