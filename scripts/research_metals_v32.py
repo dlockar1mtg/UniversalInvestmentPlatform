@@ -91,8 +91,11 @@ def ols(x_rows, y):
     return [m[i][k] / m[i][i] for i in range(k)]
 
 
-def walk_forward(series, variant, first_start, start, end):
-    """(metal, i) -> (expected, low, high), refitting each January on outcomes known by then."""
+def walk_forward(series, variant, first_start, start, end, per_metal=False):
+    """(metal, i) -> (expected, low, high), refitting each January on outcomes known by then.
+
+    per_metal: each metal's range comes from its own errors under the pooled equation
+    (pooled errors are used while a metal has fewer than 60 known outcomes)."""
     spec = VARIANTS[variant]
     names = spec["features"]
     rows = rows_for(series)
@@ -112,10 +115,17 @@ def walk_forward(series, variant, first_start, start, end):
         coef = ols([vector(r["f"]) for r in known], [r["forward"] for r in known])
         predict = lambda f: coef[0] + sum(c * x for c, x in zip(coef[1:], vector(f)))
         residuals = [r["forward"] - predict(r["f"]) for r in known]
-        low, high = quantile(residuals, RANGE_QUANTILES[0]), quantile(residuals, RANGE_QUANTILES[1])
+        pooled = (quantile(residuals, RANGE_QUANTILES[0]), quantile(residuals, RANGE_QUANTILES[1]))
+        own = {}
+        if per_metal:
+            for metal in series:
+                mine = [r["forward"] - predict(r["f"]) for r in known if r["metal"] == metal]
+                if len(mine) >= 60:
+                    own[metal] = (quantile(mine, RANGE_QUANTILES[0]), quantile(mine, RANGE_QUANTILES[1]))
         for r in rows:
             if r["date"].year == year and start <= r["date"] <= end:
                 e = predict(r["f"])
+                low, high = own.get(r["metal"], pooled)
                 out[(r["metal"], r["i"])] = (e, e + low, e + high)
     return out
 
@@ -148,6 +158,22 @@ def evaluate(series, variant, cash, first_start, start, end):
         "range_coverage": coverage(series, bands),
         "average_range_width": mean(h - l for _, l, h in bands.values()) if bands else None,
     }
+
+
+def range_study(series, first_start, start, end):
+    """v3.1 12-month ranges: pooled errors vs each metal's own errors, coverage and width per metal."""
+    out = {}
+    for label, per_metal in (("pooled", False), ("per_metal", True)):
+        bands = walk_forward(series, "v3.1", first_start, start, end, per_metal=per_metal)
+        by_metal = {}
+        for metal in sorted(series):
+            mine = {k: v for k, v in bands.items() if k[0] == metal}
+            by_metal[metal] = {"coverage": coverage(series, mine),
+                               "width": mean(h - l for _, l, h in mine.values()) if mine else None}
+        covs = [m["coverage"] for m in by_metal.values() if m["coverage"] is not None]
+        out[label] = {"overall_coverage": coverage(series, bands), "by_metal": by_metal,
+                      "worst_metal_gap": max(abs(c - 0.80) for c in covs) if covs else None}
+    return out
 
 
 def decide(results):
@@ -190,6 +216,15 @@ def render(report):
         failed = [k for k, ok in v["checks"].items() if not ok]
         lines.append(f"- {name}: {'PASSES' if v['passes'] else 'fails ' + ', '.join(failed)}")
     lines += ["", f"**Decision: {'adopt ' + report['decision']['adopt'] if report['decision']['adopt'] else 'keep v3.1'}**"]
+    rs = report.get("ranges")
+    if rs:
+        lines += ["", "## v3.1 12-month ranges: pooled vs per-metal errors (target coverage 80%)", "",
+                  f"Overall coverage: pooled {(rs['pooled']['overall_coverage'] or 0) * 100:.0f}%, per-metal {(rs['per_metal']['overall_coverage'] or 0) * 100:.0f}%. "
+                  f"Worst single-metal miss from 80%: pooled {(rs['pooled']['worst_metal_gap'] or 0) * 100:.0f} pts, per-metal {(rs['per_metal']['worst_metal_gap'] or 0) * 100:.0f} pts.", "",
+                  "| Metal | Pooled coverage | Pooled width | Per-metal coverage | Per-metal width |", "|---|---|---|---|---|"]
+        for metal in rs["pooled"]["by_metal"]:
+            p, m = rs["pooled"]["by_metal"][metal], rs["per_metal"]["by_metal"][metal]
+            lines.append(f"| {metal.split(':')[-1]} | {(p['coverage'] or 0) * 100:.0f}% | {_pct(p['width'])} | {(m['coverage'] or 0) * 100:.0f}% | {_pct(m['width'])} |")
     return "\n".join(lines) + "\n"
 
 
@@ -205,7 +240,8 @@ def main(argv=None):
     last = max(points[-1][0] for points in series.values())
     results = {name: evaluate(series, name, cash, args.first_start, args.split, last) for name in VARIANTS}
     report = {"period": [args.split.isoformat(), last.isoformat()], "cash_source": cash_source,
-              "results": results, "decision": decide(results)}
+              "results": results, "decision": decide(results),
+              "ranges": range_study(series, args.first_start, args.split, last)}
     args.output_dir.mkdir(parents=True, exist_ok=True)
     (args.output_dir / "v32_research.json").write_text(json.dumps(report, indent=2, default=str) + "\n", encoding="utf-8")
     markdown = render(report)
