@@ -208,7 +208,9 @@ def test_risk_profile_and_ranges_come_from_the_metal_history():
     assert risk["maximum_drawdown"] <= 0 and risk["value_at_risk_95"] < 0
     assert 0 < twelve_c["bear_value"] < twelve.projected_value < twelve_c["bull_value"]
     assert 0 <= twelve_c["probability_positive_return"] <= 1
-    assert twelve_c["range_basis"] == "HISTORICAL_HORIZON_RETURNS_P10_P90"
+    # 12 months: Metals v3.1 error band (#232); longer horizons keep the historical spread.
+    assert twelve_c["range_basis"] == "V3_1_MODEL_ERRORS_P10_P90"
+    assert sixty_c["range_basis"] == "HISTORICAL_HORIZON_RETURNS_P10_P90"
     # Longer horizons have a wider historical spread.
     assert (sixty_c["bull_value"] - sixty_c["bear_value"]) > (twelve_c["bull_value"] - twelve_c["bear_value"])
 
