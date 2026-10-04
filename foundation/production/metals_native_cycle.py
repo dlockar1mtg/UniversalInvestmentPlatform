@@ -562,7 +562,7 @@ def evaluate_native_cycle(
             "backtest_samples": samples,
             "backtest_hit_rate": hit_rate,
             "confidence_adjusted_return": confidence_adjusted_return,
-            "recommendation_basis": "CONFIDENCE_ADJUSTED_12M",
+            "recommendation_basis": "V3_1_RANK_TOP3" if v3_asset is not None else "CONFIDENCE_ADJUSTED_12M",
             "risk": _risk_profile(points, lookback, minimum_samples) if sufficient_history else None,
             # Valuation, trend and the historical 12-month range: shown instead of calls (#217, #219).
             "descriptive": _descriptive_indicators(points, minimum_samples),
