@@ -176,6 +176,28 @@ def range_study(series, first_start, start, end):
     return out
 
 
+INVESTABLE_DEFAULT = "GOLD,SILVER,PLATINUM,COPPER"
+
+
+def investable_study(series, cash, first_start, start, end, metals):
+    """v3.1 fitted on every metal, decisions only among metals that have a fund in the UIP."""
+    wanted = {m.strip().upper() for m in metals if m.strip()}
+    keys = {k for k in series if k.split(":")[-1].upper() in wanted}
+    if len(keys) < 2:
+        return None
+    bands = walk_forward(series, "v3.1", first_start, start, end)
+    predictions = {k: v[0] for k, v in bands.items() if k[0] in keys}
+    score = v3.score_predictions(series, predictions)
+    top1 = v3.rule_strategies(series, predictions, cash, top_k=1)
+    top2 = v3.rule_strategies(series, predictions, cash, top_k=2)
+    rules = {"top_1": top1["top_k"], "top_2": top2["top_k"], "beats_cash": top1["beats_cash"]}
+    hold = top1["hold"]
+    beats = {name: (r.get("annual_return") or -9) > (hold.get("annual_return") or -9)
+             and (r.get("sharpe") or -9) > (hold.get("sharpe") or -9) for name, r in rules.items()}
+    return {"metals": sorted(k.split(":")[-1] for k in keys), "rank_correlation": score["rank_correlation"],
+            "rules": rules, "hold": hold, "beats_hold": beats, "worth_following": any(beats.values())}
+
+
 def decide(results):
     base = results["v3.1"]
     b_top = base["strategies"]["top_k"]
@@ -216,6 +238,18 @@ def render(report):
         failed = [k for k, ok in v["checks"].items() if not ok]
         lines.append(f"- {name}: {'PASSES' if v['passes'] else 'fails ' + ', '.join(failed)}")
     lines += ["", f"**Decision: {'adopt ' + report['decision']['adopt'] if report['decision']['adopt'] else 'keep v3.1'}**"]
+    inv = report.get("investable")
+    if inv:
+        names = {"top_1": "Hold the top 1", "top_2": "Hold the top 2", "beats_cash": "Hold those expected to beat T-bills"}
+        lines += ["", f"## v3.1 on metals with a fund in the UIP ({', '.join(inv['metals'])})", "",
+                  f"Rank correlation within this set: {inv['rank_correlation']:+.3f}", "",
+                  "| Rule | Annual return | Max drawdown | Sharpe | Beats holding these? |", "|---|---|---|---|---|"]
+        for key, label in names.items():
+            r = inv["rules"][key]
+            lines.append(f"| {label} | {_pct(r.get('annual_return'))} | {_pct(r.get('max_drawdown'))} | {r.get('sharpe') or 0:.2f} | {'yes' if inv['beats_hold'][key] else 'no'} |")
+        h = inv["hold"]
+        lines += [f"| Hold all {len(inv['metals'])} equally | {_pct(h.get('annual_return'))} | {_pct(h.get('max_drawdown'))} | {h.get('sharpe') or 0:.2f} | |", "",
+                  f"**Worth following with real funds: {'yes' if inv['worth_following'] else 'no'}** (a rule must beat holding on both return and Sharpe)."]
     rs = report.get("ranges")
     if rs:
         lines += ["", "## v3.1 12-month ranges: pooled vs per-metal errors (target coverage 80%)", "",
@@ -234,6 +268,7 @@ def main(argv=None):
     parser.add_argument("--first-start", type=date.fromisoformat, default=date(1980, 1, 1))
     parser.add_argument("--split", type=date.fromisoformat, default=date(2006, 1, 1))
     parser.add_argument("--output-dir", type=Path, default=ROOT / "data" / "operations" / "metals" / "v32_research")
+    parser.add_argument("--investable", default=INVESTABLE_DEFAULT, help="comma-separated metals that have a fund in the UIP")
     args = parser.parse_args(argv)
     series = {m: p for m, p in bt.load_history(args.history).items() if bt.is_monthly(p)}
     cash, cash_source = bt.fetch_cash(os.environ.get("UIIP_FRED_API_KEY"), args.first_start)
@@ -241,7 +276,8 @@ def main(argv=None):
     results = {name: evaluate(series, name, cash, args.first_start, args.split, last) for name in VARIANTS}
     report = {"period": [args.split.isoformat(), last.isoformat()], "cash_source": cash_source,
               "results": results, "decision": decide(results),
-              "ranges": range_study(series, args.first_start, args.split, last)}
+              "ranges": range_study(series, args.first_start, args.split, last),
+              "investable": investable_study(series, cash, args.first_start, args.split, last, args.investable.split(","))}
     args.output_dir.mkdir(parents=True, exist_ok=True)
     (args.output_dir / "v32_research.json").write_text(json.dumps(report, indent=2, default=str) + "\n", encoding="utf-8")
     markdown = render(report)
