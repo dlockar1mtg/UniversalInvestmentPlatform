@@ -79,3 +79,16 @@ def test_investable_study_decides_only_among_listed_metals():
     assert study["metals"] == ["GOLD", "SILVER"]
     assert set(study["rules"]) == {"top_1", "top_2", "beats_cash"} and isinstance(study["worth_following"], bool)
     assert v32.investable_study(s, {}, date(1980, 1, 1), date(2006, 1, 1), date(2022, 12, 1), ["gold"]) is None
+
+def test_basket_study_adds_a_fee_netted_basket_choice():
+    names = ["GOLD", "SILVER", "ALUMINUM", "ZINC", "COPPER"]
+    s = {f"METALS:COMMODITY:{m}": monthly(640, lambda i, k=k: 100 * math.exp(0.5 * math.sin((i + 30 * k) / 37) + 0.2 * math.cos(i / 11 + k)))
+         for k, m in enumerate(names)}
+    points, keys = v32.basket_series(s, {"ALUMINUM", "ZINC"}, 0.012)
+    assert len(keys) == 2 and points[0][1] == 100.0
+    flat = {f"METALS:COMMODITY:{m}": monthly(24, lambda i: 50.0) for m in ("A", "B")}
+    fp, _ = v32.basket_series(flat, {"A", "B"}, 0.012)
+    assert fp[-1][1] == pytest.approx(100.0 * (1 - 0.001) ** 23)          # fee only, when prices are flat
+    study = v32.basket_study(s, {}, date(1980, 1, 1), date(2006, 1, 1), date(2022, 12, 1), ["gold", "silver", "copper"], ["aluminum", "zinc", "copper"])
+    assert study["basket_months"] > 100 and isinstance(study["worth_adding"], bool)
+    assert any(c.startswith("DBB") for c in study["choices"])
