@@ -48,4 +48,4 @@ def test_production_cycle_uses_v3_calls_and_records_them():
     assert all(c["model_version"] == "metals-native-v3.1" for c in components.values())
     uranium = twelve["METALS:COMMODITY:URANIUM"]
     assert uranium.recommendation == "HOLD"
-    assert any(r.startswith("V3_NOT_MODELED_NON_MONTHLY_HISTORY") for r in report.reasons)
+    assert any(r.startswith("V3_NOT_MODELED_NON_MONTHLY_HISTORY") for r in report.reason_codes)
