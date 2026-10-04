@@ -61,3 +61,13 @@ def test_runs_as_a_script(tmp_path):
     assert set(rep["results"]) == set(v32.VARIANTS)
     assert all(0.5 <= r["range_coverage"] <= 1.0 for r in rep["results"].values())
     assert "Adoption rule" in (out / "v32_research.md").read_text()
+
+def test_per_metal_ranges_follow_each_metals_own_volatility():
+    calm = monthly(640, lambda i: 100 * math.exp(0.1 * math.sin(i / 37) + 0.04 * math.cos(i / 11)))
+    wild = monthly(640, lambda i: 100 * math.exp(0.8 * math.sin(i / 29) + 0.3 * math.cos(i / 7)))
+    s = {"CALM": calm, "WILD": wild, "MID": monthly(640, lambda i: 100 * math.exp(0.4 * math.sin(i / 33)))}
+    study = v32.range_study(s, date(1980, 1, 1), date(2006, 1, 1), date(2022, 12, 1))
+    pooled, own = study["pooled"]["by_metal"], study["per_metal"]["by_metal"]
+    assert pooled["CALM"]["width"] == pytest.approx(pooled["WILD"]["width"])      # pooled: one width for all
+    assert own["CALM"]["width"] < own["WILD"]["width"]                              # per-metal: follows volatility
+    assert own["CALM"]["width"] < pooled["CALM"]["width"]
