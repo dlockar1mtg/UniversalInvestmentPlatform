@@ -44,3 +44,25 @@ def test_end_to_end_on_mean_reverting_prices(tmp_path):
     assert rep["coefficients"]["value"] < 0                          # cheap -> higher expected return
     assert rep["out_of_sample"]["rank_correlation"] > 0.3
     assert "Out-of-sample" in (out / "v3_research.md").read_text()
+
+def test_walk_forward_only_uses_outcomes_known_before_each_year():
+    def price(i): return 100 * math.exp(0.4 * math.sin(i / 23)) * 1.002 ** i
+    series = {"GOLD": monthly(500, price), "COPPER": monthly(500, lambda i: price(i + 7))}
+    seen = []
+    real_fit = v3.fit
+    def spy(rows):
+        seen.append(max(series[r[0]][r[1] + 12][0] for r in rows)); return real_fit(rows)
+    v3.fit = spy
+    try:
+        preds, yearly = v3.walk_forward_predictions(series, date(1980, 1, 1), date(2006, 1, 1), date(2010, 12, 1))
+    finally:
+        v3.fit = real_fit
+    assert sorted(yearly) == [2006, 2007, 2008, 2009, 2010]
+    assert all(latest < date(year, 1, 1) for latest, year in zip(seen, sorted(yearly)))
+    assert all(series[m][i][0].year in yearly for (m, i) in preds)
+
+def test_top_k_holds_the_highest_expected_metals():
+    series = {m: monthly(200, lambda i, k=k: 100 * (1 + 0.01 * k) ** i) for k, m in enumerate(["A", "B", "C", "D"])}
+    preds = {(m, i): float(k) for k, m in enumerate(["A", "B", "C", "D"]) for i in range(150, 190)}
+    perf = v3.rule_strategies(series, preds, {}, top_k=2)
+    assert perf["top_k"]["annual_return"] > perf["hold"]["annual_return"]   # C and D grow fastest and are picked
