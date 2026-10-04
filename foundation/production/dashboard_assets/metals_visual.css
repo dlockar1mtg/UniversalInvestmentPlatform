@@ -170,3 +170,6 @@
 .metals-descriptive-panel{height:auto;overflow:visible}
 .metals-detail-grid{align-items:start}
 @media print{.metals-card,.metals-panel,.metals-leaderboard,.metals-scorecard,.metals-explainer,.metals-hero,.metals-rank-row{break-inside:avoid;page-break-inside:avoid}.metals-detail-grid,.metals-layout{display:block}.metals-detail-grid>*{margin-bottom:14px}}
+
+/* Explainer: four steps on one row when there is room. */
+@media(min-width:1000px){.metals-explainer{grid-template-columns:repeat(4,minmax(0,1fr))}}
