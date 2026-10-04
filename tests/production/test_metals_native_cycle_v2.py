@@ -169,24 +169,25 @@ def test_forecasts_keep_the_source_identity_while_matching_on_the_metal():
     assert components["confirming_vehicles"] == ["GLD"]
 
 
-def test_recommendation_uses_the_confidence_adjusted_return():
+def test_recommendation_follows_the_v3_rank():
     import math
 
-    # Choppy history: the backtest is near a coin flip, so confidence sits near the minimum.
+    # Choppy history: value and trend vary, so v3.1 can be fitted; a single metal ranks first.
     choppy = [
         NativeObservation("silver", row.observation_date, 20.0 * (1 + 0.5 * math.sin(i / 3.0)), "history")
         for i, row in enumerate(_monthly("silver", 2000, 320, 1.0, 0.0))
     ]
-    # A big latest print makes the raw 12-month return large.
     recent = [NativeObservation("SILVER", "2026-09-01", 40.0, "wb")]
     report = evaluate_native_cycle(recent, [], _methodology(), history_observations=choppy)
     forecast, components = _components(report, "SILVER")
-    assert forecast.annualized_return >= 0.12  # raw return alone would be STRONG_BUY
+    v3 = components["v3"]
+    assert v3 is not None and v3["rank"] == 1 and v3["ranked_metals"] == 1
+    assert forecast.recommendation == "BUY"  # Metals v3.1: the top three by expected return are BUY
+    assert components["recommendation_basis"] == "V3_1_RANK_TOP3"
+    assert components["model_version"] == "metals-native-v3.1"
+    # The confidence-adjusted return is still reported for the downstream sidecars.
     adjusted = components["confidence_adjusted_return"]
     assert abs(adjusted - forecast.annualized_return * forecast.confidence) < 1e-6
-    assert components["recommendation_basis"] == "CONFIDENCE_ADJUSTED_12M"
-    expected = "BUY" if adjusted >= 0.06 else ("HOLD" if adjusted >= -0.02 else "REDUCE")
-    assert adjusted < 0.12 and forecast.recommendation == expected
 
 
 def test_risk_profile_and_ranges_come_from_the_metal_history():

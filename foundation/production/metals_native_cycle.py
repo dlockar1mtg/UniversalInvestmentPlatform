@@ -344,6 +344,91 @@ def _descriptive_indicators(
     return descriptive
 
 
+V3_VALUE_MONTHS = 120
+V3_TREND_MONTHS = 12
+V3_FIRST_TRAINING_MONTH = 1980 * 12  # month index of January 1980
+V3_BUY_RANKS = 3
+
+
+def _v3_features(closes: Mapping[int, float], month: int) -> tuple[float, float] | None:
+    """(value, trend) at a month: log price vs its 10-year average and vs its 12-month average."""
+    window = [closes.get(m) for m in range(month - V3_VALUE_MONTHS + 1, month + 1)]
+    if any(v is None or v <= 0 for v in window):
+        return None
+    logs = [math.log(v) for v in window]
+    value = logs[-1] - sum(logs) / len(logs)
+    trend = logs[-1] - math.log(sum(window[-V3_TREND_MONTHS:]) / V3_TREND_MONTHS)
+    return value, trend
+
+
+def _v3_fit(rows: Sequence[tuple[float, float, float]]) -> tuple[float, float, float] | None:
+    """Pooled least squares: next-12-month return = a + b * value + c * trend."""
+    if len(rows) < 60:
+        return None
+    data = [(1.0, value, trend, forward) for value, trend, forward in rows]
+    matrix = [[sum(d[i] * d[j] for d in data) for j in range(3)] + [sum(d[i] * d[3] for d in data)] for i in range(3)]
+    for col in range(3):
+        pivot = max(range(col, 3), key=lambda r: abs(matrix[r][col]))
+        matrix[col], matrix[pivot] = matrix[pivot], matrix[col]
+        if abs(matrix[col][col]) < 1e-12:
+            return None
+        for r in range(3):
+            if r != col:
+                factor = matrix[r][col] / matrix[col][col]
+                matrix[r] = [a - factor * b for a, b in zip(matrix[r], matrix[col])]
+    return tuple(matrix[k][3] / matrix[k][k] for k in range(3))
+
+
+def _v3_predictions(points_by_asset: Mapping[str, Sequence[tuple[date, float]]]) -> dict[str, dict[str, object]]:
+    """Metals model v3.1: refit on every month with a known 12-month outcome, predict, rank.
+
+    Research (scripts/research_metals_v3.py, PR #224): out of sample (2006-2026) holding the
+    top three metals by this expected return earned 8.6% a year against 6.5% for holding all
+    eight. Expected returns were well calibrated except at the very bottom, so calls are
+    rank-based: the top three are BUY, the rest HOLD.
+    """
+    closes_by_asset = {asset: _monthly_closes(points) for asset, points in points_by_asset.items()}
+    training: list[tuple[float, float, float]] = []
+    latest: dict[str, tuple[float, float]] = {}
+    for asset, closes in closes_by_asset.items():
+        if not closes:
+            continue
+        end = max(closes)
+        for month in sorted(closes):
+            if month < V3_FIRST_TRAINING_MONTH:
+                continue
+            features = _v3_features(closes, month)
+            if features is None:
+                continue
+            if month + 12 in closes:
+                training.append((features[0], features[1], closes[month + 12] / closes[month] - 1.0))
+        current = _v3_features(closes, end)
+        if current is not None:
+            latest[asset] = current
+    coefficients = _v3_fit(training)
+    if coefficients is None or not latest:
+        return {}
+    residuals = sorted(f - (coefficients[0] + coefficients[1] * v + coefficients[2] * t) for v, t, f in training)
+    expected = {asset: coefficients[0] + coefficients[1] * v + coefficients[2] * t for asset, (v, t) in latest.items()}
+    ranked = sorted(expected, key=lambda asset: expected[asset], reverse=True)
+    return {
+        asset: {
+            "model_version": "metals-native-v3.1",
+            "expected_return_12m": expected[asset],
+            "rank": ranked.index(asset) + 1,
+            "ranked_metals": len(ranked),
+            "recommendation": "BUY" if ranked.index(asset) < V3_BUY_RANKS else "HOLD",
+            "value": latest[asset][0],
+            "trend": latest[asset][1],
+            "coefficients": {"intercept": coefficients[0], "value": coefficients[1], "trend": coefficients[2]},
+            "training_observations": len(training),
+            "residual_q10": _quantile(residuals, 0.10),
+            "residual_q90": _quantile(residuals, 0.90),
+        }
+        for asset in expected
+    }
+
+
 def _key(asset_id: str) -> str:
     return str(asset_id).split(":")[-1].upper()
 
@@ -391,6 +476,9 @@ def evaluate_native_cycle(
         confidence_policy.get("long_horizon_confidence_factor", DEFAULT_LONG_HORIZON_CONFIDENCE_FACTOR)
     )
     forecasts: list[NativeForecast] = []
+
+    # Metals model v3.1 (value and trend, refitted on every known outcome; rank-based calls).
+    v3 = _v3_predictions({key: _series([*history.get(key, []), *items]) for key, items in recent.items()})
 
     for asset_id, rows in sorted(recent.items()):
         # Forecasts keep the source identity (e.g. METALS:COMMODITY:GOLD) that downstream
@@ -442,8 +530,25 @@ def evaluate_native_cycle(
             confidence_adjusted_return = annual_return * confidence
             recommendation = _recommendation(confidence_adjusted_return, recommendation_policy)
 
+        # v3.1 replaces the momentum return and call wherever monthly history allows it.
+        v3_asset = v3.get(asset_id)
+        if v3_asset is not None:
+            annual_return = _bounded(
+                float(v3_asset["expected_return_12m"]),
+                float(bounds["minimum_annual_return"]),
+                float(bounds["maximum_annual_return"]),
+            )
+            confidence_adjusted_return = annual_return * confidence
+            recommendation = str(v3_asset["recommendation"])
+        elif sufficient_history:
+            annual_return = 0.0
+            confidence_adjusted_return = 0.0
+            recommendation = "HOLD"
+            reasons.append(f"V3_NOT_MODELED_NON_MONTHLY_HISTORY:{asset_id}")
+
         base_components = {
-            "model_version": "metals-native-v2",
+            "model_version": "metals-native-v3.1" if v3_asset is not None else "metals-native-v2",
+            "v3": v3_asset,
             "benchmark_momentum": benchmark_momentum if sufficient_history else 0.0,
             "momentum_basis": "TRAILING_12M_BY_DATE" if sufficient_history else "INSUFFICIENT_HISTORY",
             "vehicle_confirmation": vehicle_confirmation,
@@ -457,7 +562,7 @@ def evaluate_native_cycle(
             "backtest_samples": samples,
             "backtest_hit_rate": hit_rate,
             "confidence_adjusted_return": confidence_adjusted_return,
-            "recommendation_basis": "CONFIDENCE_ADJUSTED_12M",
+            "recommendation_basis": "V3_1_RANK_TOP3" if v3_asset is not None else "CONFIDENCE_ADJUSTED_12M",
             "risk": _risk_profile(points, lookback, minimum_samples) if sufficient_history else None,
             # Valuation, trend and the historical 12-month range: shown instead of calls (#217, #219).
             "descriptive": _descriptive_indicators(points, minimum_samples),
