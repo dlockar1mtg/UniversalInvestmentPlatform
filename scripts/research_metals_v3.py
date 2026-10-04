@@ -212,10 +212,6 @@ def main(argv=None):
     return 0
 
 
-if __name__ == "__main__":
-    raise SystemExit(main())
-
-
 # ---------------------------------------------------------------- v3.1: yearly refit
 def walk_forward_predictions(series, first_start, start, end):
     """(metal, index) -> expected return, refitting each January on outcomes already known."""
@@ -313,3 +309,7 @@ def render_v31(report):
     for q, cal in enumerate(w["score"]["calibration_quintiles"], start=1):
         lines.append(f"| {q} (lowest first) | {_pct(cal['expected'])} | {_pct(cal['realized'])} |")
     return "\n".join(lines) + "\n"
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
