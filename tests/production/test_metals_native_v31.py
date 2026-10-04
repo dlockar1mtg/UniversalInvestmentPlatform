@@ -46,6 +46,10 @@ def test_production_cycle_uses_v3_calls_and_records_them():
     components = {k: json.loads(f.component_json) for k, f in monthly.items()}
     assert sorted(c["v3"]["rank"] for c in components.values()) == list(range(1, 9))
     assert all(c["model_version"] == "metals-native-v3.1" for c in components.values())
+    # The 12-month range is v3.1's own error band around its expected return.
+    for k, c in components.items():
+        assert c["range_basis"] == "V3_1_MODEL_ERRORS_P10_P90"
+        assert c["bear_value"] < monthly[k].projected_value < c["bull_value"]
     uranium = twelve["METALS:COMMODITY:URANIUM"]
     assert uranium.recommendation == "HOLD"
     assert any(r.startswith("V3_NOT_MODELED_NON_MONTHLY_HISTORY") for r in report.reason_codes)
