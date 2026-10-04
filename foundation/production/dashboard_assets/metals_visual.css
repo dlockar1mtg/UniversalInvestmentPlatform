@@ -187,3 +187,13 @@
 .metals-act-funds span{display:block;font-size:12px;opacity:.8}
 .metals-act-funds small{display:block;font-size:11px;opacity:.6;margin-top:2px}
 .metals-act-note{font-size:11.5px!important;opacity:.6!important;margin:0!important}
+
+/* Secret Lair v2: deal cards and notes (reuse the Metals card and scorecard styles). */
+.sl-v2-note{font-size:12.5px;opacity:.75;margin:-6px 0 14px}
+.sl-v2-prices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 10px}
+.sl-v2-prices>div{border:1px solid var(--line,rgba(255,255,255,.1));border-radius:10px;padding:8px 10px}
+.sl-v2-prices span{display:block;font-size:11px;letter-spacing:.05em;text-transform:uppercase;opacity:.6}
+.sl-v2-prices strong{display:block;font-size:17px;margin:2px 0}
+.sl-v2-prices small{font-size:11px;opacity:.65}
+.sl-v2-check{margin:8px 0;padding:8px 10px;border-radius:8px;background:rgba(251,191,36,.10);border:1px solid rgba(251,191,36,.45);color:#fbbf24;font-size:12.5px}
+.sl-v2-muted{opacity:.7;font-size:13px;margin:10px 0}
