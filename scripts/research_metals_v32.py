@@ -198,6 +198,59 @@ def investable_study(series, cash, first_start, start, end, metals):
             "rules": rules, "hold": hold, "beats_hold": beats, "worth_following": any(beats.values())}
 
 
+BASKET_DEFAULT = "ALUMINUM,ZINC,COPPER"
+BASKET_FEE = 0.008  # Invesco DB Base Metals Fund (DBB) expense ratio, about 0.8% a year
+BASKET_KEY = "METALS:BASKET:DBB"
+
+
+def basket_series(series, components, fee):
+    """Equal-weight monthly basket of the component metals, net of an annual fee."""
+    keys = sorted(k for k in series if k.split(":")[-1].upper() in components)
+    if len(keys) < 2:
+        return None, []
+    prices = [dict(series[k]) for k in keys]
+    dates = sorted(set.intersection(*(set(p) for p in prices)))
+    points, level = [], 100.0
+    for n, day in enumerate(dates):
+        if n:
+            prev = dates[n - 1]
+            level *= 1.0 + mean(p[day] / p[prev] - 1.0 for p in prices) - fee / 12.0
+        points.append((day, level))
+    return points, keys
+
+
+def basket_study(series, cash, first_start, start, end, singles, components, fee=BASKET_FEE):
+    """v3.1 choosing among the investable metals plus a base-metals basket fund (DBB)."""
+    points, comp_keys = basket_series(series, {c.strip().upper() for c in components if c.strip()}, fee)
+    wanted = {s.strip().upper() for s in singles if s.strip()}
+    single_keys = {k for k in series if k.split(":")[-1].upper() in wanted}
+    if points is None or len(single_keys) < 2:
+        return None
+    bands = walk_forward(series, "v3.1", first_start, start, end)
+    predictions = {k: v[0] for k, v in bands.items() if k[0] in single_keys}
+    by_date = {}
+    for (metal, i), (expected, _, _) in bands.items():
+        if metal in comp_keys:
+            by_date.setdefault(series[metal][i][0], []).append(expected)
+    index = {day: n for n, (day, _) in enumerate(points)}
+    for day, values in by_date.items():
+        if len(values) == len(comp_keys) and day in index:
+            predictions[(BASKET_KEY, index[day])] = mean(values) - fee
+    extended = dict(series)
+    extended[BASKET_KEY] = points
+    top1 = v3.rule_strategies(extended, predictions, cash, top_k=1)
+    top2 = v3.rule_strategies(extended, predictions, cash, top_k=2)
+    rules = {"top_1": top1["top_k"], "top_2": top2["top_k"], "beats_cash": top1["beats_cash"]}
+    hold = top1["hold"]
+    without = v3.rule_strategies(series, {k: v for k, v in predictions.items() if k[0] != BASKET_KEY}, cash)["hold"]
+    beats = {name: (r.get("annual_return") or -9) > (hold.get("annual_return") or -9)
+             and (r.get("sharpe") or -9) > (hold.get("sharpe") or -9) for name, r in rules.items()}
+    return {"choices": sorted(k.split(":")[-1] for k in single_keys) + ["DBB (" + ", ".join(k.split(":")[-1] for k in comp_keys) + ")"],
+            "fee": fee, "rules": rules, "hold": hold, "hold_without_basket": without,
+            "beats_hold": beats, "worth_adding": any(beats.values()),
+            "basket_months": sum(1 for k in predictions if k[0] == BASKET_KEY)}
+
+
 def decide(results):
     base = results["v3.1"]
     b_top = base["strategies"]["top_k"]
@@ -250,6 +303,18 @@ def render(report):
         h = inv["hold"]
         lines += [f"| Hold all {len(inv['metals'])} equally | {_pct(h.get('annual_return'))} | {_pct(h.get('max_drawdown'))} | {h.get('sharpe') or 0:.2f} | |", "",
                   f"**Worth following with real funds: {'yes' if inv['worth_following'] else 'no'}** (a rule must beat holding on both return and Sharpe)."]
+    bk = report.get("basket")
+    if bk:
+        names = {"top_1": "Hold the top 1", "top_2": "Hold the top 2", "beats_cash": "Hold those expected to beat T-bills"}
+        lines += ["", "## v3.1 with a base-metals basket fund (DBB) added", "",
+                  f"Choices: {', '.join(bk['choices'])}; basket net of a {bk['fee'] * 100:.1f}% annual fee; {bk['basket_months']} basket months scored.", "",
+                  "| Rule | Annual return | Max drawdown | Sharpe | Beats holding all five? |", "|---|---|---|---|---|"]
+        for key, label in names.items():
+            r = bk["rules"][key]
+            lines.append(f"| {label} | {_pct(r.get('annual_return'))} | {_pct(r.get('max_drawdown'))} | {r.get('sharpe') or 0:.2f} | {'yes' if bk['beats_hold'][key] else 'no'} |")
+        for label, h in (("Hold all five equally", bk["hold"]), ("Hold today's four equally (no DBB)", bk["hold_without_basket"])):
+            lines.append(f"| {label} | {_pct(h.get('annual_return'))} | {_pct(h.get('max_drawdown'))} | {h.get('sharpe') or 0:.2f} | |")
+        lines += ["", f"**Worth adding DBB for v3.1: {'yes' if bk['worth_adding'] else 'no'}** (a rule must beat holding all five on both return and Sharpe)."]
     rs = report.get("ranges")
     if rs:
         lines += ["", "## v3.1 12-month ranges: pooled vs per-metal errors (target coverage 80%)", "",
@@ -269,6 +334,7 @@ def main(argv=None):
     parser.add_argument("--split", type=date.fromisoformat, default=date(2006, 1, 1))
     parser.add_argument("--output-dir", type=Path, default=ROOT / "data" / "operations" / "metals" / "v32_research")
     parser.add_argument("--investable", default=INVESTABLE_DEFAULT, help="comma-separated metals that have a fund in the UIP")
+    parser.add_argument("--basket", default=BASKET_DEFAULT, help="comma-separated metals in the basket fund tested (DBB)")
     args = parser.parse_args(argv)
     series = {m: p for m, p in bt.load_history(args.history).items() if bt.is_monthly(p)}
     cash, cash_source = bt.fetch_cash(os.environ.get("UIIP_FRED_API_KEY"), args.first_start)
@@ -277,7 +343,8 @@ def main(argv=None):
     report = {"period": [args.split.isoformat(), last.isoformat()], "cash_source": cash_source,
               "results": results, "decision": decide(results),
               "ranges": range_study(series, args.first_start, args.split, last),
-              "investable": investable_study(series, cash, args.first_start, args.split, last, args.investable.split(","))}
+              "investable": investable_study(series, cash, args.first_start, args.split, last, args.investable.split(",")),
+              "basket": basket_study(series, cash, args.first_start, args.split, last, args.investable.split(","), args.basket.split(","))}
     args.output_dir.mkdir(parents=True, exist_ok=True)
     (args.output_dir / "v32_research.json").write_text(json.dumps(report, indent=2, default=str) + "\n", encoding="utf-8")
     markdown = render(report)
