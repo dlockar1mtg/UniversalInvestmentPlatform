@@ -193,9 +193,17 @@ def main(argv=None):
         "out_of_sample": evaluate(series, (a, b, c), cash, args.split, last),
         "metals": sorted(series),
     }
+    predictions, yearly = walk_forward_predictions(series, args.in_sample_start, args.split, last)
+    fmt = lambda coef: "(" + ", ".join(f"{x:+.3f}" for x in coef) + ")"
+    report["v3_1"] = {
+        "score": score_predictions(series, predictions),
+        "strategies": rule_strategies(series, predictions, cash),
+        "first_year_coefficients": fmt(yearly[min(yearly)]),
+        "last_year_coefficients": fmt(yearly[max(yearly)]),
+    }
     args.output_dir.mkdir(parents=True, exist_ok=True)
     (args.output_dir / "v3_research.json").write_text(json.dumps(report, indent=2, default=str) + "\n", encoding="utf-8")
-    markdown = render(report)
+    markdown = render(report) + render_v31(report)
     (args.output_dir / "v3_research.md").write_text(markdown, encoding="utf-8")
     if os.environ.get("GITHUB_STEP_SUMMARY"):
         with open(os.environ["GITHUB_STEP_SUMMARY"], "a", encoding="utf-8") as handle:
@@ -206,3 +214,102 @@ def main(argv=None):
 
 if __name__ == "__main__":
     raise SystemExit(main())
+
+
+# ---------------------------------------------------------------- v3.1: yearly refit
+def walk_forward_predictions(series, first_start, start, end):
+    """(metal, index) -> expected return, refitting each January on outcomes already known."""
+    rows = observations(series)
+    predictions, coefficients = {}, {}
+    for year in range(start.year, end.year + 1):
+        cutoff = date(year, 1, 1)
+        known = [r for r in rows if first_start <= r[2] and r[5] is not None
+                 and series[r[0]][r[1] + 12][0] < cutoff]
+        coef = fit(known)
+        coefficients[year] = coef
+        for r in rows:
+            if r[2].year == year and start <= r[2] <= end:
+                predictions[(r[0], r[1])] = predict(coef, r[3], r[4])
+    return predictions, coefficients
+
+
+def score_predictions(series, predictions):
+    scored = []
+    for (metal, i), expected in predictions.items():
+        points = series[metal]
+        if i + 12 < len(points):
+            scored.append((expected, points[i + 12][1] / points[i][1] - 1.0, call_for(expected)))
+    by_call = {}
+    for expected, forward, call in scored:
+        by_call.setdefault(call, []).append(forward)
+    ordered = sorted(scored, key=lambda s: s[0])
+    k = max(1, len(ordered) // 5)
+    return {
+        "observations": len(scored),
+        "rank_correlation": bt.spearman([s[0] for s in scored], [s[1] for s in scored]),
+        "by_call": {c: {"months": len(v), "average_next_12m": mean(v), "share_positive": sum(x > 0 for x in v) / len(v)} for c, v in by_call.items()},
+        "calibration_quintiles": [{"expected": mean(s[0] for s in ordered[q * k:(q + 1) * k]),
+                                   "realized": mean(s[1] for s in ordered[q * k:(q + 1) * k])} for q in range(5)],
+    }
+
+
+def rule_strategies(series, predictions, cash, top_k=3):
+    """Monthly portfolio returns for the three rules and for holding all, equal-weight."""
+    by_date = {}
+    for (metal, i), expected in predictions.items():
+        by_date.setdefault(series[metal][i][0], {})[metal] = (i, expected)
+    out = {"calls": [], "beats_cash": [], "top_k": [], "hold": [], "cash": []}
+    held = {"calls": set(), "beats_cash": set(), "top_k": set()}
+    for day in sorted(by_date):
+        entries = by_date[day]
+        returns = {}
+        for metal, (i, _) in entries.items():
+            j = i + 1 + bt.EXECUTION_LAG_MONTHS
+            if j < len(series[metal]):
+                returns[metal] = series[metal][j][1] / series[metal][j - 1][1] - 1.0
+        if not returns:
+            continue
+        pay_day = series[next(iter(returns))][entries[next(iter(returns))][0] + 1 + bt.EXECUTION_LAG_MONTHS][0]
+        c = cash.get((pay_day.year, pay_day.month), 0.0)
+        annual_cash = cash.get((day.year, day.month), 0.0) * 12
+        chosen = {
+            "calls": {m for m in returns if call_for(entries[m][1]) in INVESTED},
+            "beats_cash": {m for m in returns if entries[m][1] > annual_cash},
+            "top_k": set(sorted(returns, key=lambda m: entries[m][1], reverse=True)[:top_k]),
+        }
+        for rule, picks in chosen.items():
+            # each metal is a 1/N sleeve: in the metal if picked, otherwise in T-bills
+            if rule == "top_k":
+                gross = mean(returns[m] for m in picks)
+            else:
+                gross = mean(returns[m] if m in picks else c for m in returns)
+            turnover = len(picks ^ held[rule]) / max(1, len(returns)) if held[rule] or picks else 0.0
+            out[rule].append(gross - SWITCH_COST * turnover)
+            held[rule] = picks
+        out["hold"].append(mean(returns.values()))
+        out["cash"].append(c)
+    return {rule: bt.performance(out[rule], out["cash"]) for rule in ("calls", "beats_cash", "top_k", "hold")}
+
+
+def render_v31(report):
+    w = report["v3_1"]
+    perf = w["strategies"]
+    lines = ["", "# Metals model v3.1: yearly refit", "",
+             f"Equation refitted each January on outcomes known by then (first fit {report['in_sample'][0]} onward); judged {report['out_of_sample_period'][0]} to {report['out_of_sample_period'][1]}.",
+             f"Coefficients drifted from {w['first_year_coefficients']} to {w['last_year_coefficients']} (intercept, value, trend).", "",
+             f"- Rank correlation: {w['score']['rank_correlation']:+.3f}", "",
+             "| Rule | Annual return | Max drawdown | Sharpe |", "|---|---|---|---|"]
+    names = {"calls": "Hold metals rated BUY/STRONG BUY (else T-bills)", "beats_cash": "Hold metals expected to beat T-bills",
+             "top_k": "Hold the top 3 metals each month", "hold": "Hold all 8 metals"}
+    for rule, label in names.items():
+        p = perf[rule]
+        lines.append(f"| {label} | {_pct(p.get('annual_return'))} | {_pct(p.get('max_drawdown'))} | {p.get('sharpe') or 0:.2f} |")
+    lines += ["", "| Call | Months | Average next 12 months | Share positive |", "|---|---|---|---|"]
+    for name, _ in CALL_THRESHOLDS + (("AVOID", None),):
+        b = w["score"]["by_call"].get(name)
+        if b:
+            lines.append(f"| {name} | {b['months']} | {_pct(b['average_next_12m'])} | {b['share_positive'] * 100:.0f}% |")
+    lines += ["", "| Expected-return fifth | Average expected | Average realized |", "|---|---|---|"]
+    for q, cal in enumerate(w["score"]["calibration_quintiles"], start=1):
+        lines.append(f"| {q} (lowest first) | {_pct(cal['expected'])} | {_pct(cal['realized'])} |")
+    return "\n".join(lines) + "\n"
