@@ -593,6 +593,14 @@ def evaluate_native_cycle(
                     sum(1 for r in band if r - q50 + expected_return > 0) / len(band), 8
                 )
                 components["range_basis"] = "HISTORICAL_HORIZON_RETURNS_P10_P90"
+            if v3_asset is not None and horizon_months == 12:
+                # Metals v3.1: the 12-month range is the model's own past errors (10th to 90th
+                # percentile) around its expected return; out of sample they held 77% of outcomes (#231).
+                low = float(v3_asset["residual_q10"])
+                high = float(v3_asset["residual_q90"])
+                components["bear_value"] = round(max(0.0, current * (1.0 + expected_return + low)), 8)
+                components["bull_value"] = round(current * (1.0 + expected_return + high), 8)
+                components["range_basis"] = "V3_1_MODEL_ERRORS_P10_P90"
             forecasts.append(
                 NativeForecast(
                     asset_id=source_asset_id,
