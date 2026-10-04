@@ -173,3 +173,6 @@
 
 /* Explainer: four steps on one row when there is room. */
 @media(min-width:1000px){.metals-explainer{grid-template-columns:repeat(4,minmax(0,1fr))}}
+
+/* Metals with no fund in the UIP universe. */
+.metals-nofund{color:#fbbf24;font-weight:600;white-space:nowrap}
