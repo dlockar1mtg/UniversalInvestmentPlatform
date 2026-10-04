@@ -155,3 +155,18 @@
 .metals-hero-call{display:flex;align-items:center;gap:10px;margin-bottom:6px}
 .metals-hero-rank{font-weight:700;opacity:.85}
 @media(max-width:820px){.metals-rank-cols{display:none}.metals-rank-row{grid-template-columns:30px 1fr auto;row-gap:6px}.metals-rank-bar,.metals-rank-ctx{grid-column:2 / -1}.metals-rank-exp{grid-column:3;grid-row:1}.metals-rank-row .metals-call{grid-column:3;grid-row:2}}
+
+/* Metals polish: bars colored by effect; explainer as a full-width row; print-safe panels. */
+.metals-dbar-fill.right{left:50%;right:auto}
+.metals-dbar-fill.left{right:50%;left:auto}
+.metals-dbar-fill.good{background:var(--good,#22c55e)}
+.metals-dbar-fill.bad{background:var(--bad,#ef4444)}
+.metals-card-grid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
+.metals-card-grid+.metals-explainer{margin-top:16px}
+.metals-explainer{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;position:static}
+.metals-explainer h4{grid-column:1 / -1;margin:0}
+.metals-explainer-item{margin:0}
+.metals-secondary-table{margin-top:16px}
+.metals-descriptive-panel{height:auto;overflow:visible}
+.metals-detail-grid{align-items:start}
+@media print{.metals-card,.metals-panel,.metals-leaderboard,.metals-scorecard,.metals-explainer,.metals-hero,.metals-rank-row{break-inside:avoid;page-break-inside:avoid}.metals-detail-grid,.metals-layout{display:block}.metals-detail-grid>*{margin-bottom:14px}}
