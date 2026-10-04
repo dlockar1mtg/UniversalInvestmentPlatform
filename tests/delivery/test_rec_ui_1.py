@@ -271,8 +271,8 @@ def test_rec_ui_metals_detail_identifies_final_decision_as_primary_authority():
     )
 
     corrected_copy = (
-        "The governed final decision is primary. "
-        "Native recommendation, forecast, and risk remain supporting evidence."
+        "The three highest expected returns are BUY, "
+        "the rest HOLD."
     )
 
     assert old_copy not in javascript
