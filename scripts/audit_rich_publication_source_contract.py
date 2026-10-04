@@ -193,7 +193,9 @@ NATIVE_METALS_CERTIFIED_CONTRACTS = {
         "manifest_authority_key": "authority_id",
         "manifest_authority": "UIP_NATIVE_METALS_RECOMMENDATION_CHANGE_V1",
         "row_count_key": "change_row_count",
-        "minimum_rows": 1,
+        # Rows are only written when a call changes; a run with no changes is valid (v3.1 calls
+        # are rank-based and can stay stable for months).
+        "minimum_rows": 0,
         "require_nonlegacy": True,
         "output_sha_key": "output_sha256",
         "expected_manifest_values": {
