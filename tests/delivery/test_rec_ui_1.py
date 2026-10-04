@@ -166,7 +166,7 @@ def test_rec_ui_metals_premium_research_implementation_contract():
     # The forecast panel was replaced by the descriptive panel (valuation, trend, typical year).
     assert "${metalsDescriptivePanel(detail)}" in javascript
 
-    assert "The governed final decision is primary. Native recommendation, forecast, and risk remain supporting evidence." in javascript
+    assert "The three highest expected returns are BUY, the rest HOLD." in javascript
     assert "<th>Final decision</th><th>Native recommendation</th>" in javascript
     assert 'cleanStatus(nativeStatus(item))' in javascript
     assert (
