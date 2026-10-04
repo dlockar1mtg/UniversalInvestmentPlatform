@@ -71,3 +71,11 @@ def test_per_metal_ranges_follow_each_metals_own_volatility():
     assert pooled["CALM"]["width"] == pytest.approx(pooled["WILD"]["width"])      # pooled: one width for all
     assert own["CALM"]["width"] < own["WILD"]["width"]                              # per-metal: follows volatility
     assert own["CALM"]["width"] < pooled["CALM"]["width"]
+
+def test_investable_study_decides_only_among_listed_metals():
+    s = {f"METALS:COMMODITY:{m}": monthly(640, lambda i, k=k: 100 * math.exp(0.5 * math.sin((i + 30 * k) / 37) + 0.2 * math.cos(i / 11 + k)))
+         for k, m in enumerate(["GOLD", "SILVER", "NICKEL", "ZINC"])}
+    study = v32.investable_study(s, {}, date(1980, 1, 1), date(2006, 1, 1), date(2022, 12, 1), ["gold", "silver"])
+    assert study["metals"] == ["GOLD", "SILVER"]
+    assert set(study["rules"]) == {"top_1", "top_2", "beats_cash"} and isinstance(study["worth_following"], bool)
+    assert v32.investable_study(s, {}, date(1980, 1, 1), date(2006, 1, 1), date(2022, 12, 1), ["gold"]) is None
