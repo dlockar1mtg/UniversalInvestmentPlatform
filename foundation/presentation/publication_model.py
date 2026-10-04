@@ -228,6 +228,15 @@ def _mtg_premium_records_from_environment() -> list[PresentationRecord]:
     No filesystem discovery, repository search, sidecar copy,
     database ingestion, or publication activation occurs here.
     """
+    # Secret Lair model v2 replaces the August certified research when enabled together with the
+    # MTG delivery overlay (MTG_SECRET_LAIR_V2); otherwise the certified sidecar path below is used.
+    v2_path = str(os.environ.get("UIP_MTG_SECRET_LAIR_V2_PATH", "")).strip()
+    export_path = str(os.environ.get("UIP_MTG_EXPORT_PAYLOAD_PATH", "")).strip()
+    if os.environ.get("UIP_MTG_SECRET_LAIR_V2_ENABLED") == "1" and v2_path and export_path:
+        from .mtg_secret_lair_v2_projection import build_secret_lair_v2_records
+
+        return build_secret_lair_v2_records(Path(v2_path), Path(export_path))
+
     raw_path = str(
         os.environ.get(
             "UIP_MTG_PREMIUM_SIDECAR_PATH",
