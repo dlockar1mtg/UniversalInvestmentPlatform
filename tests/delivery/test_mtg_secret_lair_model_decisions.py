@@ -48,6 +48,9 @@ def test_model_decisions_sit_beside_the_certified_authority(tmp_path, monkeypatc
     a, b, gone, asset, collector = records
     assert (a.payload["model_call"], a.payload["model_purchase_status"], a.payload["model_rank"]) == ("BUY", "BUY_CANDIDATE_NOW", 1)
     assert b.payload["model_purchase_status"] == "WAIT_FOR_LISTING_DISCOUNT"
+    # the deals table reads these straight from the catalog
+    assert (a.payload["model_gap"], a.payload["model_expected_net_return_6m"]) == (0.2, 0.08)
+    assert gone.payload["model_gap"] is None and gone.payload["model_buy_price_usd"] is None
     assert gone.payload["model_call"] == "NO_PRICE" and gone.payload["model_note"] == "NOT_IN_DAILY_PRICE_FEED"
     # the certified native authority is preserved, as the MTG parity contract requires
     assert all(r.payload["native_purchase_status"] == "WAIT_FOR_Q10_ENTRY" and r.payload["native_rank"] == 7 for r in (a, b, gone))
@@ -68,3 +71,9 @@ def test_dashboard_reads_status_and_rank_through_the_model_decision():
     assert "mtgModelDecision(item)?mtgModelDecision(item).model_purchase_status" in js
     assert "const model=mtgModelDecision(item);" in js
     assert "function slV2Ranked(items){return items.some(i=>Boolean(mtgModelDecision(i)))}" in js
+
+
+def test_dashboard_deals_table_reads_catalog_fields():
+    js = (ROOT / "foundation" / "production" / "dashboard_assets" / "recommendation_ui.js").read_text(encoding="utf-8")
+    for needle in ("function slV2Table(items)", "function slV2Apply(items)", "p.model_expected_net_return_6m", "bindSlV2Controls(page)", "slV2LaneOn = slV2Ranked("):
+        assert needle in js
