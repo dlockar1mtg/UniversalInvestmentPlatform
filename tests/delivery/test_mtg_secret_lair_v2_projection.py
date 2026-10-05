@@ -66,3 +66,12 @@ def test_publication_uses_v2_only_when_enabled(tmp_path, monkeypatch):
     monkeypatch.setenv("UIP_MTG_SECRET_LAIR_V2_ENABLED", "1")
     records = publication_model._mtg_premium_records_from_environment()
     assert len(records) == 3 and records[0].payload["research_model"] == "secret-lair-v2"
+
+
+def test_price_history_and_tcgplayer_id_reach_the_record(tmp_path):
+    d, e = files(tmp_path, [decision("SL-A", "BUY")])
+    d.with_name("secret_lair_v2_history.json").write_text(json.dumps({"SL-A": [["2026-09", 50, 44], ["2026-10", 50, 44]]}))
+    recs = build_secret_lair_v2_records(d, e)
+    a, gone = recs[0].payload, recs[2].payload
+    assert a["price_history"] == [["2026-09", 50, 44], ["2026-10", 50, 44]] and gone["price_history"] == []
+    assert a["tcgplayer_product_id"] == ""

@@ -70,6 +70,8 @@ def load_decisions(path: Path) -> tuple[dict[str, dict[str, str]], dict[str, Any
 
 def build_secret_lair_v2_records(decisions_path: Path, export_path: Path, *, today: date | None = None) -> list[PresentationRecord]:
     decisions, summary = load_decisions(decisions_path)
+    history_path = decisions_path.with_name("secret_lair_v2_history.json")
+    history = json.loads(history_path.read_text(encoding="utf-8")) if history_path.is_file() else {}
     assets = [r for r in _read_csv(export_path) if r.get("mtg_lane", "").strip() == LANE]
     if not assets:
         raise RuntimeError("The MTG export has no Secret Lair assets")
@@ -88,6 +90,8 @@ def build_secret_lair_v2_records(decisions_path: Path, export_path: Path, *, tod
             "secret_lair_id": product,
             "product_name": (decision or {}).get("product_name") or asset.get("product_name", ""),
             "research_model": RESEARCH_MODEL,
+            "tcgplayer_product_id": str((decision or {}).get("tcgplayer_product_id") or "").strip(),
+            "price_history": list(history.get(product, []))[-36:],
             "price_age_days": age_days,
             "calibration_intercept": calibration.get("intercept"),
             "calibration_slope": calibration.get("slope"),
