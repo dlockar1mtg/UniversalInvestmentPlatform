@@ -84,6 +84,56 @@ def zone_history(series):
     return out
 
 
+PROJECTION_MIN_TESTS = 24
+PROJECTION_COVERAGE = (0.70, 0.90)
+
+
+def _quantile(values, q):
+    v = sorted(values)
+    if not v:
+        return None
+    pos = (len(v) - 1) * q
+    lo, hi = int(pos), min(int(pos) + 1, len(v) - 1)
+    return v[lo] + (v[hi] - v[lo]) * (pos - lo)
+
+
+def projection(series):
+    """Ranges from past months in today's zone, and a walk-forward check of the 12-month 80% range.
+
+    For each month whose 12-month outcome is known, the range is built only from outcomes known at
+    that month (start month at least 12 months earlier) in the same zone; coverage is the share of
+    actual outcomes that landed inside it. The projection counts as validated only when coverage is
+    near 80% over enough test months; otherwise the page shows the same numbers as history only.
+    """
+    ratios, f12, f24 = _ratios(series), _forward(series, 12), _forward(series, 24)
+    if not series or series[-1][0] not in ratios:
+        return None
+    month, price = series[-1]
+    now = zone(ratios[month])
+    out = {"zone": now, "price": price, "horizons": {}}
+    for k, fwd in ((12, f12), (24, f24)):
+        vals = [fwd[m] for m, r in ratios.items() if zone(r) == now and m in fwd]
+        if len(vals) >= 12:
+            lo, mid, hi = (_quantile(vals, q) for q in (0.1, 0.5, 0.9))
+            out["horizons"][str(k)] = {"cases": len(vals), "low": lo, "median": mid, "high": hi,
+                                       "share_up": sum(1 for v in vals if v > 0) / len(vals),
+                                       "price_low": price * (1 + lo), "price_median": price * (1 + mid), "price_high": price * (1 + hi)}
+    months = [m for m, _ in series]
+    hits = []
+    for i, m in enumerate(months):
+        if m not in ratios or m not in f12:
+            continue
+        known = [f12[s] for s in months[:max(0, i - 11)] if s in ratios and s in f12 and zone(ratios[s]) == zone(ratios[m])]
+        if len(known) >= 12:
+            hits.append(_quantile(known, 0.1) <= f12[m] <= _quantile(known, 0.9))
+    coverage = sum(hits) / len(hits) if hits else None
+    out["coverage_12m"] = coverage
+    out["coverage_tests"] = len(hits)
+    out["validated"] = bool(coverage is not None and len(hits) >= PROJECTION_MIN_TESTS
+                            and PROJECTION_COVERAGE[0] <= coverage <= PROJECTION_COVERAGE[1] and out["horizons"])
+    return out
+
+
 def score_asset(asset, closes):
     series = closes.get(asset) or []
     if not series:
@@ -103,6 +153,7 @@ def score_asset(asset, closes):
     if asset in CORE:
         out["call"] = "NO_CALL" if ratio is None else "ACCUMULATE" if ratio < ACCUMULATE_BELOW else "STEADY" if ratio < PAUSE_FROM else "PAUSE"
         out["zone_history"] = zone_history(series)
+        out["projection"] = projection(series)
     else:
         out["call"] = "NO_CALL"
         btc = dict(_forward(closes.get("bitcoin") or [], 12))
@@ -137,7 +188,7 @@ def apply_crypto_model_decisions(records) -> int:
             "model_price_month": s.get("price_month"), "model_avg_48m_usd": s.get("avg_48m"), "model_ratio_48m": s.get("ratio"),
             "model_zone": s.get("zone"), "model_peak_usd": s.get("peak"), "model_peak_month": s.get("peak_month"),
             "model_drawdown_from_peak": s.get("drawdown"), "model_change_12m": s.get("change_12m"),
-            "model_zone_history": s.get("zone_history"), "model_vs_btc": s.get("vs_btc"),
+            "model_zone_history": s.get("zone_history"), "model_projection": s.get("projection"), "model_vs_btc": s.get("vs_btc"),
             "model_months_since_halving": s.get("months_since_halving"), "model_last_halving": s.get("last_halving"),
             "model_robinhood_tradable": s.get("robinhood"), "model_price_history": s.get("history") or [],
             "model_thresholds": {"accumulate_below": ACCUMULATE_BELOW, "pause_from": PAUSE_FROM, "average_months": AVG_MONTHS},
