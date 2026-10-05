@@ -68,6 +68,13 @@ def load_decisions(path: Path) -> tuple[dict[str, dict[str, str]], dict[str, Any
     return decisions, summary
 
 
+def _optional_number(value):
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def build_secret_lair_v2_records(decisions_path: Path, export_path: Path, *, today: date | None = None) -> list[PresentationRecord]:
     decisions, summary = load_decisions(decisions_path)
     history_path = decisions_path.with_name("secret_lair_v2_history.json")
@@ -92,6 +99,11 @@ def build_secret_lair_v2_records(decisions_path: Path, export_path: Path, *, tod
             "research_model": RESEARCH_MODEL,
             "tcgplayer_product_id": str((decision or {}).get("tcgplayer_product_id") or "").strip(),
             "price_history": list(history.get(product, []))[-36:],
+            "range_low_6m": _optional_number((decision or {}).get("range_low_6m")),
+            "range_median_6m": _optional_number((decision or {}).get("range_median_6m")),
+            "range_high_6m": _optional_number((decision or {}).get("range_high_6m")),
+            "prob_profit_6m": _optional_number((decision or {}).get("prob_profit_6m")),
+            "similar_cases": _optional_number((decision or {}).get("similar_cases")),
             "price_age_days": age_days,
             "calibration_intercept": calibration.get("intercept"),
             "calibration_slope": calibration.get("slope"),
