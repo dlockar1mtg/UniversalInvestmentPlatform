@@ -245,3 +245,10 @@
 /* Secret Lair v2: what similar deals did. */
 .sl-v2-outcome-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:6px 0 10px}
 .sl-v2-outcome-grid .metals-hero-metric small{display:block;font-size:12px;opacity:.65;margin-top:2px}
+
+/* Secret Lair product images (TCGplayer CDN). */
+.sl-v2-img{display:block;background:rgba(255,255,255,.04);object-fit:contain}
+.mtg-research-shell .sl-v2-table td.sl-v2-name .sl-v2-thumb{float:left;width:34px;height:48px;border-radius:4px;margin:0 10px 0 0}
+.sl-v2-card-img{float:left;width:46px;height:64px;border-radius:6px;margin:0 10px 0 0}
+.sl-v2-hero-img{float:right;width:150px;max-width:35%;border-radius:10px;margin:0 0 12px 18px}
+@media (max-width:640px){.sl-v2-hero-img{float:none;margin:0 0 12px}}

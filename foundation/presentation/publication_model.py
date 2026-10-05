@@ -203,6 +203,7 @@ def apply_secret_lair_model_decisions(records: list[PresentationRecord]) -> int:
             "model_expected_return_6m": _model_number(decision.get("expected_return_6m")),
             "model_expected_net_return_6m": _model_number(decision.get("expected_net_return_6m")),
             "model_prob_profit_6m": _model_number(decision.get("prob_profit_6m")),
+            "model_tcgplayer_product_id": str(decision.get("tcgplayer_product_id") or "").strip() or None,
         })
         applied += 1
     return applied

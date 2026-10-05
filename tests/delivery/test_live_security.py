@@ -42,6 +42,8 @@ def test_security_headers_are_applied_to_accepted_responses():
     assert response.headers["x-frame-options"] == "DENY"
     assert response.headers["strict-transport-security"].startswith("max-age=")
     assert "frame-ancestors 'none'" in response.headers["content-security-policy"]
+    # images only from the TCGplayer CDN (Secret Lair product images); nothing else widened
+    assert "img-src 'self' https://tcgplayer-cdn.tcgplayer.com;" in response.headers["content-security-policy"]
 
 
 def test_oversized_requests_are_rejected_before_handler_execution():
