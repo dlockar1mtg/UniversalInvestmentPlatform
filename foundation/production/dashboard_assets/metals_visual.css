@@ -259,3 +259,11 @@
 .sl-v2-market-text strong{display:block;font-size:18px;margin:2px 0}
 .sl-v2-market-text small{display:block;font-size:12px;opacity:.65}
 .sl-v2-market svg{width:240px;max-width:100%;height:46px}
+
+/* Pre-Collector v2 scorecard. */
+.pc-v2-scorecard{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:0 0 10px}
+.pc-v2-tile{padding:14px 16px;border:1px solid var(--line,rgba(255,255,255,.1));border-radius:14px;background:rgba(255,255,255,.02)}
+.pc-v2-tile span{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.7}
+.pc-v2-tile strong{display:block;font-size:20px;margin:4px 0}
+.pc-v2-tile small{display:block;font-size:12px;opacity:.65;line-height:1.4}
+.pc-v2-lede{font-size:13px;opacity:.8;margin:0 0 14px}
