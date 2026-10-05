@@ -28,6 +28,7 @@ jobs:
       SOURCE_TOKEN: ${{ secrets.UIP_SOURCE_ARTIFACTS_TOKEN }}
       UIIP_AUTOMATED_PUBLICATION: "1"
       UIP_MTG_SECRET_LAIR_V2_ENABLED: "1"   # Secret Lair v2: research records (#239) + model decisions beside the certified authority (#244)
+      UIP_MTG_PRECOLLECTOR_V2_ENABLED: "0"   # Pre-Collector v2 price tiers; switched on once its pages are ready
     steps:
       - name: Checkout UIP
         uses: actions/checkout@v4
