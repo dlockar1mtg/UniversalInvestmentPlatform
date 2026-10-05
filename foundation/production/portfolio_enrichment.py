@@ -130,6 +130,9 @@ def _decimal(value: object | None) -> Decimal | None:
 def _recommendation(payload: dict[str, object] | None) -> tuple[str | None, str | None]:
     if payload is None:
         return None, None
+    # A daily model decision (Secret Lair v2) travels beside the certified native status; prefer it.
+    if payload.get("model_version") and payload.get("model_purchase_status"):
+        return str(payload["model_purchase_status"]), "model_purchase_status"
     for field in ("native_purchase_status", "native_recommendation", "recommendation"):
         value = payload.get(field)
         if value is not None and str(value).strip():

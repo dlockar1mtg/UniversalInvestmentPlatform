@@ -143,7 +143,8 @@ def test_rec_ui_metals_final_action_is_primary_while_native_domain_semantics_rem
     assert 'const status=cleanStatus(displayStatus(item))' in javascript
     assert "function nativeStatus(item)" in javascript
     assert (
-        'item.domain_id==="mtg"?(payload.native_purchase_status??null):(payload.native_recommendation??payload.recommendation??null)'
+        # A Secret Lair v2 model decision is preferred when present; the certified native status is the fallback.
+        'item.domain_id==="mtg"?(mtgModelDecision(item)?mtgModelDecision(item).model_purchase_status:(payload.native_purchase_status??null)):(payload.native_recommendation??payload.recommendation??null)'
         in javascript
     )
     # Metals v3.1: ranked leaderboard and decision cards (top three BUY).
@@ -253,9 +254,8 @@ def test_rec_ui_metals_final_action_labels_distinguish_governed_and_native_seman
     assert "Native recommendation" in javascript
 
     assert (
-        'item.domain_id==="mtg"?'
-        '(payload.native_purchase_status??null):'
-        '(payload.native_recommendation??payload.recommendation??null)'
+        # A Secret Lair v2 model decision is preferred when present; the certified native status is the fallback.
+        'item.domain_id==="mtg"?(mtgModelDecision(item)?mtgModelDecision(item).model_purchase_status:(payload.native_purchase_status??null)):(payload.native_recommendation??payload.recommendation??null)'
         in javascript
     )
 
