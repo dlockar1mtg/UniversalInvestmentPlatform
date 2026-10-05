@@ -27,6 +27,7 @@ jobs:
       UIIP_DATABASE_URL: ${{ secrets.UIIP_DATABASE_URL }}
       SOURCE_TOKEN: ${{ secrets.UIP_SOURCE_ARTIFACTS_TOKEN }}
       UIIP_AUTOMATED_PUBLICATION: "1"
+      UIP_MTG_SECRET_LAIR_V2_ENABLED: "1"   # Secret Lair v2 research records (pairs with MTG_SECRET_LAIR_V2 in MTG production)
     steps:
       - name: Checkout UIP
         uses: actions/checkout@v4
