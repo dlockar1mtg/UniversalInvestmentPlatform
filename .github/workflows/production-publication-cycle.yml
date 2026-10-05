@@ -27,7 +27,7 @@ jobs:
       UIIP_DATABASE_URL: ${{ secrets.UIIP_DATABASE_URL }}
       SOURCE_TOKEN: ${{ secrets.UIP_SOURCE_ARTIFACTS_TOKEN }}
       UIIP_AUTOMATED_PUBLICATION: "1"
-      UIP_MTG_SECRET_LAIR_V2_ENABLED: "0"   # off until v2 calls reach the catalog (native authority is the certified export)
+      UIP_MTG_SECRET_LAIR_V2_ENABLED: "1"   # Secret Lair v2: research records (#239) + model decisions beside the certified authority (#244)
     steps:
       - name: Checkout UIP
         uses: actions/checkout@v4
