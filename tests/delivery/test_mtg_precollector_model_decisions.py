@@ -51,3 +51,12 @@ def test_tiers_sit_beside_the_certified_authority(tmp_path, monkeypatch):
     assert "model_call" not in lair
     for p in (rtr, alpha, legends, unknown):
         assert p["model_purchase_status"] == pm.PRECOLLECTOR_MODEL_STATUS[p["model_call"]]
+
+
+def test_dashboard_renders_precollector_v2_pages():
+    from pathlib import Path
+    js = (Path(__file__).resolve().parents[2] / "foundation" / "production" / "dashboard_assets" / "recommendation_ui.js").read_text(encoding="utf-8")
+    for needle in ("function pcV2Detail(item)", "function pcV2Table(items)", "function pcV2Scorecard(items)",
+                   '(p.model_version==="secret-lair-v2"||p.model_version==="precollector-v2")&&p.model_purchase_status',
+                   "if(pcV2Decision(item)){pcV2RenderDetail(page,item);return;}", "This is history, not a forecast"):
+        assert needle in js
