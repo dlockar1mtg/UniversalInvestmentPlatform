@@ -77,3 +77,9 @@ def test_dashboard_deals_table_reads_catalog_fields():
     js = (ROOT / "foundation" / "production" / "dashboard_assets" / "recommendation_ui.js").read_text(encoding="utf-8")
     for needle in ("function slV2Table(items)", "function slV2Apply(items)", "p.model_expected_net_return_6m", "bindSlV2Controls(page)", "slV2LaneOn = slV2Ranked("):
         assert needle in js
+
+
+def test_research_page_shows_the_users_position():
+    js = (ROOT / "foundation" / "production" / "dashboard_assets" / "recommendation_ui.js").read_text(encoding="utf-8")
+    assert "async function slV2FillPosition(assetId)" in js and 'recRequest("/v1/portfolio/enriched")' in js
+    assert '<div id="sl-v2-position"></div>${slV2Outcomes(p,buy)}' in js
