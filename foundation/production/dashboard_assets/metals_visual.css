@@ -241,3 +241,7 @@
 .sl-v2-key-low{background:repeating-linear-gradient(90deg,#22c55e 0 5px,transparent 5px 9px)}
 .sl-v2-target{margin:10px 0;padding:8px 12px;border-radius:10px;background:rgba(96,165,250,.10);border:1px solid rgba(96,165,250,.35);font-size:14px}
 .sl-v2-tcg{display:inline-block;margin-top:6px;padding:7px 12px;border-radius:10px;text-decoration:none;font-weight:600}
+
+/* Secret Lair v2: what similar deals did. */
+.sl-v2-outcome-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:6px 0 10px}
+.sl-v2-outcome-grid .metals-hero-metric small{display:block;font-size:12px;opacity:.65;margin-top:2px}
