@@ -270,3 +270,21 @@
 
 /* Pre-Collector: the by-starting-year tile is text, not a headline number. */
 .pc-v2-tier .metals-hero-metric strong.pc-v2-years{font-size:14px!important;font-weight:600;line-height:1.5}
+
+/* Crypto v2 */
+.cv-v2-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin:12px 0}
+.cv-v2-card{padding:16px;border:1px solid var(--line,rgba(255,255,255,.1));border-radius:14px;background:rgba(255,255,255,.02);display:flex;flex-direction:column;gap:8px}
+.cv-v2-card.cv-v2-core{border-color:rgba(91,214,160,.35)}
+.cv-v2-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.cv-v2-card-head strong{display:block;font-size:18px}
+.cv-v2-card-head small{display:block;font-size:12px;opacity:.65}
+.cv-v2-meaning{margin:0;font-weight:600}
+.cv-v2-facts{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin:0}
+.cv-v2-facts dt{font-size:11px;opacity:.6;text-transform:uppercase;letter-spacing:.04em}
+.cv-v2-facts dd{margin:0;font-size:15px}
+.cv-v2-facts dd.neg{color:var(--neg,#f07a7a)}
+.cv-v2-facts dd.pos{color:var(--pos,#5bd6a0)}
+.cv-v2-vs{margin:0;font-size:12px;opacity:.75}
+.cv-v2-card .cv-v2-research{align-self:flex-start;margin-top:auto}
+.cv-v2-tag{margin-left:8px;font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid rgba(91,214,160,.4);opacity:.85}
+.sl-v2-table tr.cv-v2-current td{background:rgba(91,214,160,.08);font-weight:600}
