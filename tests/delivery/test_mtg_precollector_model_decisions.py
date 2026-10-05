@@ -67,3 +67,12 @@ def test_hold_calls_are_labelled_hold_not_no_price():
     js = (Path(__file__).resolve().parents[2] / "foundation" / "production" / "dashboard_assets" / "recommendation_ui.js").read_text(encoding="utf-8")
     # Pre-Collector HOLD boxes have a price; the pill must not say NO PRICE (found on the live page, Oct 5)
     assert 'c==="HOLD"?"HOLD":"NO PRICE"' in js
+
+
+def test_precollector_polish():
+    from pathlib import Path
+    js = (Path(__file__).resolve().parents[2] / "foundation" / "production" / "dashboard_assets" / "recommendation_ui.js").read_text(encoding="utf-8")
+    assert "function pcV2Change12(p)" in js and "Box price <small>past 12 mo</small>" in js
+    assert '<strong class="pc-v2-years">' in js
+    # call filters drop statuses that belong to other lanes (Secret Lair and Pre-Collector)
+    assert js.count('if(i>0&&!labels[String(o.value||"").toUpperCase()]&&!o.selected)o.remove()') == 2
