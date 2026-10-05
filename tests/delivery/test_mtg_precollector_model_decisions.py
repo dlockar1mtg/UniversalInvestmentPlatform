@@ -60,3 +60,10 @@ def test_dashboard_renders_precollector_v2_pages():
                    '(p.model_version==="secret-lair-v2"||p.model_version==="precollector-v2")&&p.model_purchase_status',
                    "if(pcV2Decision(item)){pcV2RenderDetail(page,item);return;}", "This is history, not a forecast"):
         assert needle in js
+
+
+def test_hold_calls_are_labelled_hold_not_no_price():
+    from pathlib import Path
+    js = (Path(__file__).resolve().parents[2] / "foundation" / "production" / "dashboard_assets" / "recommendation_ui.js").read_text(encoding="utf-8")
+    # Pre-Collector HOLD boxes have a price; the pill must not say NO PRICE (found on the live page, Oct 5)
+    assert 'c==="HOLD"?"HOLD":"NO PRICE"' in js
