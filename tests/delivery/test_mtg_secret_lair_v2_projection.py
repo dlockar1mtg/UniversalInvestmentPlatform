@@ -75,3 +75,5 @@ def test_price_history_and_tcgplayer_id_reach_the_record(tmp_path):
     a, gone = recs[0].payload, recs[2].payload
     assert a["price_history"] == [["2026-09", 50, 44], ["2026-10", 50, 44]] and gone["price_history"] == []
     assert a["tcgplayer_product_id"] == ""
+    # outcome ranges are optional columns: absent in the decisions file, present but empty in the record
+    assert all(k in a and a[k] is None for k in ("range_low_6m", "range_high_6m", "prob_profit_6m", "similar_cases"))
