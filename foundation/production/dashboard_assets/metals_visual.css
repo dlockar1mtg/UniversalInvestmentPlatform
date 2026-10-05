@@ -267,3 +267,6 @@
 .pc-v2-tile strong{display:block;font-size:20px;margin:4px 0}
 .pc-v2-tile small{display:block;font-size:12px;opacity:.65;line-height:1.4}
 .pc-v2-lede{font-size:13px;opacity:.8;margin:0 0 14px}
+
+/* Pre-Collector: the by-starting-year tile is text, not a headline number. */
+.pc-v2-tier .metals-hero-metric strong.pc-v2-years{font-size:14px!important;font-weight:600;line-height:1.5}
