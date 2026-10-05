@@ -99,3 +99,22 @@ def test_fetcher_keeps_months_kraken_no_longer_returns(tmp_path):
     rows = {(r["asset"], r["month"]): r["close"] for r in csv.DictReader(out.open())}
     assert rows[("bitcoin", "2013-10")] == "123.8" and rows[("bitcoin", "2026-09")] == "61000" and rows[("bitcoin", "2026-10")] == "85755"
     assert rows[("ethereum", "2026-10")] == "85755"            # every pair got the fake payload
+
+
+def test_projection_ranges_and_validation_rule(tmp_path):
+    # steady 2% monthly growth: every outcome is identical, so the "80%" range catches ~100% -> not validated
+    path = _write(tmp_path, {"bitcoin": (_months(120, (2013, 10)), [100 * 1.02 ** i for i in range(120)])})
+    closes = cv.load_closes(path)
+    closes.pop("__updated__")
+    pr = cv.score_asset("bitcoin", closes)["projection"]
+    h12 = pr["horizons"]["12"]
+    assert abs(h12["median"] - (1.02 ** 12 - 1)) < 1e-9 and h12["share_up"] == 1.0 and h12["price_median"] > pr["price"]
+    assert pr["coverage_12m"] > cv.PROJECTION_COVERAGE[1] and pr["coverage_tests"] >= 24 and pr["validated"] is False
+
+
+def test_projection_needs_enough_test_months(tmp_path):
+    path = _write(tmp_path, {"ethereum": (_months(70), [100 * (1.3 if i % 7 == 0 else 1.0) * 1.01 ** i for i in range(70)])})
+    closes = cv.load_closes(path)
+    closes.pop("__updated__")
+    pr = cv.score_asset("ethereum", closes)["projection"]
+    assert pr["coverage_tests"] < cv.PROJECTION_MIN_TESTS and pr["validated"] is False
