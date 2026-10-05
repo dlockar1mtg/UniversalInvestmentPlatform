@@ -151,6 +151,50 @@ def _generic_records(connection: Any, domain_id: str) -> list[PresentationRecord
     return records
 
 
+SECRET_LAIR_MODEL_STATUS = {
+    "BUY": "BUY_CANDIDATE_NOW",
+    "WAIT": "WAIT_FOR_LISTING_DISCOUNT",
+    "NO_PRICE": "NO_CURRENT_MARKET_PRICE",
+}
+
+
+def apply_secret_lair_model_decisions(records: list[PresentationRecord]) -> int:
+    """Add Secret Lair v2 model decisions to MTG recommendation records, when enabled.
+
+    The certified native authority (native_purchase_status, native_rank, native_rank_type,
+    purchase_semantic) is preserved unchanged, as the MTG parity contract requires; the daily
+    v2 decision travels beside it in explicit model_* fields, which consumers prefer when present.
+    Enabled by UIP_MTG_SECRET_LAIR_V2_ENABLED=1 with UIP_MTG_SECRET_LAIR_V2_PATH set.
+    """
+    path = str(os.environ.get("UIP_MTG_SECRET_LAIR_V2_PATH", "")).strip()
+    if os.environ.get("UIP_MTG_SECRET_LAIR_V2_ENABLED") != "1" or not path:
+        return 0
+    from .mtg_secret_lair_v2_projection import load_decisions
+
+    decisions, summary = load_decisions(Path(path))
+    applied = 0
+    for record in records:
+        if record.record_type != "recommendation" or not str(record.asset_id).startswith("SECRET_LAIR_V1_1|"):
+            continue
+        native = str(record.asset_id).split("|", 1)[1]
+        decision = decisions.get(native) or {}
+        call = decision.get("call") or "NO_PRICE"
+        rank = str(decision.get("rank") or "").strip()
+        record.payload.update({
+            "model_version": "secret-lair-v2",
+            "model_call": call,
+            "model_purchase_status": SECRET_LAIR_MODEL_STATUS[call],
+            "model_rank": int(rank) if rank.isdigit() else None,
+            "model_ranked_products": int(decision["ranked_products"]) if str(decision.get("ranked_products") or "").isdigit() else None,
+            "model_rank_type": "SECRET_LAIR_V2_EXPECTED_NET_RETURN_6M",
+            "model_price_usd": decision.get("market_price") or None,
+            "model_note": decision.get("note") or ("" if decision else "NOT_IN_DAILY_PRICE_FEED"),
+            "model_as_of": decision.get("as_of") or summary.get("as_of"),
+        })
+        applied += 1
+    return applied
+
+
 def _mtg_records(connection: Any) -> list[PresentationRecord]:
     records: list[PresentationRecord] = []
     rows = _rows(connection, """
@@ -216,6 +260,7 @@ def _mtg_records(connection: Any) -> list[PresentationRecord]:
                 "_imported_at_utc": row["_imported_at_utc"],
             }))
         records.append(_record("native_authority", "mtg", asset_id, asset_id, row))
+    apply_secret_lair_model_decisions(records)
     return records
 
 
