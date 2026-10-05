@@ -210,6 +210,67 @@ def apply_secret_lair_model_decisions(records: list[PresentationRecord]) -> int:
     return applied
 
 
+PRECOLLECTOR_MODEL_STATUS = {"BUY": "BUY_CANDIDATE_NOW", "HOLD": "HOLD_NO_BUY_SIGNAL", "NO_PRICE": "NO_CURRENT_MARKET_PRICE"}
+
+
+def apply_precollector_model_decisions(records: list[PresentationRecord]) -> int:
+    """Add Pre-Collector v2 model decisions (price tiers) to MTG recommendation records, when enabled.
+
+    As for Secret Lair v2, the certified native authority is preserved unchanged and the daily
+    decision travels beside it in model_* fields. Enabled by UIP_MTG_PRECOLLECTOR_V2_ENABLED=1 with
+    UIP_MTG_PRECOLLECTOR_V2_PATH set to the MTG precollector_v2_decisions.csv; its .json summary
+    (tier history) and precollector_v2_history.json (monthly prices) are read from beside it.
+    """
+    import csv as _csv
+    import json as _json
+
+    path = str(os.environ.get("UIP_MTG_PRECOLLECTOR_V2_PATH", "")).strip()
+    if os.environ.get("UIP_MTG_PRECOLLECTOR_V2_ENABLED") != "1" or not path:
+        return 0
+    decisions_path = Path(path)
+    with decisions_path.open(newline="", encoding="utf-8") as handle:
+        decisions = {str(r.get("tcgplayer_product_id") or "").strip(): r for r in _csv.DictReader(handle)}
+    summary_path = decisions_path.with_suffix(".json")
+    summary = _json.loads(summary_path.read_text(encoding="utf-8")) if summary_path.is_file() else {}
+    history_path = decisions_path.with_name("precollector_v2_history.json")
+    history = _json.loads(history_path.read_text(encoding="utf-8")) if history_path.is_file() else {}
+    tiers = summary.get("tier_history") or {}
+    applied = 0
+    for record in records:
+        asset = str(record.asset_id)
+        if record.record_type != "recommendation" or not asset.startswith("PRE_COLLECTOR_V1|"):
+            continue
+        product = asset.split("tcgplayer:", 1)[1].strip() if "tcgplayer:" in asset else ""
+        decision = decisions.get(product) or {}
+        call = decision.get("call") or "NO_PRICE"
+        if call not in PRECOLLECTOR_MODEL_STATUS:
+            raise ValueError(f"Pre-Collector v2 decision has an unknown call {call!r} for {asset}")
+        tier = str(decision.get("tier") or "").strip()
+        rank = str(decision.get("rank") or "").strip()
+        ranked = str(decision.get("ranked_boxes") or "").strip()
+        record.payload.update({
+            "model_version": "precollector-v2",
+            "model_call": call,
+            "model_purchase_status": PRECOLLECTOR_MODEL_STATUS[call],
+            "model_rank": int(rank) if rank.isdigit() else None,
+            "model_ranked_products": int(ranked) if ranked.isdigit() else None,
+            "model_rank_type": "PRECOLLECTOR_V2_PRICE_TIER",
+            "model_tier": int(tier) if tier.isdigit() else None,
+            "model_price_usd": _model_number(decision.get("price")),
+            "model_price_date": decision.get("price_date") or None,
+            "model_price_source": decision.get("price_source") or None,
+            "model_release_date": decision.get("release_date") or None,
+            "model_note": decision.get("note") or ("" if decision else "NOT_IN_PRICE_FEED"),
+            "model_as_of": decision.get("as_of") or summary.get("as_of"),
+            "model_tcgplayer_product_id": product or None,
+            "model_tier_history": tiers.get(tier) if tier else None,
+            "model_buy_tiers": summary.get("buy_tiers"),
+            "model_price_history": list(history.get(product, []))[-36:],
+        })
+        applied += 1
+    return applied
+
+
 def _mtg_records(connection: Any) -> list[PresentationRecord]:
     records: list[PresentationRecord] = []
     rows = _rows(connection, """
@@ -276,6 +337,7 @@ def _mtg_records(connection: Any) -> list[PresentationRecord]:
             }))
         records.append(_record("native_authority", "mtg", asset_id, asset_id, row))
     apply_secret_lair_model_decisions(records)
+    apply_precollector_model_decisions(records)
     return records
 
 
