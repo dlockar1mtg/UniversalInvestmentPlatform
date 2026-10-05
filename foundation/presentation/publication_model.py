@@ -491,7 +491,11 @@ def build_presentation_publication(
     validate_authority_schema(connection, contract)
     records: list[PresentationRecord] = []
     records.extend(_domain_health_records(connection))
-    records.extend(_generic_records(connection, "crypto"))
+    from foundation.presentation.crypto_v2_model import apply_crypto_model_decisions
+
+    crypto_records = _generic_records(connection, "crypto")
+    apply_crypto_model_decisions(crypto_records)   # Crypto v2 beside the certified records, when enabled
+    records.extend(crypto_records)
     records.extend(_generic_records(connection, "metals"))
     records.extend(_mtg_records(connection))
     records.extend(_mtg_premium_records_from_environment())
