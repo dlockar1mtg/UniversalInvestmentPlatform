@@ -446,7 +446,7 @@ function slV2Pct(v){return v===null||v===undefined?"—":`${Math.round(Number(v)
 function slV2Basis(b){return b==="TCGPLAYER_DIRECT_LOW"?"TCGplayer Direct (verified sellers)":b==="LOWEST_LISTING"?"lowest listing":"—"}
 function slV2BasisNoun(b){return b==="TCGPLAYER_DIRECT_LOW"?"TCGplayer Direct price":"lowest listing"}
 function slV2Name(item){let s=String(displayName(item)||"").trim();const m=s.match(/^(.*?)\s+—\s+(Foil|Nonfoil|Non-Foil) Edition$/i);if(m&&/(Foil|Non-Foil) Edition/i.test(m[1]))s=m[1];s=s.replace(/^Drop:\s*/i,"");if(/^x\s/i.test(s))s="Secret Lair "+s;return s}
-function slV2Pill(call){const c=String(call||"").toUpperCase();const label=c==="BUY"?"BUY":c==="WAIT"?"WAIT":"NO PRICE";return `<span class="metals-call metals-call-${c==="BUY"?"buy":"hold"}">${label}</span>`}
+function slV2Pill(call){const c=String(call||"").toUpperCase();const label=c==="BUY"?"BUY":c==="WAIT"?"WAIT":c==="HOLD"?"HOLD":"NO PRICE";return `<span class="metals-call metals-call-${c==="BUY"?"buy":"hold"}">${label}</span>`}
 let slV2LaneOn=false;
 let slV2SortKey="rank",slV2FinishKey="all",slV2PriceKey="all",slV2CollabKey="all";
 const SL_V2_SELL_COST=0.13;
