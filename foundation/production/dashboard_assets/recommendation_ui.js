@@ -435,6 +435,7 @@ function mtgEntryStateClass(value){
 }
 
 
+function slV2Ranked(items){return items.some(i=>String(((i&&i.payload)||{}).native_rank_type||"")==="SECRET_LAIR_V2_EXPECTED_NET_RETURN_6M")}
 function slV2(item){const p=mtgPremiumPayload(item);return p&&p.research_model==="secret-lair-v2"?p:null}
 function slV2Active(items){return items.some(i=>slV2(i))}
 function slV2Num(v){const n=Number(v);return v===""||v===null||v===undefined||!Number.isFinite(n)?null:n}
@@ -2607,8 +2608,7 @@ async function renderMtgDomain(page,all,filtered,statusOptions,start,maxPage){
     );
 
   if(mtgLane==="secret_lair"){
-    laneFiltered=
-      mtgInvestmentSort(laneFiltered);
+    laneFiltered = slV2Ranked(laneFiltered) ? mtgNativeInvestmentSort(laneFiltered) : mtgInvestmentSort(laneFiltered);
   }
 
   if(
