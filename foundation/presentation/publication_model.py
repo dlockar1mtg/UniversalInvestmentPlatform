@@ -158,6 +158,13 @@ SECRET_LAIR_MODEL_STATUS = {
 }
 
 
+def _model_number(value: Any) -> float | None:
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
+
+
 def apply_secret_lair_model_decisions(records: list[PresentationRecord]) -> int:
     """Add Secret Lair v2 model decisions to MTG recommendation records, when enabled.
 
@@ -190,6 +197,11 @@ def apply_secret_lair_model_decisions(records: list[PresentationRecord]) -> int:
             "model_price_usd": decision.get("market_price") or None,
             "model_note": decision.get("note") or ("" if decision else "NOT_IN_DAILY_PRICE_FEED"),
             "model_as_of": decision.get("as_of") or summary.get("as_of"),
+            "model_buy_price_usd": _model_number(decision.get("buy_price")),
+            "model_buy_basis": decision.get("buy_price_basis") or None,
+            "model_gap": _model_number(decision.get("gap")),
+            "model_expected_return_6m": _model_number(decision.get("expected_return_6m")),
+            "model_expected_net_return_6m": _model_number(decision.get("expected_net_return_6m")),
         })
         applied += 1
     return applied
