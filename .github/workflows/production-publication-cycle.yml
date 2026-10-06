@@ -29,6 +29,7 @@ jobs:
       UIIP_AUTOMATED_PUBLICATION: "1"
       UIP_MTG_SECRET_LAIR_V2_ENABLED: "1"   # Secret Lair v2: research records (#239) + model decisions beside the certified authority (#244)
       UIP_MTG_PRECOLLECTOR_V2_ENABLED: "1"   # Pre-Collector v2 price tiers (#255) with its list and research pages
+      UIP_CRYPTO_V2_ENABLED: "0"   # Crypto v2 valuation regime; on once its prices are stored and its pages are ready
     steps:
       - name: Checkout UIP
         uses: actions/checkout@v4
