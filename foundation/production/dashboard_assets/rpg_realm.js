@@ -59,17 +59,43 @@ function bindNavigation(root){
     else goResearch(target.dataset.rpgDomain,target.dataset.rpgAsset);
   });
 }
-/* Move a page's original sections into a closed scroll below the realm view; ids stay intact. */
+/* Keep a page's realm view first and its original sections in a closed scroll below it; ids stay intact.
+   Safe to run again: dashboard.js sometimes rebuilds a page or inserts a panel after the heading. */
 function tuck(page,view,title,detail){
-  if(page.classList.contains("rpg-realm-on"))return;
   const heading=page.querySelector(":scope > .page-heading");
-  page.insertBefore(view,heading?heading.nextSibling:page.firstChild);
-  const scroll=document.createElement("details");
-  scroll.className="rpg-scroll";
-  scroll.innerHTML=`<summary><span>${esc(title)}</span><small>${esc(detail)}</small></summary>`;
-  [...page.children].filter(child=>child!==view&&child!==heading&&child!==scroll).forEach(child=>scroll.appendChild(child));
-  page.appendChild(scroll);
+  let scroll=page.querySelector(":scope > details.rpg-scroll");
+  const viewPlaced=view.parentNode===page;
+  const stray=[...page.children].filter(child=>child!==view&&child!==heading&&child!==scroll);
+  if(!scroll){
+    scroll=document.createElement("details");
+    scroll.className="rpg-scroll";
+    scroll.innerHTML=`<summary><span>${esc(title)}</span><small>${esc(detail)}</small></summary>`;
+  }
+  const top=stray.filter(child=>viewPlaced&&(child.compareDocumentPosition(view)&Node.DOCUMENT_POSITION_FOLLOWING));
+  const summary=scroll.querySelector(":scope > summary");
+  top.reverse().forEach(child=>scroll.insertBefore(child,summary?summary.nextSibling:scroll.firstChild));
+  stray.filter(child=>!top.includes(child)).forEach(child=>scroll.appendChild(child));
+  const wanted=heading?heading.nextElementSibling:page.firstElementChild;
+  if(wanted!==view)page.insertBefore(view,heading?heading.nextSibling:page.firstChild);
+  if(scroll.parentNode!==page||page.lastElementChild!==scroll)page.appendChild(scroll);
   page.classList.add("rpg-realm-on");
+}
+const HALL_SCROLL=["The steward's ledger","Certified totals, attention, domain health and authority"];
+const TREASURY_SCROLL=["The counting house","Certified portfolio tables, Acorns and manual ETF entry"];
+/* Re-apply the realm layout when dashboard.js rewrites Home or Portfolio after the last render. */
+function guardRealmPage(id,viewId,render,scrollText){
+  const page=byId(id);
+  if(!page)return;
+  let queued=false;
+  new MutationObserver(()=>{
+    if(queued)return;
+    queued=true;
+    queueMicrotask(()=>{
+      queued=false;
+      if(!state.home)return;
+      try{const view=byId(viewId);if(view&&page.contains(view))tuck(page,view,scrollText[0],scrollText[1]);else render(state.home)}catch(error){console.error("[realm] guard",error)}
+    });
+  }).observe(page,{childList:true});
 }
 
 /* Icons */
@@ -205,7 +231,8 @@ function renderHall(d){
   const page=byId("home");
   if(!page)return;
   let hall=byId("rpg-hall");
-  if(!hall){hall=document.createElement("div");hall.id="rpg-hall";hall.className="rpg-realm-view";tuck(page,hall,"The steward's ledger","Certified totals, attention, domain health and authority");bindNavigation(hall)}
+  if(!hall){hall=document.createElement("div");hall.id="rpg-hall";hall.className="rpg-realm-view";bindNavigation(hall)}
+  tuck(page,hall,HALL_SCROLL[0],HALL_SCROLL[1]);
   hall.innerHTML=`${chronicle(d)}${realmTabs("hall")}${vitals(d.refresh)}<div class="rpg-duo">${treasuryRing(d)}${questJournal(d)}</div>${recentDeeds(d)}${footer("Research, not personal financial advice. No counsel here places a trade.")}`;
   applyWidths(hall);
   if(!state.catalog)loadCatalog().then(()=>{const q=byId("rpg-quests");if(q&&state.home===d)q.outerHTML=questJournal(d)}).catch(()=>{const q=byId("rpg-quests");const list=q&&q.querySelector(".rpg-counsel-list");if(list)list.innerHTML=`<p class="rpg-parch-note">The oracles are silent: counsel could not be loaded.</p>`});
@@ -261,8 +288,9 @@ function renderInventory(d){
   const page=byId("portfolio");
   if(!page)return;
   let view=byId("rpg-treasury");
-  if(!view){view=document.createElement("div");view.id="rpg-treasury";view.className="rpg-realm-view";tuck(page,view,"The counting house","Certified portfolio tables, Acorns and manual ETF entry");bindNavigation(view);
+  if(!view){view=document.createElement("div");view.id="rpg-treasury";view.className="rpg-realm-view";bindNavigation(view);
     view.addEventListener("click",event=>{const tab=event.target.closest("[data-rpg-filter]");const slot=event.target.closest("[data-rpg-item]");if(tab){state.invFilter=tab.dataset.rpgFilter;renderInventory(state.home)}else if(slot){state.invPick=slot.dataset.rpgItem;renderInventory(state.home);view.querySelector(`[data-rpg-item="${CSS.escape(state.invPick)}"]`)?.focus()}});}
+  tuck(page,view,TREASURY_SCROLL[0],TREASURY_SCROLL[1]);
   const all=inventoryItems(d);
   const kinds=["relic","ingot","charter","tome","coffer","purse"].filter(k=>all.some(i=>i.kind===k));
   if(state.invFilter!=="all"&&!kinds.includes(state.invFilter))state.invFilter="all";
@@ -424,7 +452,8 @@ function watchCounsel(){
   new MutationObserver(()=>{if(queued)return;queued=true;queueMicrotask(()=>{queued=false;try{decorateCounsel()}catch(error){console.error("[realm] counsel",error)}})}).observe(page,{childList:true});
   decorateCounsel();
 }
-if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",watchCounsel);else watchCounsel();
+function watchPages(){watchCounsel();guardRealmPage("home","rpg-hall",renderHall,HALL_SCROLL);guardRealmPage("portfolio","rpg-treasury",renderInventory,TREASURY_SCROLL)}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",watchPages);else watchPages();
 
 document.addEventListener("uip:home-rendered",event=>{
   const d=event.detail||{};
