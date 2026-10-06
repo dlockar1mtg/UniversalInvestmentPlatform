@@ -335,7 +335,8 @@ def apply_collector_model_decisions(records: list[PresentationRecord]) -> int:
             raise ValueError(f"Collector v2 decision has an unknown call {call!r} for {asset}")
         note = "" if decision else "NOT_IN_PRICE_FEED"
         if decision and call == "NO_PRICE":
-            note = "NO_CURRENT_PRICE" if not _model_number(decision.get("market_price")) else "NO_RELEASE_DATE"
+            note = str(decision.get("note") or "").strip() or (
+                "NO_CURRENT_PRICE" if not _model_number(decision.get("market_price")) else "NO_RELEASE_DATE")
         calibrated = signed(decision.get("calibrated_net_return_6m"))
         record.payload.update({
             "model_version": "collector-v2",
@@ -359,6 +360,7 @@ def apply_collector_model_decisions(records: list[PresentationRecord]) -> int:
             "model_validation_status": status if calibrated is not None else "NOT_VALIDATED",
             "model_walk_forward": walk_summary,
             "model_note": note,
+            "model_release_date": decision.get("release_date") or None,
             "model_as_of": decision.get("as_of") or summary.get("as_of"),
             "model_tcgplayer_product_id": product or None,
             "model_price_history": list(history.get(product, []))[-36:],
