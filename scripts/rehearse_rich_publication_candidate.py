@@ -62,6 +62,7 @@ MTG_RICH_EXPECTED_COUNTS = {
 MTG_OPTIONAL_ENV_PATHS = {
     "UIP_MTG_SECRET_LAIR_V2_PATH": "data/history/tcgcsv_weekly/secret_lair_v2_decisions.csv",
     "UIP_MTG_PRECOLLECTOR_V2_PATH": "data/history/boxes/precollector_v2_decisions.csv",
+    "UIP_MTG_COLLECTOR_V2_PATH": "data/history/boxes/collector_v2_decisions.csv",
     "UIP_MTG_EXPORT_PAYLOAD_PATH": "docs/phase_9/uip_export/mtg_v1_uip_export_payload.csv",
 }
 
