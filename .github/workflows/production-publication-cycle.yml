@@ -52,8 +52,8 @@ jobs:
           # Start time of the newest successful run that did real work (a job other than the gate succeeded).
           last_worked() {
             local token="$1" repo="$2" workflow="$3" runs id started worked
-            runs="$(api "$token" "https://api.github.com/repos/$repo/actions/workflows/$workflow/runs?branch=main&status=success&per_page=30" |
-              jq -r --argjson self "$GITHUB_RUN_ID" '.workflow_runs[] | select(.id != $self) | select(.event == "schedule" or .event == "workflow_dispatch") | "\(.id) \(.run_started_at)"')"
+            runs="$(api "$token" "https://api.github.com/repos/$repo/actions/workflows/$workflow/runs?per_page=50" |
+              jq -r --argjson self "$GITHUB_RUN_ID" '.workflow_runs[] | select(.head_branch == "main" and .conclusion == "success") | select(.id != $self) | select(.event == "schedule" or .event == "workflow_dispatch") | "\(.id) \(.run_started_at)"')"
             while read -r id started; do
               [ -n "$id" ] || continue
               worked="$(api "$token" "https://api.github.com/repos/$repo/actions/runs/$id/jobs?per_page=100" | jq '[.jobs[] | select(.name != "gate" and .conclusion == "success")] | length')"
