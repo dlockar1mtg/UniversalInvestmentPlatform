@@ -271,6 +271,102 @@ def apply_precollector_model_decisions(records: list[PresentationRecord]) -> int
     return applied
 
 
+COLLECTOR_MODEL_STATUS = {"BUY": "BUY_CANDIDATE_NOW", "HOLD": "HOLD_NO_BUY_SIGNAL", "NO_PRICE": "NO_CURRENT_MARKET_PRICE"}
+
+
+def _collector_product_id(asset: str) -> str:
+    """The TCGplayer product id inside a Collector asset id (COLLECTOR_V1|MTG-CANON-TCGPLAYER-<id>)."""
+    tail = asset.split("|", 1)[1] if "|" in asset else asset
+    for marker in ("TCGPLAYER-", "tcgplayer:"):
+        if marker in tail:
+            return tail.rsplit(marker, 1)[1].strip()
+    return tail.strip() if tail.strip().isdigit() else ""
+
+
+def apply_collector_model_decisions(records: list[PresentationRecord]) -> int:
+    """Add Collector v2 model decisions to MTG Collector recommendation records, when enabled.
+
+    As for Secret Lair and Pre-Collector v2, the certified native authority is preserved unchanged
+    and the daily decision travels beside it in model_* fields. The expected return shown is the
+    walk-forward result of the box's predicted quarter (what boxes ranked like it actually made
+    after selling costs), not the raw regression output, which ran high for the top quarter.
+    Enabled by UIP_MTG_COLLECTOR_V2_ENABLED=1 with UIP_MTG_COLLECTOR_V2_PATH set to the MTG
+    collector_v2_decisions.csv; its .json summary (walk-forward results) and
+    collector_v2_history.json (monthly prices) are read from beside it.
+    """
+    import csv as _csv
+    import json as _json
+
+    path = str(os.environ.get("UIP_MTG_COLLECTOR_V2_PATH", "")).strip()
+    if os.environ.get("UIP_MTG_COLLECTOR_V2_ENABLED") != "1" or not path:
+        return 0
+    decisions_path = Path(path)
+    with decisions_path.open(newline="", encoding="utf-8") as handle:
+        decisions = {str(r.get("tcgplayer_product_id") or "").strip(): r for r in _csv.DictReader(handle)}
+    summary_path = decisions_path.with_suffix(".json")
+    summary = _json.loads(summary_path.read_text(encoding="utf-8")) if summary_path.is_file() else {}
+    history_path = decisions_path.with_name("collector_v2_history.json")
+    history = _json.loads(history_path.read_text(encoding="utf-8")) if history_path.is_file() else {}
+    walk = summary.get("walk_forward") or {}
+    status = str(walk.get("status") or "NOT_VALIDATED")
+    walk_summary = {key: walk.get(key) for key in ("test_months", "first_test_month", "last_test_month", "quarters",
+                                                    "all_boxes", "recent", "buy_quarter_edge", "rank_correlation",
+                                                    "share_months_rank_positive", "status")} if walk else None
+
+    def whole(value):
+        text = str(value or "").strip()
+        return int(float(text)) if text.replace(".", "", 1).isdigit() else None
+
+    def signed(value):
+        try:
+            return float(value)
+        except (TypeError, ValueError):
+            return None
+
+    applied = 0
+    for record in records:
+        asset = str(record.asset_id)
+        if record.record_type != "recommendation" or not asset.startswith("COLLECTOR_V1|"):
+            continue
+        product = _collector_product_id(asset)
+        decision = decisions.get(product) or {}
+        call = decision.get("call") or "NO_PRICE"
+        if call not in COLLECTOR_MODEL_STATUS:
+            raise ValueError(f"Collector v2 decision has an unknown call {call!r} for {asset}")
+        note = "" if decision else "NOT_IN_PRICE_FEED"
+        if decision and call == "NO_PRICE":
+            note = "NO_CURRENT_PRICE" if not _model_number(decision.get("market_price")) else "NO_RELEASE_DATE"
+        calibrated = signed(decision.get("calibrated_net_return_6m"))
+        record.payload.update({
+            "model_version": "collector-v2",
+            "model_call": call,
+            "model_purchase_status": COLLECTOR_MODEL_STATUS[call],
+            "model_rank": whole(decision.get("rank")),
+            "model_ranked_products": whole(decision.get("ranked_products")),
+            "model_rank_type": "COLLECTOR_V2_EXPECTED_RETURN",
+            "model_quarter": whole(decision.get("quarter")),
+            "model_price_usd": _model_number(decision.get("market_price")),
+            "model_low_price_usd": _model_number(decision.get("low_price")),
+            "model_price_date": decision.get("as_of") or None,
+            "model_months_since_release": signed(decision.get("months_since_release")),
+            "model_in_sweet_spot": decision.get("in_sweet_spot") == "1",
+            "model_trend_6m": signed(decision.get("trend_6m")),
+            "model_raw_expected_net_return_6m": signed(decision.get("expected_net_return_6m")),
+            "model_expected_net_return_6m": calibrated,
+            "model_net_p10_6m": signed(decision.get("calibrated_net_p10_6m")),
+            "model_net_p90_6m": signed(decision.get("calibrated_net_p90_6m")),
+            "model_share_profitable_6m": signed(decision.get("calibrated_share_profitable")),
+            "model_validation_status": status if calibrated is not None else "NOT_VALIDATED",
+            "model_walk_forward": walk_summary,
+            "model_note": note,
+            "model_as_of": decision.get("as_of") or summary.get("as_of"),
+            "model_tcgplayer_product_id": product or None,
+            "model_price_history": list(history.get(product, []))[-36:],
+        })
+        applied += 1
+    return applied
+
+
 def _mtg_records(connection: Any) -> list[PresentationRecord]:
     records: list[PresentationRecord] = []
     rows = _rows(connection, """
@@ -338,6 +434,7 @@ def _mtg_records(connection: Any) -> list[PresentationRecord]:
         records.append(_record("native_authority", "mtg", asset_id, asset_id, row))
     apply_secret_lair_model_decisions(records)
     apply_precollector_model_decisions(records)
+    apply_collector_model_decisions(records)
     return records
 
 
