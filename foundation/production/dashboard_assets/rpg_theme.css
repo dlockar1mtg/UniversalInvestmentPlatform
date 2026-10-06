@@ -100,11 +100,11 @@ strong,td,dd,.num{font-variant-numeric:lining-nums tabular-nums}
 
 /* Buttons: gold-leaf primary, stone secondary */
 button{border-radius:2px;letter-spacing:.08em}
-button:not(.secondary):not(.nav-item):not(.slot){
+button:not(.secondary):not(.nav-item):not(.slot):not(.rpg-btn){
   background:linear-gradient(180deg,#e3c272,#c9a24c);color:#1b140c;border:1px solid #f0d58e;
   box-shadow:inset 0 -3px 0 var(--gold-deep);
 }
-button:not(.secondary):not(.nav-item):not(.slot):hover{filter:brightness(1.08)}
+button:not(.secondary):not(.nav-item):not(.slot):not(.rpg-btn):hover{filter:brightness(1.08)}
 button.secondary{background:#1a1612;color:#e2c27a;border:1px solid var(--bronze-dark);box-shadow:inset 0 0 0 1px rgba(0,0,0,.5)}
 button.secondary:hover{border-color:var(--bronze);color:var(--gold)}
 button:focus-visible,.nav-item:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
@@ -117,6 +117,7 @@ input::placeholder,textarea::placeholder{color:#857660}
 .pill{border-radius:2px;letter-spacing:.12em}
 
 /* Tables */
+th,td{font-size:.84rem}
 th{color:var(--muted);letter-spacing:.08em;border-bottom-color:var(--bronze-dark)}
 tbody tr:hover{background:rgba(217,180,90,.05)}
 
@@ -145,4 +146,212 @@ tbody tr:hover{background:rgba(217,180,90,.05)}
 @media (max-width:720px){
   .panel::before,.panel::after{display:none}
   .topbar h1{font-size:1.4rem}
+}
+
+/* ===== Realm views (rpg_realm.js): The Hall, the Treasury inventory, the Arcane Vault ===== */
+.rpg-realm-on>.page-heading{display:none}
+.rpg-realm-view{display:flex;flex-direction:column;gap:24px;margin:0 0 24px;font-family:var(--font-body)}
+.rpg-btn{font:inherit;cursor:pointer;background:none;border:0;color:inherit;padding:0;text-align:left;letter-spacing:normal;border-radius:0;box-shadow:none}
+.rpg-stone{background-color:#231f1a;background-image:radial-gradient(circle at 20% 10%,rgba(255,240,210,.05),transparent 40%),radial-gradient(circle at 80% 90%,rgba(0,0,0,.35),transparent 50%);border:1px solid #5f4a2c;box-shadow:inset 0 0 0 3px #1a1612,inset 0 0 0 4px #7a6038,0 10px 30px rgba(0,0,0,.45);color:#eadfc8}
+.rpg-parch{background-color:#e9dcbd;background-image:radial-gradient(circle at 15% 20%,rgba(255,250,235,.55),transparent 45%),radial-gradient(circle at 85% 80%,rgba(150,110,60,.18),transparent 55%);border:1px solid #8a6a3a;box-shadow:inset 0 0 40px rgba(120,80,30,.25),0 8px 24px rgba(0,0,0,.4);color:#2a1d12}
+.rpg-parch p,.rpg-parch span,.rpg-parch strong,.rpg-parch h2,.rpg-parch li{color:inherit}
+.rpg-stone-title,.rpg-parch-title{margin:0;font-family:var(--font-display);font-weight:700;font-size:1.25rem;letter-spacing:.1em;text-transform:uppercase}
+.rpg-stone-title{color:#e2c27a}
+.rpg-parch-title{color:#4a2f14;font-size:1.45rem}
+.rpg-parch .rpg-parch-title{color:#4a2f14}
+.rpg-parch-kicker,.rpg-stat-label{font-family:"Alegreya SC",var(--font-body);font-size:.95rem;letter-spacing:.06em;color:#6b4e2c}
+.rpg-parch .rpg-parch-kicker,.rpg-parch .rpg-stat-label{color:#6b4e2c}
+.rpg-parch-note{margin:0;font-size:.95rem;font-style:italic;color:#5a4128}
+.rpg-parch .rpg-parch-note{color:#5a4128}
+.rpg-section-head{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:12px}
+.rpg-footnote{margin:0;text-align:center;font-size:.9rem;font-style:italic;color:#8c7f68}
+.rpg-muted{color:#b9a98a}
+.rpg-gold{color:#f1d78f}
+.rpg-up{color:#4d7a3a}
+.rpg-down{color:#8f2f24}
+.rpg-stone .rpg-up{color:#9ccb7f}
+.rpg-stone .rpg-down{color:#e08a7d}
+.rpg-parch .rpg-up{color:#3f6b2e}
+.rpg-parch .rpg-down{color:#8f2f24}
+.rpg-strong{font-weight:700}
+.rpg-fluid{width:100%;height:auto;display:block}
+.rpg-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.rpg-link{font-family:var(--font-display);font-weight:700;font-size:.85rem;letter-spacing:.08em;text-transform:uppercase;color:#e2c27a}
+.rpg-link:hover{color:#f3dca4}
+.rpg-parch .rpg-link,.rpg-link-ink{color:#6b4520}
+.rpg-parch .rpg-link:hover{color:#2a1d12}
+.rpg-btn:focus-visible{outline:2px solid #f1d78f;outline-offset:2px}
+.rpg-parch .rpg-btn:focus-visible{outline-color:#4a2f14}
+
+/* Chronicle header */
+.rpg-chronicle{padding:20px 28px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px}
+.rpg-chronicle-id{display:flex;align-items:center;gap:16px}
+.rpg-chronicle-title{font-family:var(--font-display);font-weight:900;font-size:1.9rem;letter-spacing:.12em;text-transform:uppercase;color:#e8c877;line-height:1.1}
+.rpg-chronicle-sub{font-size:1rem;font-style:italic;color:#b9a98a}
+.rpg-chronicle-worth{display:flex;flex-direction:column;align-items:flex-end;gap:2px}
+.rpg-chronicle-worth span{font-family:"Alegreya SC",var(--font-body);font-size:.95rem;color:#b9a98a}
+.rpg-chronicle-worth strong{font-family:var(--font-display);font-size:1.65rem;font-weight:700;color:#f1d78f;font-variant-numeric:lining-nums tabular-nums}
+.rpg-chronicle-worth small{font-size:.95rem}
+
+/* Realm tabs */
+.rpg-realms{display:flex;flex-wrap:wrap;gap:10px}
+.rpg-realm{padding:10px 16px;font-family:var(--font-display);font-weight:700;font-size:.86rem;letter-spacing:.08em;text-transform:uppercase;color:#e2c27a;background-color:#231f1a;border:1px solid #5f4a2c;box-shadow:inset 0 0 0 3px #1a1612,inset 0 0 0 4px #7a6038,0 6px 16px rgba(0,0,0,.35)}
+.rpg-realm:hover{color:#f3dca4;background-color:#2b251e}
+.rpg-realm.is-active{color:#1b140c;background:#d9b45a;border-color:#f0d58e;box-shadow:inset 0 -3px 0 #9c7a33}
+.rpg-realm.is-locked{display:flex;gap:8px;align-items:center;color:#8c7f68;cursor:default}
+
+/* Vitals */
+.rpg-vitals.rpg-stone{padding:18px 24px;display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:20px;margin:0;cursor:pointer}
+.rpg-vitals .rpg-vital-head{font-family:"Alegreya SC",var(--font-body);font-size:1rem;letter-spacing:.02em}
+.rpg-vitals .rpg-bar{height:16px;border-color:#6b5534;background:#120f0c}
+.rpg-vitals .rpg-bar>i{box-shadow:inset 0 2px 0 rgba(255,255,255,.25)}
+
+/* Two-up rows */
+.rpg-duo{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
+.rpg-vault .rpg-duo{align-items:stretch}
+.rpg-duo>*{flex:1 1 420px;min-width:0}
+
+/* Treasury ring */
+.rpg-treasury{padding:28px 32px;display:flex;flex-direction:column;gap:20px;flex-grow:1.25!important}
+.rpg-treasury-body{display:flex;flex-wrap:wrap;gap:28px;align-items:center}
+.rpg-ring{flex:none}
+.rpg-legend{flex:1 1 240px;display:flex;flex-direction:column;gap:10px;font-size:1.05rem}
+.rpg-legend-row{display:flex;align-items:center;gap:10px}
+.rpg-legend-name{flex:1}
+.rpg-legend-value{font-weight:700;font-variant-numeric:lining-nums tabular-nums}
+.rpg-legend-share{width:48px;text-align:right;color:#6b4e2c;font-variant-numeric:lining-nums tabular-nums}
+.rpg-parch .rpg-legend-share{color:#6b4e2c}
+.rpg-treasury .rpg-link{align-self:flex-start}
+
+/* Quest journal */
+.rpg-quests{padding:28px 32px;display:flex;flex-direction:column;gap:14px}
+.rpg-counsel-list{display:flex;flex-direction:column;gap:10px}
+.rpg-counsel{display:flex;gap:14px;align-items:flex-start;padding:12px 14px;border:1px solid #a88552;background:rgba(255,248,230,.45);color:#2a1d12;width:100%}
+.rpg-counsel:hover{background:rgba(255,248,230,.75)}
+.rpg-counsel>span:last-child{display:flex;flex-direction:column;gap:2px}
+.rpg-counsel strong{font-size:1.1rem}
+.rpg-counsel>span:last-child>span{font-size:1rem;color:#5a4128}
+.rpg-badge{font-family:var(--font-display);font-weight:700;font-size:.78rem;letter-spacing:.1em;padding:6px 10px;white-space:nowrap;color:#f6e7c2;background:#7a5a24}
+.rpg-badge-azure{background:#2f5e8f}
+.rpg-badge-verdant{background:#4d7a3a}
+.rpg-badge-crimson{background:#8f2f24}
+.rpg-badge-bronze{background:#7a5a24}
+.rpg-badge-stone{background:#5f5547}
+.rpg-badge-outline{background:none;border:1px solid #8c7f68;color:#d8cbb0;padding:4px 10px}
+.rpg-parch .rpg-badge{color:#f6e7c2}
+.rpg-tasks{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:10px;font-size:1.05rem}
+.rpg-tasks li{display:flex;gap:10px;align-items:center}
+.rpg-tasks li.is-done span{text-decoration:line-through;color:#6b5a42}
+
+/* Recent deeds and tables */
+.rpg-deeds{padding:24px 28px;display:flex;flex-direction:column;gap:14px}
+.rpg-table-wrap{overflow-x:auto}
+.rpg-table{width:100%;border-collapse:collapse;font-size:1.05rem;min-width:640px;font-variant-numeric:lining-nums tabular-nums}
+.rpg-table th{font-family:"Alegreya SC",var(--font-body);font-weight:500;font-size:.95rem;color:#b9a98a;text-align:left;padding:8px 10px;border-bottom:1px solid #5f4a2c;letter-spacing:.02em;text-transform:none;background:none}
+.rpg-table td{padding:8px 10px;border-bottom:1px solid rgba(95,74,44,.35);font-size:1.02rem;text-align:left}
+.rpg-table th.num,.rpg-table td.num{text-align:right}
+.rpg-table tbody tr:hover{background:rgba(217,180,90,.05)}
+.rpg-ink[data-rpg-ink="crypto"]{color:#9ec0ea}
+.rpg-ink[data-rpg-ink="metals"]{color:#e3c37e}
+.rpg-ink[data-rpg-ink="mtg"]{color:#c9b0e6}
+.rpg-ink[data-rpg-ink="etf"]{color:#a9cf92}
+
+/* The original page content, tucked into a scroll */
+.rpg-scroll{margin-top:8px;border:1px solid #5f4a2c;background:#1a1612;box-shadow:inset 0 0 0 3px #15120f,inset 0 0 0 4px rgba(122,96,56,.6)}
+.rpg-scroll>summary{cursor:pointer;list-style:none;padding:14px 20px;display:flex;flex-wrap:wrap;gap:4px 14px;align-items:baseline}
+.rpg-scroll>summary::-webkit-details-marker{display:none}
+.rpg-scroll>summary::before{content:"\25B8";color:#d9b45a;margin-right:4px}
+.rpg-scroll[open]>summary::before{content:"\25BE"}
+.rpg-scroll>summary span{font-family:var(--font-display);font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#e2c27a}
+.rpg-scroll>summary small{font-style:italic;color:#8c7f68}
+.rpg-scroll[open]{padding:0 18px 18px}
+.rpg-scroll[open]>summary{margin:0 -18px 12px}
+
+/* Breadcrumb header */
+.rpg-crumbs{padding:16px 24px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px}
+.rpg-crumbs nav{display:flex;align-items:center;gap:12px;font-family:var(--font-display);letter-spacing:.1em;text-transform:uppercase;font-size:.95rem}
+.rpg-crumbs nav>span[aria-hidden]{color:#8c7f68}
+.rpg-crumb{font-weight:700;color:#e2c27a}
+.rpg-crumb:hover{color:#f3dca4}
+.rpg-crumb-azure{color:#9ec0ea}
+.rpg-crumb-here{font-weight:900;color:#f1d78f}
+.rpg-crumb-note{font-style:italic;color:#b9a98a}
+.rpg-crumb-stats{display:flex;gap:22px;flex-wrap:wrap;font-family:"Alegreya SC",var(--font-body);color:#b9a98a}
+.rpg-crumb-stats strong{font-family:var(--font-display);color:#f1d78f;margin-left:4px}
+
+/* Inventory */
+.rpg-inventory-layout{display:flex;flex-wrap:wrap;gap:24px;align-items:flex-start}
+.rpg-inventory{flex:999 1 640px;min-width:0;padding:22px 24px;display:flex;flex-direction:column;gap:16px}
+.rpg-tabs{display:flex;flex-wrap:wrap;gap:8px}
+.rpg-tab{min-height:44px;padding:8px 14px;font-family:var(--font-display);font-weight:700;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;border:1px solid #7a6038;background:#15120f;color:#e2c27a}
+.rpg-tab.is-active{background:#d9b45a;color:#1b140c}
+.rpg-slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px}
+.rpg-slot{display:block;padding:12px 14px;min-height:126px;background:#15120f;box-shadow:inset 0 0 18px rgba(0,0,0,.8);border:2px solid rgba(185,169,138,.4)}
+.rpg-slot:hover{background:#1f1a15}
+.rpg-slot[data-rpg-kind="relic"]{border-color:rgba(127,169,220,.55)}
+.rpg-slot[data-rpg-kind="ingot"]{border-color:rgba(217,180,90,.55)}
+.rpg-slot[data-rpg-kind="charter"]{border-color:rgba(143,191,114,.55)}
+.rpg-slot[data-rpg-kind="tome"]{border-color:rgba(180,147,214,.55)}
+.rpg-slot[data-rpg-kind="coffer"]{border-color:rgba(219,168,115,.55)}
+.rpg-slot.is-selected{border-color:#f1d78f;box-shadow:0 0 0 2px rgba(241,215,143,.33),inset 0 0 18px rgba(0,0,0,.8)}
+.rpg-slot-top{display:flex;justify-content:space-between;align-items:flex-start}
+.rpg-slot-count{font-family:var(--font-display);font-size:.8rem;font-weight:700;color:#b9a98a}
+.rpg-slot-symbol{display:block;margin-top:10px;font-family:var(--font-display);font-weight:700;font-size:1.05rem;letter-spacing:.06em;color:#f1e6cc}
+.rpg-slot-worth{display:block;font-size:.95rem;color:#f1d78f}
+.rpg-slot-gain{display:block;font-size:.85rem}
+.rpg-item-detail{flex:1 1 340px;min-width:0;padding:24px 26px;display:flex;flex-direction:column;gap:14px}
+.rpg-item-name{margin:0;font-family:var(--font-display);font-weight:900;font-size:1.6rem;letter-spacing:.06em;color:#2a1d12;text-transform:none}
+.rpg-parch .rpg-item-name{color:#2a1d12}
+.rpg-rule{height:1px;background:#8a6a3a}
+.rpg-item-stats{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.rpg-stat-value{font-family:var(--font-display);font-size:1.2rem;font-weight:700;font-variant-numeric:lining-nums tabular-nums}
+.rpg-stat-big{font-family:var(--font-display);font-size:1.65rem;font-weight:700;font-variant-numeric:lining-nums tabular-nums}
+.rpg-stat-sub{font-size:.9rem;color:#6b4e2c}
+.rpg-parch .rpg-stat-sub{color:#6b4e2c}
+.rpg-parch .rpg-stat-sub.rpg-up{color:#2f5e8f}
+.rpg-item-note{margin:0;font-size:1rem;line-height:1.5;color:#4a3520}
+.rpg-parch .rpg-item-note{color:#4a3520}
+.rpg-members{display:flex;flex-direction:column;gap:6px;max-height:260px;overflow:auto;padding-right:4px}
+.rpg-member{display:grid;grid-template-columns:1fr auto 52px;gap:10px;font-size:.92rem;border-bottom:1px dotted #a88552;padding-bottom:4px}
+.rpg-member .num{text-align:right;font-variant-numeric:lining-nums tabular-nums}
+.rpg-ledger-line{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid #a88552;background:rgba(255,248,230,.45);font-size:.95rem}
+
+/* Arcane Vault */
+.rpg-vault-on>.rec-detail-head,.rpg-vault-on>.metals-hero,.rpg-vault-on>.cv-v2-projection,.rpg-vault-on>.cv-v2-short,.rpg-vault-on>.sl-v2-chart{display:none}
+.rpg-vault-hero{padding:28px 32px;display:flex;flex-wrap:wrap;gap:32px;align-items:center}
+.rpg-vault-call{flex:1 1 420px;display:flex;flex-direction:column;gap:14px}
+.rpg-vault-id{display:flex;align-items:center;gap:16px}
+.rpg-vault-name{margin:0;font-family:var(--font-display);font-weight:900;font-size:2.5rem;letter-spacing:.08em;color:#f1d78f;text-transform:uppercase;line-height:1.05}
+.rpg-vault-role{font-family:"Alegreya SC",var(--font-body);font-size:1rem;color:#b9a98a}
+.rpg-vault-verdict{display:flex;align-items:center;gap:14px;flex-wrap:wrap;font-size:1.4rem;font-weight:700}
+.rpg-seal{font-family:var(--font-display);font-weight:900;font-size:1.35rem;letter-spacing:.16em;padding:10px 22px;color:#1b140c;background:#d9b45a;border:1px solid #f0d58e;box-shadow:inset 0 -4px 0 #9c7a33}
+.rpg-seal-azure{background:#7fa9dc;border-color:#bcd4f0;box-shadow:inset 0 -4px 0 #2f5e8f}
+.rpg-seal-crimson{background:#c4574a;border-color:#e8a296;box-shadow:inset 0 -4px 0 #8f2f24;color:#fff2e6}
+.rpg-seal-stone{background:#8c7f68;border-color:#b9a98a;box-shadow:inset 0 -4px 0 #5f5547}
+.rpg-vault-why{margin:0;font-size:1.15rem;line-height:1.5;color:#d8cbb0;max-width:620px}
+.rpg-tiles{flex:1 1 420px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.rpg-tile{padding:14px 18px}
+.rpg-rune{padding:24px 32px;display:flex;flex-direction:column;gap:14px}
+.rpg-road{padding:24px 28px;display:flex;flex-direction:column;gap:12px}
+.rpg-chart-key{display:flex;gap:18px;flex-wrap:wrap;font-size:.95rem;color:#d8cbb0}
+.rpg-chart-key span{display:flex;gap:6px;align-items:center}
+.rpg-scrying{padding:24px 28px;display:flex;flex-direction:column;gap:12px;flex-grow:1.4!important}
+.rpg-scry-body{display:flex;flex-wrap:wrap;gap:20px;align-items:center}
+.rpg-scry-chart{flex:2 1 400px;min-width:0;height:auto}
+.rpg-scry-side{flex:1 1 160px;display:flex;flex-direction:column;gap:12px}
+.rpg-inset{border:1px solid #a88552;padding:12px 14px;background:rgba(255,248,230,.45)}
+.rpg-omen{padding:24px 28px;display:flex;flex-direction:column;gap:14px}
+.rpg-omen-gauge{width:100%;max-width:340px;height:auto;align-self:center}
+.rpg-omen-copy{margin:0;font-size:1.05rem;line-height:1.5;color:#d8cbb0}
+.rpg-omen-note{margin:0;font-size:.95rem;font-style:italic;color:#b9a98a}
+.rpg-hoard{padding:24px 28px;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:18px;align-items:center}
+.rpg-hoard .rpg-stat-value{font-size:1.5rem}
+.rpg-notes-title{margin:8px 0 -8px;font-family:var(--font-display);font-weight:700;font-size:1.1rem;letter-spacing:.14em;text-transform:uppercase;color:#b9a98a}
+
+@media (max-width:720px){
+  .rpg-chronicle-worth{align-items:flex-start}
+  .rpg-chronicle-title{font-size:1.4rem}
+  .rpg-treasury,.rpg-quests,.rpg-scrying,.rpg-omen,.rpg-hoard,.rpg-rune,.rpg-vault-hero{padding:20px}
+  .rpg-tiles,.rpg-item-stats{grid-template-columns:1fr 1fr}
+  .rpg-vault-name{font-size:1.8rem}
 }
