@@ -351,7 +351,7 @@ function vaultOmen(p){
   const nx=150+98*Math.cos(theta),ny=150-98*Math.sin(theta);
   const needle=prob===null?`<path d="M150 150 L150 52" stroke="#8c7f68" stroke-width="3" stroke-dasharray="4 5"/>`:`<path d="M150 150 L${nx.toFixed(1)} ${ny.toFixed(1)}" stroke="#f1d78f" stroke-width="4" stroke-linecap="round"/>`;
   const reading=prob===null?"[ \u2014 ]":`${Math.round(prob*100)}%`;
-  const copy=prob===null?`The chance this coin is higher 7 days from now. ${st?.latest_price_date?`No reading in this run (prices through ${st.latest_price_date}).`:"The first reading arrives with the next crypto run."}`:`The chance this coin is higher on ${f.target_date||"the target day"}, read on ${f.origin_date||"\u2014"} from ${money(f.origin_price,0)}. It ${prob>=0.5?"leans up":"leans down or flat"}.`;
+  const copy=prob===null?`The chance this coin is higher 7 days from now. ${st?.latest_price_date?`No reading in this run (prices through ${st.latest_price_date}).`:"The first reading arrives with the next crypto run."}`:`The chance this coin is higher on ${f.target_date?dayLabel(`${f.target_date}T12:00:00Z`):"the target day"}, read on ${f.origin_date?dayLabel(`${f.origin_date}T12:00:00Z`):"\u2014"} from ${money(f.origin_price,0)}. It ${prob>=0.5?"leans up":"leans down or flat"}.`;
   return `<section class="rpg-stone rpg-omen" aria-labelledby="rpg-omen-h"><div class="rpg-section-head"><h2 id="rpg-omen-h" class="rpg-stone-title">Omen of the week</h2>${badge("CONTEXT ONLY","outline")}</div><svg viewBox="0 0 300 200" class="rpg-omen-gauge" role="img" aria-label="7-day chance-higher gauge: ${prob===null?"awaiting its first reading":`${Math.round(prob*100)} percent`}"><path d="M30 150 A120 120 0 0 1 270 150" fill="none" stroke="#3a3128" stroke-width="22"/><path d="M30 150 A120 120 0 0 1 150 30" fill="none" stroke="#8f2f24" stroke-opacity=".55" stroke-width="22"/><path d="M150 30 A120 120 0 0 1 270 150" fill="none" stroke="#2f5e8f" stroke-opacity=".7" stroke-width="22"/>${needle}<circle cx="150" cy="150" r="8" fill="#7a6038"/><text x="30" y="168" text-anchor="middle" font-family="Alegreya, serif" font-size="13" fill="#b9a98a">0%</text><text x="270" y="168" text-anchor="middle" font-family="Alegreya, serif" font-size="13" fill="#b9a98a">100%</text><text x="150" y="196" text-anchor="middle" font-family="Cinzel, serif" font-size="24" font-weight="700" fill="${prob===null?"#d8cbb0":"#f1d78f"}">${esc(reading)}</text></svg><p class="rpg-omen-copy">${esc(copy)}</p><p class="rpg-omen-note">${esc(st?.label||"This model passed one test of 60 forecasts (50% right against 37% for always guessing the usual direction).")} It never changes the call above.</p></section>`;
 }
 function vaultHoard(item){
@@ -379,7 +379,7 @@ function renderVault(page,item,p){
   const asOfLabel=asOf?new Date(`${asOf}T12:00:00Z`).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}):"\u2014";
   const vault=document.createElement("div");
   vault.className="rpg-realm-view rpg-vault";
-  vault.innerHTML=`<header class="rpg-stone rpg-crumbs"><nav aria-label="Breadcrumb"><button type="button" class="rpg-btn rpg-crumb" data-rpg-page="home">The Hall</button><span aria-hidden="true">\u203a</span><button type="button" class="rpg-btn rpg-crumb rpg-crumb-azure" data-rpg-vault-back>Arcane Vault</button><span aria-hidden="true">\u203a</span><span class="rpg-crumb-here">${esc(name)}</span></nav><span class="rpg-crumb-note">Kraken prices as of ${esc(asOfLabel)}</span></header><section class="rpg-stone rpg-vault-hero"><div class="rpg-vault-call"><div class="rpg-vault-id"><svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="32" cy="32" r="29" stroke="#d9b45a" stroke-width="2"/><circle cx="32" cy="32" r="23" stroke="#7a6038" stroke-width="1.5"/><path d="M32 14 L46 32 L32 50 L18 32 Z" stroke="#f1d78f" stroke-width="2.2"/><path d="M32 22 L39 32 L32 42 L25 32 Z" stroke="#f1d78f" stroke-width="1.4"/></svg><div><h1 class="rpg-vault-name">${esc(name)}</h1><div class="rpg-vault-role">${esc(role)}${p.model_robinhood_tradable?" \u00b7 tradable on Robinhood":""}</div></div></div><div class="rpg-vault-verdict"><span class="rpg-seal rpg-seal-${callTone(call)}">${esc(call==="NO_CALL"?"NO CALL":call)}</span><span>${esc(meaning)}</span></div><p class="rpg-vault-why">${esc(vaultWhy(p,name))}</p></div><div class="rpg-tiles">${tile("Price",m(price))}${tile("4-year average",m(avg))}${tile("From its peak",dd===null?"\u2014":`${dd<0?"\u2212":"+"}${Math.abs(Math.round(dd*100))}%`,`peak ${m(num(p.model_peak_usd))} \u00b7 ${monthLabel(p.model_peak_month)}`)}${tile("Past 12 months",ch===null?"\u2014":`${ch<0?"\u2212":"+"}${Math.abs(Math.round(ch*100))}%`,prior===null?"":`from ${m(prior)}`)}</div></section>${vaultRune(p)}${vaultRoad(p,name)}<div class="rpg-duo">${vaultScrying(p)}${vaultOmen(p)}</div><div id="rpg-hoard-slot">${vaultHoard(item)}</div><h2 class="rpg-notes-title">Scholar's notes</h2>`;
+  vault.innerHTML=`<header class="rpg-stone rpg-crumbs"><nav aria-label="Breadcrumb"><button type="button" class="rpg-btn rpg-crumb" data-rpg-page="home">The Hall</button><span aria-hidden="true">\u203a</span><button type="button" class="rpg-btn rpg-crumb rpg-crumb-azure" data-rpg-vault-back>Arcane Vault</button><span aria-hidden="true">\u203a</span><span class="rpg-crumb-here">${esc(name)}</span></nav><span class="rpg-crumb-note">Kraken prices as of ${esc(asOfLabel)}</span></header>${realmTabs("crypto")}<section class="rpg-stone rpg-vault-hero"><div class="rpg-vault-call"><div class="rpg-vault-id"><svg width="64" height="64" viewBox="0 0 64 64" fill="none" aria-hidden="true"><circle cx="32" cy="32" r="29" stroke="#d9b45a" stroke-width="2"/><circle cx="32" cy="32" r="23" stroke="#7a6038" stroke-width="1.5"/><path d="M32 14 L46 32 L32 50 L18 32 Z" stroke="#f1d78f" stroke-width="2.2"/><path d="M32 22 L39 32 L32 42 L25 32 Z" stroke="#f1d78f" stroke-width="1.4"/></svg><div><h1 class="rpg-vault-name">${esc(name)}</h1><div class="rpg-vault-role">${esc(role)}${p.model_robinhood_tradable?" \u00b7 tradable on Robinhood":""}</div></div></div><div class="rpg-vault-verdict"><span class="rpg-seal rpg-seal-${callTone(call)}">${esc(call==="NO_CALL"?"NO CALL":call)}</span><span>${esc(meaning)}</span></div><p class="rpg-vault-why">${esc(vaultWhy(p,name))}</p></div><div class="rpg-tiles">${tile("Price",m(price))}${tile("4-year average",m(avg))}${tile("From its peak",dd===null?"\u2014":`${dd<0?"\u2212":"+"}${Math.abs(Math.round(dd*100))}%`,`peak ${m(num(p.model_peak_usd))} \u00b7 ${monthLabel(p.model_peak_month)}`)}${tile("Past 12 months",ch===null?"\u2014":`${ch<0?"\u2212":"+"}${Math.abs(Math.round(ch*100))}%`,prior===null?"":`from ${m(prior)}`)}</div></section>${vaultRune(p)}${vaultRoad(p,name)}<div class="rpg-duo">${vaultScrying(p)}${p.model_short_term||key==="bitcoin"||key==="ethereum"?vaultOmen(p):""}</div><div id="rpg-hoard-slot">${vaultHoard(item)}</div><h2 class="rpg-notes-title">Scholar's notes</h2>`;
   shell.insertBefore(vault,shell.firstChild);
   shell.classList.add("rpg-vault-on");
   bindNavigation(vault);
@@ -387,6 +387,44 @@ function renderVault(page,item,p){
   shell.insertAdjacentHTML("beforeend",footer("Timing counsel for new money, not a price forecast. Research, not personal financial advice."));
   state.vault={item};
 }
+
+/* ---------- Counsel: a realm bar above every research view ---------- */
+const COUNSEL_REALM={metals:["The Forge","Metals research"],mtg:["The Archive","MTG research"],crypto:["Arcane Vault","Crypto research"]};
+function counselRealm(page){
+  const eyebrow=String(page.querySelector(".eyebrow")?.textContent||"").toUpperCase();
+  if(/METAL/.test(eyebrow))return "metals";
+  if(/MTG/.test(eyebrow))return "mtg";
+  if(/CRYPTO/.test(eyebrow))return "crypto";
+  return null;
+}
+function decorateCounsel(){
+  const page=byId("recommendations");
+  if(!page||page.querySelector(":scope > .rpg-counsel-bar")||page.querySelector(".rpg-vault"))return;
+  if(!page.querySelector(".eyebrow"))return;
+  const domain=counselRealm(page);
+  const detail=page.querySelector(".rec-detail");
+  const title=detail?String(detail.querySelector(".rec-detail-title h2")?.firstChild?.textContent||"").trim():"";
+  const sep=`<span aria-hidden="true">\u203a</span>`;
+  const crumbs=[`<button type="button" class="rpg-btn rpg-crumb" data-rpg-page="home">The Hall</button>`,sep];
+  if(domain){
+    const [name]=COUNSEL_REALM[domain];
+    crumbs.push(detail&&title?`<button type="button" class="rpg-btn rpg-crumb" data-rpg-domain="${domain}">${esc(name)}</button>`:`<span class="rpg-crumb-here">${esc(name)}</span>`);
+    if(detail&&title)crumbs.push(sep,`<span class="rpg-crumb-here">${esc(title)}</span>`);
+  }else crumbs.push(`<span class="rpg-crumb-here">Counsel</span>`);
+  const bar=document.createElement("div");
+  bar.className="rpg-realm-view rpg-counsel-bar";
+  bar.innerHTML=`<header class="rpg-stone rpg-crumbs"><nav aria-label="Breadcrumb">${crumbs.join("")}</nav><span class="rpg-crumb-note">${esc(domain?COUNSEL_REALM[domain][1]:"Research across every realm")} \u00b7 research, not orders</span></header>${realmTabs(domain||"counsel")}`;
+  bindNavigation(bar);
+  page.insertBefore(bar,page.firstChild);
+}
+function watchCounsel(){
+  const page=byId("recommendations");
+  if(!page)return;
+  let queued=false;
+  new MutationObserver(()=>{if(queued)return;queued=true;queueMicrotask(()=>{queued=false;try{decorateCounsel()}catch(error){console.error("[realm] counsel",error)}})}).observe(page,{childList:true});
+  decorateCounsel();
+}
+if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",watchCounsel);else watchCounsel();
 
 document.addEventListener("uip:home-rendered",event=>{
   const d=event.detail||{};

@@ -100,11 +100,16 @@ strong,td,dd,.num{font-variant-numeric:lining-nums tabular-nums}
 
 /* Buttons: gold-leaf primary, stone secondary */
 button{border-radius:2px;letter-spacing:.08em}
-button:not(.secondary):not(.nav-item):not(.slot):not(.rpg-btn){
+button:not(.secondary):not(.nav-item):not(.slot):not(.rpg-btn):not([class*="-row"]):not([class*="-card"]):not([class*="-tab"]){
   background:linear-gradient(180deg,#e3c272,#c9a24c);color:#1b140c;border:1px solid #f0d58e;
   box-shadow:inset 0 -3px 0 var(--gold-deep);
 }
-button:not(.secondary):not(.nav-item):not(.slot):not(.rpg-btn):hover{filter:brightness(1.08)}
+button:not(.secondary):not(.nav-item):not(.slot):not(.rpg-btn):not([class*="-row"]):not([class*="-card"]):not([class*="-tab"]):hover{filter:brightness(1.08)}
+/* Clickable rows and cards keep their own stone styles; tabs are stone with a gold-leaf active state */
+button[class*="-tab"]:not(.rpg-btn){background:#15120f;color:#e2c27a;border:1px solid #7a6038;border-radius:2px;box-shadow:none}
+button[class*="-tab"]:not(.rpg-btn):hover{border-color:var(--bronze);color:var(--gold)}
+button[class*="-tab"]:not(.rpg-btn).active,button[class*="-tab"]:not(.rpg-btn).is-active,button[class*="-tab"]:not(.rpg-btn)[aria-pressed="true"],button[class*="-tab"]:not(.rpg-btn)[aria-selected="true"]{background:linear-gradient(180deg,#e3c272,#c9a24c);color:#1b140c;border-color:#f0d58e;box-shadow:inset 0 -3px 0 var(--gold-deep)}
+button[class*="-tab"]:not(.rpg-btn).active *,button[class*="-tab"]:not(.rpg-btn).is-active *{color:#1b140c}
 button.secondary{background:#1a1612;color:#e2c27a;border:1px solid var(--bronze-dark);box-shadow:inset 0 0 0 1px rgba(0,0,0,.5)}
 button.secondary:hover{border-color:var(--bronze);color:var(--gold)}
 button:focus-visible,.nav-item:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
@@ -309,12 +314,16 @@ tbody tr:hover{background:rgba(217,180,90,.05)}
 .rpg-stat-sub{font-size:.9rem;color:#6b4e2c}
 .rpg-parch .rpg-stat-sub{color:#6b4e2c}
 .rpg-parch .rpg-stat-sub.rpg-up{color:#2f5e8f}
+.rpg-parch .rpg-stat-sub.rpg-down{color:#8f2f24}
 .rpg-item-note{margin:0;font-size:1rem;line-height:1.5;color:#4a3520}
 .rpg-parch .rpg-item-note{color:#4a3520}
 .rpg-members{display:flex;flex-direction:column;gap:6px;max-height:260px;overflow:auto;padding-right:4px}
 .rpg-member{display:grid;grid-template-columns:1fr auto 52px;gap:10px;font-size:.92rem;border-bottom:1px dotted #a88552;padding-bottom:4px}
 .rpg-member .num{text-align:right;font-variant-numeric:lining-nums tabular-nums}
 .rpg-ledger-line{display:flex;gap:10px;align-items:center;padding:10px 12px;border:1px solid #a88552;background:rgba(255,248,230,.45);font-size:.95rem}
+
+/* Counsel: realm bar above the research pages */
+.rpg-counsel-bar{gap:14px;margin-bottom:20px}
 
 /* Arcane Vault */
 .rpg-vault-on>.rec-detail-head,.rpg-vault-on>.metals-hero,.rpg-vault-on>.cv-v2-projection,.rpg-vault-on>.cv-v2-short,.rpg-vault-on>.sl-v2-chart{display:none}
