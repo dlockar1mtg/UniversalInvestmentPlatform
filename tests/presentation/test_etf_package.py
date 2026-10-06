@@ -15,15 +15,16 @@ ROOT = Path(__file__).resolve().parents[2]
 
 def write_package(directory: Path, *, funds=None, **manifest_changes) -> Path:
     funds = funds if funds is not None else [
-        {"ticker": "VOO", "security_id": "SEC-US-VOO", "close": 716.2, "as_of_date": "2026-10-06",
+        {"symbol": "VOO", "security_id": "SEC-US-VOO", "close": 716.2, "as_of_date": "2026-10-06",
          "quality_status": "PROVISIONAL", "freshness_state": "CURRENT", "call": "STEADY_ACCUMULATION"},
-        {"ticker": "IYY", "security_id": "SEC-US-IYY", "close": 189.6, "as_of_date": "2026-10-06",
+        {"symbol": "IYY", "security_id": "SEC-US-IYY", "close": 189.6, "as_of_date": "2026-10-06",
          "quality_status": "PROVISIONAL", "freshness_state": "CURRENT", "call": "REDIRECT_NEW_MONEY", "redirect_to": "VOO"},
     ]
     files = {
         "funds.json": json.dumps({"as_of_date": "2026-10-06", "model_version": "etf-v1", "funds": funds,
                                   "limitations": [], "automatic_execution_authorized": False}),
-        "latest_prices.csv": "security_id,ticker\n",
+        "groups.json": json.dumps({"groups": {"US_EQUITY_LARGE_BLEND": {"members": 2}}}),
+        "latest_prices.csv": "security_id,symbol\n",
         "research.json": json.dumps({"timing_rules": {}, "any_rule_passes": False}),
         "market_data_status.json": json.dumps({"funds": []}),
     }

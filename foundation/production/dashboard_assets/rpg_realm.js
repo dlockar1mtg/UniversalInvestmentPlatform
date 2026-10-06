@@ -3,7 +3,7 @@
    Read-only presentation: nothing here records, changes or executes anything. */
 (()=>{
 "use strict";
-const state={home:null,catalog:null,catalogPromise:null,invFilter:"all",invPick:null,guild:null,guildPromise:null,guildPick:null};
+const state={home:null,catalog:null,catalogPromise:null,invFilter:"all",invPick:null,guild:null,guildPromise:null,guildPick:null,guildDetail:null,guildFilter:{family:"",group:"",q:"",mine:false,best:false,sort:"group",limit:50}};
 const byId=id=>document.getElementById(id);
 const esc=value=>{const node=document.createElement("span");node.textContent=String(value??"");return node.innerHTML};
 const num=value=>{if(value===null||value===undefined||value==="")return null;const n=Number(value);return Number.isFinite(n)?n:null};
@@ -152,7 +152,7 @@ function vitals(refresh){
     return `<div class="rpg-vital ${id}"><div class="rpg-vital-head"><span>${esc(labels[id])}</span><span>${esc(text)}</span></div><div class="rpg-bar ${id}" role="meter" aria-label="${esc(labels[id])} freshness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${fill}"><i data-rpg-w="${fill}"></i></div></div>`;
   });
   const funds=state.guild?.available?state.guild.funds||[]:[];
-  if(funds.length){const ok=funds.every(f=>f.freshness_state==="CURRENT"),stale=funds.some(f=>f.freshness_state==="STALE"),asOf=state.guild.package?.package_as_of;const fill=ok?100:stale?12:60;rows.push(`<div class="rpg-vital etf"><div class="rpg-vital-head"><span>ETF data</span><span>${esc(ok?`fresh \u00b7 closes of ${dayLabel(asOf)}`:stale?"stale \u00b7 needs review":`aging \u00b7 closes of ${dayLabel(asOf)}`)}</span></div><div class="rpg-bar etf" role="meter" aria-label="ETF data freshness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${fill}"><i data-rpg-w="${fill}"></i></div></div>`)}
+  if(funds.length){const current=funds.filter(f=>f.freshness_state==="CURRENT").length,share=current/funds.length,asOf=state.guild.package?.package_as_of;const fill=Math.round(share*100);rows.push(`<div class="rpg-vital etf"><div class="rpg-vital-head"><span>ETF data</span><span>${esc(share>=0.9?`fresh \u00b7 ${current} of ${funds.length} funds \u00b7 ${dayLabel(asOf)}`:`needs review \u00b7 ${current} of ${funds.length} current`)}</span></div><div class="rpg-bar etf" role="meter" aria-label="ETF data freshness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${fill}"><i data-rpg-w="${fill}"></i></div></div>`)}
   return `<section class="rpg-stone rpg-vitals" aria-label="Data vitals" data-rpg-page="refresh-page" title="Open Vitals">${rows.join("")}</section>`;
 }
 function treasuryRing(d){
@@ -188,7 +188,7 @@ function counselCards(d){
   const mtgHeld=(d.portfolio?.positions||[]).filter(p=>p.domain_id==="mtg").length;
   if(mtgHeld)cards.push(`<button type="button" class="rpg-btn rpg-counsel" data-rpg-domain="mtg">${badge(lairs?"BUY":"HOLD",lairs?"verdant":"bronze")}<span><strong>The Archive: ${lairs?`${lairs} of your Secret Lairs are buy candidates`:"hold the collection"}</strong><span>${lairs?"Listed below the model's buy price today. Check the live listing before buying.":"No buy signal on what you already hold."}</span></span></button>`);
   const funds=state.guild?.available?state.guild.funds||[]:[];
-  if(funds.length){const moves=funds.filter(f=>f.call==="REDIRECT_NEW_MONEY"&&f.redirect_to);cards.push(`<button type="button" class="rpg-btn rpg-counsel" data-rpg-page="guild">${badge(moves.length?"REDIRECT":"STEADY",moves.length?"azure":"bronze")}<span><strong>Merchants' Guild: ${moves.length?esc(moves.map(f=>`${f.ticker} \u2192 ${f.redirect_to}`).join(", ")):"keep buying steadily"}</strong><span>${moves.length?"Same exposure for a lower fee. Everything else: keep buying steadily.":"No timing rule beat plain monthly buying over three years."}</span></span></button>`)}
+  if(funds.length){const mine=new Set((d.manualHoldings?.items||[]).filter(h=>h.asset_type==="ETF").map(h=>String(h.symbol).toUpperCase()));const moves=funds.filter(f=>mine.has(f.symbol)&&f.implementation?.call==="REDIRECT_NEW_MONEY");cards.push(`<button type="button" class="rpg-btn rpg-counsel" data-rpg-page="guild">${badge(moves.length?"REDIRECT":"STEADY",moves.length?"azure":"bronze")}<span><strong>Merchants' Guild: ${moves.length?esc(moves.map(f=>`${f.symbol} \u2192 ${f.implementation.to}`).join(", ")):"keep buying steadily"}</strong><span>${moves.length?"The same exposure, done better. Everything else: keep buying steadily.":"Your ETFs are already the best of their near-identical funds."}</span></span></button>`)}
   return cards.join("")||`<p class="rpg-parch-note">No active counsel.</p>`;
 }
 function tasks(d){
@@ -281,10 +281,12 @@ function inventoryItems(d){
   return items.sort((a,b)=>rank[a.kind]-rank[b.kind]||(b.worth||0)-(a.worth||0));
 }
 function guildNote(h){
-  const f=(state.guild?.funds||[]).find(x=>x.ticker===String(h.symbol||"").toUpperCase());
+  const f=(state.guild?.funds||[]).find(x=>x.symbol===String(h.symbol||"").toUpperCase());
   if(!f)return `Snapshot of ${dayLabel(h.as_of)}.`;
-  const text={STEADY_ACCUMULATION:"Merchants' Guild counsel: keep buying steadily.",REDIRECT_NEW_MONEY:`Merchants' Guild counsel: send new money to ${f.redirect_to}; these shares can stay.`}[f.call];
-  return text||"No usable close for this fund this run.";
+  const i=f.implementation||{};
+  const parts=[i.call==="REDIRECT_NEW_MONEY"?`Merchants' Guild counsel: send new money to ${i.to}, the same exposure done better; these shares can stay.`:i.call==="BEST_IN_CLUSTER"?"Merchants' Guild counsel: the best of its near-identical funds; keep buying steadily.":"Merchants' Guild counsel: keep buying steadily."];
+  if(f.when_to_buy?.verdict==="WAIT")parts.push(`The real-asset rule says wait for a ${Math.round(num(f.when_to_buy.parameter)*100)}% dip.`);
+  return parts.join(" ");
 }
 const LEDGER_DOT={ok:"#4d7a3a",manual:"#b5862f",missing:"#8f2f24"};
 function inventoryDetail(it){
@@ -464,10 +466,12 @@ function watchCounsel(){
   new MutationObserver(()=>{if(queued)return;queued=true;queueMicrotask(()=>{queued=false;try{decorateCounsel()}catch(error){console.error("[realm] counsel",error)}})}).observe(page,{childList:true});
   decorateCounsel();
 }
-/* ---------- The Merchants' Guild: ETFs ---------- */
-const GUILD_CALL={STEADY_ACCUMULATION:["STEADY","bronze","Keep buying steadily"],REDIRECT_NEW_MONEY:["REDIRECT","azure","Send new money elsewhere"],NO_CURRENT_MARKET_PRICE:["NO PRICE","stone","No usable price this run"]};
-const STRETCH_TEXT={DEPRESSED:"below its usual level",NORMAL:"near its usual level",ELEVATED:"above its usual level",STRETCHED:"well above its usual level"};
-const RULE_NAMES={TREND_PAUSE:"Pause new money below the 200-day average",BUY_BELOW_TREND:"Buy only below the 200-day average",STRETCH_PAUSE:"Pause new money when stretched",WAIT_FOR_DIP:"Wait for a dip before buying"};
+/* ---------- The Merchants' Guild: the ETF market board ---------- */
+const FAMILY_NAME={US_EQUITY:"US stocks",INTL_EQUITY:"International stocks",BONDS:"Bonds",OTHER:"Real assets",NONE:"Specialized / ungrouped"};
+const GROUP_WORDS={US_EQUITY_LARGE_BLEND:"US large cap",US_EQUITY_LARGE_GROWTH:"US large growth",US_EQUITY_LARGE_VALUE:"US large value",US_EQUITY_SMALL_MID:"US small & mid cap",US_EQUITY_DEFENSIVE_INCOME:"US defensive & income",INTL_DEVELOPED_EQUITY:"Developed markets",INTL_EMERGING_EQUITY:"Emerging markets",BOND_SHORT_TREASURY:"Short-term bonds",BOND_INTERMEDIATE_TREASURY:"Core & intermediate bonds",BOND_LONG_TREASURY:"Long-term Treasuries",BOND_INVESTMENT_GRADE_CORPORATE:"Corporate bonds",BOND_HIGH_YIELD:"High-yield bonds",BOND_INFLATION_PROTECTED:"Inflation-protected bonds",BOND_MUNICIPAL:"Municipal bonds",BOND_CASH_EQUIVALENT:"Cash & T-bills",PRECIOUS_METALS:"Precious metals",COMMODITIES:"Commodities",REAL_ESTATE:"Real estate",IDIOSYNCRATIC:"Ungrouped (no close match)",SPECIALIZED_LEVERAGED:"Leveraged",SPECIALIZED_INVERSE:"Inverse",INSUFFICIENT_HISTORY:"Too new to group",NOT_RANKED_OUTSIDE_MODEL:"Outside the model universe"};
+const groupName=g=>GROUP_WORDS[g]||(String(g||"").startsWith("US_SECTOR_")?`${String(g).slice(10).toLowerCase().replace(/_/g," ")} sector`.replace(/^./,c=>c.toUpperCase()):String(g||"\u2014").toLowerCase().replace(/_/g," "));
+const RULE_NAMES={TREND_PAUSE:"Pause below the trend",STRETCH_PAUSE:"Pause when stretched",WAIT_FOR_DIP:"Wait for a dip",MOMENTUM_PAUSE:"Pause after a losing year"};
+const FACTOR_NAMES={mom_12_1:"12-month momentum",mom_6:"6-month momentum",trend_200:"Price vs 200-day average",stretch_60m:"Stretch vs 5-year average",vol_1y:"Volatility",maxdd_3y:"Worst fall, 3 years",dd_now:"Distance from peak",yield_12m:"Distribution yield"};
 function loadGuild(){
   if(state.guild)return Promise.resolve(state.guild);
   if(!state.guildPromise)state.guildPromise=api("/v1/presentation/etf").then(doc=>(state.guild=doc)).catch(error=>{state.guildPromise=null;throw error});
@@ -484,83 +488,119 @@ function guildHoldings(){
   }
   return out;
 }
-function guildSeal(call){const [label,tone]=GUILD_CALL[call]||["\u2014","stone"];return `<span class="rpg-seal rpg-seal-${tone}">${esc(label)}</span>`}
-function guildCell(value,d=1){const n=num(value);return `<td class="num ${upDown(n)}">${pct(n,d)}</td>`}
-function guildLedger(funds,pick,held){
-  const rows=funds.map(f=>{
-    const z=f.stretch_context?.zone;
-    const h=held[f.ticker];
-    return `<tr class="${f.ticker===pick?"is-picked":""}"><th scope="row"><button type="button" class="rpg-btn rpg-fund-pick" data-rpg-fund="${esc(f.ticker)}" aria-pressed="${f.ticker===pick}"><strong>${esc(f.ticker)}</strong><span>${esc(f.name)}</span></button></th><td class="num">${money(f.close)}</td>${guildCell(f.return_1y)}${guildCell(f.annualized_3y)}${num(f.drawdown_now)!==null&&num(f.drawdown_now)>-0.0005?`<td class="num rpg-up">at peak</td>`:guildCell(f.drawdown_now)}<td>${esc(f.trend_state==="ABOVE"?"above":f.trend_state==="BELOW"?"below":"\u2014")}</td><td>${esc(z?z.toLowerCase():"too new")}</td><td class="num">${f.trailing_yield===null||f.trailing_yield===undefined?"\u2014":`${(num(f.trailing_yield)*100).toFixed(2)}%`}</td><td class="num">${f.expense_ratio===null||f.expense_ratio===undefined?"\u2014":`${(num(f.expense_ratio)*100).toFixed(2)}%`}</td><td class="rpg-nowrap">${badge((GUILD_CALL[f.call]||["\u2014"])[0],(GUILD_CALL[f.call]||[0,"stone"])[1])}${f.redirect_to?` <span class="rpg-muted">\u2192 ${esc(f.redirect_to)}</span>`:""}</td><td class="num">${h?money(h.worth):"\u2014"}</td></tr>`;
-  }).join("");
-  return `<section class="rpg-stone rpg-guild-ledger" aria-labelledby="rpg-guild-ledger-h"><div class="rpg-section-head"><h2 id="rpg-guild-ledger-h" class="rpg-stone-title">The Guild ledger</h2><span class="rpg-crumb-note">Total return, distributions reinvested</span></div><div class="rpg-table-wrap"><table class="rpg-table rpg-guild-table"><thead><tr><th>Fund</th><th class="num">Close</th><th class="num">1 year</th><th class="num">3 years, a year</th><th class="num">From peak</th><th>200-day trend</th><th>Stretch</th><th class="num">Yield</th><th class="num">Fee</th><th>Counsel</th><th class="num">Your worth</th></tr></thead><tbody>${rows}</tbody></table></div></section>`;
+function whenText(w){
+  if(!w)return ["\u2014","stone","No family reading"];
+  if(w.verdict==="WAIT")return ["WAIT","crimson",`Wait for a ${Math.round(num(w.parameter)*100)}% dip`];
+  if(w.verdict==="BUY_NOW")return ["BUY NOW","verdant","The family is in its buy zone"];
+  return ["STEADY","bronze","Keep buying steadily"];
 }
-function guildRoad(f){
+function implText(f){
+  const i=f.implementation||{};
+  if(i.call==="REDIRECT_NEW_MONEY")return [`\u2192 ${i.to}`,"azure",`Same exposure as ${i.to}, which has done it better`];
+  if(i.call==="BEST_IN_CLUSTER")return ["BEST","verdant","The best of its near-identical funds"];
+  return ["\u2014","stone","No near-identical fund"];
+}
+function guildFamily(f){return f.group_family||"NONE"}
+function guildFiltered(funds,held){
+  const st=state.guildFilter;
+  const q=st.q.trim().toUpperCase();
+  let out=funds.filter(f=>(st.family==="ALL"||(!st.family?guildFamily(f)!=="NONE"||!!held[f.symbol]:guildFamily(f)===st.family))&&(!st.group||f.peer_group===st.group)&&(!st.mine||held[f.symbol])&&(!st.best||f.implementation?.call==="BEST_IN_CLUSTER"||f.implementation?.call==="NO_NEAR_DUPLICATE")&&(!q||String(f.symbol).includes(q)||String(f.name||"").toUpperCase().includes(q)));
+  if(st.sort==="group")return out.slice().sort((a,b)=>(held[b.symbol]?1:0)-(held[a.symbol]?1:0)||groupName(a.peer_group).localeCompare(groupName(b.peer_group))||(num(b.annualized_3y)??-9)-(num(a.annualized_3y)??-9));
+  const key={"3y":f=>num(f.annualized_3y),"1y":f=>num(f.return_1y),fee:f=>num(f.expense_ratio)===null?null:-num(f.expense_ratio),peak:f=>num(f.drawdown_now),yield:f=>num(f.yield_12m)}[st.sort];
+  if(key)out=out.slice().sort((a,b)=>(key(b)??-1e9)-(key(a)??-1e9));else out=out.slice().sort((a,b)=>String(a.symbol).localeCompare(String(b.symbol)));
+  return out;
+}
+function guildBoardRows(funds,held){
+  const shown=guildFiltered(funds,held);
+  const page=shown.slice(0,state.guildFilter.limit);
+  const cell=v=>{const n=num(v);return `<td class="num ${upDown(n)}">${pct(n)}</td>`};
+  const rows=page.map(f=>{const [il,it]=implText(f);const [wl,wt]=whenText(f.when_to_buy);const h=held[f.symbol];
+    const peak=num(f.drawdown_now);
+    return `<tr class="${f.symbol===state.guildPick?"is-picked":""}${h?" is-mine":""}"><th scope="row"><button type="button" class="rpg-btn rpg-fund-pick" data-rpg-fund="${esc(f.symbol)}" aria-pressed="${f.symbol===state.guildPick}"><strong>${esc(f.symbol)}${h?" \u2726":""}</strong><span>${esc(f.name||"")}</span></button></th><td>${esc(groupName(f.peer_group))}</td><td class="num">${money(f.close)}</td>${cell(f.return_1y)}${cell(f.annualized_3y)}${peak!==null&&peak>-0.0005?`<td class="num rpg-up">at peak</td>`:cell(f.drawdown_now)}<td class="num">${num(f.yield_12m)===null?"\u2014":`${(num(f.yield_12m)*100).toFixed(2)}%`}</td><td class="num">${num(f.expense_ratio)===null?"\u2014":`${(num(f.expense_ratio)*100).toFixed(2)}%`}</td><td class="rpg-nowrap">${badge(il,it)}</td><td class="rpg-nowrap">${badge(wl,wt)}</td><td class="num">${h?money(h.worth):"\u2014"}</td></tr>`}).join("");
+  const more=shown.length>page.length?`<button type="button" class="rpg-btn rpg-link" data-rpg-more>Show ${Math.min(50,shown.length-page.length)} more of ${shown.length-page.length} \u203a</button>`:"";
+  return `<p class="rpg-crumb-note">${shown.length} of ${funds.length} funds</p><div class="rpg-table-wrap"><table class="rpg-table rpg-guild-table"><thead><tr><th>Fund</th><th>Peer group</th><th class="num">Close</th><th class="num">1 year</th><th class="num">3 years, a year</th><th class="num">From peak</th><th class="num">Yield</th><th class="num">Fee</th><th>Which fund</th><th>When</th><th class="num">Your worth</th></tr></thead><tbody>${rows||`<tr><td colspan="11" class="rpg-muted">No fund matches these filters.</td></tr>`}</tbody></table></div>${more}`;
+}
+function guildBoard(funds,held){
+  const st=state.guildFilter;
+  const fams=["US_EQUITY","INTL_EQUITY","BONDS","OTHER","NONE"].filter(k=>funds.some(f=>guildFamily(f)===k));
+  const groups=[...new Set(funds.filter(f=>st.family==="ALL"||(!st.family?guildFamily(f)!=="NONE":guildFamily(f)===st.family)).map(f=>f.peer_group))].sort((a,b)=>groupName(a).localeCompare(groupName(b)));
+  const opt=(v,label,cur)=>`<option value="${esc(v)}"${v===cur?" selected":""}>${esc(label)}</option>`;
+  return `<section class="rpg-stone rpg-guild-ledger" aria-labelledby="rpg-board-h"><div class="rpg-section-head"><h2 id="rpg-board-h" class="rpg-stone-title">The Market Board</h2><span class="rpg-crumb-note">Total return, distributions reinvested</span></div><div class="rpg-board-filters" role="search"><label>Family <select data-rpg-filter-key="family">${opt("","All grouped funds",st.family)}${fams.map(k=>opt(k,FAMILY_NAME[k],st.family)).join("")}${opt("ALL","Everything, incl. specialized",st.family)}</select></label><label>Peer group <select data-rpg-filter-key="group">${opt("","All groups",st.group)}${groups.map(g=>opt(g,groupName(g),st.group)).join("")}</select></label><label>Sort <select data-rpg-filter-key="sort">${[["group","Peer group, yours first"],["3y","3-year return"],["1y","1-year return"],["fee","Lowest fee"],["yield","Yield"],["peak","Nearest its peak"],["name","Symbol"]].map(([v,l])=>opt(v,l,st.sort)).join("")}</select></label><label class="rpg-board-search">Find <input type="search" data-rpg-filter-key="q" value="${esc(st.q)}" placeholder="Symbol or name" autocomplete="off"></label><label class="rpg-check"><input type="checkbox" data-rpg-filter-key="mine"${st.mine?" checked":""}> Your funds</label><label class="rpg-check"><input type="checkbox" data-rpg-filter-key="best"${st.best?" checked":""}> Best of each exposure</label></div><div id="rpg-guild-board">${guildBoardRows(funds,held)}</div></section>`;
+}
+function guildChart(f){
   const hist=(f.history_monthly||[]).filter(r=>num(r.close)!==null);
-  if(hist.length<12)return "";
+  if(hist.length<6)return "";
   const prices=hist.map(r=>num(r.close));
   const lo=Math.min(...prices),hi=Math.max(...prices);
-  const step=niceStep(Math.max(hi-lo*0.8,1),5);
-  const bottom=Math.max(0,Math.floor(lo*0.9/step)*step),top=Math.ceil(hi*1.05/step)*step;
+  const step=niceStep(Math.max(hi-lo,hi*0.05,0.01),5);
+  const bottom=Math.max(0,Math.floor(lo/step)*step),top=Math.ceil(hi/step)*step||1;
   const X0=60,X1=860,Y0=16,Y1=236;
   const x=i=>X0+(X1-X0)*i/(hist.length-1);
-  const y=v=>Y1-(Y1-Y0)*(v-bottom)/(top-bottom||1);
-  const path=prices.map((v,i)=>`${i?"L":"M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ");
+  const y=v=>Y1-(Y1-Y0)*(v-bottom)/((top-bottom)||1);
   const grid=[],labels=[];
   for(let v=bottom;v<=top+1e-9;v+=step){grid.push(`M${X0} ${y(v).toFixed(1)} H${X1}`);labels.push(`<text x="52" y="${(y(v)+4).toFixed(1)}">${compact(v)}</text>`)}
-  const xt=[0,Math.round((hist.length-1)/3),Math.round(2*(hist.length-1)/3),hist.length-1];
-  const xl=xt.map(i=>`<text x="${x(i).toFixed(0)}" y="258">${esc(monthLabel(hist[i].month))}</text>`).join("");
+  const xt=[0,Math.round((hist.length-1)/2),hist.length-1];
   const last=prices[prices.length-1];
-  return `<section class="rpg-stone rpg-road" aria-labelledby="rpg-groad-h"><div class="rpg-section-head"><h2 id="rpg-groad-h" class="rpg-stone-title">The Long Road \u00b7 ${hist.length} month-end closes</h2></div><svg viewBox="0 0 900 270" class="rpg-fluid" role="img" aria-label="${esc(`${f.ticker} month-end close from ${monthLabel(hist[0].month)} to ${monthLabel(hist[hist.length-1].month)}, last ${money(last)}`)}"><path d="${grid.join(" ")}" stroke="#4a3d2c"/><path d="M${X0} ${Y1} H${X1}" stroke="#7a6038" stroke-width="1.5"/><g font-family="Alegreya, serif" font-size="14" fill="#b9a98a" text-anchor="end">${labels.join("")}</g><g font-family="Alegreya, serif" font-size="14" fill="#b9a98a" text-anchor="middle">${xl}</g><path d="${path}" fill="none" stroke="#a9cf92" stroke-width="3" stroke-linejoin="round"/><circle cx="${X1}" cy="${y(last).toFixed(1)}" r="6" fill="#a9cf92" stroke="#231f1a" stroke-width="2"/><text x="${X1-8}" y="${(y(last)-13).toFixed(1)}" text-anchor="end" font-family="Cinzel, serif" font-size="15" font-weight="700" fill="#a9cf92">${esc(money(last))}</text></svg></section>`;
+  return `<section class="rpg-stone rpg-road" aria-labelledby="rpg-groad-h"><div class="rpg-section-head"><h2 id="rpg-groad-h" class="rpg-stone-title">The Long Road \u00b7 ${hist.length} month-end closes</h2></div><svg viewBox="0 0 900 270" class="rpg-fluid" role="img" aria-label="${esc(`${f.symbol} month-end close from ${monthLabel(hist[0].month)} to ${monthLabel(hist[hist.length-1].month)}`)}"><path d="${grid.join(" ")}" stroke="#4a3d2c"/><g font-family="Alegreya, serif" font-size="14" fill="#b9a98a" text-anchor="end">${labels.join("")}</g><g font-family="Alegreya, serif" font-size="14" fill="#b9a98a" text-anchor="middle">${xt.map(i=>`<text x="${x(i).toFixed(0)}" y="258">${esc(monthLabel(hist[i].month))}</text>`).join("")}</g><path d="${prices.map((v,i)=>`${i?"L":"M"}${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(" ")}" fill="none" stroke="#a9cf92" stroke-width="3" stroke-linejoin="round"/><circle cx="${X1}" cy="${y(last).toFixed(1)}" r="6" fill="#a9cf92" stroke="#231f1a" stroke-width="2"/></svg></section>`;
 }
-function guildStretch(f){
-  const s=f.stretch_context;
-  if(!s||!(s.bands||[]).length)return `<section class="rpg-parch rpg-rune"><h2 class="rpg-parch-title">The Rune of Stretch</h2><p class="rpg-parch-note">${esc(f.ticker)} has too little history for a five-year reading yet.</p></section>`;
-  const bands=s.bands,w=960/bands.length;
-  const shade=["#2f5e8f","#4d7a3a","#b5862f","#a0612b","#8f2f24"];
-  const cells=bands.map((b,i)=>`<rect x="${20+i*w}" y="30" width="${w}" height="34" fill="${shade[i]||"#7a6038"}"/><text x="${20+i*w+w/2}" y="52" text-anchor="middle" font-family="Cinzel, serif" font-size="14" font-weight="700" fill="#f6e7c2">${(num(b.forward_3y_median)*100).toFixed(1)}% a year</text><text x="${20+i*w+w/2}" y="86" text-anchor="middle" font-family="Alegreya, serif" font-size="14" fill="#5a4128">${num(b.stretch_from).toFixed(2)}\u2013${num(b.stretch_to).toFixed(2)}\u00d7</text>`).join("");
-  const band=Math.min(bands.length,Math.max(1,num(s.band)||1))-1;
-  const mark=20+band*w+w/2;
-  const since=String(s.history_from||"").slice(0,4);
-  const read=`Today ${f.ticker} is ${num(s.stretch).toFixed(2)}\u00d7 its five-year average, ${STRETCH_TEXT[s.zone]||""}: more stretched than ${Math.round(num(s.percentile)*100)}% of months since ${since}${s.proxy&&s.proxy!==f.ticker?` (measured on ${s.proxy}, which tracks the same market for longer)`:""}. After readings in this band the next three years returned a median ${(num(s.forward_3y_median_in_band)*100).toFixed(1)}% a year, against ${(num(s.forward_3y_median_all)*100).toFixed(1)}% across all months. That was still usually better than cash, so pausing new money did not pay in testing.`;
-  return `<section class="rpg-parch rpg-rune" aria-labelledby="rpg-stretch-h"><h2 id="rpg-stretch-h" class="rpg-parch-title">The Rune of Stretch \u00b7 what followed each fifth of history</h2><svg viewBox="0 0 1000 96" class="rpg-fluid" role="img" aria-label="${esc(read)}">${cells}<rect x="20" y="30" width="960" height="34" fill="none" stroke="#4a2f14" stroke-width="2"/><rect x="${20+band*w+2}" y="28" width="${w-4}" height="38" fill="none" stroke="#f6e7c2" stroke-width="3"/><path d="M${mark} 26 L${mark+9} 10 L${mark-9} 10 Z" fill="#2a1d12"/></svg><p class="rpg-parch-note">${esc(read)}</p></section>`;
-}
-function guildDetail(f,held){
+function guildDetail(f,held,groups){
   if(!f)return "";
-  const h=held[f.ticker];
-  const [,,meaning]=GUILD_CALL[f.call]||["","",""];
   const tile=(label,value,sub="")=>`<div class="rpg-parch rpg-tile"><div class="rpg-stat-label">${esc(label)}</div><div class="rpg-stat-big num">${value}</div>${sub?`<div class="rpg-stat-sub">${esc(sub)}</div>`:""}</div>`;
-  const over=(f.overlaps||[]).filter(o=>num(o.correlation_3y)>=0.95).map(o=>`<li><strong>${esc(o.ticker)}</strong> moved ${num(o.correlation_3y).toFixed(3)} in step over 3 years${o.same_index?" (same index)":""}${o.tracking_difference_3y===null||o.tracking_difference_3y===undefined?"":`; ${f.ticker} returned ${pct(o.tracking_difference_3y,2)} a year against it`}.</li>`).join("");
-  const hold=h?`<div class="rpg-parch-kicker">Your charter</div><div class="rpg-item-stats"><div><div class="rpg-stat-label">Held</div><div class="rpg-stat-value">${esc(qty(h.shares))} shares</div></div><div><div class="rpg-stat-label">Gold paid</div><div class="rpg-stat-value">${money(h.paid)}</div></div><div><div class="rpg-stat-label">Worth at the close</div><div class="rpg-stat-value">${money(h.worth)}</div><div class="rpg-stat-sub ${upDown(h.worth-h.paid)}">${signed(h.worth-h.paid)}${h.paid?` \u00b7 ${pct((h.worth-h.paid)/h.paid)}`:""}</div></div></div><p class="rpg-item-note">${h.marked?`Valued at the ${esc(dayLabel(h.asOf))} close.`:"Valued at your own snapshot: no usable close for this fund."}</p>`:"";
-  return `<section class="rpg-stone rpg-vault-hero" aria-labelledby="rpg-fund-h"><div class="rpg-vault-call"><div class="rpg-vault-id"><div><h2 id="rpg-fund-h" class="rpg-vault-name">${esc(f.ticker)} \u00b7 ${esc(f.name)}</h2><div class="rpg-vault-role">${esc(f.index)} \u00b7 ${esc(f.issuer)} \u00b7 since ${esc(String(f.history_from||"").slice(0,4))}</div></div></div><div class="rpg-vault-verdict">${guildSeal(f.call)}<span>${esc(meaning)}${f.redirect_to?`: ${esc(f.redirect_to)}`:""}</span></div><p class="rpg-vault-why">${esc(f.call_reason||"")}</p></div><div class="rpg-tiles">${tile("Close",money(f.close),`as of ${dayLabel(f.as_of_date)}`)}${tile("3 years, a year",pct(f.annualized_3y),`5 years ${pct(f.annualized_5y)} a year`)}${tile("Worst fall, 3 years",pct(f.max_drawdown_3y),num(f.drawdown_now)!==null&&num(f.drawdown_now)>-0.0005?"at its peak now":`now ${pct(f.drawdown_now)} from its peak`)}${tile("Yield",f.trailing_yield===null||f.trailing_yield===undefined?"\u2014":`${(num(f.trailing_yield)*100).toFixed(2)}%`,`fee ${(num(f.expense_ratio)*100).toFixed(2)}% a year`)}</div></section>${guildStretch(f)}<div class="rpg-duo">${guildRoad(f)}<aside class="rpg-parch rpg-item-detail"><div class="rpg-parch-kicker">Risk</div><p class="rpg-item-note">Swings ${pct(f.volatility_3y).replace("+","")} a year (3-year volatility); beta ${num(f.beta_vs_voo_3y)===null?"\u2014":num(f.beta_vs_voo_3y).toFixed(2)} against VOO. ${f.trend_state==="ABOVE"?"Above":"Below"} its 200-day average (${num(f.trend_ratio_200d)===null?"\u2014":`${num(f.trend_ratio_200d).toFixed(3)}\u00d7`}).</p>${over?`<div class="rpg-parch-kicker">Overlaps with your other funds</div><ul class="rpg-overlaps">${over}</ul>`:""}${hold}</aside></div>`;
+  const g=groups[f.peer_group]||{};
+  const [il,it,imean]=implText(f);
+  const w=f.when_to_buy;
+  const [wl,wt,wmean]=whenText(w);
+  const h=held[f.symbol];
+  const ev=f.group_evidence||{};
+  const cl=f.cluster;
+  const whenWhy=!w?"This fund has no peer family, so there is no timing reading.":w.verdict==="STEADY_BUYING"?"For this family no timing rule beat plain monthly buying out of sample, so steady buying is the counsel.":`For ${FAMILY_NAME[f.group_family]||"this family"}, waiting for a ${Math.round(num(w.parameter)*100)}% dip from the peak beat monthly buying in ${Math.round(num(w.evidence?.share_beating)*100)}% of 3-year test periods (median gain ${pct(w.evidence?.median_edge)}). The family is ${pct(w.drawdown)} from its peak as of ${monthLabel(w.as_of_month)}.`;
+  const implWhy=!cl?"No other fund in the universe moves almost identically to this one.":f.implementation?.call==="REDIRECT_NEW_MONEY"?`${cl.members.length} funds move almost identically (daily returns at 0.998+ correlation over 3 years). ${f.implementation.to} did it best${cl.basis==="LOWEST_OFFICIAL_EXPENSE_RATIO_AMONG_BEST_TRACKERS"?" at the lowest official fee":", net of its costs"}, so new money goes further there; shares you already hold can stay.`:`It is the best of ${cl.members.length} near-identical funds${cl.basis==="LOWEST_OFFICIAL_EXPENSE_RATIO_AMONG_BEST_TRACKERS"?", by official fee":", by 3-year return net of costs"}.`;
+  const hold=h?`<div class="rpg-parch-kicker">Your charter</div><div class="rpg-item-stats"><div><div class="rpg-stat-label">Held</div><div class="rpg-stat-value">${esc(qty(h.shares))} shares</div></div><div><div class="rpg-stat-label">Gold paid</div><div class="rpg-stat-value">${money(h.paid)}</div></div><div><div class="rpg-stat-label">Worth at the close</div><div class="rpg-stat-value">${money(h.worth)}</div><div class="rpg-stat-sub ${upDown(h.worth-h.paid)}">${signed(h.worth-h.paid)}${h.paid?` \u00b7 ${pct((h.worth-h.paid)/h.paid)}`:""}</div></div></div>`:"";
+  const pctile=v=>num(v)===null?"\u2014":`${Math.round(num(v))}th`;
+  return `<section class="rpg-stone rpg-vault-hero" aria-labelledby="rpg-fund-h"><div class="rpg-vault-call"><div class="rpg-vault-id"><div><h2 id="rpg-fund-h" class="rpg-vault-name">${esc(f.symbol)}</h2><div class="rpg-vault-role">${esc(f.name||"")} \u00b7 ${esc(groupName(f.peer_group))}${f.history_from?` \u00b7 since ${esc(String(f.history_from).slice(0,4))}`:""}</div></div></div><div class="rpg-guild-verdicts"><div class="rpg-vault-verdict">${badge(il,it)}<span>${esc(imean)}</span></div><div class="rpg-vault-verdict">${badge(wl,wt)}<span>${esc(wmean)}</span></div></div><p class="rpg-vault-why">${esc(implWhy)}</p><p class="rpg-vault-why">${esc(whenWhy)}</p></div><div class="rpg-tiles">${tile("Close",money(f.close),`as of ${dayLabel(f.as_of_date)}`)}${tile("3 years, a year",pct(f.annualized_3y),`5 years ${pct(f.annualized_5y)} a year`)}${tile("Worst fall, 3 years",pct(f.max_drawdown_3y),`now ${pct(f.drawdown_now)} from its peak`)}${tile("Fee",num(f.expense_ratio)===null?"\u2014":`${(num(f.expense_ratio)*100).toFixed(2)}%`,num(f.expense_ratio)===null?"not in SEC data yet":"official, SEC filing")}</div></section><div class="rpg-duo">${guildChart(f)}<aside class="rpg-parch rpg-item-detail"><div class="rpg-parch-kicker">Among its ${esc(String(g.members||"\u2014"))} peers \u00b7 ${esc(groupName(f.peer_group))}</div><p class="rpg-item-note">1-year return in the ${pctile(f.return_1y_group_percentile)} percentile; 3-year in the ${pctile(f.annualized_3y_group_percentile)}. Peer medians: ${pct(g.median_return_1y)} over 1 year, ${pct(g.median_annualized_3y)} a year over 3. Past rank did not predict future rank in testing, so this is context, not counsel.</p><p class="rpg-item-note">Grouped by its own returns: closest to ${esc(ev.nearest_reference||"\u2014")} (${num(ev.correlation)===null?"\u2014":num(ev.correlation).toFixed(2)} correlation), beta ${num(ev.beta_spy)===null?"\u2014":num(ev.beta_spy).toFixed(2)} to the S&P 500. Provisional until the SEC taxonomy is certified.</p>${cl?`<div class="rpg-parch-kicker">Near-identical funds</div><p class="rpg-item-note">${cl.members.map(s=>s===cl.best?`<strong>${esc(s)} (best)</strong>`:esc(s)).join(", ")}</p>`:""}${hold}</aside></div>`;
 }
-function guildResearch(pkg){
-  const rules=pkg?.research?.timing_rules||{};
-  const rows=Object.entries(rules).map(([key,r])=>`<tr><th scope="row">${esc(RULE_NAMES[key]||key)}</th><td class="num">${r.share_beating===null?"\u2014":`${Math.round(num(r.share_beating)*100)}%`}</td><td class="num ${upDown(num(r.median_edge))}">${pct(r.median_edge)}</td><td class="num ${upDown(num(r.worst_edge))}">${pct(r.worst_edge)}</td><td>${r.passes_gate?badge("PASSES","verdant"):badge("FAILS","crimson")}</td></tr>`).join("");
-  if(!rows)return "";
-  const n=Object.values(rules)[0]?.out_of_sample_starts;
-  return `<section class="rpg-stone rpg-guild-research" aria-labelledby="rpg-gres-h"><div class="rpg-section-head"><h2 id="rpg-gres-h" class="rpg-stone-title">The Guild's trials \u00b7 timing rules against plain monthly buying</h2></div><div class="rpg-table-wrap"><table class="rpg-table"><thead><tr><th>Rule for new money</th><th class="num">Beat monthly buying</th><th class="num">Median edge</th><th class="num">Worst</th><th>Test</th></tr></thead><tbody>${rows}</tbody></table></div><p class="rpg-footnote">${esc(`Each rule was tested walk-forward over ${n||"many"} three-year stretches of $100 a month from 2013 on, with its setting chosen only from earlier years and paused money earning T-bill interest. The pass mark was set before any result was seen. None passed, so the Guild's counsel is steady buying; the useful advice is where new money goes.`)}</p></section>`;
+function guildTrials(pkg){
+  const r=pkg?.research||{};
+  const ic=r.factor_ic_12m||{};
+  const rows=Object.entries(ic).filter(([k])=>FACTOR_NAMES[k]).map(([k,v])=>`<tr><th scope="row">${esc(FACTOR_NAMES[k])}</th><td class="num">${num(v.mean_ic)===null?"\u2014":num(v.mean_ic).toFixed(3)}</td><td class="num">${num(v.t_yearly)===null?"\u2014":num(v.t_yearly).toFixed(1)}</td><td>${Math.abs(num(v.t_yearly)||0)>=2?badge("RELIABLE","verdant"):badge("NOISE","stone")}</td></tr>`).join("");
+  const fams=Object.entries(r.timing||{}).map(([fam,rules])=>`<tr><th scope="row">${esc(FAMILY_NAME[fam]||fam)}</th>${["TREND_PAUSE","STRETCH_PAUSE","WAIT_FOR_DIP","MOMENTUM_PAUSE"].map(k=>{const v=rules[k]||{};return `<td class="num">${v.share_beating===null||v.share_beating===undefined?"\u2014":`${Math.round(num(v.share_beating)*100)}%`}${v.passes_gate?" \u2713":""}</td>`}).join("")}</tr>`).join("");
+  return `<section class="rpg-stone rpg-guild-research" aria-labelledby="rpg-gres-h"><div class="rpg-section-head"><h2 id="rpg-gres-h" class="rpg-stone-title">The Guild's trials</h2></div><div class="rpg-duo"><div><div class="rpg-parch-kicker">Does it pick next year's winners within a peer group?</div><div class="rpg-table-wrap"><table class="rpg-table"><thead><tr><th>Signal</th><th class="num">Rank correlation</th><th class="num">t (yearly)</th><th>Verdict</th></tr></thead><tbody>${rows}</tbody></table></div></div><div><div class="rpg-parch-kicker">Does waiting beat buying every month? (share of 3-year tests won)</div><div class="rpg-table-wrap"><table class="rpg-table"><thead><tr><th>Family</th>${["TREND_PAUSE","STRETCH_PAUSE","WAIT_FOR_DIP","MOMENTUM_PAUSE"].map(k=>`<th class="num">${esc(RULE_NAMES[k])}</th>`).join("")}</tr></thead><tbody>${fams}</tbody></table></div></div></div><p class="rpg-footnote">${esc("Every test was walk-forward on 1,077 funds' month-end total returns, with each setting chosen only from earlier years and the pass marks set before any result was seen. No signal reliably picked winners within a peer group, so the Guild names no BUY or AVOID by rank. What the evidence supports: among funds that are effectively the same, the one with the lowest cost and best tracking (\u2713 marks a timing rule that passed).")}</p></section>`;
+}
+function guildCounsel(funds,held){
+  const mine=funds.filter(f=>held[f.symbol]);
+  const moves=mine.filter(f=>f.implementation?.call==="REDIRECT_NEW_MONEY").map(f=>`${f.symbol} \u2192 ${f.implementation.to}`);
+  const waits=mine.filter(f=>f.when_to_buy?.verdict==="WAIT").map(f=>f.symbol);
+  const parts=[];
+  parts.push(moves.length?`Send new money for ${moves.join(", ")}: the same exposure, done better.`:"Your funds are already the best of their near-identical groups.");
+  if(waits.length)parts.push(`For ${waits.join(", ")}, the real-asset rule says wait for a dip.`);
+  parts.push("Everything else: keep buying steadily.");
+  return parts.join(" ");
 }
 function renderGuild(){
   const page=byId("guild");
   if(!page)return;
   let view=byId("rpg-guild");
   if(!view){view=document.createElement("div");view.id="rpg-guild";view.className="rpg-realm-view";page.appendChild(view);bindNavigation(view);
-    view.addEventListener("click",event=>{const pick=event.target.closest("[data-rpg-fund]");if(pick){state.guildPick=pick.dataset.rpgFund;renderGuild();byId("rpg-fund-h")?.scrollIntoView({behavior:"smooth",block:"start"})}});}
+    view.addEventListener("click",event=>{const pick=event.target.closest("[data-rpg-fund]");const more=event.target.closest("[data-rpg-more]");if(pick){state.guildPick=pick.dataset.rpgFund;state.guildDetail=null;renderGuild();loadGuildFund(state.guildPick)}else if(more){state.guildFilter.limit+=50;guildRefreshBoard()}});
+    const onFilter=event=>{const el=event.target.closest("[data-rpg-filter-key]");if(!el)return;const k=el.dataset.rpgFilterKey;state.guildFilter[k]=el.type==="checkbox"?el.checked:el.value;if(k==="family")state.guildFilter.group="";state.guildFilter.limit=50;if(k==="q")guildRefreshBoard();else renderGuild()};
+    view.addEventListener("change",onFilter);view.addEventListener("input",event=>{if(event.target.dataset?.rpgFilterKey==="q")onFilter(event)});}
   const crumbs=note=>`<header class="rpg-stone rpg-crumbs"><nav aria-label="Breadcrumb"><button type="button" class="rpg-btn rpg-crumb" data-rpg-page="home">The Hall</button><span aria-hidden="true">\u203a</span><span class="rpg-crumb-here">Merchants' Guild</span></nav><span class="rpg-crumb-note">${esc(note)}</span></header>${realmTabs("etf")}`;
   const g=state.guild;
   if(!g){view.innerHTML=`${crumbs("ETFs")}<p class="rpg-parch-note">Opening the Guild's ledger\u2026</p>`;loadGuild().then(renderGuild).catch(()=>{view.innerHTML=`${crumbs("ETFs")}<p class="rpg-parch-note">The Guild's ledger could not be loaded.</p>`});return}
   if(!g.available||!(g.funds||[]).length){view.innerHTML=`${crumbs("ETFs")}<section class="rpg-stone"><p class="rpg-parch-note">The Merchants' Guild has no ledger in this publication yet. It fills after the daily ETF package publishes.</p></section>`;return}
   const pkg=g.package||{};
-  const order=["VOO","SCHD","QQQM","QQQ","IWM","DIA","EDOW","IYY"];
-  const funds=g.funds.slice().sort((a,b)=>(order.indexOf(a.ticker)+99)%99-(order.indexOf(b.ticker)+99)%99||String(a.ticker).localeCompare(String(b.ticker)));
-  if(!funds.some(f=>f.ticker===state.guildPick))state.guildPick=funds[0].ticker;
+  const funds=g.funds;
   const held=guildHoldings();
+  if(!state.guildPick){const first=funds.find(f=>held[f.symbol])||funds.find(f=>f.symbol==="VOO")||funds[0];state.guildPick=first.symbol}
   const worth=Object.values(held).reduce((a,h)=>a+h.worth,0),paid=Object.values(held).reduce((a,h)=>a+h.paid,0);
-  const redirects=funds.filter(f=>f.call==="REDIRECT_NEW_MONEY"&&f.redirect_to);
-  const counsel=redirects.length?`Keep buying steadily, and send new money for ${redirects.map(f=>`${f.ticker} to ${f.redirect_to}`).join(" and ")}: the same exposure for a lower fee.`:"Keep buying steadily: no timing rule beat plain monthly buying over three years.";
   const asOf=pkg.package_as_of||funds[0].as_of_date;
-  const limits=(pkg.limitations||[]).length?` \u00b7 ${pkg.limitations.join("; ")}`:"";
-  view.innerHTML=`${crumbs(`Closes of ${dayLabel(asOf)} \u00b7 ${String(pkg.certification_status||"PROVISIONAL").toLowerCase()} \u00b7 research, not orders`)}<section class="rpg-stone rpg-guild-hero"><div><div class="rpg-parch-kicker">The Guild's counsel</div><p class="rpg-guild-counsel">${esc(counsel)}</p></div><div class="rpg-crumb-stats"><span>Charters <strong class="num">${Object.keys(held).length}</strong></span><span>Worth <strong class="num">${money(worth)}</strong></span><span>Gold paid <strong class="num">${money(paid)}</strong></span><span class="${upDown(worth-paid)}">${signed(worth-paid)}</span></div></section>${guildLedger(funds,state.guildPick,held)}${guildDetail(funds.find(f=>f.ticker===state.guildPick),held)}${guildResearch(pkg)}${footer(`Prices from free public sources (Yahoo's chart feed, checked against Nasdaq): provisional, not certified. Package ${pkg.package_id||"\u2014"}${limits}. Research, not personal financial advice; nothing here places a trade.`)}`;
+  const detail=state.guildDetail&&state.guildDetail.symbol===state.guildPick?state.guildDetail:funds.find(f=>f.symbol===state.guildPick);
+  view.innerHTML=`${crumbs(`${funds.length} funds \u00b7 closes of ${dayLabel(asOf)} \u00b7 ${String(pkg.certification_status||"PROVISIONAL").toLowerCase()} \u00b7 research, not orders`)}<section class="rpg-stone rpg-guild-hero"><div><div class="rpg-parch-kicker">The Guild's counsel for your charters</div><p class="rpg-guild-counsel">${esc(guildCounsel(funds,held))}</p></div><div class="rpg-crumb-stats"><span>Charters <strong class="num">${Object.keys(held).length}</strong></span><span>Worth <strong class="num">${money(worth)}</strong></span><span>Gold paid <strong class="num">${money(paid)}</strong></span><span class="${upDown(worth-paid)}">${signed(worth-paid)}</span></div></section>${guildBoard(funds,held)}<div id="rpg-guild-detail">${guildDetail(detail,held,pkg.groups||{})}</div>${guildTrials(pkg)}${footer(`Prices from free public data (tier 4) and peer groups from each fund's own returns: provisional, not certified. Package ${pkg.package_id||"\u2014"}. Research, not personal financial advice; nothing here places a trade.`)}`;
+  if(!state.guildDetail||state.guildDetail.symbol!==state.guildPick)loadGuildFund(state.guildPick);
+}
+function guildRefreshBoard(){const slot=byId("rpg-guild-board");if(slot&&state.guild)slot.innerHTML=guildBoardRows(state.guild.funds,guildHoldings())}
+function loadGuildFund(symbol){
+  api(`/v1/presentation/etf/${encodeURIComponent(symbol)}`).then(doc=>{if(state.guildPick!==symbol)return;state.guildDetail=doc;const slot=byId("rpg-guild-detail");if(slot)slot.innerHTML=guildDetail(doc,guildHoldings(),state.guild?.package?.groups||{})}).catch(()=>{});
 }
 
 function watchGuild(){document.addEventListener("click",event=>{if(event.target.closest('.nav-item[data-page="guild"]'))setTimeout(()=>{try{renderGuild()}catch(error){console.error("[realm] guild",error)}},0)});if(location.hash==="#guild")setTimeout(renderGuild,0)}

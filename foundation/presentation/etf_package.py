@@ -17,7 +17,7 @@ from pathlib import Path
 from typing import Any
 
 DOMAIN_ID = "etf"
-REQUIRED_FILES = ("funds.json", "latest_prices.csv", "research.json", "market_data_status.json")
+REQUIRED_FILES = ("funds.json", "groups.json", "latest_prices.csv", "research.json", "market_data_status.json")
 ALLOWED_CERTIFICATION = {"PROVISIONAL", "CERTIFIED"}
 ALLOWED_VALIDATION = {"PASS", "PASS_WITH_LIMITATIONS"}
 MANIFEST_KEYS = {"package_id", "domain", "contract_version", "generated_at_utc", "source_snapshot_id",
@@ -80,6 +80,7 @@ def build_etf_records(directory: Path, *, source_run_id: str | None = None):
     manifest = verify_etf_package(directory)
     funds = json.loads((directory / "funds.json").read_text(encoding="utf-8"))
     research = json.loads((directory / "research.json").read_text(encoding="utf-8"))
+    groups = json.loads((directory / "groups.json").read_text(encoding="utf-8")).get("groups") or {}
     lineage = {"package_id": manifest["package_id"], "package_as_of": funds.get("as_of_date"),
                "certification_status": manifest["certification_status"],
                "validation_status": manifest["validation_status"],
@@ -87,13 +88,14 @@ def build_etf_records(directory: Path, *, source_run_id: str | None = None):
                "source_commit": manifest["repository_commit"], "source_run_id": source_run_id}
     records = []
     for fund in funds["funds"]:
-        ticker = str(fund["ticker"]).upper()
-        records.append(PresentationRecord("etf_fund", DOMAIN_ID, f"etf:{ticker.lower()}", ticker,
+        symbol = str(fund.get("symbol") or fund.get("ticker")).upper()
+        records.append(PresentationRecord("etf_fund", DOMAIN_ID, f"etf:{symbol.lower()}", symbol,
                                           {**fund, "_lineage": lineage, "automatic_execution_authorized": False}))
-    records.append(PresentationRecord("etf_package", DOMAIN_ID, None, "etf-v1", {
+    records.append(PresentationRecord("etf_package", DOMAIN_ID, None, "etf-universe", {
         **lineage, "generated_at_utc": manifest["generated_at_utc"], "model_version": funds.get("model_version"),
+        "package_format": funds.get("package_format"),
         "limitations": funds.get("limitations") or [], "fund_count": len(funds["funds"]),
-        "research": research, "automatic_execution_authorized": False,
+        "research": research, "groups": groups, "automatic_execution_authorized": False,
     }))
     return records
 

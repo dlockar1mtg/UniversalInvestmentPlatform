@@ -382,3 +382,15 @@ tbody tr:hover{background:rgba(217,180,90,.05)}
 .rpg-overlaps{margin:4px 0 12px;padding-left:20px;line-height:1.5}
 .rpg-muted{color:#b9a98a}
 @media (max-width:720px){.rpg-guild-ledger,.rpg-guild-research{padding:14px 12px}.rpg-guild-hero{padding:16px}.rpg-guild-counsel{font-size:1.05rem}}
+.rpg-board-filters{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end;margin:4px 0 14px}
+.rpg-board-filters label{display:flex;flex-direction:column;gap:4px;font-family:"Alegreya SC",var(--font-body);font-size:.9rem;color:#b9a98a}
+.rpg-board-filters select,.rpg-board-filters input[type=search]{background:#15110c;color:#f1e3c2;border:1px solid #6b5432;padding:6px 8px;font:inherit;font-family:var(--font-body);min-width:150px}
+.rpg-board-filters select:focus-visible,.rpg-board-filters input:focus-visible{outline:2px solid #a9cf92;outline-offset:1px}
+.rpg-board-filters .rpg-board-search input{min-width:200px}
+.rpg-board-filters .rpg-check{flex-direction:row;align-items:center;gap:6px;padding-bottom:6px}
+.rpg-board-filters .rpg-check input{accent-color:#4d7a3a;width:16px;height:16px}
+.rpg-guild-table tr.is-mine th[scope=row] strong{color:#f1d78f}
+.rpg-guild-verdicts{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+.rpg-guild-verdicts .rpg-vault-verdict{margin:0}
+@media (max-width:720px){.rpg-board-filters select,.rpg-board-filters input[type=search],.rpg-board-filters .rpg-board-search input{min-width:0;width:100%}.rpg-board-filters label{flex:1 1 140px}}
+.rpg-guild-research .rpg-table{min-width:0}

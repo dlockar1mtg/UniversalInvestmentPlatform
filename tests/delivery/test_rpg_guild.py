@@ -23,7 +23,8 @@ def test_guild_page_and_tab_are_open():
 def test_guild_reads_the_etf_package_and_stays_read_only():
     realm = _read("rpg_realm.js")
     assert 'api("/v1/presentation/etf")' in realm
-    for heading in ("The Guild ledger", "The Rune of Stretch", "The Guild's trials", "Your charter"):
+    assert "api(`/v1/presentation/etf/${encodeURIComponent(symbol)}`)" in realm
+    for heading in ("The Market Board", "The Guild's trials", "Your charter", "Near-identical funds", "Best of each exposure"):
         assert heading in realm, heading
     assert 'h.valuation_source==="ETF_PACKAGE_CLOSE"' in realm
     assert "provisional, not certified" in realm
@@ -34,5 +35,5 @@ def test_guild_reads_the_etf_package_and_stays_read_only():
 
 def test_guild_styles_exist():
     css = _read("rpg_theme.css")
-    for selector in (".rpg-guild-hero{", ".rpg-guild-table{", ".rpg-fund-pick{", ".rpg-bar.etf>i{"):
+    for selector in (".rpg-guild-hero{", ".rpg-guild-table{", ".rpg-fund-pick{", ".rpg-bar.etf>i{", ".rpg-board-filters{"):
         assert selector in css, selector

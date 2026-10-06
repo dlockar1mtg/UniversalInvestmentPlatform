@@ -176,11 +176,13 @@ class PresentationReadRepository:
         return {"domain_id": domain_id, "asset_id": asset_id, "records": grouped}
 
     def etf_guild(self) -> dict[str, object] | None:
-        """The provisional ETF package records in the active publication, or None if it has none."""
+        """The ETF package in the active publication: package summary plus every fund without its
+        price history (fetch one fund with etf_fund for that). None if the publication has none."""
         with closing(self.connection_factory()) as db, db.cursor() as cursor:
             publication_id = self._active_id(cursor)
             cursor.execute("""
-                SELECT record_type, record_key, payload_json
+                SELECT record_type, record_key,
+                       CASE WHEN record_type='etf_fund' THEN payload_json - 'history_monthly' - 'history_daily' ELSE payload_json END
                 FROM presentation_records
                 WHERE publication_id=%s AND domain_id='etf' AND record_type IN ('etf_fund', 'etf_package')
                 ORDER BY record_type, record_key
@@ -192,13 +194,23 @@ class PresentationReadRepository:
             return None
         return {"package": package, "funds": funds}
 
+    def etf_fund(self, symbol: str) -> dict[str, object] | None:
+        with closing(self.connection_factory()) as db, db.cursor() as cursor:
+            publication_id = self._active_id(cursor)
+            cursor.execute("""
+                SELECT payload_json FROM presentation_records
+                WHERE publication_id=%s AND domain_id='etf' AND record_type='etf_fund' AND record_key=%s
+            """, (publication_id, symbol.strip().upper()))
+            row = cursor.fetchone()
+        return None if row is None else dict(row[0])
+
     def etf_latest_prices(self) -> dict[str, dict[str, object]]:
         """Latest package close per ETF ticker, for marking manual holdings. Empty when unavailable."""
         try:
             with closing(self.connection_factory()) as db, db.cursor() as cursor:
                 publication_id = self._active_id(cursor)
                 cursor.execute("""
-                    SELECT payload_json->>'ticker', payload_json->>'close', payload_json->>'as_of_date',
+                    SELECT COALESCE(payload_json->>'symbol', payload_json->>'ticker'), payload_json->>'close', payload_json->>'as_of_date',
                            payload_json->>'quality_status', payload_json->>'freshness_state',
                            payload_json->'_lineage'->>'package_id'
                     FROM presentation_records
@@ -657,6 +669,21 @@ def install_presentation_read_routes(
         if guild is None:
             return {"available": False, "package": None, "funds": []}
         return {"available": True, **guild}
+
+    @app.get("/v1/presentation/etf/{symbol}")
+    def presentation_etf_fund(symbol: str, x_api_key: str | None = Header(default=None)):
+        denied = authorize(x_api_key)
+        if denied:
+            return denied
+        if not symbol.replace(".", "").replace("-", "").isalnum() or len(symbol) > 12:
+            return JSONResponse({"error": {"code": "INVALID_SYMBOL", "message": "symbol is not valid"}}, status_code=400)
+        try:
+            fund = repository.etf_fund(symbol)
+        except LookupError:
+            fund = None
+        if fund is None:
+            return JSONResponse({"error": {"code": "ETF_NOT_FOUND", "message": "fund is not in the active ETF package"}}, status_code=404)
+        return fund
 
     @app.get("/v1/presentation/mtg-research/{asset_id}")
     def presentation_mtg_research(
