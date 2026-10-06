@@ -57,7 +57,7 @@ def test_dashboard_renders_precollector_v2_pages():
     from pathlib import Path
     js = (Path(__file__).resolve().parents[2] / "foundation" / "production" / "dashboard_assets" / "recommendation_ui.js").read_text(encoding="utf-8")
     for needle in ("function pcV2Detail(item)", "function pcV2Table(items)", "function pcV2Scorecard(items)",
-                   '(p.model_version==="secret-lair-v2"||p.model_version==="precollector-v2")&&p.model_purchase_status',
+                   '(p.model_version==="secret-lair-v2"||p.model_version==="precollector-v2"||p.model_version==="collector-v2")&&p.model_purchase_status',
                    "if(pcV2Decision(item)){pcV2RenderDetail(page,item);return;}", "This is history, not a forecast"):
         assert needle in js
 
@@ -74,5 +74,5 @@ def test_precollector_polish():
     js = (Path(__file__).resolve().parents[2] / "foundation" / "production" / "dashboard_assets" / "recommendation_ui.js").read_text(encoding="utf-8")
     assert "function pcV2Change12(p)" in js and "Box price <small>past 12 mo</small>" in js
     assert '<strong class="pc-v2-years">' in js
-    # call filters drop statuses that belong to other lanes (Secret Lair and Pre-Collector)
-    assert js.count('if(i>0&&!labels[String(o.value||"").toUpperCase()]&&!o.selected)o.remove()') == 2
+    # call filters drop statuses that belong to other lanes (Secret Lair, Pre-Collector and Collector)
+    assert js.count('if(i>0&&!labels[String(o.value||"").toUpperCase()]&&!o.selected)o.remove()') == 3
