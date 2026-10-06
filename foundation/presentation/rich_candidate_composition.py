@@ -4,6 +4,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from foundation.presentation.crypto_current_price_projection import ASSETS, build_crypto_current_price_records
+from foundation.presentation.crypto_forecast_tracking import apply_crypto_forecast_tracking
 from foundation.presentation.metals_rich_projection import build_metals_rich_records
 from foundation.presentation.metals_vehicle_implementation_projection import build_metals_vehicle_implementation_records
 from foundation.presentation.publication_model import PresentationPublication
@@ -19,6 +20,8 @@ def compose_rich_candidate(
     }
     if generic_crypto_ids != ASSETS:
         raise RuntimeError("Crypto current-price identity set does not reconcile with generic asset catalog")
+    # Labeled 7-day context and the forecast-log scorecard from the crypto run evidence (optional).
+    apply_crypto_forecast_tracking(base.records, crypto_artifact)
     combined = (
         list(base.records)
         + build_metals_rich_records(metals_artifact)
