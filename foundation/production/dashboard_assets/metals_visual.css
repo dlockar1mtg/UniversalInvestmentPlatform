@@ -288,3 +288,7 @@
 .cv-v2-card .cv-v2-research{align-self:flex-start;margin-top:auto}
 .cv-v2-tag{margin-left:8px;font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid rgba(91,214,160,.4);opacity:.85}
 .sl-v2-table tr.cv-v2-current td{background:rgba(91,214,160,.08);font-weight:600}
+
+.cv-v2-dim{opacity:.6}
+.sl-v2-table tr.cv-v2-scenario td{font-style:italic;opacity:.85}
+.cv-v2-projection h4 .cv-v2-tag{vertical-align:middle}
