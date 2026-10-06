@@ -3,6 +3,9 @@ name: UIP Production Publication Cycle
 on:
   schedule:
     - cron: "0 14 * * *"
+    - cron: "7 17 * * *" # backup: skipped unless a source has newer data than the last publication (see the gate job)
+    - cron: "7 20 * * *"
+    - cron: "7 23 * * *"
   workflow_dispatch:
     inputs:
       confirmation:
@@ -19,7 +22,66 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  gate:
+    # GitHub often starts scheduled runs hours late or skips them, so the publication also has
+    # backup schedule times. A scheduled run goes ahead when a governed source (or the Crypto v2
+    # prices) has finished a newer run than the last successful publication, or when nothing has
+    # been published for 20 hours. Manual runs always go ahead.
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    environment: staging
+    permissions:
+      actions: read
+    outputs:
+      run: ${{ steps.check.outputs.run }}
+    steps:
+      - id: check
+        env:
+          UIP_TOKEN: ${{ github.token }}
+          SOURCE_TOKEN: ${{ secrets.UIP_SOURCE_ARTIFACTS_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ "$GITHUB_EVENT_NAME" != "schedule" ]; then echo "run=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          api() {
+            curl --fail-with-body --silent --show-error --location \
+              --header "Accept: application/vnd.github+json" \
+              --header "Authorization: Bearer $1" \
+              --header "X-GitHub-Api-Version: 2022-11-28" \
+              "$2"
+          }
+          # Start time of the newest successful run that did real work (a job other than the gate succeeded).
+          last_worked() {
+            local token="$1" repo="$2" workflow="$3" runs id started worked
+            runs="$(api "$token" "https://api.github.com/repos/$repo/actions/workflows/$workflow/runs?branch=main&status=success&per_page=30" |
+              jq -r --argjson self "$GITHUB_RUN_ID" '.workflow_runs[] | select(.id != $self) | select(.event == "schedule" or .event == "workflow_dispatch") | "\(.id) \(.run_started_at)"')"
+            while read -r id started; do
+              [ -n "$id" ] || continue
+              worked="$(api "$token" "https://api.github.com/repos/$repo/actions/runs/$id/jobs?per_page=100" | jq '[.jobs[] | select(.name != "gate" and .conclusion == "success")] | length')"
+              if [ "$worked" -gt 0 ]; then echo "$started"; return 0; fi
+            done <<< "$runs"
+            echo ""
+          }
+          published="$(last_worked "$UIP_TOKEN" "$GITHUB_REPOSITORY" production-publication-cycle.yml)"
+          echo "Last successful publication started: ${published:-never}"
+          stale="$(date -u -d '20 hours ago' +%Y-%m-%dT%H:%M:%SZ)"
+          if [ -z "$published" ] || [[ "$published" < "$stale" ]]; then echo "run=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          while read -r token_name repo workflow; do
+            token="$UIP_TOKEN"; [ "$token_name" = "source" ] && token="$SOURCE_TOKEN"
+            newest="$(last_worked "$token" "$repo" "$workflow")"
+            echo "$repo/$workflow newest successful run: ${newest:-none}"
+            if [ -n "$newest" ] && [[ "$newest" > "$published" ]]; then echo "run=true" >> "$GITHUB_OUTPUT"; exit 0; fi
+          done <<'SOURCES'
+          source dlockar1mtg/CryptoIntelligencePlatform crypto-production-cycle.yml
+          uip dlockar1mtg/UniversalInvestmentPlatform metals-production-cycle.yml
+          source dlockar1mtg/mtg-investment-terminal mtg-marketplace-production.yml
+          uip dlockar1mtg/UniversalInvestmentPlatform crypto-v2-prices.yml
+          SOURCES
+          echo "No source has a newer run than the last publication, so this backup run stops here."
+          echo "run=false" >> "$GITHUB_OUTPUT"
+
   publish:
+    needs: gate
+    if: ${{ !cancelled() && needs.gate.outputs.run != 'false' }} # a failed gate never blocks the run
     runs-on: ubuntu-24.04
     timeout-minutes: 30
     environment: staging
@@ -94,7 +156,22 @@ jobs:
             runs_json="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/workflows/${workflow}/runs?per_page=50")"
             printf '%s' "$runs_json" |
               jq -r --arg key "$key" --arg path ".github/workflows/${workflow}" '[.workflow_runs[] | select(.head_branch == "main") | select(.event != "push") | select(.path == $path)] | sort_by(.run_started_at // .created_at) | reverse | .[0:3][] | "RUN_CANDIDATE domain=\($key) run=\(.id) event=\(.event) status=\(.status) conclusion=\(.conclusion // "") started_at=\(.run_started_at // .created_at)"' || true
-            run_json="$(
+            # Backup schedule runs that found the day's work already done skip every job but the
+            # gate and carry no artifact, so pass over them to the newest run that did the work.
+            run_json=""
+            while IFS= read -r candidate; do
+              [ -n "$candidate" ] || continue
+              candidate_id="$(printf '%s' "$candidate" | jq -r '.id')"
+              if [ "$(printf '%s' "$candidate" | jq -r '.status + "/" + (.conclusion // "")')" = "completed/success" ]; then
+                worked="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/runs/${candidate_id}/jobs?per_page=100" | jq '[.jobs[] | select(.name != "gate" and .conclusion == "success")] | length')"
+                if [ "$worked" = "0" ]; then
+                  echo "SKIPPED_BACKUP_RUN domain=${key} run=${candidate_id}"
+                  continue
+                fi
+              fi
+              run_json="$candidate"
+              break
+            done < <(
               printf '%s' "$runs_json" |
                 jq -c --arg path ".github/workflows/${workflow}" '
                   [
@@ -105,9 +182,9 @@ jobs:
                   ]
                   | sort_by(.run_started_at // .created_at)
                   | reverse
-                  | .[0] // empty
+                  | .[0:10][]
                 '
-            )"
+            )
             test -n "$run_json" || {
               echo "No governed source run found for ${repo}/${workflow}" >&2
               exit 1
