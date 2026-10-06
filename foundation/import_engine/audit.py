@@ -210,8 +210,14 @@ def synchronize_successful_import(
     config: ImportEngineConfig,
     *,
     import_id: str,
+    fallback_data_as_of_date: str | None = None,
 ) -> None:
-    """Upsert registry metadata from a successful import."""
+    """Upsert registry metadata from a successful import.
+
+    ``fallback_data_as_of_date`` is used only when the import carried no platform
+    status row with a data date. The MTG native binding imports no status row, so
+    its consumer supplies the newest market observation date here.
+    """
 
     connection = duckdb.connect(str(config.database_path))
     try:
@@ -260,6 +266,9 @@ def synchronize_successful_import(
             data_as_of_date,
             status_message,
         ) = row
+
+        if data_as_of_date in (None, "") and fallback_data_as_of_date:
+            data_as_of_date = fallback_data_as_of_date
 
         now = utc_now()
 
