@@ -8,13 +8,14 @@ validation succeed.
 from __future__ import annotations
 
 import argparse
+import csv
 import hashlib
 import json
 import os
 import sys
 import tempfile
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 
 import duckdb
@@ -94,6 +95,39 @@ def import_universal_package(config: ImportEngineConfig, package_root: Path, dom
     }
 
 
+def _iso_date(value: object) -> str | None:
+    text = str(value or "").strip()
+    if len(text) < 10:
+        return None
+    try:
+        return date.fromisoformat(text[:10]).isoformat()
+    except ValueError:
+        return None
+
+
+def mtg_data_as_of_date(package_root: Path, summary_payload: dict) -> str | None:
+    """Return the newest live market observation date in the MTG package.
+
+    The live overlay stamps each forecast row it priced with ``market_observed_at_utc``.
+    When no row carries one, fall back to the date the overlay was applied.
+    """
+
+    dates: list[str] = []
+    forecasts = package_root / "forecasts.csv"
+    if forecasts.is_file():
+        with forecasts.open("r", encoding="utf-8-sig", newline="") as handle:
+            for row in csv.DictReader(handle):
+                observed = _iso_date(row.get("market_observed_at_utc"))
+                if observed:
+                    dates.append(observed)
+    if not dates:
+        overlay = summary_payload.get("live_overlay") or {}
+        applied = _iso_date(overlay.get("applied_at_utc"))
+        if applied:
+            dates.append(applied)
+    return max(dates) if dates else None
+
+
 def import_mtg(config: ImportEngineConfig, package_root: Path, mtg_repo: Path) -> dict:
     native_authority = package_root / "mtg_native_authority.csv"
     summary = package_root / "package_summary.json"
@@ -129,8 +163,13 @@ def import_mtg(config: ImportEngineConfig, package_root: Path, mtg_repo: Path) -
     # The MTG A2 binding performs the transactional import but intentionally leaves
     # shared platform-registry synchronization to the UIP consumer. Mirror the
     # Crypto/Metals import path so the successfully imported MTG domain becomes ACTIVE
-    # before the presentation bundle is built and validated.
-    synchronize_successful_import(config, import_id=result.import_id)
+    # before the presentation bundle is built and validated. The binding imports no
+    # platform-status row, so pass the newest market observation date for freshness.
+    synchronize_successful_import(
+        config,
+        import_id=result.import_id,
+        fallback_data_as_of_date=mtg_data_as_of_date(package_root, summary_payload),
+    )
 
     return {
         "domain": "mtg",
