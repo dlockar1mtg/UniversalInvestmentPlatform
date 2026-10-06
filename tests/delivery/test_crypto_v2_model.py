@@ -101,20 +101,18 @@ def test_fetcher_keeps_months_kraken_no_longer_returns(tmp_path):
     assert rows[("ethereum", "2026-10")] == "85755"            # every pair got the fake payload
 
 
-def test_projection_ranges_and_validation_rule(tmp_path):
-    # steady 2% monthly growth: every outcome is identical, so the "80%" range catches ~100% -> not validated
-    path = _write(tmp_path, {"bitcoin": (_months(120, (2013, 10)), [100 * 1.02 ** i for i in range(120)])})
-    closes = cv.load_closes(path)
-    closes.pop("__updated__")
-    pr = cv.score_asset("bitcoin", closes)["projection"]
-    h12 = pr["horizons"]["12"]
-    assert abs(h12["median"] - (1.02 ** 12 - 1)) < 1e-9 and h12["share_up"] == 1.0 and h12["price_median"] > pr["price"]
-    assert pr["coverage_12m"] > cv.PROJECTION_COVERAGE[1] and pr["coverage_tests"] >= 24 and pr["validated"] is False
 
-
-def test_projection_needs_enough_test_months(tmp_path):
-    path = _write(tmp_path, {"ethereum": (_months(70), [100 * (1.3 if i % 7 == 0 else 1.0) * 1.01 ** i for i in range(70)])})
-    closes = cv.load_closes(path)
-    closes.pop("__updated__")
-    pr = cv.score_asset("ethereum", closes)["projection"]
-    assert pr["coverage_tests"] < cv.PROJECTION_MIN_TESTS and pr["validated"] is False
+def test_projection_comes_from_the_daily_projection_file(tmp_path, monkeypatch):
+    path = _write(tmp_path, {"bitcoin": _flat_then(150.0), "solana": _flat_then(100.0)})
+    proj = tmp_path / "proj.json"
+    proj.write_text('{"projections": {"bitcoin": {"status": "VALIDATED", "horizons": {"12": {"kind": "VALIDATED"}}}}}')
+    monkeypatch.setenv("UIP_CRYPTO_V2_ENABLED", "1")
+    monkeypatch.setenv("UIP_CRYPTO_V2_PATH", str(path))
+    monkeypatch.setenv("UIP_CRYPTO_V2_PROJECTIONS_PATH", str(proj))
+    recs = [Rec("crypto:bitcoin"), Rec("crypto:solana")]
+    cv.apply_crypto_model_decisions(recs)
+    assert recs[0].payload["model_projection"]["status"] == "VALIDATED" and recs[1].payload["model_projection"] is None
+    monkeypatch.setenv("UIP_CRYPTO_V2_PROJECTIONS_PATH", str(tmp_path / "missing.json"))
+    recs = [Rec("crypto:bitcoin")]
+    cv.apply_crypto_model_decisions(recs)                                   # a missing file is not an error
+    assert recs[0].payload["model_projection"] is None and recs[0].payload["model_call"] == "STEADY"
