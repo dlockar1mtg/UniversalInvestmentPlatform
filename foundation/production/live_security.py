@@ -53,7 +53,7 @@ def install_live_security(app, settings: LiveSecuritySettings) -> None:
         response.headers["X-Frame-Options"] = "DENY"
         response.headers["Referrer-Policy"] = "no-referrer"
         response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
-        response.headers["Content-Security-Policy"] = "default-src 'self'; style-src 'self'; img-src 'self' https://tcgplayer-cdn.tcgplayer.com; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
+        response.headers["Content-Security-Policy"] = "default-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' https://tcgplayer-cdn.tcgplayer.com; script-src 'self'; object-src 'none'; frame-ancestors 'none'"
         response.headers["Cache-Control"] = "no-store"
         if settings.require_https:
             response.headers["Strict-Transport-Security"] = "max-age=31536000; includeSubDomains"
