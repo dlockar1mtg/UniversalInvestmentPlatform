@@ -30,6 +30,7 @@ jobs:
       UIP_MTG_SECRET_LAIR_V2_ENABLED: "1"   # Secret Lair v2: research records (#239) + model decisions beside the certified authority (#244)
       UIP_MTG_PRECOLLECTOR_V2_ENABLED: "1"   # Pre-Collector v2 price tiers (#255) with its list and research pages
       UIP_CRYPTO_V2_ENABLED: "1"   # Crypto v2: valuation regime, Monte Carlo projections (#259) and pages (#260)
+      UIP_MTG_COLLECTOR_V2_ENABLED: "1" # Collector v2: tested quarter returns (mtg #97), decisions and pages (#263)
     steps:
       - name: Checkout UIP
         uses: actions/checkout@v4
