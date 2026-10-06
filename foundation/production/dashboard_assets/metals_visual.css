@@ -1,74 +1,74 @@
 .metals-layout{display:grid;grid-template-columns:minmax(0,1fr) 280px;gap:14px}
 .metals-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
-.metals-card{border:1px solid var(--line);border-radius:14px;background:linear-gradient(145deg,rgba(18,37,34,.96),rgba(9,23,21,.98));padding:18px;display:grid;gap:14px;min-height:250px;box-shadow:var(--shadow)}
+.metals-card{border:1px solid var(--line);border-radius:14px;background:linear-gradient(145deg,rgba(35,29,22,.96),rgba(21,17,12,.98));padding:18px;display:grid;gap:14px;min-height:250px;box-shadow:var(--shadow)}
 .metals-card-head{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
 .metals-asset-id{display:flex;align-items:center;gap:10px}
-.metals-symbol{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(99,230,190,.10);border:1px solid rgba(99,230,190,.28);color:var(--accent);font-weight:900;font-size:10px}
+.metals-symbol{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:rgba(217,181,95,.10);border:1px solid rgba(217,181,95,.28);color:var(--accent);font-weight:900;font-size:10px}
 .metals-asset-name{display:grid;gap:3px}
 .metals-asset-name strong{font-size:14px}
 .metals-asset-name small{font-size:9px;color:var(--muted)}
-.metals-status{border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-size:9px;text-transform:uppercase;color:var(--accent);background:rgba(99,230,190,.06)}
+.metals-status{border:1px solid var(--line);border-radius:999px;padding:4px 8px;font-size:9px;text-transform:uppercase;color:var(--accent);background:rgba(217,181,95,.06)}
 .metals-kpis{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
 .metals-kpi span{display:block;color:var(--muted);font-size:9px}
 .metals-kpi strong{display:block;margin-top:4px;font-size:18px}
 .metals-momentum{display:grid;grid-template-columns:repeat(3,1fr);gap:7px}
-.metals-momentum div{border:1px solid rgba(36,65,59,.7);border-radius:9px;padding:8px;background:rgba(7,19,16,.45)}
+.metals-momentum div{border:1px solid rgba(63,53,42,.7);border-radius:9px;padding:8px;background:rgba(17,14,10,.45)}
 .metals-momentum span{display:block;font-size:8px;color:var(--muted)}
 .metals-momentum strong{display:block;margin-top:4px;font-size:12px}
-.metals-regime-track{height:8px;border-radius:999px;background:linear-gradient(90deg,rgba(255,123,123,.8),rgba(255,207,102,.8),rgba(99,230,190,.8));position:relative}
-.metals-regime-dot{position:absolute;top:50%;width:12px;height:12px;border-radius:50%;background:var(--text);border:2px solid #07100f;transform:translate(-50%,-50%)}
+.metals-regime-track{height:8px;border-radius:999px;background:linear-gradient(90deg,rgba(214,108,92,.8),rgba(228,153,88,.8),rgba(217,181,95,.8));position:relative}
+.metals-regime-dot{position:absolute;top:50%;width:12px;height:12px;border-radius:50%;background:var(--text);border:2px solid #0f0c09;transform:translate(-50%,-50%)}
 .metals-track-labels{display:flex;justify-content:space-between;color:var(--muted);font-size:8px;margin-top:5px}
 .metals-card-foot{display:flex;justify-content:space-between;gap:10px;align-items:end}
 .metals-tactical-mini span{display:block;color:var(--muted);font-size:8px}
 .metals-tactical-mini strong{display:block;font-size:11px;margin-top:3px}
-.metals-explainer{border:1px solid var(--line);border-radius:14px;padding:18px;background:linear-gradient(145deg,rgba(18,37,34,.9),rgba(10,24,22,.95));align-self:stretch}
+.metals-explainer{border:1px solid var(--line);border-radius:14px;padding:18px;background:linear-gradient(145deg,rgba(35,29,22,.9),rgba(23,18,13,.95));align-self:stretch}
 .metals-explainer h4{margin:0 0 16px}
 .metals-explainer-item{display:grid;grid-template-columns:34px 1fr;gap:10px;margin:16px 0}
-.metals-explainer-icon{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(99,230,190,.28);color:var(--accent)}
+.metals-explainer-icon{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(217,181,95,.28);color:var(--accent)}
 .metals-explainer strong{font-size:10px}
 .metals-explainer p{font-size:9px;color:var(--muted);line-height:1.55;margin:4px 0 0}
 .metals-secondary-table{margin-top:22px}
 .metals-secondary-table summary{cursor:pointer;color:var(--text);font-weight:800;padding:14px 0}
-.metals-reference-note{border:1px dashed rgba(255,207,102,.35);background:rgba(255,207,102,.05);border-radius:10px;padding:10px 12px;font-size:9px;color:var(--muted);margin-top:12px}
-.metals-hero{border:1px solid var(--line);border-radius:16px;padding:24px;background:linear-gradient(135deg,rgba(18,37,34,.98),rgba(8,24,20,.98));display:grid;grid-template-columns:1.2fr .8fr;gap:20px;box-shadow:var(--shadow)}
+.metals-reference-note{border:1px dashed rgba(228,153,88,.35);background:rgba(228,153,88,.05);border-radius:10px;padding:10px 12px;font-size:9px;color:var(--muted);margin-top:12px}
+.metals-hero{border:1px solid var(--line);border-radius:16px;padding:24px;background:linear-gradient(135deg,rgba(35,29,22,.98),rgba(21,17,12,.98));display:grid;grid-template-columns:1.2fr .8fr;gap:20px;box-shadow:var(--shadow)}
 .metals-hero h3{font-size:27px;margin:10px 0}
 .metals-hero-copy{color:var(--muted);line-height:1.55;font-size:10px}
 .metals-hero-side{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-.metals-hero-metric{border:1px solid var(--line);border-radius:11px;padding:13px;background:rgba(7,19,16,.45)}
+.metals-hero-metric{border:1px solid var(--line);border-radius:11px;padding:13px;background:rgba(17,14,10,.45)}
 .metals-hero-metric span{display:block;color:var(--muted);font-size:8px}
 .metals-hero-metric strong{display:block;margin-top:5px;font-size:16px}
 .metals-detail-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:12px 0}
-.metals-detail-kpis article{border:1px solid var(--line);border-radius:12px;padding:15px;background:rgba(18,37,34,.88)}
+.metals-detail-kpis article{border:1px solid var(--line);border-radius:12px;padding:15px;background:rgba(35,29,22,.88)}
 .metals-detail-kpis span{font-size:8px;color:var(--muted)}
 .metals-detail-kpis strong{display:block;font-size:20px;margin-top:6px}
 .metals-detail-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(280px,.75fr);gap:14px}
-.metals-panel{border:1px solid var(--line);border-radius:14px;padding:18px;background:rgba(13,27,25,.92)}
+.metals-panel{border:1px solid var(--line);border-radius:14px;padding:18px;background:rgba(26,21,16,.92)}
 .metals-panel h4{margin:0 0 6px}
 .metals-panel-sub{color:var(--muted);font-size:9px;line-height:1.5;margin-bottom:14px}
 .metals-momentum-bars{display:grid;gap:10px}
 .metals-bar-row{display:grid;grid-template-columns:80px 1fr 62px;gap:10px;align-items:center;font-size:9px}
-.metals-bar-track{height:9px;border-radius:999px;background:#071310;position:relative;overflow:hidden}
+.metals-bar-track{height:9px;border-radius:999px;background:#110e0a;position:relative;overflow:hidden}
 .metals-bar-fill{position:absolute;top:0;bottom:0;left:50%;background:var(--accent);border-radius:999px}
 .metals-bar-fill.negative{right:50%;left:auto;background:var(--bad)}
 @media(max-width:1100px){.metals-layout,.metals-detail-grid,.metals-hero{grid-template-columns:1fr}.metals-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:720px){.metals-card-grid,.metals-detail-kpis{grid-template-columns:1fr}.metals-hero-side{grid-template-columns:1fr 1fr}}
 
 /* Metals research detail panels: fund ranking, forecast evidence, regime, technical context, tactical. */
-.metals-vehicle-panel,.metals-research-evidence-panel,.metals-technical-context-panel{border:1px solid var(--line);border-radius:14px;background:linear-gradient(145deg,rgba(18,37,34,.96),rgba(9,23,21,.98));padding:18px;display:grid;gap:14px;box-shadow:var(--shadow);margin:14px 0}
+.metals-vehicle-panel,.metals-research-evidence-panel,.metals-technical-context-panel{border:1px solid var(--line);border-radius:14px;background:linear-gradient(145deg,rgba(35,29,22,.96),rgba(21,17,12,.98));padding:18px;display:grid;gap:14px;box-shadow:var(--shadow);margin:14px 0}
 .metals-vehicle-panel-head,.metals-research-evidence-head,.metals-technical-context-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
 .metals-vehicle-panel-head h4,.metals-research-evidence-head h4,.metals-technical-context-head h4{margin:4px 0 6px;font-size:16px}
 .metals-vehicle-panel-head p,.metals-research-evidence-head p,.metals-technical-context-head p{margin:0;color:var(--muted);font-size:12px;line-height:1.5;max-width:72ch}
 .metals-vehicle-grid,.metals-research-horizons{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px}
 .metals-vehicle-card,.metals-research-horizon{border:1px solid var(--line);border-radius:12px;background:var(--surface2);padding:14px;display:grid;gap:10px;align-content:start}
-.metals-vehicle-card.is-preferred{border-color:rgba(99,230,190,.55);box-shadow:inset 0 0 0 1px rgba(99,230,190,.18)}
+.metals-vehicle-card.is-preferred{border-color:rgba(217,181,95,.55);box-shadow:inset 0 0 0 1px rgba(217,181,95,.18)}
 .metals-vehicle-card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .metals-vehicle-id{display:flex;align-items:center;gap:10px}
 .metals-vehicle-id strong{font-size:15px}
 .metals-vehicle-id small{display:block;color:var(--muted);font-size:10px;margin-top:2px}
-.metals-vehicle-rank{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(99,230,190,.10);border:1px solid rgba(99,230,190,.28);color:var(--accent);font-weight:800;font-size:11px;flex:none}
-.metals-vehicle-label{border:1px solid rgba(99,230,190,.35);color:var(--accent);border-radius:999px;padding:3px 8px;font-size:9px;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+.metals-vehicle-rank{width:30px;height:30px;border-radius:50%;display:grid;place-items:center;background:rgba(217,181,95,.10);border:1px solid rgba(217,181,95,.28);color:var(--accent);font-weight:800;font-size:11px;flex:none}
+.metals-vehicle-label{border:1px solid rgba(217,181,95,.35);color:var(--accent);border-radius:999px;padding:3px 8px;font-size:9px;text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
 .metals-vehicle-metrics,.metals-vehicle-breakdown,.metals-vehicle-evidence,.metals-technical-grid,.metals-research-signal-grid,.metals-research-adjusted{display:grid;gap:4px}
-.metals-vehicle-metric,.metals-technical-metric,.metals-research-signal,.metals-research-adjusted>div{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:12px;padding:4px 0;border-bottom:1px solid rgba(36,65,59,.6)}
+.metals-vehicle-metric,.metals-technical-metric,.metals-research-signal,.metals-research-adjusted>div{display:flex;justify-content:space-between;align-items:baseline;gap:10px;font-size:12px;padding:4px 0;border-bottom:1px solid rgba(63,53,42,.6)}
 .metals-vehicle-metric span,.metals-technical-metric span,.metals-research-signal span,.metals-research-adjusted span{color:var(--muted)}
 .metals-vehicle-metric strong,.metals-technical-metric strong,.metals-research-signal strong,.metals-research-adjusted strong{font-variant-numeric:tabular-nums;text-align:right}
 .metals-vehicle-subhead{margin-top:4px;font-size:10px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}
@@ -86,7 +86,7 @@
 .metals-regime-cell{border:1px solid var(--line);border-radius:10px;background:var(--surface2);padding:10px;display:grid;gap:4px;font-size:11px}
 .metals-regime-cell span{color:var(--muted)}
 .metals-regime-cell strong{font-size:16px}
-.metals-regime-cell.is-dominant{border-color:rgba(99,230,190,.55)}
+.metals-regime-cell.is-dominant{border-color:rgba(217,181,95,.55)}
 .metals-regime-cell.is-dominant strong{color:var(--accent)}
 .metals-technical-grid{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));column-gap:18px}
 .rec-tactical-panel{border:1px solid var(--line);border-radius:14px;background:var(--surface);padding:16px;display:grid;gap:8px}
@@ -98,51 +98,51 @@
 @media (max-width:760px){.metals-vehicle-panel-head,.metals-research-evidence-head,.metals-technical-context-head{flex-direction:column}}
 
 /* Metals model validation note (inserted by dashboard.js next to Metals calls). */
-.metals-model-note{margin:0 0 14px;padding:10px 14px;border:1px solid rgba(230,180,80,.45);border-left:4px solid #e6b450;border-radius:10px;background:rgba(230,180,80,.08);color:inherit;font-size:13px;line-height:1.5}
+.metals-model-note{margin:0 0 14px;padding:10px 14px;border:1px solid rgba(227,150,83,.45);border-left:4px solid #e39653;border-radius:10px;background:rgba(227,150,83,.08);color:inherit;font-size:13px;line-height:1.5}
 
 /* Metals descriptive panel: valuation, trend and a typical year (no rating). */
 .metals-descriptive-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;margin:10px 0}
-.metals-descriptive-grid>div{padding:12px;border:1px solid rgba(255,255,255,.08);border-radius:10px;background:rgba(255,255,255,.02)}
+.metals-descriptive-grid>div{padding:12px;border:1px solid rgba(255,240,214,.08);border-radius:10px;background:rgba(255,240,214,.02)}
 .metals-descriptive-grid span{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.7}
 .metals-descriptive-grid strong{display:block;margin:6px 0;font-size:16px}
 .metals-descriptive-grid p{margin:0;font-size:12.5px;line-height:1.45;opacity:.85}
 
 /* Metals v3.1: scorecard, ranked leaderboard and decision cards. */
 .metals-scorecard{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:14px 0}
-.metals-score-tile{border:1px solid var(--line,rgba(255,255,255,.1));border-radius:12px;padding:12px 14px;background:linear-gradient(160deg,rgba(255,255,255,.04),rgba(255,255,255,.01))}
+.metals-score-tile{border:1px solid var(--line,rgba(255,240,214,.1));border-radius:12px;padding:12px 14px;background:linear-gradient(160deg,rgba(255,240,214,.04),rgba(255,240,214,.01))}
 .metals-score-tile span{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.65}
 .metals-score-tile strong{display:block;font-size:20px;margin:4px 0 2px}
 .metals-score-tile small{opacity:.7;font-size:12px;line-height:1.35}
-.metals-leaderboard{border:1px solid var(--line,rgba(255,255,255,.1));border-radius:14px;padding:14px 16px;margin:0 0 16px;background:rgba(255,255,255,.015)}
+.metals-leaderboard{border:1px solid var(--line,rgba(255,240,214,.1));border-radius:14px;padding:14px 16px;margin:0 0 16px;background:rgba(255,240,214,.015)}
 .metals-leaderboard-head{display:flex;justify-content:space-between;align-items:flex-end;gap:12px;flex-wrap:wrap;margin-bottom:8px}
 .metals-leaderboard-head h4{margin:2px 0 0}
 .metals-leaderboard-legend{font-size:12px;opacity:.8}
 .metals-rank-cols,.metals-rank-row{display:grid;grid-template-columns:34px minmax(120px,1.2fr) 74px minmax(140px,2fr) 70px minmax(150px,1.3fr);align-items:center;gap:10px}
 .metals-rank-cols{font-size:11px;letter-spacing:.05em;text-transform:uppercase;opacity:.55;padding:4px 8px}
-.metals-rank-row{width:100%;text-align:left;font:inherit;color:inherit;background:transparent;border:0;border-top:1px solid var(--line,rgba(255,255,255,.08));padding:9px 8px;cursor:pointer;border-radius:8px}
-.metals-rank-row:hover{background:rgba(255,255,255,.04)}
-.metals-rank-row.top{box-shadow:inset 3px 0 0 var(--good,#22c55e);background:rgba(34,197,94,.05)}
+.metals-rank-row{width:100%;text-align:left;font:inherit;color:inherit;background:transparent;border:0;border-top:1px solid var(--line,rgba(255,240,214,.08));padding:9px 8px;cursor:pointer;border-radius:8px}
+.metals-rank-row:hover{background:rgba(255,240,214,.04)}
+.metals-rank-row.top{box-shadow:inset 3px 0 0 var(--good,#6aa443);background:rgba(106,164,67,.05)}
 .metals-rank-row.muted{cursor:default;opacity:.7}
 .metals-rank-row.muted .metals-rank-note{grid-column:4 / -1;font-size:12px}
-.metals-rank-badge{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:rgba(255,255,255,.07);font-weight:700;font-size:13px}
-.metals-rank-row.top .metals-rank-badge{background:var(--good,#22c55e);color:#04130a}
+.metals-rank-badge{display:inline-flex;align-items:center;justify-content:center;width:26px;height:26px;border-radius:50%;background:rgba(255,240,214,.07);font-weight:700;font-size:13px}
+.metals-rank-row.top .metals-rank-badge{background:var(--good,#6aa443);color:#0f0c09}
 .metals-rank-name strong{display:block}
 .metals-rank-name small{opacity:.6;font-size:11px}
 .metals-call{display:inline-block;padding:3px 9px;border-radius:999px;font-size:11px;font-weight:700;letter-spacing:.06em;text-align:center}
-.metals-call-buy{background:rgba(34,197,94,.16);color:var(--good,#4ade80);border:1px solid rgba(34,197,94,.45)}
-.metals-call-hold{background:rgba(148,163,184,.12);color:#cbd5e1;border:1px solid rgba(148,163,184,.35)}
-.metals-call-avoid{background:rgba(239,68,68,.14);color:var(--bad,#f87171);border:1px solid rgba(239,68,68,.45)}
-.metals-dbar{position:relative;display:block;height:8px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden}
-.metals-dbar-zero{position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:rgba(255,255,255,.35)}
+.metals-call-buy{background:rgba(106,164,67,.16);color:var(--good,#8bc167);border:1px solid rgba(106,164,67,.45)}
+.metals-call-hold{background:rgba(182,170,150,.12);color:#ebddc1;border:1px solid rgba(182,170,150,.35)}
+.metals-call-avoid{background:rgba(214,108,92,.14);color:var(--bad,#d66c5c);border:1px solid rgba(214,108,92,.45)}
+.metals-dbar{position:relative;display:block;height:8px;border-radius:999px;background:rgba(255,240,214,.06);overflow:hidden}
+.metals-dbar-zero{position:absolute;left:50%;top:-2px;bottom:-2px;width:1px;background:rgba(255,240,214,.35)}
 .metals-dbar-fill{position:absolute;top:0;bottom:0;width:0;border-radius:999px;transition:width .4s ease}
-.metals-dbar-fill.pos{left:50%;background:var(--good,#22c55e)}
-.metals-dbar-fill.neg{right:50%;background:var(--bad,#ef4444)}
+.metals-dbar-fill.pos{left:50%;background:var(--good,#6aa443)}
+.metals-dbar-fill.neg{right:50%;background:var(--bad,#d66c5c)}
 .metals-rank-exp{font-weight:700;font-variant-numeric:tabular-nums;text-align:right}
-.metals-rank-exp.pos,.metals-card-expected strong.pos{color:var(--good,#4ade80)}
-.metals-rank-exp.neg,.metals-card-expected strong.neg{color:var(--bad,#f87171)}
+.metals-rank-exp.pos,.metals-card-expected strong.pos{color:var(--good,#8bc167)}
+.metals-rank-exp.neg,.metals-card-expected strong.neg{color:var(--bad,#d66c5c)}
 .metals-rank-ctx{display:flex;gap:10px;font-size:12px;opacity:.8;font-variant-numeric:tabular-nums}
 .metals-leaderboard-foot{margin:10px 2px 0;font-size:12px;opacity:.7;line-height:1.45}
-.metals-card-top{box-shadow:0 0 0 1px rgba(34,197,94,.45),0 6px 24px rgba(34,197,94,.08)}
+.metals-card-top{box-shadow:0 0 0 1px rgba(106,164,67,.45),0 6px 24px rgba(106,164,67,.08)}
 .metals-card-expected{margin:12px 0 8px}
 .metals-card-expected span{display:block;font-size:11px;letter-spacing:.05em;text-transform:uppercase;opacity:.6}
 .metals-card-expected strong{display:block;font-size:28px;line-height:1.15;font-variant-numeric:tabular-nums}
@@ -159,8 +159,8 @@
 /* Metals polish: bars colored by effect; explainer as a full-width row; print-safe panels. */
 .metals-dbar-fill.right{left:50%;right:auto}
 .metals-dbar-fill.left{right:50%;left:auto}
-.metals-dbar-fill.good{background:var(--good,#22c55e)}
-.metals-dbar-fill.bad{background:var(--bad,#ef4444)}
+.metals-dbar-fill.good{background:var(--good,#6aa443)}
+.metals-dbar-fill.bad{background:var(--bad,#d66c5c)}
 .metals-card-grid{grid-template-columns:repeat(auto-fill,minmax(300px,1fr))}
 .metals-card-grid+.metals-explainer{margin-top:16px}
 .metals-explainer{display:grid;grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:14px;position:static}
@@ -175,14 +175,14 @@
 @media(min-width:1000px){.metals-explainer{grid-template-columns:repeat(4,minmax(0,1fr))}}
 
 /* Metals with no fund in the UIP universe. */
-.metals-nofund{color:#fbbf24;font-weight:600;white-space:nowrap}
+.metals-nofund{color:#e08a3f;font-weight:600;white-space:nowrap}
 
 /* What you can act on. */
-.metals-act{border:1px solid rgba(34,197,94,.45);border-radius:14px;padding:16px 18px;margin:0 0 16px;background:linear-gradient(160deg,rgba(34,197,94,.08),rgba(34,197,94,.02))}
+.metals-act{border:1px solid rgba(106,164,67,.45);border-radius:14px;padding:16px 18px;margin:0 0 16px;background:linear-gradient(160deg,rgba(106,164,67,.08),rgba(106,164,67,.02))}
 .metals-act-head h4{margin:2px 0 6px}
 .metals-act p{margin:0 0 10px;font-size:13px;line-height:1.5;opacity:.85}
 .metals-act-funds{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px;margin:4px 0 10px}
-.metals-act-funds>div{border:1px solid var(--line,rgba(255,255,255,.1));border-radius:10px;padding:10px 12px;background:rgba(0,0,0,.15)}
+.metals-act-funds>div{border:1px solid var(--line,rgba(255,240,214,.1));border-radius:10px;padding:10px 12px;background:rgba(0,0,0,.15)}
 .metals-act-funds strong{display:block;font-size:18px}
 .metals-act-funds span{display:block;font-size:12px;opacity:.8}
 .metals-act-funds small{display:block;font-size:11px;opacity:.6;margin-top:2px}
@@ -191,33 +191,33 @@
 /* Secret Lair v2: deal cards and notes (reuse the Metals card and scorecard styles). */
 .sl-v2-note{font-size:12.5px;opacity:.75;margin:-6px 0 14px}
 .sl-v2-prices{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:4px 0 10px}
-.sl-v2-prices>div{border:1px solid var(--line,rgba(255,255,255,.1));border-radius:10px;padding:8px 10px}
+.sl-v2-prices>div{border:1px solid var(--line,rgba(255,240,214,.1));border-radius:10px;padding:8px 10px}
 .sl-v2-prices span{display:block;font-size:11px;letter-spacing:.05em;text-transform:uppercase;opacity:.6}
 .sl-v2-prices strong{display:block;font-size:17px;margin:2px 0}
 .sl-v2-prices small{font-size:11px;opacity:.65}
-.sl-v2-check{margin:8px 0;padding:8px 10px;border-radius:8px;background:rgba(251,191,36,.10);border:1px solid rgba(251,191,36,.45);color:#fbbf24;font-size:12.5px}
+.sl-v2-check{margin:8px 0;padding:8px 10px;border-radius:8px;background:rgba(224,138,63,.10);border:1px solid rgba(224,138,63,.45);color:#e08a3f;font-size:12.5px}
 .sl-v2-muted{opacity:.7;font-size:13px;margin:10px 0}
 
 /* Secret Lair v2: deal filters and table. */
 .sl-v2-controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:10px;margin:0 0 14px}
 .sl-v2-control{display:flex;flex-direction:column;gap:4px;font-size:11px;letter-spacing:.05em;text-transform:uppercase;opacity:.85}
-.sl-v2-control select{padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.25);color:inherit;border:1px solid var(--line,rgba(255,255,255,.12));font-size:13px;text-transform:none;letter-spacing:0}
+.sl-v2-control select{padding:8px 10px;border-radius:10px;background:rgba(0,0,0,.25);color:inherit;border:1px solid var(--line,rgba(255,240,214,.12));font-size:13px;text-transform:none;letter-spacing:0}
 .sl-v2-subhead{margin:6px 0 10px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;opacity:.75}
 .sl-v2-featured{margin-bottom:18px}
-.sl-v2-table-wrap{overflow-x:auto;border:1px solid var(--line,rgba(255,255,255,.1));border-radius:14px}
+.sl-v2-table-wrap{overflow-x:auto;border:1px solid var(--line,rgba(255,240,214,.1));border-radius:14px}
 .sl-v2-table{width:100%;border-collapse:collapse;font-size:13px}
-.sl-v2-table th{text-align:left;font-size:11px;letter-spacing:.05em;text-transform:uppercase;opacity:.65;padding:10px 12px;border-bottom:1px solid var(--line,rgba(255,255,255,.1));white-space:nowrap}
-.sl-v2-table td{padding:9px 12px;border-bottom:1px solid rgba(255,255,255,.05);vertical-align:middle}
-.sl-v2-table tr.sl-v2-row-buy td:first-child{box-shadow:inset 3px 0 0 #22c55e}
+.sl-v2-table th{text-align:left;font-size:11px;letter-spacing:.05em;text-transform:uppercase;opacity:.65;padding:10px 12px;border-bottom:1px solid var(--line,rgba(255,240,214,.1));white-space:nowrap}
+.sl-v2-table td{padding:9px 12px;border-bottom:1px solid rgba(255,240,214,.05);vertical-align:middle}
+.sl-v2-table tr.sl-v2-row-buy td:first-child{box-shadow:inset 3px 0 0 #6aa443}
 .sl-v2-table .num{text-align:right;white-space:nowrap}
 .sl-v2-table td small,.sl-v2-table th small{display:block;font-size:11px;opacity:.6}
 .sl-v2-name strong{font-weight:600}
 .sl-v2-rank{opacity:.7;width:36px}
-.sl-v2-flag{color:#fbbf24;margin-left:6px}
-.sl-v2-gapbar{display:block;width:90px;height:6px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden}
-.sl-v2-gapbar span{display:block;height:100%;width:0;background:#22c55e}
-.sl-v2-table .pos{color:#4ade80}
-.sl-v2-table .neg{color:#f87171}
+.sl-v2-flag{color:#e08a3f;margin-left:6px}
+.sl-v2-gapbar{display:block;width:90px;height:6px;border-radius:4px;background:rgba(255,240,214,.08);overflow:hidden}
+.sl-v2-gapbar span{display:block;height:100%;width:0;background:#6aa443}
+.sl-v2-table .pos{color:#8bc167}
+.sl-v2-table .neg{color:#d66c5c}
 .sl-v2-research{padding:6px 10px;font-size:12px}
 @media print{.sl-v2-table tr{break-inside:avoid}}
 
@@ -229,7 +229,7 @@
 .mtg-research-shell .sl-v2-table td small,.mtg-research-shell .sl-v2-table th small{display:block;font-size:11px!important;opacity:.6;font-weight:400}
 .mtg-research-shell .sl-v2-table td.num{font-weight:600}
 .mtg-research-shell .sl-v2-table td{padding:8px 12px!important}
-.mtg-research-shell .sl-v2-table tr.sl-v2-row-buy td:first-child{box-shadow:none;border-left:3px solid #22c55e}
+.mtg-research-shell .sl-v2-table tr.sl-v2-row-buy td:first-child{box-shadow:none;border-left:3px solid #6aa443}
 .mtg-research-shell .sl-v2-table .sl-v2-research{white-space:nowrap;padding:5px 10px!important;font-size:12px!important;min-height:0;line-height:1.2}
 .mtg-research-shell .sl-v2-table td:last-child{width:1%}
 
@@ -237,9 +237,9 @@
 .sl-v2-chart svg{display:block;width:100%;height:auto;margin:4px 0 6px}
 .sl-v2-legend{font-size:12px;opacity:.75;margin:0}
 .sl-v2-key{display:inline-block;width:18px;height:3px;vertical-align:middle;margin:0 6px 0 10px;border-radius:2px}
-.sl-v2-key-market{background:#60a5fa}
-.sl-v2-key-low{background:repeating-linear-gradient(90deg,#22c55e 0 5px,transparent 5px 9px)}
-.sl-v2-target{margin:10px 0;padding:8px 12px;border-radius:10px;background:rgba(96,165,250,.10);border:1px solid rgba(96,165,250,.35);font-size:14px}
+.sl-v2-key-market{background:#80aada}
+.sl-v2-key-low{background:repeating-linear-gradient(90deg,#6aa443 0 5px,transparent 5px 9px)}
+.sl-v2-target{margin:10px 0;padding:8px 12px;border-radius:10px;background:rgba(128,170,218,.10);border:1px solid rgba(128,170,218,.35);font-size:14px}
 .sl-v2-tcg{display:inline-block;margin-top:6px;padding:7px 12px;border-radius:10px;text-decoration:none;font-weight:600}
 
 /* Secret Lair v2: what similar deals did. */
@@ -247,14 +247,14 @@
 .sl-v2-outcome-grid .metals-hero-metric small{display:block;font-size:12px;opacity:.65;margin-top:2px}
 
 /* Secret Lair product images (TCGplayer CDN). */
-.sl-v2-img{display:block;background:rgba(255,255,255,.04);object-fit:contain}
+.sl-v2-img{display:block;background:rgba(255,240,214,.04);object-fit:contain}
 .mtg-research-shell .sl-v2-table td.sl-v2-name .sl-v2-thumb{float:left;width:34px;height:48px;border-radius:4px;margin:0 10px 0 0}
 .sl-v2-card-img{float:left;width:46px;height:64px;border-radius:6px;margin:0 10px 0 0}
 .sl-v2-hero-img{float:right;width:150px;max-width:35%;border-radius:10px;margin:0 0 12px 18px}
 @media (max-width:640px){.sl-v2-hero-img{float:none;margin:0 0 12px}}
 
 /* Secret Lair market context on the scorecard. */
-.sl-v2-market{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:0 0 14px;padding:12px 16px;border:1px solid var(--line,rgba(255,255,255,.1));border-radius:14px;background:rgba(255,255,255,.02)}
+.sl-v2-market{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;margin:0 0 14px;padding:12px 16px;border:1px solid var(--line,rgba(255,240,214,.1));border-radius:14px;background:rgba(255,240,214,.02)}
 .sl-v2-market-text span{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.7}
 .sl-v2-market-text strong{display:block;font-size:18px;margin:2px 0}
 .sl-v2-market-text small{display:block;font-size:12px;opacity:.65}
@@ -262,7 +262,7 @@
 
 /* Pre-Collector v2 scorecard. */
 .pc-v2-scorecard{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:0 0 10px}
-.pc-v2-tile{padding:14px 16px;border:1px solid var(--line,rgba(255,255,255,.1));border-radius:14px;background:rgba(255,255,255,.02)}
+.pc-v2-tile{padding:14px 16px;border:1px solid var(--line,rgba(255,240,214,.1));border-radius:14px;background:rgba(255,240,214,.02)}
 .pc-v2-tile span{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.7}
 .pc-v2-tile strong{display:block;font-size:20px;margin:4px 0}
 .pc-v2-tile small{display:block;font-size:12px;opacity:.65;line-height:1.4}
@@ -273,8 +273,8 @@
 
 /* Crypto v2 */
 .cv-v2-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:14px;margin:12px 0}
-.cv-v2-card{padding:16px;border:1px solid var(--line,rgba(255,255,255,.1));border-radius:14px;background:rgba(255,255,255,.02);display:flex;flex-direction:column;gap:8px}
-.cv-v2-card.cv-v2-core{border-color:rgba(91,214,160,.35)}
+.cv-v2-card{padding:16px;border:1px solid var(--line,rgba(255,240,214,.1));border-radius:14px;background:rgba(255,240,214,.02);display:flex;flex-direction:column;gap:8px}
+.cv-v2-card.cv-v2-core{border-color:rgba(139,193,103,.35)}
 .cv-v2-card-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
 .cv-v2-card-head strong{display:block;font-size:18px}
 .cv-v2-card-head small{display:block;font-size:12px;opacity:.65}
@@ -282,12 +282,12 @@
 .cv-v2-facts{display:grid;grid-template-columns:1fr 1fr;gap:6px 12px;margin:0}
 .cv-v2-facts dt{font-size:11px;opacity:.6;text-transform:uppercase;letter-spacing:.04em}
 .cv-v2-facts dd{margin:0;font-size:15px}
-.cv-v2-facts dd.neg{color:var(--neg,#f07a7a)}
-.cv-v2-facts dd.pos{color:var(--pos,#5bd6a0)}
+.cv-v2-facts dd.neg{color:var(--neg,#d66c5c)}
+.cv-v2-facts dd.pos{color:var(--pos,#8bc167)}
 .cv-v2-vs{margin:0;font-size:12px;opacity:.75}
 .cv-v2-card .cv-v2-research{align-self:flex-start;margin-top:auto}
-.cv-v2-tag{margin-left:8px;font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid rgba(91,214,160,.4);opacity:.85}
-.sl-v2-table tr.cv-v2-current td{background:rgba(91,214,160,.08);font-weight:600}
+.cv-v2-tag{margin-left:8px;font-size:11px;padding:2px 8px;border-radius:999px;border:1px solid rgba(139,193,103,.4);opacity:.85}
+.sl-v2-table tr.cv-v2-current td{background:rgba(139,193,103,.08);font-weight:600}
 
 .cv-v2-dim{opacity:.6}
 .sl-v2-table tr.cv-v2-scenario td{font-style:italic;opacity:.85}

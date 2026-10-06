@@ -1,0 +1,148 @@
+/* UIP fantasy-RPG theme: carved stone, bronze trim, gold leaf and parchment.
+   Loaded after the base stylesheets. Colors in the base files are already mapped to
+   this palette; this file adds the type, textures, frames and a few signature pieces. */
+:root{
+  color-scheme:dark;
+  --bg:#15120f;--surface:#211c17;--surface2:#2a231c;--surface3:#332a21;
+  --line:#5f4a2c;--text:#eadfc8;--muted:#b3a383;--accent:#d9b45a;--accent2:#7fa9dc;
+  --warn:#e0913a;--bad:#d4725e;--good:#8fbf72;
+  --gold:#e8c877;--gold-deep:#9c7a33;--bronze:#a8834a;--bronze-dark:#6b5232;
+  --stone-edge:#1a1612;--parchment:#e9dcbd;--parchment-2:#d8c7a0;--ink:#2a1d12;--ink-soft:#5a4128;
+  --shadow:0 14px 36px rgba(0,0,0,.5);
+  --font-display:"Cinzel","Trajan Pro","Palatino Linotype","Book Antiqua",Georgia,serif;
+  --font-body:"Alegreya","Palatino Linotype","Book Antiqua",Georgia,serif;
+  font-family:var(--font-body);
+}
+html{background:var(--bg)}
+body{
+  background-color:var(--bg);
+  background-image:
+    radial-gradient(ellipse at 12% -10%,rgba(255,226,170,.08),transparent 55%),
+    radial-gradient(ellipse at 95% 110%,rgba(0,0,0,.6),transparent 60%),
+    repeating-linear-gradient(135deg,rgba(255,240,210,.012) 0 2px,transparent 2px 7px);
+  background-attachment:fixed;
+  color:var(--text);font-family:var(--font-body);font-size:16.5px;
+}
+::selection{background:rgba(217,180,90,.35);color:#fff6e0}
+
+/* Type */
+h1,h2,h3,h4,h5,.eyebrow,.brand strong,.nav-item,.pill,th,
+button,.section-title h3,.page-heading h2{font-family:var(--font-display)}
+h1,h2{color:var(--gold);font-weight:700;letter-spacing:.06em}
+h3,h4,h5{color:#e2c27a;font-weight:700;letter-spacing:.05em}
+.eyebrow{color:var(--bronze);letter-spacing:.2em}
+p,li,dd,td,small,span{font-family:var(--font-body)}
+strong,td,dd,.num{font-variant-numeric:lining-nums tabular-nums}
+
+/* Carved stone frames */
+.panel,.card,.decision-panel,.domain-cards>*,.portfolio-cards>article,.cards>article,
+.attention-list>*,.refresh-domain-cards>*,.global-status,.message{
+  background-color:var(--surface);
+  background-image:radial-gradient(circle at 18% 0%,rgba(255,240,210,.05),transparent 45%),radial-gradient(circle at 85% 100%,rgba(0,0,0,.28),transparent 55%);
+  border:1px solid var(--bronze-dark);
+  border-radius:3px;
+  box-shadow:inset 0 0 0 3px var(--stone-edge),inset 0 0 0 4px rgba(168,131,74,.5),var(--shadow);
+}
+.message:empty{display:none}
+.panel{position:relative}
+.panel::before,.panel::after{
+  content:"";position:absolute;width:14px;height:14px;pointer-events:none;
+  border:2px solid var(--bronze);opacity:.85;
+}
+.panel::before{top:6px;left:6px;border-right:0;border-bottom:0}
+.panel::after{bottom:6px;right:6px;border-left:0;border-top:0}
+
+/* Parchment: the hero decision and the sign-in scroll */
+.decision-panel,.auth-panel{
+  background-color:var(--parchment);
+  background-image:radial-gradient(circle at 15% 20%,rgba(255,250,235,.55),transparent 45%),radial-gradient(circle at 85% 85%,rgba(150,110,60,.2),transparent 55%);
+  color:var(--ink);border-color:#8a6a3a;
+  box-shadow:inset 0 0 40px rgba(120,80,30,.28),0 10px 28px rgba(0,0,0,.45);
+}
+.decision-panel h3,.auth-panel h2,.decision-panel p,.auth-panel p,.decision-panel .hero-meta span{color:var(--ink)}
+.decision-panel .eyebrow,.auth-panel .eyebrow,.auth-panel label{color:var(--ink-soft)}
+.auth-panel input{background:#f6ecd3;color:var(--ink);border-color:#8a6a3a}
+
+/* Sidebar: a stone pillar */
+.sidebar{
+  background-color:#17130f;
+  background-image:linear-gradient(180deg,rgba(255,240,210,.04),transparent 30%),repeating-linear-gradient(0deg,rgba(0,0,0,.18) 0 1px,transparent 1px 46px);
+  border-right:1px solid var(--bronze-dark);
+  box-shadow:inset -4px 0 0 #0e0b09,inset -5px 0 0 rgba(168,131,74,.4);
+}
+.brand{gap:12px}
+.brand-mark{
+  background:radial-gradient(circle at 35% 30%,#f3dca4,#b98f3c 60%,#6b5232);
+  color:#1b140c;border:1px solid #f0d58e;border-radius:50%;
+  box-shadow:0 0 0 3px #1a1612,0 0 0 4px var(--bronze),0 0 18px rgba(217,180,90,.35);
+  font-family:var(--font-display);font-weight:900;
+}
+.brand strong{color:var(--gold);letter-spacing:.12em;text-transform:uppercase;font-size:.92rem;line-height:1.15}
+.brand small{color:var(--muted);font-style:italic}
+.nav-item{
+  font-size:.86rem;letter-spacing:.1em;text-transform:uppercase;color:#e2c27a;
+  border:1px solid transparent;border-radius:2px;
+}
+.nav-item{display:flex;flex-direction:column;align-items:flex-start;gap:1px;line-height:1.2}
+.nav-item small{font-family:var(--font-body);font-size:.74rem;font-style:italic;letter-spacing:.02em;text-transform:none;color:var(--muted)}
+.nav-item.active small{color:var(--ink-soft)}
+.nav-item:hover{background:rgba(217,180,90,.08);border-color:var(--bronze-dark)}
+.nav-item.active{
+  background:linear-gradient(180deg,#e3c272,#c9a24c);color:#1b140c;border-color:#f0d58e;
+  box-shadow:inset 0 -3px 0 var(--gold-deep),0 0 14px rgba(217,180,90,.25);
+}
+.sidebar-foot{border-top:1px solid var(--bronze-dark);color:var(--muted)}
+
+/* Top bar */
+.topbar{border-bottom:1px solid var(--bronze-dark);box-shadow:0 1px 0 rgba(0,0,0,.6)}
+.topbar .eyebrow{text-transform:uppercase}
+.topbar h1{font-size:1.9rem;font-weight:900;letter-spacing:.1em;text-transform:uppercase;text-shadow:0 2px 0 rgba(0,0,0,.6)}
+
+/* Buttons: gold-leaf primary, stone secondary */
+button{border-radius:2px;letter-spacing:.08em}
+button:not(.secondary):not(.nav-item):not(.slot){
+  background:linear-gradient(180deg,#e3c272,#c9a24c);color:#1b140c;border:1px solid #f0d58e;
+  box-shadow:inset 0 -3px 0 var(--gold-deep);
+}
+button:not(.secondary):not(.nav-item):not(.slot):hover{filter:brightness(1.08)}
+button.secondary{background:#1a1612;color:#e2c27a;border:1px solid var(--bronze-dark);box-shadow:inset 0 0 0 1px rgba(0,0,0,.5)}
+button.secondary:hover{border-color:var(--bronze);color:var(--gold)}
+button:focus-visible,.nav-item:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+
+/* Inputs */
+input,select,textarea{background:#14110e;color:var(--text);border:1px solid var(--bronze-dark);border-radius:2px;font-family:var(--font-body)}
+input::placeholder,textarea::placeholder{color:#857660}
+
+/* Pills become carved tags */
+.pill{border-radius:2px;letter-spacing:.12em}
+
+/* Tables */
+th{color:var(--muted);letter-spacing:.08em;border-bottom-color:var(--bronze-dark)}
+tbody tr:hover{background:rgba(217,180,90,.05)}
+
+/* Scrollbars */
+*{scrollbar-color:#6b5232 #15120f}
+::-webkit-scrollbar{width:12px;height:12px}
+::-webkit-scrollbar-track{background:#15120f}
+::-webkit-scrollbar-thumb{background:#4a3a24;border:2px solid #15120f;border-radius:6px}
+
+/* Vitals: domain freshness as health / magicka / stamina style bars */
+.rpg-vitals{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:18px;margin:0 0 18px}
+.rpg-vital{display:flex;flex-direction:column;gap:6px}
+.rpg-vital-head{display:flex;justify-content:space-between;gap:10px;font-family:var(--font-display);font-size:.8rem;letter-spacing:.1em}
+.rpg-vital-head span:last-child{font-family:var(--font-body);letter-spacing:0;color:var(--muted)}
+.rpg-bar{height:14px;border:1px solid var(--bronze-dark);background:#100d0a;box-shadow:inset 0 1px 3px rgba(0,0,0,.85)}
+.rpg-bar>i{display:block;height:100%;box-shadow:inset 0 2px 0 rgba(255,255,255,.22)}
+.rpg-bar.crypto>i{background:#a3392b}
+.rpg-bar.metals>i{background:#2f63a0}
+.rpg-bar.mtg>i{background:#4f8a3a}
+.rpg-bar>i.w0{width:3%}.rpg-bar>i.w25{width:25%}.rpg-bar>i.w50{width:50%}.rpg-bar>i.w75{width:75%}.rpg-bar>i.w100{width:100%}
+.rpg-vital.crypto .rpg-vital-head span:first-child{color:#e7b2a6}
+.rpg-vital.metals .rpg-vital-head span:first-child{color:#a9c3e6}
+.rpg-vital.mtg .rpg-vital-head span:first-child{color:#b6d39f}
+
+/* Small screens: keep frames readable */
+@media (max-width:720px){
+  .panel::before,.panel::after{display:none}
+  .topbar h1{font-size:1.4rem}
+}

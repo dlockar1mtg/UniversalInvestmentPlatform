@@ -101,6 +101,10 @@ def create_http_app(settings: HTTPServiceSettings, repository=None, dashboard_se
     def metals_visual_css():
         return FileResponse(assets / "metals_visual.css", media_type="text/css")
 
+    @app.get("/dashboard/assets/rpg_theme.css", include_in_schema=False)
+    def rpg_theme_css():
+        return FileResponse(assets / "rpg_theme.css", media_type="text/css")
+
     @app.get("/dashboard/assets/dashboard.js", include_in_schema=False)
     def dashboard_javascript():
         return FileResponse(assets / "dashboard.js", media_type="text/javascript")

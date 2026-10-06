@@ -7,25 +7,27 @@
   <link rel="stylesheet" href="/dashboard/assets/dashboard.css">
   <link rel="stylesheet" href="/dashboard/assets/recommendation_visual.css">
   <link rel="stylesheet" href="/dashboard/assets/metals_visual.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=Alegreya+SC:wght@500;700&family=Cinzel:wght@500;700;900&display=swap">
+  <link rel="stylesheet" href="/dashboard/assets/rpg_theme.css">
 </head>
 <body>
   <div class="app-shell">
     <aside class="sidebar" aria-label="Primary navigation">
-      <div class="brand"><span class="brand-mark">U</span><div><strong>UIP</strong><small>Universal Investment Platform</small></div></div>
+      <div class="brand"><span class="brand-mark">U</span><div><strong>The Universal Ledger</strong><small>Universal Investment Platform</small></div></div>
       <nav id="primary-nav" class="nav" hidden>
-        <button class="nav-item active" data-page="home">Home</button>
-        <button class="nav-item" data-page="recommendations">Recommendations</button>
-        <button class="nav-item" data-page="portfolio">Portfolio</button>
-        <button class="nav-item" data-page="transactions">Transactions</button>
-        <button class="nav-item" data-page="refresh-page">Refresh</button>
-        <button class="nav-item" data-page="operations">Operations</button>
+        <button class="nav-item active" data-page="home"><span class="nav-realm">The Hall</span><small>Home</small></button>
+        <button class="nav-item" data-page="recommendations"><span class="nav-realm">Counsel</span><small>Recommendations</small></button>
+        <button class="nav-item" data-page="portfolio"><span class="nav-realm">The Treasury</span><small>Portfolio</small></button>
+        <button class="nav-item" data-page="transactions"><span class="nav-realm">Book of Deeds</span><small>Transactions</small></button>
+        <button class="nav-item" data-page="refresh-page"><span class="nav-realm">Vitals</span><small>Refresh</small></button>
+        <button class="nav-item" data-page="operations"><span class="nav-realm">The Workshop</span><small>Operations</small></button>
       </nav>
       <div class="sidebar-foot"><span>Certified authority</span><small id="sidebar-publication">Not connected</small></div>
     </aside>
 
     <div class="workspace">
       <header class="topbar">
-        <div><span class="eyebrow">UNIVERSAL INVESTMENT PLATFORM</span><h1 id="page-title">Dashboard</h1></div>
+        <div><span id="page-eyebrow" class="eyebrow">UNIVERSAL INVESTMENT PLATFORM</span><h1 id="page-title">Dashboard</h1></div>
         <div class="top-actions"><span id="principal" class="principal"></span><button id="refresh" class="secondary" hidden>Refresh</button></div>
       </header>
 

@@ -1,4 +1,4 @@
-.rec-shell{display:grid;gap:18px}.rec-hero{display:grid;grid-template-columns:minmax(250px,.75fr) minmax(0,2fr);gap:18px;align-items:stretch}.rec-intro{padding:8px 4px 8px 0;display:flex;flex-direction:column;justify-content:center}.rec-intro h2{font-size:32px;margin:8px 0 10px;letter-spacing:-.035em}.rec-intro p{margin:0;color:var(--muted);line-height:1.7;max-width:520px}.rec-intro-link{margin-top:18px;color:var(--accent);font-size:11px;font-weight:800;letter-spacing:.02em}.rec-domain-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.rec-domain-card{position:relative;overflow:hidden;min-height:190px;padding:19px;border-radius:15px;border:1px solid var(--line);background:linear-gradient(145deg,rgba(18,37,34,.98),rgba(8,21,19,.98));box-shadow:0 18px 48px rgba(0,0,0,.2);display:flex;flex-direction:column}.rec-domain-card:before{content:"";position:absolute;inset:auto -45px -70px auto;width:190px;height:190px;border-radius:50%;background:radial-gradient(circle,rgba(99,230,190,.16),transparent 68%);pointer-events:none}.rec-domain-card.crypto{border-color:rgba(99,230,190,.5);box-shadow:0 18px 48px rgba(0,0,0,.24),inset 0 0 40px rgba(99,230,190,.035)}.rec-domain-card.metals{border-color:rgba(255,207,102,.25)}.rec-domain-card.mtg{border-color:rgba(138,125,255,.28)}.rec-domain-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.rec-domain-name{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:850}.rec-domain-icon{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(255,255,255,.09);font-size:17px;background:rgba(99,230,190,.08);color:var(--accent)}.metals .rec-domain-icon{color:var(--warn);background:rgba(255,207,102,.08)}.mtg .rec-domain-icon{color:var(--accent2);background:rgba(138,125,255,.08)}.rec-lens-chip{font-size:9px;border:1px solid var(--line);border-radius:7px;padding:5px 7px;color:var(--muted);white-space:nowrap}.rec-domain-card p{font-size:11px;line-height:1.55;color:var(--muted);margin:16px 0 12px;max-width:260px}.rec-domain-viz{height:42px;margin-top:auto;display:flex;align-items:end;gap:5px}.rec-domain-viz i{display:block;width:14%;min-width:10px;border-radius:999px 999px 3px 3px;background:linear-gradient(180deg,var(--accent),rgba(99,230,190,.12));opacity:.75}.metals .rec-domain-viz i{background:linear-gradient(180deg,var(--warn),rgba(255,207,102,.1))}.mtg .rec-domain-viz i{background:linear-gradient(180deg,var(--accent2),rgba(138,125,255,.1))}.rec-domain-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;color:var(--muted);font-size:10px}.rec-domain-foot strong{color:var(--text)}.rec-domain-foot button{padding:8px 11px}.rec-section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;padding-top:4px}.rec-section-head h3{font-size:25px;margin:4px 0 0}.rec-section-head-actions{display:flex;align-items:center;gap:10px}.rec-count-chip{display:inline-flex;align-items:center;border:1px solid rgba(99,230,190,.22);background:rgba(99,230,190,.06);color:var(--accent);border-radius:999px;padding:4px 8px;font-size:10px}.rec-crypto-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px}.rec-asset-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.rec-asset-card{position:relative;overflow:hidden;padding:17px;border-radius:14px;border:1px solid var(--line);background:linear-gradient(150deg,rgba(18,37,34,.98),rgba(8,21,19,.98));min-height:230px;box-shadow:0 12px 32px rgba(0,0,0,.18);transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}.rec-asset-card:hover{transform:translateY(-2px);border-color:rgba(99,230,190,.35);box-shadow:0 20px 44px rgba(0,0,0,.25)}.rec-asset-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.rec-asset-id{display:flex;align-items:center;gap:10px}.rec-coin{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,rgba(99,230,190,.25),rgba(99,230,190,.06));border:1px solid rgba(99,230,190,.2);font-weight:900;color:var(--accent);font-size:13px}.rec-asset-name{display:grid;gap:2px}.rec-asset-name strong{font-size:14px}.rec-asset-name small{font-size:10px;color:var(--muted)}.rec-status{border-radius:6px;padding:4px 7px;font-size:9px;font-weight:800;text-transform:lowercase;border:1px solid rgba(99,230,190,.2);background:rgba(99,230,190,.07);color:var(--accent)}.rec-status.sell,.rec-status.avoid{color:var(--bad);border-color:rgba(255,123,123,.2);background:rgba(255,123,123,.06)}.rec-card-kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0 14px}.rec-card-kpi span{display:block;color:var(--muted);font-size:9px}.rec-card-kpi strong{display:block;font-size:17px;margin-top:4px}.rec-card-kpi strong.positive{color:var(--accent)!important}.rec-scenario-labels{display:grid;grid-template-columns:1fr 1fr 1fr;font-size:9px;color:var(--muted);margin-bottom:5px}.rec-scenario-labels span:nth-child(2){text-align:center}.rec-scenario-labels span:last-child{text-align:right}.rec-scenario-values{display:grid;grid-template-columns:1fr 1fr 1fr;font-size:10px;margin-bottom:6px}.rec-scenario-values span:nth-child(2){text-align:center}.rec-scenario-values span:last-child{text-align:right}.rec-range{position:relative;height:6px;border-radius:999px;background:linear-gradient(90deg,#d95c5c 0%,#d7b04a 48%,#3fd89c 100%);box-shadow:0 0 18px rgba(99,230,190,.08)}.rec-range-dot{position:absolute;top:50%;width:10px;height:10px;border-radius:50%;background:#f4fbf8;border:2px solid #dce9e4;transform:translate(-50%,-50%);box-shadow:0 1px 8px rgba(0,0,0,.5)}.rec-card-foot{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-top:16px}.rec-risk-mini span{display:block;font-size:9px;color:var(--muted)}.rec-risk-mini strong{display:block;font-size:10px;text-transform:uppercase;margin-top:3px}.rec-risk-bars{display:flex;gap:3px;margin-top:5px}.rec-risk-bars i{width:16px;height:5px;border-radius:999px;background:#2c3f3a}.rec-risk-bars i.on{background:var(--warn)}.rec-risk-bars.low i.on{background:var(--accent)}.rec-research-button{background:rgba(99,230,190,.08);border:1px solid rgba(99,230,190,.22);color:var(--text);padding:8px 11px}.rec-sparkline{height:34px;margin:5px 0 0;opacity:.75}.rec-sparkline svg{width:100%;height:100%;overflow:visible}.rec-sparkline polyline{fill:none;stroke:var(--accent);stroke-width:2;vector-effect:non-scaling-stroke}.rec-explainer{border:1px solid var(--line);border-radius:14px;padding:18px;background:linear-gradient(145deg,rgba(18,37,34,.94),rgba(10,24,22,.96));display:grid;align-content:start;gap:18px}.rec-explainer h4{margin:0;font-size:13px}.rec-explainer-item{display:grid;grid-template-columns:42px 1fr;gap:12px}.rec-explainer-icon{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(99,230,190,.22);background:rgba(99,230,190,.08);color:var(--accent);font-size:16px}.rec-explainer-item:nth-of-type(3) .rec-explainer-icon{color:var(--warn);border-color:rgba(255,207,102,.2);background:rgba(255,207,102,.06)}.rec-explainer-item:nth-of-type(4) .rec-explainer-icon{color:var(--accent2);border-color:rgba(138,125,255,.2);background:rgba(138,125,255,.06)}.rec-explainer-item strong{display:block;font-size:11px;color:var(--accent)}.rec-explainer-item p{margin:4px 0 0;color:var(--muted);font-size:10.5px;line-height:1.5}.rec-governance-callout{padding:10px;border:1px solid var(--line);border-radius:10px;font-size:9.5px;color:var(--muted);line-height:1.5}.rec-toolbar{display:grid;grid-template-columns:minmax(0,1fr) 240px auto;gap:10px;margin:4px 0 14px}.rec-toolbar input,.rec-toolbar select{width:100%;border:1px solid #34584f;border-radius:8px;background:#071310;color:var(--text);padding:10px 11px}.rec-detail{display:grid;gap:14px}.rec-detail-head{display:flex;align-items:start;justify-content:space-between;gap:16px}.rec-detail-title h2{font-size:34px;margin:6px 0 4px;letter-spacing:-.035em}.rec-detail-title p{margin:0;color:var(--muted);font-size:11px}.rec-strategic-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(390px,.9fr);gap:24px;padding:24px;border:1px solid rgba(99,230,190,.2);border-radius:15px;background:radial-gradient(circle at 75% 20%,rgba(99,230,190,.09),transparent 36%),linear-gradient(145deg,rgba(18,37,34,.98),rgba(8,21,19,.98));box-shadow:0 18px 50px rgba(0,0,0,.22)}.rec-strategic-hero h3{font-size:27px;line-height:1.12;margin:10px 0 10px;letter-spacing:-.02em}.rec-strategic-hero h3 .return{color:var(--accent)}.rec-strategic-copy{color:var(--muted);font-size:11px;line-height:1.55}.rec-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}.rec-chip{border:1px solid var(--line);border-radius:999px;padding:5px 8px;color:var(--muted);font-size:9px}.rec-range-chart{display:grid;align-content:center}.rec-range-head{display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;margin-bottom:14px}.rec-range-head strong{display:block;font-size:12px}.rec-range-head span{display:block;font-size:16px;font-weight:850;margin-top:4px}.rec-range-scale{position:relative;height:74px;margin:0 14px}.rec-range-band{position:absolute;left:0;right:0;top:30px;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--bad),var(--warn),var(--accent));box-shadow:0 0 24px rgba(99,230,190,.15)}.rec-range-band:before{content:"";position:absolute;left:0;right:0;top:-18px;height:40px;background:linear-gradient(90deg,rgba(255,123,123,.05),rgba(255,207,102,.08),rgba(99,230,190,.08));clip-path:polygon(0 72%,18% 54%,40% 46%,58% 20%,78% 42%,100% 8%,100% 100%,0 100%)}.rec-range-marker{position:absolute;top:24px;width:14px;height:14px;border-radius:50%;transform:translateX(-50%);border:3px solid #091513}.rec-range-marker.bear{left:0;background:var(--bad)}.rec-range-marker.base{background:var(--warn)}.rec-range-marker.bull{left:100%;background:var(--accent)}.rec-range-axis{display:flex;justify-content:space-between;color:var(--muted);font-size:9px;margin-top:47px}.rec-kpi-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.rec-kpi-card{min-height:135px;padding:16px;border:1px solid var(--line);border-radius:13px;background:linear-gradient(145deg,rgba(18,37,34,.95),rgba(10,24,22,.96))}.rec-kpi-label{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:7px}.rec-kpi-dot{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:rgba(99,230,190,.08);color:var(--accent)}.rec-kpi-card.bear .rec-kpi-dot{color:var(--bad);background:rgba(255,123,123,.07)}.rec-kpi-card.base .rec-kpi-dot{color:var(--warn);background:rgba(255,207,102,.07)}.rec-kpi-card strong{display:block;font-size:22px;margin:10px 0 3px}.rec-detail-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.65fr);gap:14px}.rec-forecast-panel,.rec-side-panel{padding:18px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(145deg,rgba(18,37,34,.94),rgba(10,24,22,.96))}.rec-panel-head h4{margin:0;font-size:13px}.rec-panel-head p{margin:4px 0 0;color:var(--muted);font-size:9.5px;line-height:1.45}.rec-horizon-tabs{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin:14px 0}.rec-horizon-tab{padding:9px 5px;border:1px solid var(--line);border-radius:8px;text-align:center;background:#091715}.rec-horizon-tab strong{display:block;font-size:11px}.rec-horizon-tab span{display:block;color:var(--muted);font-size:8.5px;margin-top:2px}.rec-horizon-tab.strategic{border-color:rgba(99,230,190,.65);box-shadow:inset 0 0 18px rgba(99,230,190,.07);color:var(--accent)}.rec-forecast-viz{display:grid;grid-template-columns:270px minmax(0,1fr);gap:12px;align-items:stretch}.rec-line-chart{border:1px solid var(--line);border-radius:10px;background:#091715;padding:12px}.rec-line-chart svg{width:100%;height:190px}.rec-line-chart .grid-line{stroke:#24413b;stroke-width:1;stroke-dasharray:3 4}.rec-line-chart .base-line{fill:none;stroke:var(--warn);stroke-width:2}.rec-line-chart .bull-line{fill:none;stroke:var(--accent);stroke-width:2}.rec-line-chart .bear-line{fill:none;stroke:var(--bad);stroke-width:2}.rec-line-chart text{fill:var(--muted);font-size:8px}.rec-detail-table{overflow:auto;border:1px solid var(--line);border-radius:10px;max-height:270px}.rec-detail-table table{min-width:760px}.rec-detail-table tr.strategic td{background:rgba(99,230,190,.05);box-shadow:inset 0 1px rgba(99,230,190,.2),inset 0 -1px rgba(99,230,190,.2)}.rec-side-stack{display:grid;gap:12px}.rec-side-panel h4{margin:0 0 12px;font-size:13px}.rec-narrative{display:grid;gap:15px}.rec-narrative span{display:block;font-size:9px;color:var(--muted)}.rec-narrative p{font-size:10.5px;line-height:1.5;margin:3px 0 0}.rec-risk-gauge-wrap{display:grid;grid-template-columns:130px 1fr;gap:16px;align-items:center}.rec-risk-gauge{width:126px;height:72px;position:relative;overflow:hidden}.rec-risk-gauge:before{content:"";position:absolute;width:116px;height:116px;border-radius:50%;left:5px;top:8px;background:conic-gradient(from 270deg,var(--accent) 0deg 70deg,var(--warn) 70deg 120deg,var(--bad) 120deg 180deg,#243e38 180deg 360deg);mask:radial-gradient(circle at center,transparent 52%,#000 54%)}.rec-risk-gauge:after{content:"";position:absolute;width:48px;height:2px;background:var(--muted);left:63px;bottom:17px;transform-origin:left center;transform:rotate(var(--risk-angle,-145deg));border-radius:2px}.rec-risk-readout span{display:block;color:var(--muted);font-size:9px}.rec-risk-readout strong{display:block;font-size:18px;margin:2px 0 12px}.rec-risk-note{margin-top:14px;color:var(--muted);font-size:9.5px;line-height:1.5}.rec-domain-table{padding:18px}.rec-domain-table .table-wrap{margin-top:14px}@media(max-width:1250px){.rec-hero{grid-template-columns:1fr}.rec-domain-grid{grid-template-columns:repeat(3,1fr)}.rec-asset-grid{grid-template-columns:repeat(2,1fr)}.rec-crypto-layout{grid-template-columns:1fr}.rec-explainer{grid-template-columns:repeat(3,1fr)}.rec-explainer h4,.rec-governance-callout{grid-column:1/-1}.rec-strategic-hero{grid-template-columns:1fr}.rec-detail-grid{grid-template-columns:1fr}.rec-side-stack{grid-template-columns:1fr 1fr}}@media(max-width:900px){.rec-domain-grid{grid-template-columns:1fr}.rec-asset-grid{grid-template-columns:1fr}.rec-explainer{grid-template-columns:1fr}.rec-kpi-row{grid-template-columns:repeat(2,1fr)}.rec-forecast-viz{grid-template-columns:1fr}.rec-horizon-tabs{grid-template-columns:repeat(3,1fr)}.rec-side-stack{grid-template-columns:1fr}.rec-toolbar{grid-template-columns:1fr}}@media(max-width:560px){.rec-kpi-row{grid-template-columns:1fr}.rec-detail-head{flex-direction:column}.rec-strategic-hero{padding:18px}.rec-strategic-hero h3{font-size:22px}.rec-asset-card{min-height:0}}
+.rec-shell{display:grid;gap:18px}.rec-hero{display:grid;grid-template-columns:minmax(250px,.75fr) minmax(0,2fr);gap:18px;align-items:stretch}.rec-intro{padding:8px 4px 8px 0;display:flex;flex-direction:column;justify-content:center}.rec-intro h2{font-size:32px;margin:8px 0 10px;letter-spacing:-.035em}.rec-intro p{margin:0;color:var(--muted);line-height:1.7;max-width:520px}.rec-intro-link{margin-top:18px;color:var(--accent);font-size:11px;font-weight:800;letter-spacing:.02em}.rec-domain-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.rec-domain-card{position:relative;overflow:hidden;min-height:190px;padding:19px;border-radius:15px;border:1px solid var(--line);background:linear-gradient(145deg,rgba(35,29,22,.98),rgba(19,15,11,.98));box-shadow:0 18px 48px rgba(0,0,0,.2);display:flex;flex-direction:column}.rec-domain-card:before{content:"";position:absolute;inset:auto -45px -70px auto;width:190px;height:190px;border-radius:50%;background:radial-gradient(circle,rgba(217,181,95,.16),transparent 68%);pointer-events:none}.rec-domain-card.crypto{border-color:rgba(217,181,95,.5);box-shadow:0 18px 48px rgba(0,0,0,.24),inset 0 0 40px rgba(217,181,95,.035)}.rec-domain-card.metals{border-color:rgba(228,153,88,.25)}.rec-domain-card.mtg{border-color:rgba(131,169,219,.28)}.rec-domain-top{display:flex;align-items:center;justify-content:space-between;gap:12px}.rec-domain-name{display:flex;align-items:center;gap:10px;font-size:14px;font-weight:850}.rec-domain-icon{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(255,240,214,.09);font-size:17px;background:rgba(217,181,95,.08);color:var(--accent)}.metals .rec-domain-icon{color:var(--warn);background:rgba(228,153,88,.08)}.mtg .rec-domain-icon{color:var(--accent2);background:rgba(131,169,219,.08)}.rec-lens-chip{font-size:9px;border:1px solid var(--line);border-radius:7px;padding:5px 7px;color:var(--muted);white-space:nowrap}.rec-domain-card p{font-size:11px;line-height:1.55;color:var(--muted);margin:16px 0 12px;max-width:260px}.rec-domain-viz{height:42px;margin-top:auto;display:flex;align-items:end;gap:5px}.rec-domain-viz i{display:block;width:14%;min-width:10px;border-radius:999px 999px 3px 3px;background:linear-gradient(180deg,var(--accent),rgba(217,181,95,.12));opacity:.75}.metals .rec-domain-viz i{background:linear-gradient(180deg,var(--warn),rgba(228,153,88,.1))}.mtg .rec-domain-viz i{background:linear-gradient(180deg,var(--accent2),rgba(131,169,219,.1))}.rec-domain-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:14px;color:var(--muted);font-size:10px}.rec-domain-foot strong{color:var(--text)}.rec-domain-foot button{padding:8px 11px}.rec-section-head{display:flex;align-items:end;justify-content:space-between;gap:16px;padding-top:4px}.rec-section-head h3{font-size:25px;margin:4px 0 0}.rec-section-head-actions{display:flex;align-items:center;gap:10px}.rec-count-chip{display:inline-flex;align-items:center;border:1px solid rgba(217,181,95,.22);background:rgba(217,181,95,.06);color:var(--accent);border-radius:999px;padding:4px 8px;font-size:10px}.rec-crypto-layout{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:14px}.rec-asset-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.rec-asset-card{position:relative;overflow:hidden;padding:17px;border-radius:14px;border:1px solid var(--line);background:linear-gradient(150deg,rgba(35,29,22,.98),rgba(19,15,11,.98));min-height:230px;box-shadow:0 12px 32px rgba(0,0,0,.18);transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}.rec-asset-card:hover{transform:translateY(-2px);border-color:rgba(217,181,95,.35);box-shadow:0 20px 44px rgba(0,0,0,.25)}.rec-asset-head{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}.rec-asset-id{display:flex;align-items:center;gap:10px}.rec-coin{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,rgba(217,181,95,.25),rgba(217,181,95,.06));border:1px solid rgba(217,181,95,.2);font-weight:900;color:var(--accent);font-size:13px}.rec-asset-name{display:grid;gap:2px}.rec-asset-name strong{font-size:14px}.rec-asset-name small{font-size:10px;color:var(--muted)}.rec-status{border-radius:6px;padding:4px 7px;font-size:9px;font-weight:800;text-transform:lowercase;border:1px solid rgba(217,181,95,.2);background:rgba(217,181,95,.07);color:var(--accent)}.rec-status.sell,.rec-status.avoid{color:var(--bad);border-color:rgba(214,108,92,.2);background:rgba(214,108,92,.06)}.rec-card-kpis{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:18px 0 14px}.rec-card-kpi span{display:block;color:var(--muted);font-size:9px}.rec-card-kpi strong{display:block;font-size:17px;margin-top:4px}.rec-card-kpi strong.positive{color:var(--accent)!important}.rec-scenario-labels{display:grid;grid-template-columns:1fr 1fr 1fr;font-size:9px;color:var(--muted);margin-bottom:5px}.rec-scenario-labels span:nth-child(2){text-align:center}.rec-scenario-labels span:last-child{text-align:right}.rec-scenario-values{display:grid;grid-template-columns:1fr 1fr 1fr;font-size:10px;margin-bottom:6px}.rec-scenario-values span:nth-child(2){text-align:center}.rec-scenario-values span:last-child{text-align:right}.rec-range{position:relative;height:6px;border-radius:999px;background:linear-gradient(90deg,#d66c5c 0%,#e08b41 48%,#d0a339 100%);box-shadow:0 0 18px rgba(217,181,95,.08)}.rec-range-dot{position:absolute;top:50%;width:10px;height:10px;border-radius:50%;background:#fbf9f4;border:2px solid #f1e7d4;transform:translate(-50%,-50%);box-shadow:0 1px 8px rgba(0,0,0,.5)}.rec-card-foot{display:flex;align-items:end;justify-content:space-between;gap:12px;margin-top:16px}.rec-risk-mini span{display:block;font-size:9px;color:var(--muted)}.rec-risk-mini strong{display:block;font-size:10px;text-transform:uppercase;margin-top:3px}.rec-risk-bars{display:flex;gap:3px;margin-top:5px}.rec-risk-bars i{width:16px;height:5px;border-radius:999px;background:#3f382c}.rec-risk-bars i.on{background:var(--warn)}.rec-risk-bars.low i.on{background:var(--accent)}.rec-research-button{background:rgba(217,181,95,.08);border:1px solid rgba(217,181,95,.22);color:var(--text);padding:8px 11px}.rec-sparkline{height:34px;margin:5px 0 0;opacity:.75}.rec-sparkline svg{width:100%;height:100%;overflow:visible}.rec-sparkline polyline{fill:none;stroke:var(--accent);stroke-width:2;vector-effect:non-scaling-stroke}.rec-explainer{border:1px solid var(--line);border-radius:14px;padding:18px;background:linear-gradient(145deg,rgba(35,29,22,.94),rgba(23,18,13,.96));display:grid;align-content:start;gap:18px}.rec-explainer h4{margin:0;font-size:13px}.rec-explainer-item{display:grid;grid-template-columns:42px 1fr;gap:12px}.rec-explainer-icon{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;border:1px solid rgba(217,181,95,.22);background:rgba(217,181,95,.08);color:var(--accent);font-size:16px}.rec-explainer-item:nth-of-type(3) .rec-explainer-icon{color:var(--warn);border-color:rgba(228,153,88,.2);background:rgba(228,153,88,.06)}.rec-explainer-item:nth-of-type(4) .rec-explainer-icon{color:var(--accent2);border-color:rgba(131,169,219,.2);background:rgba(131,169,219,.06)}.rec-explainer-item strong{display:block;font-size:11px;color:var(--accent)}.rec-explainer-item p{margin:4px 0 0;color:var(--muted);font-size:10.5px;line-height:1.5}.rec-governance-callout{padding:10px;border:1px solid var(--line);border-radius:10px;font-size:9.5px;color:var(--muted);line-height:1.5}.rec-toolbar{display:grid;grid-template-columns:minmax(0,1fr) 240px auto;gap:10px;margin:4px 0 14px}.rec-toolbar input,.rec-toolbar select{width:100%;border:1px solid #574a3b;border-radius:8px;background:#110e0a;color:var(--text);padding:10px 11px}.rec-detail{display:grid;gap:14px}.rec-detail-head{display:flex;align-items:start;justify-content:space-between;gap:16px}.rec-detail-title h2{font-size:34px;margin:6px 0 4px;letter-spacing:-.035em}.rec-detail-title p{margin:0;color:var(--muted);font-size:11px}.rec-strategic-hero{display:grid;grid-template-columns:minmax(0,1fr) minmax(390px,.9fr);gap:24px;padding:24px;border:1px solid rgba(217,181,95,.2);border-radius:15px;background:radial-gradient(circle at 75% 20%,rgba(217,181,95,.09),transparent 36%),linear-gradient(145deg,rgba(35,29,22,.98),rgba(19,15,11,.98));box-shadow:0 18px 50px rgba(0,0,0,.22)}.rec-strategic-hero h3{font-size:27px;line-height:1.12;margin:10px 0 10px;letter-spacing:-.02em}.rec-strategic-hero h3 .return{color:var(--accent)}.rec-strategic-copy{color:var(--muted);font-size:11px;line-height:1.55}.rec-chips{display:flex;flex-wrap:wrap;gap:7px;margin-top:18px}.rec-chip{border:1px solid var(--line);border-radius:999px;padding:5px 8px;color:var(--muted);font-size:9px}.rec-range-chart{display:grid;align-content:center}.rec-range-head{display:grid;grid-template-columns:1fr 1fr 1fr;text-align:center;margin-bottom:14px}.rec-range-head strong{display:block;font-size:12px}.rec-range-head span{display:block;font-size:16px;font-weight:850;margin-top:4px}.rec-range-scale{position:relative;height:74px;margin:0 14px}.rec-range-band{position:absolute;left:0;right:0;top:30px;height:4px;border-radius:999px;background:linear-gradient(90deg,var(--bad),var(--warn),var(--accent));box-shadow:0 0 24px rgba(217,181,95,.15)}.rec-range-band:before{content:"";position:absolute;left:0;right:0;top:-18px;height:40px;background:linear-gradient(90deg,rgba(214,108,92,.05),rgba(228,153,88,.08),rgba(217,181,95,.08));clip-path:polygon(0 72%,18% 54%,40% 46%,58% 20%,78% 42%,100% 8%,100% 100%,0 100%)}.rec-range-marker{position:absolute;top:24px;width:14px;height:14px;border-radius:50%;transform:translateX(-50%);border:3px solid #14100b}.rec-range-marker.bear{left:0;background:var(--bad)}.rec-range-marker.base{background:var(--warn)}.rec-range-marker.bull{left:100%;background:var(--accent)}.rec-range-axis{display:flex;justify-content:space-between;color:var(--muted);font-size:9px;margin-top:47px}.rec-kpi-row{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}.rec-kpi-card{min-height:135px;padding:16px;border:1px solid var(--line);border-radius:13px;background:linear-gradient(145deg,rgba(35,29,22,.95),rgba(23,18,13,.96))}.rec-kpi-label{font-size:10px;color:var(--muted);display:flex;align-items:center;gap:7px}.rec-kpi-dot{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:rgba(217,181,95,.08);color:var(--accent)}.rec-kpi-card.bear .rec-kpi-dot{color:var(--bad);background:rgba(214,108,92,.07)}.rec-kpi-card.base .rec-kpi-dot{color:var(--warn);background:rgba(228,153,88,.07)}.rec-kpi-card strong{display:block;font-size:22px;margin:10px 0 3px}.rec-detail-grid{display:grid;grid-template-columns:minmax(0,1.65fr) minmax(280px,.65fr);gap:14px}.rec-forecast-panel,.rec-side-panel{padding:18px;border:1px solid var(--line);border-radius:14px;background:linear-gradient(145deg,rgba(35,29,22,.94),rgba(23,18,13,.96))}.rec-panel-head h4{margin:0;font-size:13px}.rec-panel-head p{margin:4px 0 0;color:var(--muted);font-size:9.5px;line-height:1.45}.rec-horizon-tabs{display:grid;grid-template-columns:repeat(6,1fr);gap:7px;margin:14px 0}.rec-horizon-tab{padding:9px 5px;border:1px solid var(--line);border-radius:8px;text-align:center;background:#15110c}.rec-horizon-tab strong{display:block;font-size:11px}.rec-horizon-tab span{display:block;color:var(--muted);font-size:8.5px;margin-top:2px}.rec-horizon-tab.strategic{border-color:rgba(217,181,95,.65);box-shadow:inset 0 0 18px rgba(217,181,95,.07);color:var(--accent)}.rec-forecast-viz{display:grid;grid-template-columns:270px minmax(0,1fr);gap:12px;align-items:stretch}.rec-line-chart{border:1px solid var(--line);border-radius:10px;background:#15110c;padding:12px}.rec-line-chart svg{width:100%;height:190px}.rec-line-chart .grid-line{stroke:#3f352a;stroke-width:1;stroke-dasharray:3 4}.rec-line-chart .base-line{fill:none;stroke:var(--warn);stroke-width:2}.rec-line-chart .bull-line{fill:none;stroke:var(--accent);stroke-width:2}.rec-line-chart .bear-line{fill:none;stroke:var(--bad);stroke-width:2}.rec-line-chart text{fill:var(--muted);font-size:8px}.rec-detail-table{overflow:auto;border:1px solid var(--line);border-radius:10px;max-height:270px}.rec-detail-table table{min-width:760px}.rec-detail-table tr.strategic td{background:rgba(217,181,95,.05);box-shadow:inset 0 1px rgba(217,181,95,.2),inset 0 -1px rgba(217,181,95,.2)}.rec-side-stack{display:grid;gap:12px}.rec-side-panel h4{margin:0 0 12px;font-size:13px}.rec-narrative{display:grid;gap:15px}.rec-narrative span{display:block;font-size:9px;color:var(--muted)}.rec-narrative p{font-size:10.5px;line-height:1.5;margin:3px 0 0}.rec-risk-gauge-wrap{display:grid;grid-template-columns:130px 1fr;gap:16px;align-items:center}.rec-risk-gauge{width:126px;height:72px;position:relative;overflow:hidden}.rec-risk-gauge:before{content:"";position:absolute;width:116px;height:116px;border-radius:50%;left:5px;top:8px;background:conic-gradient(from 270deg,var(--accent) 0deg 70deg,var(--warn) 70deg 120deg,var(--bad) 120deg 180deg,#3d3429 180deg 360deg);mask:radial-gradient(circle at center,transparent 52%,#000000 54%)}.rec-risk-gauge:after{content:"";position:absolute;width:48px;height:2px;background:var(--muted);left:63px;bottom:17px;transform-origin:left center;transform:rotate(var(--risk-angle,-145deg));border-radius:2px}.rec-risk-readout span{display:block;color:var(--muted);font-size:9px}.rec-risk-readout strong{display:block;font-size:18px;margin:2px 0 12px}.rec-risk-note{margin-top:14px;color:var(--muted);font-size:9.5px;line-height:1.5}.rec-domain-table{padding:18px}.rec-domain-table .table-wrap{margin-top:14px}@media(max-width:1250px){.rec-hero{grid-template-columns:1fr}.rec-domain-grid{grid-template-columns:repeat(3,1fr)}.rec-asset-grid{grid-template-columns:repeat(2,1fr)}.rec-crypto-layout{grid-template-columns:1fr}.rec-explainer{grid-template-columns:repeat(3,1fr)}.rec-explainer h4,.rec-governance-callout{grid-column:1/-1}.rec-strategic-hero{grid-template-columns:1fr}.rec-detail-grid{grid-template-columns:1fr}.rec-side-stack{grid-template-columns:1fr 1fr}}@media(max-width:900px){.rec-domain-grid{grid-template-columns:1fr}.rec-asset-grid{grid-template-columns:1fr}.rec-explainer{grid-template-columns:1fr}.rec-kpi-row{grid-template-columns:repeat(2,1fr)}.rec-forecast-viz{grid-template-columns:1fr}.rec-horizon-tabs{grid-template-columns:repeat(3,1fr)}.rec-side-stack{grid-template-columns:1fr}.rec-toolbar{grid-template-columns:1fr}}@media(max-width:560px){.rec-kpi-row{grid-template-columns:1fr}.rec-detail-head{flex-direction:column}.rec-strategic-hero{padding:18px}.rec-strategic-hero h3{font-size:22px}.rec-asset-card{min-height:0}}
 /* MTG_CRYPTO_PARITY_REDESIGN_V1 */
 .mtg-research-shell{
   gap:16px
@@ -13,7 +13,7 @@
 .mtg-lane-tab{
   border:1px solid var(--line);
   border-radius:11px;
-  background:linear-gradient(145deg,rgba(18,37,34,.94),rgba(10,24,22,.96));
+  background:linear-gradient(145deg,rgba(35,29,22,.94),rgba(23,18,13,.96));
   color:var(--text);
   padding:12px 14px;
   display:flex;
@@ -34,20 +34,20 @@
 }
 
 .mtg-lane-tab.active{
-  border-color:rgba(138,125,255,.55);
-  box-shadow:inset 0 0 24px rgba(138,125,255,.08);
-  background:linear-gradient(145deg,rgba(31,29,54,.95),rgba(11,26,25,.97))
+  border-color:rgba(131,169,219,.55);
+  box-shadow:inset 0 0 24px rgba(131,169,219,.08);
+  background:linear-gradient(145deg,rgba(52,44,34,.95),rgba(24,20,14,.97))
 }
 
 .mtg-lane-tab.active span{
-  color:#c6bcff
+  color:#eee3cd
 }
 
 .mtg-research-hero{
-  border-color:rgba(138,125,255,.28);
+  border-color:rgba(131,169,219,.28);
   background:
-    radial-gradient(circle at 78% 18%,rgba(138,125,255,.13),transparent 36%),
-    linear-gradient(145deg,rgba(26,28,43,.98),rgba(8,22,20,.98))
+    radial-gradient(circle at 78% 18%,rgba(131,169,219,.13),transparent 36%),
+    linear-gradient(145deg,rgba(43,36,29,.98),rgba(20,16,11,.98))
 }
 
 .mtg-hero-kpis{
@@ -59,9 +59,9 @@
 
 .mtg-hero-kpis article{
   padding:13px;
-  border:1px solid rgba(255,255,255,.08);
+  border:1px solid rgba(255,240,214,.08);
   border-radius:11px;
-  background:rgba(7,19,17,.58)
+  background:rgba(17,14,10,.58)
 }
 
 .mtg-hero-kpis span,
@@ -88,7 +88,7 @@
   color:var(--muted);
   font-size:9px;
   line-height:1.5;
-  background:rgba(6,17,15,.5)
+  background:rgba(15,12,9,.5)
 }
 
 .mtg-compact-governance strong{
@@ -106,21 +106,21 @@
 }
 
 .mtg-investment-card.buy{
-  border-color:rgba(99,230,190,.36);
-  box-shadow:0 18px 42px rgba(0,0,0,.22),inset 0 0 28px rgba(99,230,190,.025)
+  border-color:rgba(217,181,95,.36);
+  box-shadow:0 18px 42px rgba(0,0,0,.22),inset 0 0 28px rgba(217,181,95,.025)
 }
 
 .mtg-investment-card.wait{
-  border-color:rgba(255,207,102,.28)
+  border-color:rgba(228,153,88,.28)
 }
 
 .mtg-product-icon{
   width:40px;
   height:40px;
   border-radius:10px;
-  color:#c8beff;
-  background:linear-gradient(135deg,rgba(138,125,255,.20),rgba(138,125,255,.05));
-  border-color:rgba(138,125,255,.22);
+  color:#efe4ce;
+  background:linear-gradient(135deg,rgba(131,169,219,.20),rgba(131,169,219,.05));
+  border-color:rgba(131,169,219,.22);
   font-size:9px;
   letter-spacing:.04em
 }
@@ -134,14 +134,14 @@
 
 .mtg-decision.buy{
   color:var(--accent);
-  border-color:rgba(99,230,190,.28);
-  background:rgba(99,230,190,.07)
+  border-color:rgba(217,181,95,.28);
+  background:rgba(217,181,95,.07)
 }
 
 .mtg-decision.wait{
   color:var(--warn);
-  border-color:rgba(255,207,102,.28);
-  background:rgba(255,207,102,.07)
+  border-color:rgba(228,153,88,.28);
+  background:rgba(228,153,88,.07)
 }
 
 .mtg-primary-kpis{
@@ -154,7 +154,7 @@
   align-items:end;
   gap:10px;
   padding:10px 0 5px;
-  border-top:1px solid rgba(255,255,255,.06)
+  border-top:1px solid rgba(255,240,214,.06)
 }
 
 .mtg-q10-summary span{
@@ -196,7 +196,7 @@
   top:9px;
   height:4px;
   border-radius:999px;
-  background:linear-gradient(90deg,rgba(99,230,190,.55),rgba(255,207,102,.55))
+  background:linear-gradient(90deg,rgba(217,181,95,.55),rgba(228,153,88,.55))
 }
 
 .mtg-entry-scale-q10{
@@ -205,7 +205,7 @@
   top:3px;
   width:2px;
   height:16px;
-  background:#f4fbf8;
+  background:#fbf9f4;
   opacity:.72
 }
 
@@ -216,7 +216,7 @@
   height:12px;
   border-radius:50%;
   transform:translateX(-50%);
-  border:2px solid #091513;
+  border:2px solid #14100b;
   background:var(--warn);
   box-shadow:0 1px 8px rgba(0,0,0,.45)
 }
@@ -235,9 +235,9 @@
 .mtg-card-risk-row div,
 .mtg-scenario-preview div{
   padding:8px 9px;
-  border:1px solid rgba(255,255,255,.06);
+  border:1px solid rgba(255,240,214,.06);
   border-radius:8px;
-  background:rgba(6,17,15,.35)
+  background:rgba(15,12,9,.35)
 }
 
 .mtg-card-risk-row span,
@@ -281,7 +281,7 @@
 
 .mtg-native-kpis div{
   padding:10px;
-  border:1px solid rgba(255,255,255,.06);
+  border:1px solid rgba(255,240,214,.06);
   border-radius:9px
 }
 
@@ -318,7 +318,7 @@
   padding:20px;
   border:1px solid var(--line);
   border-radius:14px;
-  background:linear-gradient(145deg,rgba(18,37,34,.95),rgba(10,24,22,.96))
+  background:linear-gradient(145deg,rgba(35,29,22,.95),rgba(23,18,13,.96))
 }
 
 .mtg-native-lane-hero h3{
@@ -364,10 +364,10 @@
 }
 
 .mtg-detail-strategic-hero{
-  border-color:rgba(138,125,255,.28);
+  border-color:rgba(131,169,219,.28);
   background:
-    radial-gradient(circle at 77% 22%,rgba(138,125,255,.12),transparent 36%),
-    linear-gradient(145deg,rgba(26,28,43,.98),rgba(8,22,20,.98))
+    radial-gradient(circle at 77% 22%,rgba(131,169,219,.12),transparent 36%),
+    linear-gradient(145deg,rgba(43,36,29,.98),rgba(20,16,11,.98))
 }
 
 .mtg-detail-status-row{
@@ -391,9 +391,9 @@
 
 .mtg-price-pair article{
   padding:13px;
-  border:1px solid rgba(255,255,255,.08);
+  border:1px solid rgba(255,240,214,.08);
   border-radius:11px;
-  background:rgba(5,15,17,.45)
+  background:rgba(15,12,8,.45)
 }
 
 .mtg-price-pair span{
@@ -440,11 +440,11 @@
   height:15px;
   border-radius:50%;
   transform:translateX(-50%);
-  border:3px solid #091513
+  border:3px solid #14100b
 }
 
 .mtg-detail-entry-scale .q10 i{
-  background:#f4fbf8
+  background:#fbf9f4
 }
 
 .mtg-detail-entry-scale .current i{
@@ -493,7 +493,7 @@
   padding:13px;
   border:1px solid var(--line);
   border-radius:10px;
-  background:#091715
+  background:#15110c
 }
 
 .mtg-distribution-cards span{
@@ -543,7 +543,7 @@
   width:14px;
   height:14px;
   border-radius:50%;
-  border:3px solid #091513
+  border:3px solid #14100b
 }
 
 .mtg-distribution-line .bear{
@@ -571,9 +571,9 @@
 
 .mtg-scenario-kpis article{
   padding:10px;
-  border:1px solid rgba(255,255,255,.07);
+  border:1px solid rgba(255,240,214,.07);
   border-radius:9px;
-  background:#091715
+  background:#15110c
 }
 
 .mtg-scenario-kpis span{
@@ -600,7 +600,7 @@
   justify-content:space-between;
   gap:14px;
   padding:9px 0;
-  border-bottom:1px solid rgba(255,255,255,.06);
+  border-bottom:1px solid rgba(255,240,214,.06);
   font-size:9px
 }
 
@@ -670,18 +670,18 @@
 }
 
 .mtg-native-card.mtg-native-research-ready{
-  border-color:rgba(99,230,190,.34);
+  border-color:rgba(217,181,95,.34);
   box-shadow:
     0 15px 38px rgba(0,0,0,.22),
-    inset 0 0 28px rgba(99,230,190,.025)
+    inset 0 0 28px rgba(217,181,95,.025)
 }
 
 .mtg-native-card.mtg-native-partial{
-  border-color:rgba(255,207,102,.25)
+  border-color:rgba(228,153,88,.25)
 }
 
 .mtg-native-card.mtg-native-blocked{
-  border-color:rgba(255,123,123,.18)
+  border-color:rgba(214,108,92,.18)
 }
 
 .mtg-native-investment-kpis{
@@ -693,9 +693,9 @@
 
 .mtg-native-investment-kpis>div{
   padding:11px;
-  border:1px solid rgba(255,255,255,.07);
+  border:1px solid rgba(255,240,214,.07);
   border-radius:9px;
-  background:rgba(5,15,14,.32)
+  background:rgba(13,11,7,.32)
 }
 
 .mtg-native-investment-kpis span,
@@ -719,7 +719,7 @@
 }
 
 .mtg-native-authority-strip span{
-  border:1px solid rgba(255,255,255,.06);
+  border:1px solid rgba(255,240,214,.06);
   border-radius:7px;
   padding:7px;
   color:var(--muted);
@@ -738,22 +738,22 @@
 }
 
 .mtg-native-detail-hero{
-  border-color:rgba(138,125,255,.25);
+  border-color:rgba(131,169,219,.25);
   background:
-    radial-gradient(circle at 78% 18%,rgba(138,125,255,.11),transparent 37%),
-    linear-gradient(145deg,rgba(25,28,42,.98),rgba(8,22,20,.98))
+    radial-gradient(circle at 78% 18%,rgba(131,169,219,.11),transparent 37%),
+    linear-gradient(145deg,rgba(41,35,28,.98),rgba(20,16,11,.98))
 }
 
 .mtg-native-detail-research-ready{
-  border-color:rgba(99,230,190,.34)
+  border-color:rgba(217,181,95,.34)
 }
 
 .mtg-native-detail-partial{
-  border-color:rgba(255,207,102,.28)
+  border-color:rgba(228,153,88,.28)
 }
 
 .mtg-native-detail-blocked{
-  border-color:rgba(255,123,123,.23)
+  border-color:rgba(214,108,92,.23)
 }
 
 .mtg-native-detail-authority-grid{
@@ -765,9 +765,9 @@
 
 .mtg-native-detail-authority-grid article{
   padding:13px;
-  border:1px solid rgba(255,255,255,.08);
+  border:1px solid rgba(255,240,214,.08);
   border-radius:10px;
-  background:rgba(6,17,16,.48)
+  background:rgba(15,12,9,.48)
 }
 
 .mtg-native-detail-authority-grid span,
@@ -800,7 +800,7 @@
   justify-content:space-between;
   gap:12px;
   padding:10px 0;
-  border-bottom:1px solid rgba(255,255,255,.06);
+  border-bottom:1px solid rgba(255,240,214,.06);
   font-size:9px
 }
 
@@ -821,14 +821,14 @@
 
 .mtg-native-missing-list>div{
   padding:9px;
-  border:1px solid rgba(255,123,123,.16);
+  border:1px solid rgba(214,108,92,.16);
   border-radius:8px;
-  background:rgba(255,123,123,.035)
+  background:rgba(214,108,92,.035)
 }
 
 .mtg-native-missing-list>div.available{
-  border-color:rgba(99,230,190,.18);
-  background:rgba(99,230,190,.035)
+  border-color:rgba(217,181,95,.18);
+  background:rgba(217,181,95,.035)
 }
 
 .mtg-native-missing-list span{
@@ -856,9 +856,9 @@
 }
 
 .mtg-native-record-groups details{
-  border:1px solid rgba(255,255,255,.07);
+  border:1px solid rgba(255,240,214,.07);
   border-radius:9px;
-  background:rgba(6,17,15,.35)
+  background:rgba(15,12,9,.35)
 }
 
 .mtg-native-record-groups summary{
@@ -884,7 +884,7 @@
   grid-template-columns:1fr 1fr;
   gap:0 14px;
   padding:10px;
-  border:1px solid rgba(255,255,255,.05);
+  border:1px solid rgba(255,240,214,.05);
   border-radius:8px
 }
 
@@ -893,7 +893,7 @@
   justify-content:space-between;
   gap:10px;
   padding:6px 0;
-  border-bottom:1px solid rgba(255,255,255,.045);
+  border-bottom:1px solid rgba(255,240,214,.045);
   font-size:8.5px
 }
 
@@ -909,7 +909,7 @@
 .mtg-native-detail-error{
   margin-top:10px;
   padding:9px;
-  border:1px solid rgba(255,123,123,.18);
+  border:1px solid rgba(214,108,92,.18);
   border-radius:8px;
   color:var(--bad);
   font-size:8.5px;
@@ -968,7 +968,7 @@
   position:absolute;
   inset:0 auto 0 0;
   width:3px;
-  background:rgba(255,255,255,.08)
+  background:rgba(255,240,214,.08)
 }
 
 .mtg-native-primary-price:before,
@@ -981,10 +981,10 @@
   background:
     radial-gradient(
       circle at 80% 20%,
-      rgba(99,230,190,.10),
+      rgba(217,181,95,.10),
       transparent 42%
     ),
-    rgba(6,17,16,.48)!important
+    rgba(15,12,9,.48)!important
 }
 
 .mtg-native-primary-metrics strong{
@@ -997,8 +997,8 @@
 }
 
 .mtg-native-observed-panel.mtg-native-provenance-panel{
-  background:rgba(7,18,17,.35);
-  border-color:rgba(255,255,255,.055)
+  background:rgba(17,13,9,.35);
+  border-color:rgba(255,240,214,.055)
 }
 
 .mtg-native-provenance-summary{
@@ -1040,13 +1040,13 @@
   background:
     radial-gradient(
       circle at 88% 10%,
-      rgba(99,230,190,.08),
+      rgba(217,181,95,.08),
       transparent 32%
     ),
     linear-gradient(
       145deg,
-      rgba(18,37,34,.97),
-      rgba(8,22,20,.98)
+      rgba(35,29,22,.97),
+      rgba(20,16,11,.98)
     )
 }
 
@@ -1136,13 +1136,13 @@
   background:
     radial-gradient(
       circle at 88% 6%,
-      rgba(99,230,190,.08),
+      rgba(217,181,95,.08),
       transparent 28%
     ),
     linear-gradient(
       150deg,
-      rgba(18,37,34,.98),
-      rgba(8,21,19,.98)
+      rgba(35,29,22,.98),
+      rgba(19,15,11,.98)
     );
   box-shadow:0 12px 32px rgba(0,0,0,.18);
   transition:
@@ -1153,7 +1153,7 @@
 
 .mtg-native-visual-parity:hover{
   transform:translateY(-2px);
-  border-color:rgba(99,230,190,.40);
+  border-color:rgba(217,181,95,.40);
   box-shadow:0 20px 44px rgba(0,0,0,.25)
 }
 
@@ -1173,9 +1173,9 @@
   min-height:25px;
   padding:3px 8px;
   border-radius:999px;
-  border:1px solid rgba(138,125,255,.30);
-  background:rgba(138,125,255,.10);
-  color:#c8c1ff;
+  border:1px solid rgba(131,169,219,.30);
+  background:rgba(131,169,219,.10);
+  color:#f0e5d1;
   font-size:10px;
   font-weight:900
 }
@@ -1189,9 +1189,9 @@
 
 .mtg-native-card-thesis>div{
   padding:11px 12px;
-  border:1px solid rgba(255,255,255,.07);
+  border:1px solid rgba(255,240,214,.07);
   border-radius:10px;
-  background:rgba(5,15,14,.38)
+  background:rgba(13,11,7,.38)
 }
 
 .mtg-native-card-thesis span,
@@ -1235,9 +1235,9 @@
 .mtg-native-journey{
   margin:4px 0 12px;
   padding:10px 11px;
-  border:1px solid rgba(255,255,255,.06);
+  border:1px solid rgba(255,240,214,.06);
   border-radius:10px;
-  background:#091715
+  background:#15110c
 }
 
 .mtg-native-journey-values{
@@ -1279,7 +1279,7 @@
       var(--warn),
       var(--accent)
     );
-  box-shadow:0 0 18px rgba(99,230,190,.10)
+  box-shadow:0 0 18px rgba(217,181,95,.10)
 }
 
 .mtg-native-journey-down
@@ -1296,7 +1296,7 @@
   width:13px;
   height:13px;
   border-radius:50%;
-  border:3px solid #091513;
+  border:3px solid #14100b;
   z-index:2
 }
 
@@ -1348,9 +1348,9 @@
 .mtg-native-card-semantics>div{
   min-width:0;
   padding:8px;
-  border:1px solid rgba(255,255,255,.055);
+  border:1px solid rgba(255,240,214,.055);
   border-radius:8px;
-  background:rgba(7,19,16,.30)
+  background:rgba(17,14,10,.30)
 }
 
 .mtg-native-card-semantics span{
@@ -1407,7 +1407,7 @@
   width:16px;
   height:5px;
   border-radius:999px;
-  background:#2c3f3a
+  background:#3f382c
 }
 
 .mtg-native-authority-dots i.on{
@@ -1417,7 +1417,7 @@
 .mtg-native-card-governance{
   margin-top:9px;
   padding-top:7px;
-  border-top:1px solid rgba(255,255,255,.04);
+  border-top:1px solid rgba(255,240,214,.04);
   color:var(--muted);
   opacity:.58;
   font-size:7px;
@@ -1476,9 +1476,9 @@
 }
 
 .mtg-rank-chip{
-  border-color:rgba(138,125,255,.35);
-  background:rgba(138,125,255,.08);
-  color:#c8c1ff
+  border-color:rgba(131,169,219,.35);
+  background:rgba(131,169,219,.08);
+  color:#f0e5d1
 }
 
 /* ---------------------------------------------------------
@@ -1489,13 +1489,13 @@
   background:
     radial-gradient(
       circle at 92% 12%,
-      rgba(138,125,255,.07),
+      rgba(131,169,219,.07),
       transparent 30%
     ),
     linear-gradient(
       145deg,
-      rgba(18,37,34,.94),
-      rgba(10,24,22,.96)
+      rgba(35,29,22,.94),
+      rgba(23,18,13,.96)
     )
 }
 
@@ -1510,7 +1510,7 @@
   padding:13px;
   border:1px solid var(--line);
   border-radius:10px;
-  background:#091715
+  background:#15110c
 }
 
 .mtg-native-thesis-grid span{
@@ -1538,9 +1538,9 @@
   justify-content:space-between;
   padding:12px;
   margin:12px 0;
-  border:1px solid rgba(99,230,190,.12);
+  border:1px solid rgba(217,181,95,.12);
   border-radius:10px;
-  background:rgba(99,230,190,.025)
+  background:rgba(217,181,95,.025)
 }
 
 .mtg-native-authority-list{
@@ -1553,7 +1553,7 @@
   justify-content:space-between;
   gap:12px;
   padding:9px 0;
-  border-bottom:1px solid rgba(255,255,255,.05);
+  border-bottom:1px solid rgba(255,240,214,.05);
   font-size:9px
 }
 
@@ -1603,13 +1603,13 @@
   background:
     radial-gradient(
       circle at 92% 5%,
-      rgba(138,125,255,.075),
+      rgba(131,169,219,.075),
       transparent 29%
     ),
     linear-gradient(
       150deg,
-      rgba(15,32,29,.98),
-      rgba(8,20,18,.98)
+      rgba(31,25,18,.98),
+      rgba(19,15,10,.98)
     )
 }
 
@@ -1629,10 +1629,10 @@
 .mtg-native-rich-count{
   flex:0 0 auto;
   padding:5px 9px;
-  border:1px solid rgba(138,125,255,.26);
+  border:1px solid rgba(131,169,219,.26);
   border-radius:999px;
-  background:rgba(138,125,255,.08);
-  color:#c8c1ff;
+  background:rgba(131,169,219,.08);
+  color:#f0e5d1;
   font-size:8px;
   font-weight:800
 }
@@ -1646,9 +1646,9 @@
 .mtg-native-rich-kpis>div{
   min-width:0;
   padding:12px;
-  border:1px solid rgba(255,255,255,.065);
+  border:1px solid rgba(255,240,214,.065);
   border-radius:10px;
-  background:#091715
+  background:#15110c
 }
 
 .mtg-native-rich-kpis span,
@@ -1675,9 +1675,9 @@
 
 .mtg-native-calibration-grid>div{
   padding:11px 12px;
-  border:1px solid rgba(99,230,190,.10);
+  border:1px solid rgba(217,181,95,.10);
   border-radius:9px;
-  background:rgba(99,230,190,.025)
+  background:rgba(217,181,95,.025)
 }
 
 .mtg-native-calibration-grid span{
@@ -1696,9 +1696,9 @@
 .mtg-native-limitations{
   margin-top:10px;
   padding:11px 12px;
-  border-left:3px solid rgba(255,194,92,.58);
+  border-left:3px solid rgba(228,153,88,.58);
   border-radius:8px;
-  background:rgba(255,194,92,.035)
+  background:rgba(228,153,88,.035)
 }
 
 .mtg-native-limitations span{
@@ -1717,7 +1717,7 @@
 .mtg-native-rich-table-wrap{
   margin-top:13px;
   overflow-x:auto;
-  border:1px solid rgba(255,255,255,.06);
+  border:1px solid rgba(255,240,214,.06);
   border-radius:10px
 }
 
@@ -1730,7 +1730,7 @@
 .mtg-native-rich-table th,
 .mtg-native-rich-table td{
   padding:9px 10px;
-  border-bottom:1px solid rgba(255,255,255,.045);
+  border-bottom:1px solid rgba(255,240,214,.045);
   text-align:right;
   white-space:nowrap;
   font-size:8.5px
@@ -1769,13 +1769,13 @@
 .mtg-native-scenario-card{
   min-width:0;
   padding:13px;
-  border:1px solid rgba(138,125,255,.15);
+  border:1px solid rgba(131,169,219,.15);
   border-radius:11px;
   background:
     linear-gradient(
       145deg,
-      rgba(16,31,29,.95),
-      rgba(7,18,16,.98)
+      rgba(30,25,19,.95),
+      rgba(17,13,9,.98)
     )
 }
 
@@ -1808,14 +1808,14 @@
 }
 
 .mtg-native-scenario-badge.scenario{
-  border:1px solid rgba(255,194,92,.22);
-  background:rgba(255,194,92,.055);
+  border:1px solid rgba(228,153,88,.22);
+  background:rgba(228,153,88,.055);
   color:var(--warn)!important
 }
 
 .mtg-native-scenario-badge.direct{
-  border:1px solid rgba(99,230,190,.22);
-  background:rgba(99,230,190,.055);
+  border:1px solid rgba(217,181,95,.22);
+  background:rgba(217,181,95,.055);
   color:var(--accent)!important
 }
 
@@ -1829,9 +1829,9 @@
 .mtg-native-scenario-metrics>div{
   min-width:0;
   padding:8px;
-  border:1px solid rgba(255,255,255,.05);
+  border:1px solid rgba(255,240,214,.05);
   border-radius:8px;
-  background:#091715
+  background:#15110c
 }
 
 .mtg-native-scenario-metrics span{
@@ -1853,7 +1853,7 @@
   gap:10px;
   margin-top:10px;
   padding-top:8px;
-  border-top:1px solid rgba(255,255,255,.05);
+  border-top:1px solid rgba(255,240,214,.05);
   color:var(--muted);
   font-size:7.5px
 }
@@ -1892,7 +1892,7 @@
 
 .mtg-native-card-secondary{
   margin-top:9px;
-  border-top:1px solid rgba(255,255,255,.045)
+  border-top:1px solid rgba(255,240,214,.045)
 }
 
 .mtg-native-card-secondary>summary{
@@ -1932,13 +1932,13 @@
 .mtg-native-horizon-viz{
   margin-top:13px;
   padding:13px 13px 8px;
-  border:1px solid rgba(255,255,255,.06);
+  border:1px solid rgba(255,240,214,.06);
   border-radius:11px;
   background:
     linear-gradient(
       145deg,
-      rgba(9,24,21,.98),
-      rgba(6,17,15,.98)
+      rgba(22,17,12,.98),
+      rgba(15,12,9,.98)
     )
 }
 
@@ -1994,7 +1994,7 @@
 }
 
 .mtg-native-horizon-grid{
-  stroke:rgba(255,255,255,.045);
+  stroke:rgba(255,240,214,.045);
   stroke-width:1
 }
 
@@ -2033,9 +2033,9 @@
 
 .mtg-native-scenario-primary>div{
   padding:10px;
-  border:1px solid rgba(99,230,190,.10);
+  border:1px solid rgba(217,181,95,.10);
   border-radius:9px;
-  background:rgba(99,230,190,.028)
+  background:rgba(217,181,95,.028)
 }
 
 .mtg-native-scenario-primary span{
@@ -2094,7 +2094,7 @@
   display:grid;
   gap:13px;
   padding:0 14px 14px;
-  border-top:1px solid rgba(255,255,255,.05)
+  border-top:1px solid rgba(255,240,214,.05)
 }
 
 .mtg-native-methodology-body>section{
