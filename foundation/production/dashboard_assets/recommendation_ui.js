@@ -447,7 +447,7 @@ function slV2Pct(v){return v===null||v===undefined?"—":`${Math.round(Number(v)
 function slV2Basis(b){return b==="TCGPLAYER_DIRECT_LOW"?"TCGplayer Direct (verified sellers)":b==="LOWEST_LISTING"?"lowest listing":"—"}
 function slV2BasisNoun(b){return b==="TCGPLAYER_DIRECT_LOW"?"TCGplayer Direct price":"lowest listing"}
 function slV2Name(item){let s=String(displayName(item)||"").trim();const m=s.match(/^(.*?)\s+—\s+(Foil|Nonfoil|Non-Foil) Edition$/i);if(m&&/(Foil|Non-Foil) Edition/i.test(m[1]))s=m[1];s=s.replace(/^Drop:\s*/i,"");if(/^x\s/i.test(s))s="Secret Lair "+s;return s}
-function slV2Pill(call){const c=String(call||"").toUpperCase();const label=c==="BUY"?"BUY":c==="WAIT"?"WAIT":c==="HOLD"?"HOLD":"NO PRICE";return `<span class="metals-call metals-call-${c==="BUY"?"buy":"hold"}">${label}</span>`}
+function slV2Pill(call){const c=String(call||"").toUpperCase();const label=c==="BUY"?"BUY":c==="WAIT"?"WAIT":c==="NO_CALL"?"NO CALL":c==="HOLD"?"HOLD":"NO PRICE";return `<span class="metals-call metals-call-${c==="BUY"?"buy":"hold"}">${label}</span>`}
 let slV2LaneOn=false;
 let slV2SortKey="rank",slV2FinishKey="all",slV2PriceKey="all",slV2CollabKey="all";
 const SL_V2_SELL_COST=0.13;
@@ -480,10 +480,10 @@ function clV2Decision(item){const p=(item&&item.payload)||{};return p.model_vers
 function clV2Name(item){return String(displayName(item)||"").replace(/\s+\u2014\s+.*$/,"").trim()}
 function clV2Order(p){if(!p)return 9;if(p.model_call==="BUY")return 0;if(p.model_call==="HOLD")return 1;return 2}
 function clV2Sort(items){return items.slice().sort((a,b)=>{const pa=clV2Decision(a),pb=clV2Decision(b);const oa=clV2Order(pa),ob=clV2Order(pb);if(oa!==ob)return oa-ob;const ra=pa&&pa.model_rank!=null?Number(pa.model_rank):1e9,rb=pb&&pb.model_rank!=null?Number(pb.model_rank):1e9;if(ra!==rb)return ra-rb;return String(clV2Name(a)).localeCompare(String(clV2Name(b)))})}
-function clV2CallLabel(p){if(!p)return "\u2014";if(p.model_call==="BUY")return "BUY";if(p.model_call==="NO_PRICE")return "NO_PRICE";return "HOLD"}
+function clV2CallLabel(p){if(!p)return "\u2014";if(p.model_call==="BUY")return "BUY";if(p.model_call==="NO_PRICE")return p.model_price_usd!=null?"NO_CALL":"NO_PRICE";return "HOLD"}
 function clV2Status(p){const s=p&&p.model_validation_status;return s==="VALIDATED"?"Validated":s==="PROVISIONAL"?"Provisional":"Not validated"}
 function clV2Range(p){return p.model_net_p10_6m==null||p.model_net_p90_6m==null?"":`${pcV2Pct(p.model_net_p10_6m)} to ${pcV2Pct(p.model_net_p90_6m)}`}
-function clV2Age(p){const m=slV2Num(p.model_months_since_release);if(m===null)return "\u2014";return m<24?`${Math.round(m)} months`:`${(m/12).toFixed(1)} years`}
+function clV2Age(p){const m=slV2Num(p.model_months_since_release);if(m===null)return "\u2014";if(m<1){const d=Math.max(1,Math.round(m*30.44));return `${d} day${d===1?"":"s"}`}return m<24?`${Math.round(m)} months`:`${(m/12).toFixed(1)} years`}
 function clV2Quarter(p){return p.model_quarter?`${p.model_quarter} of 4`:"\u2014"}
 function clV2Pts(v){const n=slV2Num(v);return n===null?"\u2014":signedPct(n).replace("%"," pts")}
 function clV2Walk(ps){const p=ps.find(x=>x&&x.model_walk_forward);return p?p.model_walk_forward:null}
