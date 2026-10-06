@@ -11,7 +11,38 @@ from .observability import OperationalEvent
 from .security import APIKeyAuthenticator, Permission
 
 
-def install_manual_holding_routes(app, settings, repository):
+def mark_to_market(documents, prices):
+    """Value ETF snapshots at the latest package close (shares x close), keeping the entered snapshot.
+
+    Holdings without a usable close keep their manually entered value. The entered value stays
+    available as snapshot_current_value; nothing is written back to the stored snapshot.
+    """
+    marked = []
+    for doc in documents:
+        doc = dict(doc)
+        price = prices.get(str(doc.get("symbol", "")).upper()) if doc.get("asset_type") == "ETF" else None
+        doc["snapshot_current_value"] = doc["current_value"]
+        doc["snapshot_current_price"] = doc.get("current_price")
+        if price is None:
+            doc.update({"valuation_source": "MANUAL_SNAPSHOT", "valuation_as_of": doc.get("as_of")})
+            marked.append(doc)
+            continue
+        shares, basis = Decimal(doc["shares"]), Decimal(doc["cost_basis"])
+        close = Decimal(str(price["close"]))
+        value = (shares * close).quantize(Decimal("0.01"))
+        gain = value - basis
+        doc.update({
+            "current_value": str(value), "current_price": str(close), "gain_loss": str(gain),
+            "return_pct": None if basis == 0 else str(gain / basis * Decimal(100)),
+            "valuation_source": "ETF_PACKAGE_CLOSE", "valuation_as_of": price.get("as_of_date"),
+            "valuation_quality": price.get("quality_status"), "valuation_freshness": price.get("freshness_state"),
+            "valuation_package_id": price.get("package_id"),
+        })
+        marked.append(doc)
+    return marked
+
+
+def install_manual_holding_routes(app, settings, repository, market_prices=None):
     principals, hashes = {}, {}
     for pid, (credential, roles) in sorted(settings.credentials.items()):
         principals[pid] = roles
@@ -39,14 +70,23 @@ def install_manual_holding_routes(app, settings, repository):
         if denied:
             return denied
         items = repository.current()
-        total_value = sum((item.current_value for item in items), Decimal("0"))
+        try:
+            prices = market_prices() if market_prices is not None else {}
+        except Exception:
+            prices = {}                                    # pricing is best-effort; snapshots still serve
+        documents = mark_to_market([item.document() for item in items], prices or {})
+        total_value = sum((Decimal(doc["current_value"]) for doc in documents), Decimal("0"))
         total_basis = sum((item.cost_basis for item in items), Decimal("0"))
+        marked = [doc for doc in documents if doc["valuation_source"] == "ETF_PACKAGE_CLOSE"]
         return {
-            "items": [item.document() for item in items],
+            "items": documents,
             "position_count": len(items),
             "current_value": str(total_value),
+            "snapshot_current_value": str(sum((item.current_value for item in items), Decimal("0"))),
             "cost_basis": str(total_basis),
             "gain_loss": str(total_value - total_basis),
+            "marked_position_count": len(marked),
+            "valuation_as_of": max((doc["valuation_as_of"] for doc in marked if doc.get("valuation_as_of")), default=None),
             "authority_state": "MANUAL_USER_ENTERED_EXTERNAL_HOLDINGS",
         }
 

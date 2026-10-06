@@ -364,3 +364,21 @@ tbody tr:hover{background:rgba(217,180,90,.05)}
   .rpg-tiles,.rpg-item-stats{grid-template-columns:1fr 1fr}
   .rpg-vault-name{font-size:1.8rem}
 }
+
+/* ---------- The Merchants' Guild (ETFs) ---------- */
+.rpg-bar.etf>i{background:#4d7a3a}
+.rpg-vital.etf .rpg-vital-head span:first-child{color:#a9cf92}
+.rpg-guild-hero{display:flex;flex-wrap:wrap;gap:20px 32px;align-items:center;justify-content:space-between;padding:22px 28px;margin:0 0 18px;border-left:4px solid #4d7a3a}
+.rpg-guild-counsel{margin:6px 0 0;font-family:var(--font-display);font-size:1.25rem;line-height:1.45;color:#f1d78f;max-width:62ch}
+.rpg-guild-ledger,.rpg-guild-research{margin:0 0 18px;padding:20px 24px}
+.rpg-nowrap{white-space:nowrap}
+.rpg-guild-table{min-width:980px}
+.rpg-guild-table th[scope=row]{padding:4px 6px}
+.rpg-fund-pick{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;padding:6px 8px;background:none;border:1px solid transparent;color:inherit;text-align:left;cursor:pointer;font:inherit}
+.rpg-fund-pick strong{font-family:var(--font-display);color:#a9cf92;letter-spacing:.06em}
+.rpg-fund-pick span{font-size:.85rem;color:#b9a98a}
+.rpg-fund-pick:hover,.rpg-fund-pick:focus-visible{border-color:#4d7a3a;outline:none}
+.rpg-guild-table tr.is-picked{background:rgba(77,122,58,.16)}
+.rpg-overlaps{margin:4px 0 12px;padding-left:20px;line-height:1.5}
+.rpg-muted{color:#b9a98a}
+@media (max-width:720px){.rpg-guild-ledger,.rpg-guild-research{padding:14px 12px}.rpg-guild-hero{padding:16px}.rpg-guild-counsel{font-size:1.05rem}}

@@ -175,6 +175,46 @@ class PresentationReadRepository:
             })
         return {"domain_id": domain_id, "asset_id": asset_id, "records": grouped}
 
+    def etf_guild(self) -> dict[str, object] | None:
+        """The provisional ETF package records in the active publication, or None if it has none."""
+        with closing(self.connection_factory()) as db, db.cursor() as cursor:
+            publication_id = self._active_id(cursor)
+            cursor.execute("""
+                SELECT record_type, record_key, payload_json
+                FROM presentation_records
+                WHERE publication_id=%s AND domain_id='etf' AND record_type IN ('etf_fund', 'etf_package')
+                ORDER BY record_type, record_key
+            """, (publication_id,))
+            rows = cursor.fetchall()
+        package = next((dict(payload) for kind, _, payload in rows if kind == "etf_package"), None)
+        funds = [dict(payload) for kind, _, payload in rows if kind == "etf_fund"]
+        if package is None and not funds:
+            return None
+        return {"package": package, "funds": funds}
+
+    def etf_latest_prices(self) -> dict[str, dict[str, object]]:
+        """Latest package close per ETF ticker, for marking manual holdings. Empty when unavailable."""
+        try:
+            with closing(self.connection_factory()) as db, db.cursor() as cursor:
+                publication_id = self._active_id(cursor)
+                cursor.execute("""
+                    SELECT payload_json->>'ticker', payload_json->>'close', payload_json->>'as_of_date',
+                           payload_json->>'quality_status', payload_json->>'freshness_state',
+                           payload_json->'_lineage'->>'package_id'
+                    FROM presentation_records
+                    WHERE publication_id=%s AND domain_id='etf' AND record_type='etf_fund'
+                """, (publication_id,))
+                rows = cursor.fetchall()
+        except Exception:
+            return {}
+        out: dict[str, dict[str, object]] = {}
+        for ticker, close, as_of, quality, freshness, package_id in rows:
+            if not ticker or close in (None, "") or quality not in ("PASS", "PROVISIONAL"):
+                continue
+            out[str(ticker).upper()] = {"close": close, "as_of_date": as_of, "quality_status": quality,
+                                        "freshness_state": freshness, "package_id": package_id}
+        return out
+
     def mtg_premium_research(
         self,
         asset_id: str,
@@ -604,6 +644,19 @@ def install_presentation_read_routes(
         if detail is None:
             return JSONResponse({"error": {"code": "ASSET_NOT_FOUND", "message": "asset is not present in the active presentation publication"}}, status_code=404)
         return detail
+
+    @app.get("/v1/presentation/etf")
+    def presentation_etf(x_api_key: str | None = Header(default=None)):
+        denied = authorize(x_api_key)
+        if denied:
+            return denied
+        try:
+            guild = repository.etf_guild()
+        except LookupError:
+            guild = None
+        if guild is None:
+            return {"available": False, "package": None, "funds": []}
+        return {"available": True, **guild}
 
     @app.get("/v1/presentation/mtg-research/{asset_id}")
     def presentation_mtg_research(

@@ -599,6 +599,9 @@ def build_presentation_publication(
     records.extend(_mtg_records(connection))
     records.extend(_mtg_premium_records_from_environment())
     records.extend(_mtg_lane_native_research_records_from_environment())
+    from foundation.presentation.etf_package import etf_records_from_environment
+
+    records.extend(etf_records_from_environment())   # provisional ETF package beside the certified domains, when supplied
     records.sort(key=lambda item: (item.record_type, item.domain_id, item.asset_id or "", item.record_key))
     return PresentationPublication(
         publication_id=publication_id or str(uuid4()),
