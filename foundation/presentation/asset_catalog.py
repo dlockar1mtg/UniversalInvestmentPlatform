@@ -87,6 +87,8 @@ class GovernedAssetCatalogRepository:
                 "asset_class": document.get("asset_class"),
                 "asset_subclass": document.get("asset_subclass"),
             })
+        if domain == "metals":
+            items.extend(_metals_vehicle_items(term, limit - len(items)))
         return tuple(items)
 
     def asset_exists(self, domain_id: str, asset_id: str) -> bool:
@@ -94,6 +96,8 @@ class GovernedAssetCatalogRepository:
         asset = asset_id.strip()
         if not domain or not asset:
             return False
+        if domain == "metals" and asset.startswith("metals:vehicle:"):
+            return any(item.vehicle_id == asset for item in _enabled_metals_vehicles())
         with closing(self.connection_factory()) as db, db.cursor() as cursor:
             cursor.execute("""
                 SELECT 1
@@ -107,6 +111,34 @@ class GovernedAssetCatalogRepository:
                 LIMIT 1
             """, (domain, asset))
             return cursor.fetchone() is not None
+
+
+def _enabled_metals_vehicles():
+    """Metals ETFs are held as vehicles (GLD, SLV...). They are not publication asset records,
+    so their identities come from the governed vehicle registry the portfolio already values."""
+    from foundation.production.metals_registry import load_metals_registry
+
+    return tuple(item for item in load_metals_registry().vehicles if item.enabled)
+
+
+def _metals_vehicle_items(term: str, room: int) -> list[dict[str, object]]:
+    if room <= 0:
+        return []
+    needle = term.lower()
+    items: list[dict[str, object]] = []
+    for item in _enabled_metals_vehicles():
+        text = f"{item.vehicle_id} {item.ticker} {item.name} {item.vehicle_type}".lower()
+        if needle and needle not in text:
+            continue
+        items.append({
+            "domain_id": "metals",
+            "asset_id": item.vehicle_id,
+            "asset_name": item.name,
+            "asset_symbol": item.ticker,
+            "asset_class": "metals",
+            "asset_subclass": item.vehicle_type,
+        })
+    return items[:room]
 
 
 def install_governed_asset_catalog_routes(
