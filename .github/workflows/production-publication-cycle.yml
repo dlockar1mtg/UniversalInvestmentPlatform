@@ -75,7 +75,7 @@ jobs:
           uip dlockar1mtg/UniversalInvestmentPlatform metals-production-cycle.yml
           source dlockar1mtg/mtg-investment-terminal mtg-marketplace-production.yml
           uip dlockar1mtg/UniversalInvestmentPlatform crypto-v2-prices.yml
-          source dlockar1mtg/StocksETFIntelligencePlatform etf-market-data.yml
+          source dlockar1mtg/StocksETFIntelligencePlatform etf-hosted-market-data.yml
           SOURCES
           echo "No source has a newer run than the last publication, so this backup run stops here."
           echo "run=false" >> "$GITHUB_OUTPUT"
@@ -355,7 +355,7 @@ jobs:
           }
           fetch_etf() {
             local runs run_id started worked artifact artifact_id digest
-            runs="$(api_get "https://api.github.com/repos/${repo}/actions/workflows/etf-market-data.yml/runs?per_page=30")" || return 1
+            runs="$(api_get "https://api.github.com/repos/${repo}/actions/workflows/etf-hosted-market-data.yml/runs?per_page=30")" || return 1
             while read -r run_id started; do
               [ -n "$run_id" ] || continue
               worked="$(api_get "https://api.github.com/repos/${repo}/actions/runs/${run_id}/jobs?per_page=100" | jq '[.jobs[] | select(.name != "gate" and .conclusion == "success")] | length')" || return 1
