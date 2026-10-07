@@ -1,0 +1,32 @@
+{
+  "assumptions_id": "household-projection-assumptions-v1",
+  "status": "PLANNING_ASSUMPTIONS_NOT_FORECASTS",
+  "notes": [
+    "Typical (median) yearly growth and yearly swings (standard deviation) used to simulate each part of the household plan.",
+    "They are deliberately plain long-run planning numbers, not model forecasts. Crypto's swing is set wide on purpose.",
+    "The monthly savings plan itself (income, bills, contributions) is taken as written; only market returns are simulated.",
+    "Taxes on gains are not modelled. MTG sealed product loses sell_cost (marketplace fees and shipping) when counted toward the house."
+  ],
+  "paths": 4000,
+  "seed": 20291201,
+  "sleeves": {
+    "stocks":     {"label": "Stock ETFs and Acorns", "annual_return": 0.08, "annual_volatility": 0.16, "sell_cost": 0.0},
+    "crypto":     {"label": "Crypto",                "annual_return": 0.10, "annual_volatility": 0.60, "sell_cost": 0.0},
+    "metals":     {"label": "Metals ETFs",           "annual_return": 0.05, "annual_volatility": 0.15, "sell_cost": 0.0},
+    "mtg":        {"label": "MTG sealed",            "annual_return": 0.06, "annual_volatility": 0.20, "sell_cost": 0.12},
+    "cash":       {"label": "T-bills and cash funds","annual_return": 0.04, "annual_volatility": 0.01, "sell_cost": 0.0},
+    "retirement": {"label": "Retirement accounts",   "annual_return": 0.07, "annual_volatility": 0.14, "sell_cost": 0.0}
+  },
+  "correlation_order": ["stocks", "crypto", "metals", "mtg", "cash", "retirement"],
+  "correlation": [
+    [1.00, 0.40, 0.10, 0.30, 0.00, 0.90],
+    [0.40, 1.00, 0.10, 0.20, 0.00, 0.35],
+    [0.10, 0.10, 1.00, 0.05, 0.00, 0.10],
+    [0.30, 0.20, 0.05, 1.00, 0.00, 0.25],
+    [0.00, 0.00, 0.00, 0.00, 1.00, 0.00],
+    [0.90, 0.35, 0.10, 0.25, 0.00, 1.00]
+  ],
+  "holding_sleeves": {"etf": "stocks", "acorns": "stocks", "crypto": "crypto", "metals": "metals", "mtg": "mtg", "purse": "cash"},
+  "percentiles": [10, 25, 50, 75, 90],
+  "price_ladder": [300000, 325000, 350000, 375000, 400000, 425000, 450000, 475000, 500000]
+}

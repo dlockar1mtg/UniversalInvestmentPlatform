@@ -394,3 +394,37 @@ tbody tr:hover{background:rgba(217,180,90,.05)}
 .rpg-guild-verdicts .rpg-vault-verdict{margin:0}
 @media (max-width:720px){.rpg-board-filters select,.rpg-board-filters input[type=search],.rpg-board-filters .rpg-board-search input{min-width:0;width:100%}.rpg-board-filters label{flex:1 1 140px}}
 .rpg-guild-research .rpg-table{min-width:0}
+/* The Homestead (household plan) */
+.rpg-home-hero{border-left-color:#b5862f}
+.rpg-home-hero .rpg-vault-why{margin-top:10px}
+.rpg-home-stats{flex-direction:column;gap:8px}
+.rpg-home-toggle{display:flex;gap:8px;flex-wrap:wrap}
+.rpg-home-toggle .rpg-realm{padding:6px 12px;font-size:.78rem}
+.rpg-home-tiles{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.rpg-home-ledger td.rpg-home-actual{color:#f1d78f}
+.rpg-home-ledger tr.is-now{box-shadow:inset 3px 0 0 #b5862f}
+.rpg-home-ledger{min-width:880px}
+.rpg-home-ladder{min-width:0;margin-top:16px}
+.rpg-home-dirty{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center;padding:10px 14px;margin:6px 0 12px;border:1px solid #b5862f;background:rgba(181,134,47,.12);color:#f1d78f}
+.rpg-home-editor{margin-top:18px;padding:18px 20px;border:1px solid #6b5432;background:#1c1814;display:flex;flex-direction:column;gap:12px}
+.rpg-home-editor fieldset,.rpg-home-mix{border:1px solid #3a3127;padding:10px 14px;margin:0}
+.rpg-home-editor legend,.rpg-home-mix legend{font-family:"Alegreya SC",var(--font-body);color:#e2c27a;padding:0 6px}
+.rpg-home-grid{margin:0}
+.rpg-board-filters input[type=number],.rpg-board-filters input[type=month],.rpg-board-filters input[type=file],.rpg-home-note input{background:#15110c;color:#f1e3c2;border:1px solid #6b5432;padding:6px 8px;font:inherit;font-family:var(--font-body);min-width:130px}
+.rpg-home-note{display:flex;flex-direction:column;gap:4px;font-family:"Alegreya SC",var(--font-body);font-size:.9rem;color:#b9a98a}
+.rpg-home-actions{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:center}
+.rpg-action{padding:9px 16px;font-family:var(--font-display);font-weight:700;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;color:#1b140c;background:#d9b45a;border:1px solid #f0d58e;box-shadow:inset 0 -3px 0 #9c7a33}
+.rpg-action:hover{background:#e8c56c}
+.rpg-action-quiet{color:#e2c27a;background:#231f1a;border-color:#5f4a2c;box-shadow:inset 0 0 0 2px #1a1612}
+.rpg-action:focus-visible,.rpg-home-editor input:focus-visible{outline:2px solid #f1d78f;outline-offset:2px}
+.rpg-home-msg{margin:0;padding:10px 14px;border:1px solid #5f4a2c;background:#1c1814}
+.rpg-home-preview{padding:16px 18px;margin-top:14px;display:flex;flex-direction:column;gap:10px}
+.rpg-home-hint{color:#b9a98a;margin-top:14px}
+.rpg-home-limits{margin:0;padding-left:20px;color:#d8cbb0;line-height:1.5;flex:1 1 280px}
+@media (max-width:720px){.rpg-home-editor{padding:12px}.rpg-board-filters input[type=number],.rpg-board-filters input[type=month]{min-width:0;width:100%}}
+.rpg-home-tiles{flex:none}
+.rpg-home-hero .rpg-parch-kicker{color:#b9a98a}
+.rpg-home-mix{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end}
+.rpg-home-mix label{flex:0 1 130px}
+.rpg-home-mix input[type=number]{min-width:0;width:100%}
+.rpg-home-sure{margin-top:14px}

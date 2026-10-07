@@ -15,6 +15,8 @@ from foundation.production.hosted_transactions import install_hosted_transaction
 from foundation.production.hosted_external_accounts import install_external_account_performance_routes
 from foundation.production.external_account_performance import PostgresExternalAccountPerformanceRepository
 from foundation.production.hosted_manual_holdings import install_manual_holding_routes
+from foundation.production.hosted_household_plan import install_household_plan_routes
+from foundation.production.household_plan import PostgresHouseholdPlanRepository
 from foundation.production.hosted_refresh_status import install_refresh_status_routes
 from foundation.production.manual_holdings import PostgresManualHoldingRepository
 from foundation.production.portfolio_persistence import PostgresPortfolioSnapshotRepository
@@ -27,6 +29,7 @@ portfolio_repository = None
 transaction_repository = None
 external_account_repository = None
 manual_holding_repository = None
+household_plan_repository = None
 presentation_repository = None
 asset_catalog_repository = None
 if os.getenv("RENDER_EXTERNAL_HOSTNAME"):
@@ -41,6 +44,8 @@ if os.getenv("RENDER_EXTERNAL_HOSTNAME"):
     external_account_repository.initialize()
     manual_holding_repository = PostgresManualHoldingRepository.from_dsn(free_settings.database_url)
     manual_holding_repository.initialize()
+    household_plan_repository = PostgresHouseholdPlanRepository.from_dsn(free_settings.database_url)
+    household_plan_repository.initialize()
     presentation_repository = PresentationReadRepository.from_dsn(free_settings.database_url)
     asset_catalog_repository = GovernedAssetCatalogRepository.from_dsn(free_settings.database_url)
 settings = HTTPServiceSettings.from_environment()
@@ -59,6 +64,8 @@ if manual_holding_repository is not None:
         app, settings, manual_holding_repository,
         market_prices=None if presentation_repository is None else presentation_repository.etf_latest_prices,
     )
+if household_plan_repository is not None:
+    install_household_plan_routes(app, settings, household_plan_repository)
 if transaction_repository is not None:
     install_hosted_transaction_routes(
         app,
