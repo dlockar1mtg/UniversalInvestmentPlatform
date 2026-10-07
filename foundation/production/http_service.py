@@ -109,6 +109,10 @@ def create_http_app(settings: HTTPServiceSettings, repository=None, dashboard_se
     def rpg_realm_js():
         return FileResponse(assets / "rpg_realm.js", media_type="text/javascript")
 
+    @app.get("/dashboard/assets/homestead.js", include_in_schema=False)
+    def homestead_js():
+        return FileResponse(assets / "homestead.js", media_type="text/javascript")
+
     @app.get("/dashboard/assets/dashboard.js", include_in_schema=False)
     def dashboard_javascript():
         return FileResponse(assets / "dashboard.js", media_type="text/javascript")
