@@ -364,3 +364,33 @@ tbody tr:hover{background:rgba(217,180,90,.05)}
   .rpg-tiles,.rpg-item-stats{grid-template-columns:1fr 1fr}
   .rpg-vault-name{font-size:1.8rem}
 }
+
+/* ---------- The Merchants' Guild (ETFs) ---------- */
+.rpg-bar.etf>i{background:#4d7a3a}
+.rpg-vital.etf .rpg-vital-head span:first-child{color:#a9cf92}
+.rpg-guild-hero{display:flex;flex-wrap:wrap;gap:20px 32px;align-items:center;justify-content:space-between;padding:22px 28px;margin:0 0 18px;border-left:4px solid #4d7a3a}
+.rpg-guild-counsel{margin:6px 0 0;font-family:var(--font-display);font-size:1.25rem;line-height:1.45;color:#f1d78f;max-width:62ch}
+.rpg-guild-ledger,.rpg-guild-research{margin:0 0 18px;padding:20px 24px}
+.rpg-nowrap{white-space:nowrap}
+.rpg-guild-table{min-width:980px}
+.rpg-guild-table th[scope=row]{padding:4px 6px}
+.rpg-fund-pick{display:flex;flex-direction:column;align-items:flex-start;gap:2px;width:100%;padding:6px 8px;background:none;border:1px solid transparent;color:inherit;text-align:left;cursor:pointer;font:inherit}
+.rpg-fund-pick strong{font-family:var(--font-display);color:#a9cf92;letter-spacing:.06em}
+.rpg-fund-pick span{font-size:.85rem;color:#b9a98a}
+.rpg-fund-pick:hover,.rpg-fund-pick:focus-visible{border-color:#4d7a3a;outline:none}
+.rpg-guild-table tr.is-picked{background:rgba(77,122,58,.16)}
+.rpg-overlaps{margin:4px 0 12px;padding-left:20px;line-height:1.5}
+.rpg-muted{color:#b9a98a}
+@media (max-width:720px){.rpg-guild-ledger,.rpg-guild-research{padding:14px 12px}.rpg-guild-hero{padding:16px}.rpg-guild-counsel{font-size:1.05rem}}
+.rpg-board-filters{display:flex;flex-wrap:wrap;gap:12px 18px;align-items:flex-end;margin:4px 0 14px}
+.rpg-board-filters label{display:flex;flex-direction:column;gap:4px;font-family:"Alegreya SC",var(--font-body);font-size:.9rem;color:#b9a98a}
+.rpg-board-filters select,.rpg-board-filters input[type=search]{background:#15110c;color:#f1e3c2;border:1px solid #6b5432;padding:6px 8px;font:inherit;font-family:var(--font-body);min-width:150px}
+.rpg-board-filters select:focus-visible,.rpg-board-filters input:focus-visible{outline:2px solid #a9cf92;outline-offset:1px}
+.rpg-board-filters .rpg-board-search input{min-width:200px}
+.rpg-board-filters .rpg-check{flex-direction:row;align-items:center;gap:6px;padding-bottom:6px}
+.rpg-board-filters .rpg-check input{accent-color:#4d7a3a;width:16px;height:16px}
+.rpg-guild-table tr.is-mine th[scope=row] strong{color:#f1d78f}
+.rpg-guild-verdicts{display:flex;flex-direction:column;gap:8px;margin:10px 0}
+.rpg-guild-verdicts .rpg-vault-verdict{margin:0}
+@media (max-width:720px){.rpg-board-filters select,.rpg-board-filters input[type=search],.rpg-board-filters .rpg-board-search input{min-width:0;width:100%}.rpg-board-filters label{flex:1 1 140px}}
+.rpg-guild-research .rpg-table{min-width:0}

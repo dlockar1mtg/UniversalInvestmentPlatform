@@ -67,7 +67,7 @@ jobs:
           if [ -z "$published" ] || [[ "$published" < "$stale" ]]; then echo "run=true" >> "$GITHUB_OUTPUT"; exit 0; fi
           while read -r token_name repo workflow; do
             token="$UIP_TOKEN"; [ "$token_name" = "source" ] && token="$SOURCE_TOKEN"
-            newest="$(last_worked "$token" "$repo" "$workflow")"
+            newest="$(last_worked "$token" "$repo" "$workflow")" || newest=""   # an unreadable source never stops the gate
             echo "$repo/$workflow newest successful run: ${newest:-none}"
             if [ -n "$newest" ] && [[ "$newest" > "$published" ]]; then echo "run=true" >> "$GITHUB_OUTPUT"; exit 0; fi
           done <<'SOURCES'
@@ -75,6 +75,7 @@ jobs:
           uip dlockar1mtg/UniversalInvestmentPlatform metals-production-cycle.yml
           source dlockar1mtg/mtg-investment-terminal mtg-marketplace-production.yml
           uip dlockar1mtg/UniversalInvestmentPlatform crypto-v2-prices.yml
+          source dlockar1mtg/StocksETFIntelligencePlatform etf-market-data.yml
           SOURCES
           echo "No source has a newer run than the last publication, so this backup run stops here."
           echo "run=false" >> "$GITHUB_OUTPUT"
@@ -339,6 +340,44 @@ jobs:
             "${{ steps.sources.outputs.metals_artifact_digest }}" \
             "$UIP_TOKEN" \
             "incoming/metals"
+
+      - name: Fetch the provisional ETF package (optional; never blocks the certified domains)
+        shell: bash
+        run: |
+          set -uo pipefail
+          repo="dlockar1mtg/StocksETFIntelligencePlatform"
+          api_get() {
+            curl --fail-with-body --silent --show-error --location \
+              --header "Accept: application/vnd.github+json" \
+              --header "Authorization: Bearer ${SOURCE_TOKEN}" \
+              --header "X-GitHub-Api-Version: 2022-11-28" \
+              "$1"
+          }
+          fetch_etf() {
+            local runs run_id started worked artifact artifact_id digest
+            runs="$(api_get "https://api.github.com/repos/${repo}/actions/workflows/etf-market-data.yml/runs?per_page=30")" || return 1
+            while read -r run_id started; do
+              [ -n "$run_id" ] || continue
+              worked="$(api_get "https://api.github.com/repos/${repo}/actions/runs/${run_id}/jobs?per_page=100" | jq '[.jobs[] | select(.name != "gate" and .conclusion == "success")] | length')" || return 1
+              [ "$worked" -gt 0 ] && break
+              run_id=""
+            done < <(printf '%s' "$runs" | jq -r '[.workflow_runs[] | select(.head_branch == "main" and .status == "completed" and .conclusion == "success") | select(.event == "schedule" or .event == "workflow_dispatch")] | sort_by(.run_started_at) | reverse | .[0:10][] | "\(.id) \(.run_started_at)"')
+            [ -n "${run_id:-}" ] || { echo "No successful ETF market data run"; return 1; }
+            python -c 'import sys; from datetime import datetime, timezone; s=datetime.fromisoformat(sys.argv[1].replace("Z","+00:00")); sys.exit(0 if (datetime.now(timezone.utc)-s).total_seconds() <= 30*3600 else 1)' "$started" || { echo "Newest ETF run ${run_id} is over 30 hours old"; return 1; }
+            artifact="$(api_get "https://api.github.com/repos/${repo}/actions/runs/${run_id}/artifacts?per_page=100" | jq -c '[.artifacts[] | select(.expired == false and (.name | startswith("etf-production-")))][0] // empty')" || return 1
+            [ -n "$artifact" ] || { echo "ETF run ${run_id} has no etf-production artifact"; return 1; }
+            artifact_id="$(printf '%s' "$artifact" | jq -r '.id')"; digest="$(printf '%s' "$artifact" | jq -r '.digest // ""')"
+            api_get "https://api.github.com/repos/${repo}/actions/artifacts/${artifact_id}/zip" > incoming/etf.zip || return 1
+            case "$digest" in sha256:*) echo "${digest#sha256:}  incoming/etf.zip" | sha256sum --check --status || { echo "ETF artifact digest mismatch"; return 1; } ;; esac
+            rm -rf incoming/etf && mkdir -p incoming/etf && unzip -q incoming/etf.zip -d incoming/etf || return 1
+            python -m foundation.presentation.etf_package incoming/etf || return 1
+            echo "CURRENT_SOURCE domain=etf repo=${repo} run=${run_id} artifact=$(printf '%s' "$artifact" | jq -r '.name')"
+            echo "UIP_ETF_PACKAGE_DIR=${PWD}/incoming/etf" >> "$GITHUB_ENV"
+            echo "UIP_ETF_SOURCE_RUN_ID=${run_id}" >> "$GITHUB_ENV"
+          }
+          if ! fetch_etf; then
+            echo "::warning title=ETF package::Not published this cycle (see log above). The certified domains publish as usual."
+          fi
 
       - name: Re-certify current rich source contracts before any PostgreSQL connection
         run: >-

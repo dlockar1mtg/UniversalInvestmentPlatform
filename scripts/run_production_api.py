@@ -55,7 +55,10 @@ if asset_catalog_repository is not None:
 if external_account_repository is not None:
     install_external_account_performance_routes(app, settings, external_account_repository)
 if manual_holding_repository is not None:
-    install_manual_holding_routes(app, settings, manual_holding_repository)
+    install_manual_holding_routes(
+        app, settings, manual_holding_repository,
+        market_prices=None if presentation_repository is None else presentation_repository.etf_latest_prices,
+    )
 if transaction_repository is not None:
     install_hosted_transaction_routes(
         app,
