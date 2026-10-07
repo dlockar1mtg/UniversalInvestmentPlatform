@@ -110,7 +110,7 @@ def test_wiring_publication_api_and_cycle():
     run = (ROOT / "scripts/run_production_api.py").read_text()
     assert "market_prices=None if presentation_repository is None else presentation_repository.etf_latest_prices" in run
     cycle = (ROOT / ".github/workflows/production-publication-cycle.yml").read_text()
-    assert "source dlockar1mtg/StocksETFIntelligencePlatform etf-market-data.yml" in cycle
+    assert "source dlockar1mtg/StocksETFIntelligencePlatform etf-hosted-market-data.yml" in cycle
     assert 'startswith("etf-production-")' in cycle
     assert "python -m foundation.presentation.etf_package incoming/etf" in cycle
     assert "never blocks the certified domains" in cycle
