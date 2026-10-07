@@ -163,6 +163,13 @@ jobs:
             while IFS= read -r candidate; do
               [ -n "$candidate" ] || continue
               candidate_id="$(printf '%s' "$candidate" | jq -r '.id')"
+              # A source run still queued or in progress has published nothing yet (GitHub often
+              # starts schedules hours late), so use the newest finished run; the 30-hour limit
+              # below still refuses anything stale, and a failed finished run still stops the cycle.
+              if [ "$(printf '%s' "$candidate" | jq -r '.status')" != "completed" ]; then
+                echo "SKIPPED_RUNNING_RUN domain=${key} run=${candidate_id} status=$(printf '%s' "$candidate" | jq -r '.status')"
+                continue
+              fi
               if [ "$(printf '%s' "$candidate" | jq -r '.status + "/" + (.conclusion // "")')" = "completed/success" ]; then
                 worked="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/runs/${candidate_id}/jobs?per_page=100" | jq '[.jobs[] | select(.name != "gate" and .conclusion == "success")] | length')"
                 if [ "$worked" = "0" ]; then

@@ -37,6 +37,10 @@ def test_automated_publication_fails_closed_on_latest_source_failure_or_stalenes
     assert 'Latest governed source run is not complete' in text
     assert 'Latest governed source run failed' in text
     assert 'age_hours > 30' in text
+    # A run still in progress is passed over for the newest finished one (run #78 stopped on a
+    # crypto schedule GitHub started six hours late); failed finished runs still stop the cycle.
+    assert 'SKIPPED_RUNNING_RUN domain=' in text
+    assert text.index('SKIPPED_RUNNING_RUN') < text.index('SKIPPED_BACKUP_RUN')
     assert 'No current source artifact found' in text
     assert 'Artifact digest mismatch' in text
     assert 'Re-certify current rich source contracts before any PostgreSQL connection' in text
