@@ -47,3 +47,11 @@ def test_homestead_styles_exist():
     css = _read("rpg_theme.css")
     for selector in (".rpg-home-hero{", ".rpg-home-editor{", ".rpg-action{", ".rpg-home-ledger{", ".rpg-home-tiles{flex:none}"):
         assert selector in css, selector
+
+
+def test_the_deployed_image_installs_what_the_household_plan_imports():
+    # The first staging import failed with a 500: the Docker image (phase_7_3) had no openpyxl.
+    lines = (ROOT / "requirements" / "phase_7_3.txt").read_text().splitlines()
+    names = {line.split(">")[0].split("<")[0].split("[")[0].strip() for line in lines}
+    assert {"openpyxl", "numpy", "pandas", "duckdb"} <= names
+    assert "requirements/phase_7_3.txt" in (ROOT / "deployment" / "Dockerfile").read_text()
