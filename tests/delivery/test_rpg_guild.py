@@ -24,7 +24,7 @@ def test_guild_reads_the_etf_package_and_stays_read_only():
     realm = _read("rpg_realm.js")
     assert 'api("/v1/presentation/etf")' in realm
     assert "api(`/v1/presentation/etf/${encodeURIComponent(symbol)}`)" in realm
-    for heading in ("The Market Board", "The Guild's trials", "Your charter", "Near-identical funds", "Best of each exposure"):
+    for heading in ("The Market Board", "The Guild's trials", "Your charter", "Near-identical funds", "Best of each exposure", "BUY calls only", "Lower official fee (3 years)"):
         assert heading in realm, heading
     assert 'h.valuation_source==="ETF_PACKAGE_CLOSE"' in realm
     assert "provisional, not certified" in realm
