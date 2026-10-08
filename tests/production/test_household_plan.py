@@ -230,3 +230,35 @@ def test_home_prices_grow_to_the_target_month():
     with pytest.raises(H.HouseholdPlanError, match="home_price_growth"):
         plan["settings"]["home_price_growth"] = 0.9
         H.normalize_plan(plan)
+
+
+def test_a_bank_check_in_projects_the_month_end_from_what_is_still_to_come():
+    plan = H.import_books(*books(), "abc")
+    m = plan["months"][3]                                  # Oct 2026: +4000 +3000, rent -1200, car -800, invest 2000
+    inc1, inc2 = plan["income_lines"]
+    m["bank_check"] = {"balance": 2500.0, "as_of": "2026-10-08", "done": [f"income:{inc1}", "expenses:Car"]}
+    rows = H.roll_forward(H.normalize_plan(plan))
+    # still to come: job 2 pay +3000, rent -1200, the 2000 investment transfer
+    assert rows[3]["bank_balance"] == pytest.approx(2500 + 3000 - 1200 - 2000)
+    assert rows[3]["bank_check"] == {"as_of": "2026-10-08", "balance": 2500.0, "still_to_come": -200.0}
+    assert rows[4]["bank_balance"] == pytest.approx(rows[3]["bank_balance"] + rows[4]["net_to_bank"])
+    # a lower car payment counts once it is still to come
+    m["bank_check"]["done"] = [f"income:{inc1}"]
+    m["expenses"]["Car"] = -500.0
+    assert H.roll_forward(H.normalize_plan(plan))[3]["bank_balance"] == pytest.approx(2500 + 3000 - 1200 - 500 - 2000)
+    # an entered month-end balance still wins
+    m["bank_balance"] = 999.0
+    row = H.roll_forward(H.normalize_plan(plan))[3]
+    assert row["bank_balance"] == 999.0 and row["bank_check"] is None
+
+
+@pytest.mark.parametrize("check,message", [
+    ({"as_of": "2026-10-08"}, "needs a balance"),
+    ({"balance": 1, "as_of": "2026-11-01"}, "day in that month"),
+    ({"balance": 1, "as_of": "2026-10-08", "done": ["expenses:Boat"]}, "unknown line"),
+])
+def test_bad_bank_check_ins_are_refused(check, message):
+    plan = H.import_books(*books(), "abc")
+    plan["months"][3]["bank_check"] = check
+    with pytest.raises(H.HouseholdPlanError, match=message):
+        H.normalize_plan(plan)

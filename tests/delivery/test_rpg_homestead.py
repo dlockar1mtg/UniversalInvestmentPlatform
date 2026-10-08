@@ -63,3 +63,11 @@ def test_housing_cards_read_the_v11_out_of_sample_calibration():
                  'pkg.model_version||"V10"'):
         assert text in page, text
     assert page.isascii()
+
+
+def test_the_purse_takes_a_real_bank_balance_and_ticks_what_already_happened():
+    page = _read("homestead.js")
+    for text in ("The purse", "Bank balance now", "data-check-done", "still coming in", "still going out",
+                 "Save the check-in", "bank_check", "stillToCome("):
+        assert text in page, text
+    assert ".rpg-home-check-sum{" in _read("rpg_theme.css")

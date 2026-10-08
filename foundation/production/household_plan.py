@@ -5,6 +5,8 @@ kept as a new immutable version, and the newest version is the plan. Balances en
 are anchors (actuals or the workbook's own starting points); months without one roll forward:
 
     bank        = previous bank + income + expenses (negative) - investment - house-fund contributions
+                  (or, with a bank check-in for the month: the balance you entered + everything not yet
+                  received or paid that month; an entered month-end bank balance still wins)
     retirement  = previous retirement x (1 + plan_retirement_return / 12) + retirement contribution
     investments = previous investments x (1 + plan_investment_return / 12) + investment contribution
     house fund  = previous house fund + house-fund contribution
@@ -133,6 +135,7 @@ def normalize_plan(document) -> dict:
         for key in BALANCES:
             item[key] = _number(raw.get(key), f"{month} {key}", allow_none=True)
         item["note"] = str(raw.get("note") or "")[:500]
+        item["bank_check"] = _bank_check(raw.get("bank_check"), month, income_lines, expense_lines)
         months.append(item)
     if not months:
         raise HouseholdPlanError("the plan has no months")
@@ -140,6 +143,39 @@ def normalize_plan(document) -> dict:
     source = document.get("source") if isinstance(document.get("source"), dict) else {}
     return {"schema_version": SCHEMA, "settings": settings, "income_lines": income_lines,
             "expense_lines": expense_lines, "months": months, "source": source}
+
+
+DATE = re.compile(r"^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$")
+TRANSFERS = ("investment_contribution", "house_fund_contribution")
+
+
+def _bank_check(raw, month: str, income_lines: list[str], expense_lines: list[str]) -> dict | None:
+    """A mid-month bank check-in: today's real balance and which of the month's lines already happened."""
+    if raw in (None, "", {}):
+        return None
+    if not isinstance(raw, dict):
+        raise HouseholdPlanError(f"{month} bank_check must be an object")
+    balance = _number(raw.get("balance"), f"{month} bank check balance", allow_none=True)
+    if balance is None:
+        raise HouseholdPlanError(f"{month} bank check needs a balance")
+    as_of = str(raw.get("as_of") or "")
+    if not DATE.match(as_of) or as_of[:7] != month:
+        raise HouseholdPlanError(f"{month} bank check date must be a day in that month")
+    known = {f"income:{x}" for x in income_lines} | {f"expenses:{x}" for x in expense_lines} | set(TRANSFERS)
+    done = sorted({str(x) for x in raw.get("done") or []})
+    unknown = [x for x in done if x not in known]
+    if unknown:
+        raise HouseholdPlanError(f"{month} bank check names an unknown line: {unknown[0]}")
+    return {"balance": balance, "as_of": as_of, "done": done}
+
+
+def still_to_come(m: dict) -> float:
+    """What a month's lines not yet done will add to the bank (income +, bills and transfers -)."""
+    done = set((m.get("bank_check") or {}).get("done") or [])
+    total = sum(v for k, v in m["income"].items() if f"income:{k}" not in done)
+    total += sum(v for k, v in m["expenses"].items() if f"expenses:{k}" not in done)
+    total -= sum(m[k] for k in TRANSFERS if k not in done)
+    return total
 
 
 def roll_forward(plan: dict) -> list[dict]:
@@ -153,8 +189,11 @@ def roll_forward(plan: dict) -> list[dict]:
         net = income + expenses
         to_bank = net - m["investment_contribution"] - m["house_fund_contribution"]
         first = k == 0
+        check = m.get("bank_check")
+        bank = (m["bank_balance"] if m["bank_balance"] is not None
+                else check["balance"] + still_to_come(m) if check else prev["bank_balance"] + to_bank)
         bal = {
-            "bank_balance": m["bank_balance"] if m["bank_balance"] is not None else prev["bank_balance"] + to_bank,
+            "bank_balance": bank,
             "retirement_balance": m["retirement_balance"] if m["retirement_balance"] is not None
             else (0.0 if first else prev["retirement_balance"] * (1 + rr)) + m["retirement_contribution"],
             "investment_balance": m["investment_balance"] if m["investment_balance"] is not None
@@ -171,6 +210,8 @@ def roll_forward(plan: dict) -> list[dict]:
                      "retirement_contribution": m["retirement_contribution"],
                      **{key: round(v, 2) for key, v in bal.items()},
                      "anchored": [key for key in BALANCES if m[key] is not None],
+                     "bank_check": None if not check or m["bank_balance"] is not None else
+                     {"as_of": check["as_of"], "balance": check["balance"], "still_to_come": round(still_to_come(m), 2)},
                      "net_worth": round(worth, 2),
                      "net_worth_gain": None if first else round(worth - rows[-1]["net_worth"], 2)})
         prev = bal

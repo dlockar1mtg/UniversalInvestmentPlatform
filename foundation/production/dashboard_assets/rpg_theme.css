@@ -440,3 +440,38 @@ tbody tr:hover{background:rgba(217,180,90,.05)}
 .rpg-home-market .rpg-action[disabled]{opacity:.65;cursor:default}
 .rpg-home-stale{border-left:3px solid #b5862f;padding-left:10px}
 .rpg-home-grown{display:block;font-size:.85rem;color:#b9a98a;font-weight:400}
+/* The purse: a mid-month bank check-in */
+.rpg-home-purse{border-left-color:#b5862f}
+.rpg-home-check{display:flex;flex-direction:column;gap:12px}
+.rpg-home-check input[type=date]{background:#15110c;color:#f1e3c2;border:1px solid #6b5432;padding:6px 8px;font:inherit;font-family:var(--font-body);color-scheme:dark}
+.rpg-home-check-table{min-width:0;max-width:640px}
+.rpg-home-check-table input[type=number]{width:120px;text-align:right;background:#15110c;color:#f1e3c2;border:1px solid #6b5432;padding:5px 8px;font:inherit;font-family:var(--font-body)}
+.rpg-home-check-table input:focus-visible{outline:2px solid #f1d78f;outline-offset:1px}
+.rpg-home-check-table .rpg-check{display:inline-flex;align-items:center;gap:6px;color:#d8cbb0}
+.rpg-home-check-table .rpg-check input{accent-color:#4d7a3a;width:16px;height:16px}
+.rpg-home-check-group th{font-family:"Alegreya SC",var(--font-body);color:#e2c27a;background:#1c1814;font-weight:normal}
+.rpg-home-check-sum{display:flex;flex-wrap:wrap;gap:6px 18px;align-items:baseline;padding:10px 14px;border:1px solid #5f4a2c;background:#1c1814;font-variant-numeric:tabular-nums}
+.rpg-home-check-sum strong{color:#f1d78f;font-size:1.1rem}
+.rpg-home-ledger td.rpg-home-checked{color:#e2c27a;font-style:italic}
+@media (max-width:720px){.rpg-home-check-table input[type=number]{width:92px}.rpg-home-check-table .rpg-check-verb{display:none}.rpg-home-check-table th,.rpg-home-check-table td{padding-left:6px;padding-right:6px}}
+/* Market Board: spreadsheet-style sort and column filters */
+.rpg-sort{display:inline-flex;align-items:center;gap:2px;padding:0;background:none;border:0;color:inherit;font:inherit;text-align:inherit;cursor:pointer;letter-spacing:inherit;text-transform:inherit}
+.rpg-sort:hover,.rpg-sort.is-on{color:#f1d78f}
+.rpg-sort:focus-visible{outline:2px solid #a9cf92;outline-offset:2px}
+th.num .rpg-sort{justify-content:flex-end;width:100%}
+.rpg-colfilters td{padding-top:4px;padding-bottom:8px;vertical-align:top;background:#1c1814}
+.rpg-colfilter-text,.rpg-colfilter-num{background:#15110c;color:#f1e3c2;border:1px solid #6b5432;padding:4px 6px;font:inherit;font-family:var(--font-body);font-size:.85rem}
+.rpg-colfilter-text{width:150px}
+.rpg-colfilter-num{width:64px;text-align:right}
+.rpg-colfilter-num.is-bad{border-color:#c0583f}
+.rpg-colfilter-text:focus-visible,.rpg-colfilter-num:focus-visible{outline:2px solid #a9cf92;outline-offset:1px}
+.rpg-colfilter summary{cursor:pointer;list-style:none;padding:4px 8px;border:1px solid #6b5432;background:#15110c;color:#f1e3c2;font-size:.85rem;white-space:nowrap}
+.rpg-colfilter summary::-webkit-details-marker{display:none}
+.rpg-colfilter[open] summary{border-color:#d9b45a;color:#f1d78f}
+.rpg-colfilter summary:focus-visible{outline:2px solid #a9cf92;outline-offset:1px}
+.rpg-colfilter-menu{display:flex;flex-direction:column;gap:6px;margin-top:6px;padding:8px 10px;border:1px solid #6b5432;background:#15110c;max-height:260px;overflow:auto;min-width:150px}
+.rpg-colfilter-menu .rpg-check{display:flex;align-items:center;gap:6px;color:#d8cbb0;font-size:.88rem;white-space:nowrap}
+.rpg-colfilter-menu .rpg-check input{accent-color:#4d7a3a;width:15px;height:15px}
+.rpg-board-count{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;margin-bottom:6px}
+.rpg-board-note{margin:0 0 8px;color:#d8cbb0}
+.rpg-board-hint{align-self:center;padding-bottom:6px}
