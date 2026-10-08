@@ -194,6 +194,48 @@ class PostgresPresentationRepository:
             if cursor.rowcount != 1:
                 raise ValueError("Only a STAGED publication may be rejected")
 
+    def prune(self, keep_superseded: int = 2) -> dict[str, int]:
+        """Delete old presentation versions so the database stays under its size limit.
+
+        Kept: the ACTIVE publication and the newest `keep_superseded` SUPERSEDED ones (for rollback).
+        Deleted: older SUPERSEDED versions and every REJECTED or abandoned STAGED one. Publications are
+        projections rebuilt from the domain packages, never the analytical record, so nothing unique is
+        lost. VACUUM then makes the freed space reusable by the next publication (Neon counts the files,
+        and a plain VACUUM does not shrink them, but new rows fill the freed pages instead of growing them).
+        """
+        if keep_superseded < 1:
+            raise ValueError("keep at least one superseded publication for rollback")
+        with closing(self._connection_factory()) as db, db, db.cursor() as cursor:
+            cursor.execute("""
+                SELECT publication_id FROM presentation_publications
+                WHERE publication_status <> 'ACTIVE'
+                  AND publication_id NOT IN (SELECT publication_id FROM presentation_active_publication)
+                  AND publication_id NOT IN (
+                      SELECT publication_id FROM presentation_publications
+                      WHERE publication_status = 'SUPERSEDED'
+                      ORDER BY published_at_utc DESC, publication_id DESC LIMIT %s)
+            """, (keep_superseded,))
+            doomed = [row[0] for row in cursor.fetchall()]
+            records = 0
+            for publication_id in doomed:
+                cursor.execute("DELETE FROM presentation_records WHERE publication_id=%s", (publication_id,))
+                records += max(cursor.rowcount, 0)
+                cursor.execute("DELETE FROM presentation_publications WHERE publication_id=%s", (publication_id,))
+        vacuumed = False
+        if doomed:
+            db = self._connection_factory()
+            try:
+                db.autocommit = True                      # VACUUM cannot run inside a transaction
+                with db.cursor() as cursor:
+                    cursor.execute("VACUUM (ANALYZE) presentation_records")
+                    cursor.execute("VACUUM (ANALYZE) presentation_publications")
+                vacuumed = True
+            except Exception:                             # space is still reclaimed later by autovacuum
+                vacuumed = False
+            finally:
+                db.close()
+        return {"publications_deleted": len(doomed), "records_deleted": records, "vacuumed": vacuumed}
+
     def active_metadata(self) -> dict[str, object] | None:
         with closing(self._connection_factory()) as db, db.cursor() as cursor:
             cursor.execute("""

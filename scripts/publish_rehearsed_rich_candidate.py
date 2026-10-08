@@ -244,7 +244,11 @@ def main() -> int:
         store = PostgresPresentationRepository.from_dsn(dsn)
         store.initialize()
         previous = store.active_metadata()
+        # Retention before staging: the hosted database has a fixed size limit (2026-10-08: it filled
+        # after ~80 publications were all kept), so old versions go before the new one is written.
+        retention_before = store.prune(keep_superseded=2)
         result = publish_presentation_bundle(store, publication)
+        retention_after = store.prune(keep_superseded=2)
         active = store.active_metadata()
         if result.status != "ACTIVE" or not active or active.get("publication_id") != publication_id:
             raise RuntimeError("Validated rich publication did not become the active PostgreSQL publication")
@@ -258,6 +262,7 @@ def main() -> int:
             "record_count": len(publication.records),
             "crypto_current_price_record_count": crypto_current_price_count,
             "previous_active_publication_id": None if not previous else previous.get("publication_id"),
+            "retention": {"policy": "ACTIVE_PLUS_2_SUPERSEDED", "before": retention_before, "after": retention_after},
             "active_publication_id": active.get("publication_id"),
             "imports": imports,
             "preactivation_gate": preactivation,
