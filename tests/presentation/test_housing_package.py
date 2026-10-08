@@ -93,3 +93,20 @@ def test_housing_records_leave_the_certified_publication_checks_passing(tmp_path
 
     base = valid_publication()
     validate_publication_bundle(replace(base, records=base.records + tuple(HP.build_housing_records(write(tmp_path / "pkg")))))
+
+
+RATES = {"as_of_month": "2026-10", "mortgage_30yr_month_avg": 7.34, "mortgage_30yr_latest_weekly": {"date": "2026-10-08", "rate": 7.4},
+         "horizons": [{"months": 36, "month": "2029-10", "rule": "NO_CHANGE", "center": 7.34, "p10": 4.98, "p25": 5.96, "p50": 7.08,
+                       "p75": 7.96, "p90": 10.12, "status": "TESTED"}], "test": {}}
+
+
+def test_the_rates_outlook_travels_with_the_package(tmp_path):
+    records = HP.build_housing_records(write(tmp_path / "pkg", contract_changes={"contract_version": "1.2.0", "rates_outlook": RATES}))
+    package = next(r for r in records if r.record_type == "housing_package")
+    assert package.payload["rates_outlook"]["horizons"][0]["p50"] == 7.08
+
+
+def test_a_disordered_rates_band_is_refused(tmp_path):
+    bad = {**RATES, "horizons": [{**RATES["horizons"][0], "p10": 9.0}]}
+    with pytest.raises(HP.HousingPackageError, match="rates outlook"):
+        HP.verify_housing_package(write(tmp_path / "pkg", contract_changes={"rates_outlook": bad}))

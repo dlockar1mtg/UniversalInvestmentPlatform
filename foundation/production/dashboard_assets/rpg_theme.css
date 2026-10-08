@@ -475,3 +475,10 @@ th.num .rpg-sort{justify-content:flex-end;width:100%}
 .rpg-board-count{display:flex;flex-wrap:wrap;gap:6px 16px;align-items:baseline;margin-bottom:6px}
 .rpg-board-note{margin:0 0 8px;color:#d8cbb0}
 .rpg-board-hint{align-self:center;padding-bottom:6px}
+/* Homestead: mortgage-rate outlook */
+.rpg-home-rates{border-left-color:#4f7fa8}
+.rpg-home-rate-tiles{grid-template-columns:repeat(auto-fit,minmax(180px,1fr));flex:none}
+.rpg-home-rates-k{margin:14px 0 4px;font-family:"Alegreya SC",var(--font-body);color:#e2c27a}
+.rpg-home-rates-table{min-width:560px}
+.rpg-home-rates-table th small{font-family:var(--font-body);color:#d8cbb0;font-size:.85rem}
+.rpg-home-rates-why{color:#d8cbb0;margin:10px 0 12px}

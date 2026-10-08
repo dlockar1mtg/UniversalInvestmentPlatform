@@ -71,3 +71,11 @@ def test_the_purse_takes_a_real_bank_balance_and_ticks_what_already_happened():
                  "Save the check-in", "bank_check", "stillToCome("):
         assert text in page, text
     assert ".rpg-home-check-sum{" in _read("rpg_theme.css")
+
+
+def test_homestead_shows_the_mortgage_rate_outlook_and_payment_range():
+    page = _read("homestead.js")
+    for text in ("rates_outlook", "Mortgage rates around", "Market's curve", "data-home-use-rate", "missed the rate",
+                 "mortgages follow the 10-year Treasury"):
+        assert text in page, text
+    assert ".rpg-home-rates{" in _read("rpg_theme.css")
