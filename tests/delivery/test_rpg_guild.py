@@ -37,3 +37,14 @@ def test_guild_styles_exist():
     css = _read("rpg_theme.css")
     for selector in (".rpg-guild-hero{", ".rpg-guild-table{", ".rpg-fund-pick{", ".rpg-bar.etf>i{", ".rpg-board-filters{"):
         assert selector in css, selector
+
+
+def test_guild_shows_three_year_outlooks_without_ranking_single_funds():
+    realm = _read("rpg_realm.js")
+    for text in ("The next three years", "Where three years of growth could come from", "Chance of a loss",
+                 "TOO CAUTIOUS", "MOVES_FAR_MORE_THAN_ITS_REFERENCE", "Next 3 years, typical"):
+        assert text in realm, text
+    assert '["proj",' not in realm and "proj:f=>" not in realm      # growth compares groups, never single funds
+    assert 'sort:"call"' in realm
+    css = _read("rpg_theme.css")
+    assert ".rpg-outlook-tiles{" in css

@@ -428,3 +428,8 @@ tbody tr:hover{background:rgba(217,180,90,.05)}
 .rpg-home-mix label{flex:0 1 130px}
 .rpg-home-mix input[type=number]{min-width:0;width:100%}
 .rpg-home-sure{margin-top:14px}
+/* Merchants' Guild: 3-year outlook */
+.rpg-outlook-tiles{flex:none;grid-template-columns:repeat(auto-fit,minmax(180px,1fr))}
+.rpg-outlook-why{color:#d8cbb0}
+.rpg-growth .rpg-table{min-width:640px}
+.rpg-growth tr.rpg-muted th .rpg-link{color:#b9a98a}
