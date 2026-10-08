@@ -35,15 +35,26 @@ function roll(plan){
     const income=sum(m.income),expenses=sum(m.expenses),net=income+expenses;
     const toBank=net-(num(m.investment_contribution)||0)-(num(m.house_fund_contribution)||0);
     const pick=(f,calc)=>num(m[f])!==null?num(m[f]):calc;
-    const b={bank_balance:pick("bank_balance",prev.bank_balance+toBank),
+    const check=m.bank_check&&num(m.bank_check.balance)!==null?m.bank_check:null;
+    const b={bank_balance:pick("bank_balance",check?num(check.balance)+stillToCome(m,check.done):prev.bank_balance+toBank),
       retirement_balance:pick("retirement_balance",(k?prev.retirement_balance*(1+rr):0)+(num(m.retirement_contribution)||0)),
       investment_balance:pick("investment_balance",(k?prev.investment_balance*(1+ri):0)+(num(m.investment_contribution)||0)),
       house_fund_balance:pick("house_fund_balance",prev.house_fund_balance+(num(m.house_fund_contribution)||0)),
       home_equity:pick("home_equity",prev.home_equity)};
     prev=b;
     return {month:m.month,income,expenses,net,toBank,...b,net_worth:b.bank_balance+b.retirement_balance+b.investment_balance+b.house_fund_balance+b.home_equity,
-      anchored:["bank_balance","retirement_balance","investment_balance"].filter(f=>num(m[f])!==null)};
+      anchored:["bank_balance","retirement_balance","investment_balance"].filter(f=>num(m[f])!==null),
+      checked:check&&num(m.bank_balance)===null?check.as_of:null};
   });
+}
+/* What the month's lines not yet done still add to the bank: income +, bills (stored negative) and transfers -. */
+const TRANSFERS=[["investment_contribution","Into investments"],["house_fund_contribution","Into the house fund"]];
+function stillToCome(m,done){
+  const d=new Set(done||[]);let t=0;
+  for(const [k,v] of Object.entries(m.income||{}))if(!d.has(`income:${k}`))t+=num(v)||0;
+  for(const [k,v] of Object.entries(m.expenses||{}))if(!d.has(`expenses:${k}`))t+=num(v)||0;
+  for(const [k] of TRANSFERS)if(!d.has(k))t-=num(m[k])||0;
+  return t;
 }
 
 /* ---------------- loading ---------------- */
@@ -122,10 +133,45 @@ function capacity(p){
 
 function ledger(){
   const rows=roll(S.plan),now=nowMonth();
-  const body=rows.map(r=>`<tr class="${r.month===S.pick?"is-picked":""}${r.month===now?" is-now":""}"><th scope="row"><button type="button" class="rpg-btn rpg-fund-pick" data-home-month="${esc(r.month)}" aria-pressed="${r.month===S.pick}"><strong>${esc(monthLabel(r.month))}</strong><span>${r.anchored.length?"actuals entered":r.month<now?"plan only":r.month===now?"this month":""}</span></button></th><td class="num">${money(r.income)}</td><td class="num">${money(r.expenses)}</td><td class="num">${money(r.net)}</td><td class="num">${money(S.plan.months.find(m=>m.month===r.month).investment_contribution)}</td><td class="num${r.anchored.includes("bank_balance")?" rpg-home-actual":""}">${money(r.bank_balance)}</td><td class="num${r.anchored.includes("retirement_balance")?" rpg-home-actual":""}">${money(r.retirement_balance)}</td><td class="num${r.anchored.includes("investment_balance")?" rpg-home-actual":""}">${money(r.investment_balance)}</td><td class="num"><strong>${money(r.net_worth)}</strong></td></tr>`).join("");
+  const body=rows.map(r=>`<tr class="${r.month===S.pick?"is-picked":""}${r.month===now?" is-now":""}"><th scope="row"><button type="button" class="rpg-btn rpg-fund-pick" data-home-month="${esc(r.month)}" aria-pressed="${r.month===S.pick}"><strong>${esc(monthLabel(r.month))}</strong><span>${r.checked?`bank checked ${esc(dayText(r.checked))}`:r.anchored.length?"actuals entered":r.month<now?"plan only":r.month===now?"this month":""}</span></button></th><td class="num">${money(r.income)}</td><td class="num">${money(r.expenses)}</td><td class="num">${money(r.net)}</td><td class="num">${money(S.plan.months.find(m=>m.month===r.month).investment_contribution)}</td><td class="num${r.anchored.includes("bank_balance")?" rpg-home-actual":r.checked?" rpg-home-checked":""}"${r.checked?` title="Projected from your ${esc(dayText(r.checked))} bank balance"`:""}>${money(r.bank_balance)}</td><td class="num${r.anchored.includes("retirement_balance")?" rpg-home-actual":""}">${money(r.retirement_balance)}</td><td class="num${r.anchored.includes("investment_balance")?" rpg-home-actual":""}">${money(r.investment_balance)}</td><td class="num"><strong>${money(r.net_worth)}</strong></td></tr>`).join("");
   return `<section class="rpg-stone rpg-guild-ledger" aria-labelledby="rpg-home-led-h"><div class="rpg-section-head"><h2 id="rpg-home-led-h" class="rpg-stone-title">The ledger of months</h2><span class="rpg-crumb-note">Pick a month to edit it. Gold figures are actuals you entered; the rest roll forward from them.</span></div>${S.dirty?`<div class="rpg-home-dirty" role="status"><span>Unsaved changes to the plan.</span><button type="button" class="rpg-btn rpg-action" data-home-save>Save the plan</button><button type="button" class="rpg-btn rpg-link" data-home-discard>Discard</button></div>`:""}<div class="rpg-table-wrap"><table class="rpg-table rpg-guild-table rpg-home-ledger"><thead><tr><th>Month</th><th class="num">Income</th><th class="num">Bills</th><th class="num">Net</th><th class="num">Invested</th><th class="num">Bank</th><th class="num">Retirement</th><th class="num">Investments</th><th class="num">Net worth</th></tr></thead><tbody>${body}</tbody></table></div><div id="rpg-home-editor">${editor()}</div></section>`;
 }
 
+const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
+const dayText=d=>/^\d{4}-\d{2}-\d{2}$/.test(String(d||""))?`${MONTHS[Number(d.slice(5,7))-1]} ${Number(d.slice(8,10))}`:"\u2014";
+function purse(){
+  const month=nowMonth(),m=S.plan.months.find(x=>x.month===month);
+  if(!m)return "";
+  const c=m.bank_check||{},done=new Set(c.done||[]);
+  const line=(key,label,amount,sign,verb)=>{const shown=sign<0?Math.abs(num(amount)||0):(num(amount)||0);return `<tr><th scope="row">${esc(label)}</th><td class="num"><input type="number" step="0.01" min="0" inputmode="decimal" aria-label="${esc(label)} amount" data-check-amount="${esc(key)}" data-sign="${sign}" value="${shown?esc(shown):""}"></td><td><label class="rpg-check"><input type="checkbox" data-check-done="${esc(key)}"${done.has(key)?" checked":""} aria-label="${esc(label)} ${esc(verb)}"><span class="rpg-check-verb">${esc(verb)}</span></label></td></tr>`};
+  const keep=(k,v)=>(num(v)||0)!==0||done.has(k);
+  const ordered=(obj,names)=>(names||Object.keys(obj)).filter(k=>k in obj).map(k=>[k,obj[k]]);
+  const inc=ordered(m.income,S.plan.income_lines).filter(([k,v])=>keep(`income:${k}`,v)).map(([k,v])=>line(`income:${k}`,k,v,1,"received")).join("");
+  const exp=ordered(m.expenses,S.plan.expense_lines).filter(([k,v])=>keep(`expenses:${k}`,v)).map(([k,v])=>line(`expenses:${k}`,k,v,-1,"paid")).join("");
+  const tr=TRANSFERS.filter(([k])=>keep(k,m[k])).map(([k,l])=>line(k,l,m[k],-1,"moved")).join("");
+  const has=num(c.balance)!==null;
+  return `<section class="rpg-stone rpg-road rpg-home-purse" aria-labelledby="rpg-home-purse-h"><div class="rpg-section-head"><h2 id="rpg-home-purse-h" class="rpg-stone-title">The purse \u00b7 ${esc(monthLabel(month))}</h2><span class="rpg-crumb-note">${has?`Checked ${esc(dayText(c.as_of))}`:"Enter your real bank balance to project the month's end"}</span></div><form class="rpg-home-check" data-home-check="${esc(month)}"><div class="rpg-board-filters rpg-home-grid"><label>Bank balance now<input type="number" step="0.01" inputmode="decimal" data-check-balance value="${has?esc(c.balance):""}" placeholder="What your account shows"></label><label>As of<input type="date" data-check-asof value="${esc(has?c.as_of:today())}" min="${esc(month)}-01" max="${esc(month)}-31"></label></div><p class="rpg-vault-why">Tick what has already come in or gone out this month: your balance already includes those. Change an amount if the real one differs (a smaller car payment, say); it changes the month in the plan too.</p><div class="rpg-table-wrap"><table class="rpg-table rpg-home-check-table"><thead><tr><th>This month</th><th class="num">Amount</th><th>Done?</th></tr></thead><tbody>${inc?`<tr class="rpg-home-check-group"><th colspan="3">Income</th></tr>${inc}`:""}${exp?`<tr class="rpg-home-check-group"><th colspan="3">Bills</th></tr>${exp}`:""}${tr?`<tr class="rpg-home-check-group"><th colspan="3">Savings moved out of the bank</th></tr>${tr}`:""}</tbody></table></div><div class="rpg-home-check-sum" data-check-sum role="status">${purseSum(m,c.balance,c.done)}</div><div class="rpg-home-actions"><button type="submit" class="rpg-btn rpg-action">Save the check-in</button>${has?`<button type="button" class="rpg-btn rpg-link" data-home-check-clear>Clear the check-in</button>`:""}</div></form></section>`;
+}
+function purseSum(m,balance,done){
+  const b=num(balance);
+  if(b===null)return `<span class="rpg-muted">Enter the balance to see where the month ends.</span>`;
+  const d=new Set(done||[]);let inc=0,out=0;
+  for(const [k,v] of Object.entries(m.income||{}))if(!d.has(`income:${k}`))inc+=num(v)||0;
+  for(const [k,v] of Object.entries(m.expenses||{}))if(!d.has(`expenses:${k}`))out-=num(v)||0;
+  for(const [k] of TRANSFERS)if(!d.has(k))out+=num(m[k])||0;
+  return `<span>${money(b,2)} now</span><span class="rpg-up">+ ${money(inc,2)} still coming in</span><span class="rpg-down">\u2212 ${money(out,2)} still going out</span><strong>= ${money(b+inc-out,2)} at the end of ${esc(monthLabel(m.month))}</strong>`;
+}
+function readCheck(form){
+  const month=form.dataset.homeCheck,m=clone(S.plan.months.find(x=>x.month===month));
+  form.querySelectorAll("[data-check-amount]").forEach(el=>{
+    const k=el.dataset.checkAmount,sign=Number(el.dataset.sign),v=el.value===""?0:Math.abs(Number(el.value))*sign;
+    if(k.includes(":")){const [g,l]=k.split(/:(.*)/s);m[g][l]=v}else m[k]=Math.abs(v);
+  });
+  const done=[...form.querySelectorAll("[data-check-done]:checked")].map(el=>el.dataset.checkDone);
+  const raw=form.querySelector("[data-check-balance]").value;
+  m.bank_check=raw===""?null:{balance:Number(raw),as_of:form.querySelector("[data-check-asof]").value||today(),done};
+  return m;
+}
 function field(id,label,value,extra=""){return `<label>${esc(label)}<input type="number" step="0.01" data-home-field="${esc(id)}" value="${value===null||value===undefined?"":esc(value)}"${extra}></label>`}
 function editor(){
   const m=S.plan.months.find(x=>x.month===S.pick);
@@ -199,7 +245,7 @@ function render(){
   if(!S.plan){view.innerHTML=`${crumbs("Household plan \u00b7 not set up yet")}${message()}<section class="rpg-stone rpg-guild-hero"><div><div class="rpg-parch-kicker">The Homestead</div><p class="rpg-guild-counsel">Bring your Income &amp; Net Worth Tracker into the UIP once. After that the plan lives here: edit any month, enter real balances as months pass, and see the range of where the plan lands and what it means for the house.</p></div></section>${importPanel()}`;return}
   const v=S.doc.version,p=S.proj;
   const note=`Plan saved ${v?new Date(v.recorded_at).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}):"\u2014"} \u00b7 ${monthLabel(S.plan.months[0].month)} to ${monthLabel(S.plan.months[S.plan.months.length-1].month)}${S.tried?" \u00b7 showing unsaved settings":""}`;
-  view.innerHTML=`${crumbs(note)}${message()}${p?goal(p)+fan(p)+targetTiles(p)+capacity(p)+housingSection():`<p class="rpg-parch-note">Working out the ranges\u2026</p>`}${ledger()}${settingsForm()}${importPanel()}${p?assumptions(p):""}`;
+  view.innerHTML=`${crumbs(note)}${message()}${p?goal(p)+fan(p)+targetTiles(p)+capacity(p)+housingSection():`<p class="rpg-parch-note">Working out the ranges\u2026</p>`}${purse()}${ledger()}${settingsForm()}${importPanel()}${p?assumptions(p):""}`;
 }
 function setMsg(kind,text){S.msg=text?[kind,text]:null}
 async function savePlan(plan,okText){
@@ -219,11 +265,21 @@ function bind(view){
     if(t.hasAttribute("data-home-try")){S.tried=readSettings(t.closest("form"));setMsg(null);S.proj=null;render();refreshProjection(true);return}
     if(t.hasAttribute("data-home-keep")){const plan=clone(S.plan);const set=readSettings(t.closest("form"));plan.settings={...plan.settings,...set};savePlan(plan,"Settings saved into the plan.");return}
     if(t.hasAttribute("data-home-import-save")){const plan=S.preview.plan;S.preview=null;savePlan(plan,"The workbook is now your plan in the UIP.");return}
-    if(t.hasAttribute("data-home-import-cancel")){S.preview=null;render()}
+    if(t.hasAttribute("data-home-import-cancel")){S.preview=null;render();return}
+    if(t.hasAttribute("data-home-check-clear")){const plan=clone(S.plan);const m=plan.months.find(x=>x.month===nowMonth());if(m){m.bank_check=null;savePlan(plan,"Check-in cleared. The month rolls forward from the plan again.")}}
   });
+  const live=event=>{const form=event.target.closest("[data-home-check]");if(!form)return;const m=readCheck(form);const box=form.querySelector("[data-check-sum]");if(box)box.innerHTML=purseSum(m,m.bank_check?.balance,m.bank_check?.done)};
+  view.addEventListener("input",live);view.addEventListener("change",live);
   view.addEventListener("submit",async event=>{
     const form=event.target;event.preventDefault();
     if(form.dataset.homeEditor){applyEdit(form,false);return}
+    if(form.dataset.homeCheck){
+      const m=readCheck(form);
+      if(m.bank_check&&!Number.isFinite(m.bank_check.balance)){setMsg("bad","The bank balance must be a number.");render();return}
+      const replaced=m.bank_check&&num(m.bank_balance)!==null;
+      if(replaced)m.bank_balance=null;                  // a check-in is newer than a month-end figure typed in advance
+      const plan=clone(S.plan);plan.months[plan.months.findIndex(x=>x.month===m.month)]=m;
+      savePlan(plan,m.bank_check?`Check-in saved. ${monthLabel(m.month)} now ends from your real balance${replaced?" (it replaces the month-end bank figure the plan had)":""}.`:"Check-in cleared.");return}
     if(form.hasAttribute("data-home-import")){
       const file=form.querySelector("[data-home-file]")?.files?.[0];
       if(!file){setMsg("bad","Choose the workbook file first.");render();return}

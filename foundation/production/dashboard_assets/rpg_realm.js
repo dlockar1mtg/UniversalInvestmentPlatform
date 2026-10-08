@@ -3,7 +3,7 @@
    Read-only presentation: nothing here records, changes or executes anything. */
 (()=>{
 "use strict";
-const state={home:null,catalog:null,catalogPromise:null,invFilter:"all",invPick:null,guild:null,guildPromise:null,guildPick:null,guildDetail:null,guildFilter:{family:"",group:"",q:"",mine:false,best:false,buys:false,sort:"group",limit:50}};
+const state={home:null,catalog:null,catalogPromise:null,invFilter:"all",invPick:null,guild:null,guildPromise:null,guildPick:null,guildDetail:null,guildFilter:{family:"",group:"",q:"",mine:false,best:false,buys:false,sort:"group",dir:"desc",cols:{},nums:{},limit:50}};
 const byId=id=>document.getElementById(id);
 const esc=value=>{const node=document.createElement("span");node.textContent=String(value??"");return node.innerHTML};
 const num=value=>{if(value===null||value===undefined||value==="")return null;const n=Number(value);return Number.isFinite(n)?n:null};
@@ -511,31 +511,85 @@ function looseWhy(f){
 }
 const CALL_ORDER={BUY:0,ACCUMULATE:1,HOLD:2,AVOID:3};
 function guildFamily(f){return f.group_family||"NONE"}
+/* The Market Board works like a spreadsheet: click a header to sort (again to flip), filter any column. */
+const fromHigh=f=>num(f.drawdown_3y_high)!==null?num(f.drawdown_3y_high):num(f.drawdown_now);
+const projP50=f=>num(f.projection_3y?.p50)??num(f.outlook_3y?.p50);
+const callLabel=f=>CALL_ORDER[f.ranking_call]===undefined?"No call":callText(f)[0];
+const BOARD_COLS=[
+  {k:"fund",label:"Fund",text:true,val:f=>String(f.symbol)},
+  {k:"group",label:"Peer group",text:true,cat:f=>groupName(f.peer_group),val:f=>groupName(f.peer_group)},
+  {k:"close",label:"Close",val:f=>num(f.close)},
+  {k:"1y",label:"1 year",pct:true,val:f=>num(f.return_1y)},
+  {k:"3y",label:"3 years, a year",pct:true,val:f=>num(f.annualized_3y)},
+  {k:"p3y",label:"Next 3 years, typical",pct:true,val:projP50},
+  {k:"peak",label:"From 3-year high",pct:true,val:fromHigh},
+  {k:"yield",label:"Yield",pct:true,val:f=>num(f.yield_12m)},
+  {k:"fee",label:"Fee",pct:true,val:f=>num(f.expense_ratio)},
+  {k:"call",label:"Call",cat:callLabel,val:f=>CALL_ORDER[f.ranking_call]===undefined?null:-CALL_ORDER[f.ranking_call]+(num(f.cost_percentile_in_group)??0)/1000,order:["BUY","ACCUMULATE","HOLD","AVOID","No call"]},
+  {k:"which",label:"Which fund",cat:f=>implText(f)[0],val:f=>implText(f)[0]==="REDIRECT"?0:1},
+  {k:"when",label:"When",cat:f=>whenText(f.when_to_buy)[0],val:f=>({"BUY NOW":2,STEADY:1,WAIT:0})[whenText(f.when_to_buy)[0]]??null},
+  {k:"worth",label:"Your worth",val:(f,h)=>h[f.symbol]?num(h[f.symbol].worth):null},
+];
+/* "> 5", ">= 5", "< 0.5", "5..10", "5 to 10" or a plain number (at least). Percent columns read in percent. */
+function parseNumFilter(text,isPct){
+  const t=String(text||"").trim().replace(/[%$,\s]/g,"").toLowerCase();if(!t)return null;
+  const scale=v=>isPct?v/100:v;
+  let m=t.match(/^(-?\d*\.?\d+)(?:\.\.|to)(-?\d*\.?\d+)$/);
+  if(m){const a=scale(Number(m[1])),b=scale(Number(m[2]));return v=>v!==null&&v>=Math.min(a,b)&&v<=Math.max(a,b)}
+  m=t.match(/^(>=|<=|>|<|=)?(-?\d*\.?\d+)$/);
+  if(!m)return undefined;
+  const x=scale(Number(m[2])),op=m[1]||">=";
+  return v=>v!==null&&(op===">"?v>x:op===">="?v>=x:op==="<"?v<x:op==="<="?v<=x:Math.abs(v-x)<1e-9);
+}
 function guildFiltered(funds,held){
   const st=state.guildFilter;
   const q=st.q.trim().toUpperCase();
-  let out=funds.filter(f=>(st.family==="ALL"||(!st.family?guildFamily(f)!=="NONE"||!!held[f.symbol]:guildFamily(f)===st.family))&&(!st.group||f.peer_group===st.group)&&(!st.mine||held[f.symbol])&&(!st.buys||f.ranking_call==="BUY")&&(!st.best||f.implementation?.call==="BEST_IN_CLUSTER"||f.implementation?.call==="NO_NEAR_DUPLICATE")&&(!q||String(f.symbol).includes(q)||String(f.name||"").toUpperCase().includes(q)));
+  const cats=BOARD_COLS.filter(c=>c.cat&&(st.cols[c.k]||[]).length).map(c=>[c,new Set(st.cols[c.k])]);
+  const nums=BOARD_COLS.filter(c=>!c.text&&!c.cat&&st.nums[c.k]).map(c=>[c,parseNumFilter(st.nums[c.k],c.pct)]).filter(([,fn])=>typeof fn==="function");
+  let out=funds.filter(f=>(st.family==="ALL"||(!st.family?guildFamily(f)!=="NONE"||!!held[f.symbol]:guildFamily(f)===st.family))&&(!st.group||f.peer_group===st.group)&&(!st.mine||held[f.symbol])&&(!st.buys||f.ranking_call==="BUY")&&(!st.best||f.implementation?.call==="BEST_IN_CLUSTER"||f.implementation?.call==="NO_NEAR_DUPLICATE")&&(!q||String(f.symbol).includes(q)||String(f.name||"").toUpperCase().includes(q))
+    &&cats.every(([c,set])=>set.has(c.cat(f)))&&nums.every(([c,fn])=>fn(c.val(f,held))));
   if(st.sort==="group")return out.slice().sort((a,b)=>(held[b.symbol]?1:0)-(held[a.symbol]?1:0)||groupName(a.peer_group).localeCompare(groupName(b.peer_group))||(num(b.annualized_3y)??-9)-(num(a.annualized_3y)??-9));
-  const key={call:f=>CALL_ORDER[f.ranking_call]===undefined?null:-CALL_ORDER[f.ranking_call]-(num(f.cost_percentile_in_group)===null?0:-num(f.cost_percentile_in_group)/1000),"3y":f=>num(f.annualized_3y),"1y":f=>num(f.return_1y),fee:f=>num(f.expense_ratio)===null?null:-num(f.expense_ratio),peak:f=>num(f.drawdown_now),yield:f=>num(f.yield_12m)}[st.sort];
-  if(key)out=out.slice().sort((a,b)=>(key(b)??-1e9)-(key(a)??-1e9));else out=out.slice().sort((a,b)=>String(a.symbol).localeCompare(String(b.symbol)));
-  return out;
+  const col=BOARD_COLS.find(c=>c.k===st.sort)||BOARD_COLS[0],dir=st.dir==="asc"?1:-1;
+  return out.slice().sort((a,b)=>{const x=col.val(a,held),y=col.val(b,held);
+    if(col.text)return dir*String(x).localeCompare(String(y))||String(a.symbol).localeCompare(String(b.symbol));
+    if(x===null&&y===null)return String(a.symbol).localeCompare(String(b.symbol));if(x===null)return 1;if(y===null)return -1;   // blanks last either way
+    return dir*(x-y)||String(a.symbol).localeCompare(String(b.symbol))});
+}
+function guildHeader(funds,held){
+  const st=state.guildFilter;
+  const has3y=funds.some(f=>num(f.drawdown_3y_high)!==null);
+  const head=BOARD_COLS.map(c0=>{const c=c0.k==="peak"&&!has3y?{...c0,label:"From peak"}:c0;const on=st.sort===c.k,arrow=on?(st.dir==="asc"?" \u25b2":" \u25bc"):"";const aria=on?(st.dir==="asc"?"ascending":"descending"):"none";
+    return `<th class="${c.text||c.cat?"":"num"}" aria-sort="${aria}"><button type="button" class="rpg-btn rpg-sort${on?" is-on":""}" data-rpg-sort="${c.k}" title="Sort by ${esc(c.label)}${on?`, ${st.dir==="asc"?"low to high":"high to low"} (click to flip)`:""}">${esc(c.label)}<span aria-hidden="true">${arrow}</span></button></th>`}).join("");
+  const base=funds.filter(f=>st.family==="ALL"||(!st.family?guildFamily(f)!=="NONE"||!!held[f.symbol]:guildFamily(f)===st.family));
+  const filt=BOARD_COLS.map(c=>{
+    if(c.k==="fund")return `<td><input type="search" class="rpg-colfilter-text" data-rpg-filter-key="q" value="${esc(st.q)}" placeholder="Symbol or name" aria-label="Filter funds by symbol or name" autocomplete="off"></td>`;
+    if(c.cat){const vals=[...new Set(base.map(c.cat))].sort((a,b)=>c.order?c.order.indexOf(a)-c.order.indexOf(b):String(a).localeCompare(String(b)));const sel=new Set(st.cols[c.k]||[]);
+      const label=!sel.size?"All":sel.size===1?[...sel][0]:`${sel.size} chosen`;
+      return `<td><details class="rpg-colfilter"${state.guildOpenFilter===c.k?" open":""} data-rpg-colfilter="${c.k}"><summary aria-label="Filter ${esc(c.label)}">${esc(label)} \u25be</summary><div class="rpg-colfilter-menu" role="group" aria-label="${esc(c.label)} values">${vals.map(v=>`<label class="rpg-check"><input type="checkbox" data-rpg-col="${c.k}" value="${esc(v)}"${sel.has(v)?" checked":""}> ${esc(v)}</label>`).join("")}${sel.size?`<button type="button" class="rpg-btn rpg-link" data-rpg-col-clear="${c.k}">Show all</button>`:""}</div></details></td>`}
+    if(c.text)return "<td></td>";
+    const bad=st.nums[c.k]&&parseNumFilter(st.nums[c.k],c.pct)===undefined;
+    return `<td class="num"><input type="text" inputmode="decimal" class="rpg-colfilter-num${bad?" is-bad":""}" data-rpg-num="${c.k}" value="${esc(st.nums[c.k]||"")}" placeholder="${c.k==="fee"?"< 0.2":c.pct?"> 5":"> 100"}" aria-label="Filter ${esc(c.label)}${c.pct?" (in percent)":""}, for example > 5 or 2..8" title="> 5, < 0.5, 2..8${c.pct?" (percent)":""}"></td>`}).join("");
+  return `<thead><tr>${head}</tr><tr class="rpg-colfilters">${filt}</tr></thead>`;
 }
 function guildBoardRows(funds,held){
+  const st=state.guildFilter;
   const shown=guildFiltered(funds,held);
-  const page=shown.slice(0,state.guildFilter.limit);
+  const page=shown.slice(0,st.limit);
   const cell=v=>{const n=num(v);return `<td class="num ${upDown(n)}">${pct(n)}</td>`};
   const rows=page.map(f=>{const [il,it]=implText(f);const [wl,wt]=whenText(f.when_to_buy);const h=held[f.symbol];
-    const peak=num(f.drawdown_now);
-    return `<tr class="${f.symbol===state.guildPick?"is-picked":""}${h?" is-mine":""}"><th scope="row"><button type="button" class="rpg-btn rpg-fund-pick" data-rpg-fund="${esc(f.symbol)}" aria-pressed="${f.symbol===state.guildPick}"><strong>${esc(f.symbol)}${h?" \u2726":""}</strong><span>${esc(f.name||"")}</span></button></th><td>${esc(groupName(f.peer_group))}</td><td class="num">${money(f.close)}</td>${cell(f.return_1y)}${cell(f.annualized_3y)}${projCell(f)}${peak!==null&&peak>-0.0005?`<td class="num rpg-up">at peak</td>`:cell(f.drawdown_now)}<td class="num">${num(f.yield_12m)===null?"\u2014":`${(num(f.yield_12m)*100).toFixed(2)}%`}</td><td class="num">${num(f.expense_ratio)===null?"\u2014":`${(num(f.expense_ratio)*100).toFixed(2)}%`}</td><td class="rpg-nowrap">${badge(callText(f)[0],callText(f)[1])}</td><td class="rpg-nowrap">${badge(il,it)}</td><td class="rpg-nowrap">${badge(wl,wt)}</td><td class="num">${h?money(h.worth):"\u2014"}</td></tr>`}).join("");
+    const peak=fromHigh(f);
+    return `<tr class="${f.symbol===state.guildPick?"is-picked":""}${h?" is-mine":""}"><th scope="row"><button type="button" class="rpg-btn rpg-fund-pick" data-rpg-fund="${esc(f.symbol)}" aria-pressed="${f.symbol===state.guildPick}"><strong>${esc(f.symbol)}${h?" \u2726":""}</strong><span>${esc(f.name||"")}</span></button></th><td>${esc(groupName(f.peer_group))}</td><td class="num">${money(f.close)}</td>${cell(f.return_1y)}${cell(f.annualized_3y)}${projCell(f)}${peak!==null&&peak>-0.0005?`<td class="num rpg-up">at high</td>`:cell(peak)}<td class="num">${num(f.yield_12m)===null?"\u2014":`${(num(f.yield_12m)*100).toFixed(2)}%`}</td><td class="num">${num(f.expense_ratio)===null?"\u2014":`${(num(f.expense_ratio)*100).toFixed(2)}%`}</td><td class="rpg-nowrap">${badge(callText(f)[0],callText(f)[1])}</td><td class="rpg-nowrap">${badge(il,it)}</td><td class="rpg-nowrap">${badge(wl,wt)}</td><td class="num">${h?money(h.worth):"\u2014"}</td></tr>`}).join("");
   const more=shown.length>page.length?`<button type="button" class="rpg-btn rpg-link" data-rpg-more>Show ${Math.min(50,shown.length-page.length)} more of ${shown.length-page.length} \u203a</button>`:"";
-  return `<p class="rpg-crumb-note">${shown.length} of ${funds.length} funds</p><div class="rpg-table-wrap"><table class="rpg-table rpg-guild-table"><thead><tr><th>Fund</th><th>Peer group</th><th class="num">Close</th><th class="num">1 year</th><th class="num">3 years, a year</th><th class="num">Next 3 years, typical</th><th class="num">From peak</th><th class="num">Yield</th><th class="num">Fee</th><th>Call</th><th>Which fund</th><th>When</th><th class="num">Your worth</th></tr></thead><tbody>${rows||`<tr><td colspan="13" class="rpg-muted">No fund matches these filters.</td></tr>`}</tbody></table></div>${more}`;
+  const active=Object.values(st.cols).some(v=>(v||[]).length)||Object.values(st.nums).some(Boolean)||st.q;
+  const projNote=st.sort==="p3y"?`<p class="rpg-item-note rpg-board-note">${esc("Sorted by the typical 3-year figure. Within a peer group a higher figure mostly means a fund that swings more than its peers, which did not pay more in the Guild's trials; figures marked \u00b0 come from a fund's own history alone and are weaker still. Read the bad case on each fund's page before buying.")}</p>`:"";
+  return `<div class="rpg-board-count"><span class="rpg-crumb-note">${shown.length} of ${funds.length} funds${st.sort!=="group"?` \u00b7 sorted by ${esc((BOARD_COLS.find(c=>c.k===st.sort)||{}).label||"")}, ${st.dir==="asc"?"low to high":"high to low"}`:""}</span>${active||st.sort!=="group"?`<button type="button" class="rpg-btn rpg-link" data-rpg-board-reset>Clear sort and filters</button>`:""}</div>${projNote}<div class="rpg-table-wrap"><table class="rpg-table rpg-guild-table">${guildHeader(funds,held)}<tbody>${rows||`<tr><td colspan="13" class="rpg-muted">No fund matches these filters.</td></tr>`}</tbody></table></div>${more}`;
 }
 function guildBoard(funds,held){
   const st=state.guildFilter;
   const fams=["US_EQUITY","INTL_EQUITY","BONDS","OTHER","NONE"].filter(k=>funds.some(f=>guildFamily(f)===k));
   const groups=[...new Set(funds.filter(f=>st.family==="ALL"||(!st.family?guildFamily(f)!=="NONE":guildFamily(f)===st.family)).map(f=>f.peer_group))].sort((a,b)=>groupName(a).localeCompare(groupName(b)));
   const opt=(v,label,cur)=>`<option value="${esc(v)}"${v===cur?" selected":""}>${esc(label)}</option>`;
-  return `<section class="rpg-stone rpg-guild-ledger" aria-labelledby="rpg-board-h"><div class="rpg-section-head"><h2 id="rpg-board-h" class="rpg-stone-title">The Market Board</h2><span class="rpg-crumb-note">Total return, distributions reinvested</span></div><div class="rpg-board-filters" role="search"><label>Family <select data-rpg-filter-key="family">${opt("","All grouped funds",st.family)}${fams.map(k=>opt(k,FAMILY_NAME[k],st.family)).join("")}${opt("ALL","Everything, incl. specialized",st.family)}</select></label><label>Peer group <select data-rpg-filter-key="group">${opt("","All groups",st.group)}${groups.map(g=>opt(g,groupName(g),st.group)).join("")}</select></label><label>Sort <select data-rpg-filter-key="sort">${[["group","Peer group, yours first"],["call","Call (BUY first)"],["3y","3-year return"],["1y","1-year return"],["fee","Lowest fee"],["yield","Yield"],["peak","Nearest its peak"],["name","Symbol"]].map(([v,l])=>opt(v,l,st.sort)).join("")}</select></label><label class="rpg-board-search">Find <input type="search" data-rpg-filter-key="q" value="${esc(st.q)}" placeholder="Symbol or name" autocomplete="off"></label><label class="rpg-check"><input type="checkbox" data-rpg-filter-key="mine"${st.mine?" checked":""}> Your funds</label><label class="rpg-check"><input type="checkbox" data-rpg-filter-key="best"${st.best?" checked":""}> Best of each exposure</label><label class="rpg-check"><input type="checkbox" data-rpg-filter-key="buys"${st.buys?" checked":""}> BUY calls only</label></div><div id="rpg-guild-board">${guildBoardRows(funds,held)}</div></section>`;
+  return `<section class="rpg-stone rpg-guild-ledger" aria-labelledby="rpg-board-h"><div class="rpg-section-head"><h2 id="rpg-board-h" class="rpg-stone-title">The Market Board</h2><span class="rpg-crumb-note">Total return, distributions reinvested</span></div><div class="rpg-board-filters" role="search"><label>Family <select data-rpg-filter-key="family">${opt("","All grouped funds",st.family)}${fams.map(k=>opt(k,FAMILY_NAME[k],st.family)).join("")}${opt("ALL","Everything, incl. specialized",st.family)}</select></label>${st.group?`<label class="rpg-check"><input type="checkbox" data-rpg-filter-key="group" value="" checked> Only ${esc(groupName(st.group))}</label>`:""}<label class="rpg-check"><input type="checkbox" data-rpg-filter-key="mine"${st.mine?" checked":""}> Your funds</label><label class="rpg-check"><input type="checkbox" data-rpg-filter-key="best"${st.best?" checked":""}> Best of each exposure</label><span class="rpg-crumb-note rpg-board-hint">Click a column name to sort; click again to flip. Use the row under the names to filter.</span></div><div id="rpg-guild-board">${guildBoardRows(funds,held)}</div></section>`;
 }
 function guildChart(f){
   const hist=(f.history_monthly||[]).filter(r=>num(r.close)!==null);
@@ -606,7 +660,7 @@ function guildDetail(f,held,groups){
   const callWhy=f.ranking_basis==="COST_WITHIN_PEER_GROUP_36M"?`Its official fee (${(num(f.expense_ratio)*100).toFixed(2)}% a year) is cheaper than ${Math.round(num(f.cost_percentile_in_group))}% of its peers. In testing, the cheapest fifth of a peer group beat the costliest fifth over the next 3 years in 11 of 12 years, and the costliest fifth trailed its peers by about 1.4% a year. Past returns, momentum and trend did not predict which peer would do better.`:f.ranking_call==="RANKED_NO_CALL"?"There is no official SEC expense ratio on file for this fund, so it gets no call.":looseWhy(f);
   const hold=h?`<div class="rpg-parch-kicker">Your charter</div><div class="rpg-item-stats"><div><div class="rpg-stat-label">Held</div><div class="rpg-stat-value">${esc(qty(h.shares))} shares</div></div><div><div class="rpg-stat-label">Gold paid</div><div class="rpg-stat-value">${money(h.paid)}</div></div><div><div class="rpg-stat-label">Worth at the close</div><div class="rpg-stat-value">${money(h.worth)}</div><div class="rpg-stat-sub ${upDown(h.worth-h.paid)}">${signed(h.worth-h.paid)}${h.paid?` \u00b7 ${pct((h.worth-h.paid)/h.paid)}`:""}</div></div></div>`:"";
   const pctile=v=>num(v)===null?"\u2014":`${Math.round(num(v))}th`;
-  return `<section class="rpg-stone rpg-vault-hero" aria-labelledby="rpg-fund-h"><div class="rpg-vault-call"><div class="rpg-vault-id"><div><h2 id="rpg-fund-h" class="rpg-vault-name">${esc(f.symbol)}</h2><div class="rpg-vault-role">${esc(f.name||"")} \u00b7 ${esc(groupName(f.peer_group))}${f.history_from?` \u00b7 since ${esc(String(f.history_from).slice(0,4))}`:""}</div></div></div><div class="rpg-guild-verdicts"><div class="rpg-vault-verdict">${badge(callText(f)[0],callText(f)[1])}<span>${esc(callText(f)[2])}</span></div><div class="rpg-vault-verdict">${badge(il,it)}<span>${esc(imean)}</span></div><div class="rpg-vault-verdict">${badge(wl,wt)}<span>${esc(wmean)}</span></div></div><p class="rpg-vault-why">${esc(callWhy)}</p><p class="rpg-vault-why">${esc(implWhy)}</p><p class="rpg-vault-why">${esc(whenWhy)}</p></div><div class="rpg-tiles">${tile("Close",money(f.close),`as of ${dayLabel(f.as_of_date)}`)}${tile("3 years, a year",pct(f.annualized_3y),`5 years ${pct(f.annualized_5y)} a year`)}${tile("Worst fall, 3 years",pct(f.max_drawdown_3y),`now ${pct(f.drawdown_now)} from its peak`)}${tile("Fee",num(f.expense_ratio)===null?"\u2014":`${(num(f.expense_ratio)*100).toFixed(2)}%`,num(f.expense_ratio)===null?"not in SEC data yet":"official, SEC filing")}</div></section><div class="rpg-duo">${guildChart(f)}<aside class="rpg-parch rpg-item-detail"><div class="rpg-parch-kicker">Among its ${esc(String(g.members||"\u2014"))} peers \u00b7 ${esc(groupName(f.peer_group))}</div><p class="rpg-item-note">1-year return in the ${pctile(f.return_1y_group_percentile)} percentile; 3-year in the ${pctile(f.annualized_3y_group_percentile)}. Peer medians: ${pct(g.median_return_1y)} over 1 year, ${pct(g.median_annualized_3y)} a year over 3. Past rank did not predict future rank in testing, so this is context, not counsel.</p><p class="rpg-item-note">Grouped by its own returns: closest to ${esc(ev.nearest_reference||"\u2014")} (${num(ev.correlation)===null?"\u2014":num(ev.correlation).toFixed(2)} correlation), beta ${num(ev.beta_spy)===null?"\u2014":num(ev.beta_spy).toFixed(2)} to the S&P 500. Provisional until the SEC taxonomy is certified.</p>${cl?`<div class="rpg-parch-kicker">Near-identical funds</div><p class="rpg-item-note">${cl.members.map(s=>s===cl.best?`<strong>${esc(s)} (best)</strong>`:esc(s)).join(", ")}</p>`:""}${hold}</aside></div>${guildOutlook(f,h)}`;
+  return `<section class="rpg-stone rpg-vault-hero" aria-labelledby="rpg-fund-h"><div class="rpg-vault-call"><div class="rpg-vault-id"><div><h2 id="rpg-fund-h" class="rpg-vault-name">${esc(f.symbol)}</h2><div class="rpg-vault-role">${esc(f.name||"")} \u00b7 ${esc(groupName(f.peer_group))}${f.history_from?` \u00b7 since ${esc(String(f.history_from).slice(0,4))}`:""}</div></div></div><div class="rpg-guild-verdicts"><div class="rpg-vault-verdict">${badge(callText(f)[0],callText(f)[1])}<span>${esc(callText(f)[2])}</span></div><div class="rpg-vault-verdict">${badge(il,it)}<span>${esc(imean)}</span></div><div class="rpg-vault-verdict">${badge(wl,wt)}<span>${esc(wmean)}</span></div></div><p class="rpg-vault-why">${esc(callWhy)}</p><p class="rpg-vault-why">${esc(implWhy)}</p><p class="rpg-vault-why">${esc(whenWhy)}</p></div><div class="rpg-tiles">${tile("Close",money(f.close),`as of ${dayLabel(f.as_of_date)}`)}${tile("3 years, a year",pct(f.annualized_3y),`5 years ${pct(f.annualized_5y)} a year`)}${tile("Worst fall, 3 years",pct(f.max_drawdown_3y),num(f.drawdown_3y_high)!==null?`now ${pct(f.drawdown_3y_high)} from its 3-year high; ${pct(f.drawdown_now)} from its all-time high${f.peak_date?` (${String(f.peak_date).slice(0,4)})`:""}`:`now ${pct(f.drawdown_now)} from its peak`)}${tile("Fee",num(f.expense_ratio)===null?"\u2014":`${(num(f.expense_ratio)*100).toFixed(2)}%`,num(f.expense_ratio)===null?"not in SEC data yet":"official, SEC filing")}</div></section><div class="rpg-duo">${guildChart(f)}<aside class="rpg-parch rpg-item-detail"><div class="rpg-parch-kicker">Among its ${esc(String(g.members||"\u2014"))} peers \u00b7 ${esc(groupName(f.peer_group))}</div><p class="rpg-item-note">1-year return in the ${pctile(f.return_1y_group_percentile)} percentile; 3-year in the ${pctile(f.annualized_3y_group_percentile)}. Peer medians: ${pct(g.median_return_1y)} over 1 year, ${pct(g.median_annualized_3y)} a year over 3. Past rank did not predict future rank in testing, so this is context, not counsel.</p><p class="rpg-item-note">Grouped by its own returns: closest to ${esc(ev.nearest_reference||"\u2014")} (${num(ev.correlation)===null?"\u2014":num(ev.correlation).toFixed(2)} correlation), beta ${num(ev.beta_spy)===null?"\u2014":num(ev.beta_spy).toFixed(2)} to the S&P 500. Provisional until the SEC taxonomy is certified.</p>${cl?`<div class="rpg-parch-kicker">Near-identical funds</div><p class="rpg-item-note">${cl.members.map(s=>s===cl.best?`<strong>${esc(s)} (best)</strong>`:esc(s)).join(", ")}</p>`:""}${hold}</aside></div>${guildOutlook(f,h)}`;
 }
 function guildTrials(pkg){
   const r=pkg?.research||{};
@@ -636,7 +690,18 @@ function renderGuild(){
   if(!page)return;
   let view=byId("rpg-guild");
   if(!view){view=document.createElement("div");view.id="rpg-guild";view.className="rpg-realm-view";page.appendChild(view);bindNavigation(view);
-    view.addEventListener("click",event=>{const pick=event.target.closest("[data-rpg-fund]");const more=event.target.closest("[data-rpg-more]");const grow=event.target.closest("[data-rpg-growth-group]");if(grow){Object.assign(state.guildFilter,{family:"ALL",group:grow.dataset.rpgGrowthGroup,sort:"call",buys:false,best:false,mine:false,q:"",limit:50});renderGuild();byId("rpg-board-h")?.scrollIntoView({behavior:"smooth",block:"start"});return}if(pick){state.guildPick=pick.dataset.rpgFund;state.guildDetail=null;renderGuild();loadGuildFund(state.guildPick)}else if(more){state.guildFilter.limit+=50;guildRefreshBoard()}});
+    view.addEventListener("click",event=>{const pick=event.target.closest("[data-rpg-fund]");const more=event.target.closest("[data-rpg-more]");const grow=event.target.closest("[data-rpg-growth-group]");if(grow){Object.assign(state.guildFilter,{family:"ALL",group:grow.dataset.rpgGrowthGroup,sort:"call",dir:"desc",buys:false,best:false,mine:false,q:"",cols:{},nums:{},limit:50});renderGuild();byId("rpg-board-h")?.scrollIntoView({behavior:"smooth",block:"start"});return}if(pick){state.guildPick=pick.dataset.rpgFund;state.guildDetail=null;renderGuild();loadGuildFund(state.guildPick)}else if(more){state.guildFilter.limit+=50;guildRefreshBoard()}
+      const st=state.guildFilter,sortBtn=event.target.closest("[data-rpg-sort]"),clear=event.target.closest("[data-rpg-col-clear]");
+      if(sortBtn){const k=sortBtn.dataset.rpgSort,col=BOARD_COLS.find(c=>c.k===k);if(st.sort===k)st.dir=st.dir==="asc"?"desc":"asc";else{st.sort=k;st.dir=col&&col.text?"asc":"desc"}guildRefreshBoard();return}
+      if(clear){st.cols[clear.dataset.rpgColClear]=[];st.limit=50;guildRefreshBoard();return}
+      if(event.target.closest("[data-rpg-board-reset]")){Object.assign(st,{sort:"group",dir:"desc",cols:{},nums:{},q:"",group:"",buys:false,limit:50});state.guildOpenFilter=null;renderGuild()}});
+    view.addEventListener("toggle",event=>{const d=event.target;if(!d.matches||!d.matches("[data-rpg-colfilter]"))return;if(d.open){state.guildOpenFilter=d.dataset.rpgColfilter;view.querySelectorAll("[data-rpg-colfilter][open]").forEach(o=>{if(o!==d)o.open=false})}else if(state.guildOpenFilter===d.dataset.rpgColfilter)state.guildOpenFilter=null},true);
+    const onColumn=event=>{const st=state.guildFilter,box=event.target.closest("[data-rpg-col]"),inp=event.target.closest("[data-rpg-num]");
+      if(box){const k=box.dataset.rpgCol;const set=new Set(st.cols[k]||[]);box.checked?set.add(box.value):set.delete(box.value);st.cols[k]=[...set];st.limit=50;guildRefreshBoard();return true}
+      if(inp){st.nums[inp.dataset.rpgNum]=inp.value;st.limit=50;guildRefreshBoard();return true}
+      return false};
+    view.addEventListener("change",event=>{if(event.target.closest("[data-rpg-num]"))return;onColumn(event)});
+    view.addEventListener("input",event=>{if(event.target.closest("[data-rpg-num]"))onColumn(event)});
     const onFilter=event=>{const el=event.target.closest("[data-rpg-filter-key]");if(!el)return;const k=el.dataset.rpgFilterKey;state.guildFilter[k]=el.type==="checkbox"?el.checked:el.value;if(k==="family")state.guildFilter.group="";state.guildFilter.limit=50;if(k==="q")guildRefreshBoard();else renderGuild()};
     view.addEventListener("change",onFilter);view.addEventListener("input",event=>{if(event.target.dataset?.rpgFilterKey==="q")onFilter(event)});}
   const crumbs=note=>`<header class="rpg-stone rpg-crumbs"><nav aria-label="Breadcrumb"><button type="button" class="rpg-btn rpg-crumb" data-rpg-page="home">The Hall</button><span aria-hidden="true">\u203a</span><span class="rpg-crumb-here">Merchants' Guild</span></nav><span class="rpg-crumb-note">${esc(note)}</span></header>${realmTabs("etf")}`;
@@ -653,7 +718,13 @@ function renderGuild(){
   view.innerHTML=`${crumbs(`${funds.length} funds \u00b7 closes of ${dayLabel(asOf)} \u00b7 ${String(pkg.certification_status||"PROVISIONAL").toLowerCase()} \u00b7 research, not orders`)}<section class="rpg-stone rpg-guild-hero"><div><div class="rpg-parch-kicker">The Guild's counsel for your charters</div><p class="rpg-guild-counsel">${esc(guildCounsel(funds,held))}</p></div><div class="rpg-crumb-stats"><span>Charters <strong class="num">${Object.keys(held).length}</strong></span><span>Worth <strong class="num">${money(worth)}</strong></span><span>Gold paid <strong class="num">${money(paid)}</strong></span><span class="${upDown(worth-paid)}">${signed(worth-paid)}</span></div></section>${guildBoard(funds,held)}<div id="rpg-guild-detail">${guildDetail(detail,held,pkg.groups||{})}</div>${guildGrowthBoard(pkg)}${guildTrials(pkg)}${footer(`Prices from free public data (tier 4) and peer groups from each fund's own returns: provisional, not certified. Package ${pkg.package_id||"\u2014"}. Research, not personal financial advice; nothing here places a trade.`)}`;
   if(!state.guildDetail||state.guildDetail.symbol!==state.guildPick)loadGuildFund(state.guildPick);
 }
-function guildRefreshBoard(){const slot=byId("rpg-guild-board");if(slot&&state.guild)slot.innerHTML=guildBoardRows(state.guild.funds,guildHoldings())}
+function guildRefreshBoard(){
+  const slot=byId("rpg-guild-board");if(!slot||!state.guild)return;
+  const a=document.activeElement,keep=a&&slot.contains(a)?(a.dataset.rpgNum?`[data-rpg-num="${a.dataset.rpgNum}"]`:a.dataset.rpgFilterKey?`[data-rpg-filter-key="${a.dataset.rpgFilterKey}"]`:a.dataset.rpgSort?`[data-rpg-sort="${a.dataset.rpgSort}"]`:a.dataset.rpgCol?`[data-rpg-col="${a.dataset.rpgCol}"][value="${CSS.escape(a.value)}"]`:null):null;
+  const caret=keep&&a.selectionStart!==undefined?[a.selectionStart,a.selectionEnd]:null;
+  slot.innerHTML=guildBoardRows(state.guild.funds,guildHoldings());
+  if(keep){const el=slot.querySelector(keep);if(el){el.focus({preventScroll:true});if(caret&&el.setSelectionRange)try{el.setSelectionRange(...caret)}catch(e){}}}
+}
 function loadGuildFund(symbol){
   api(`/v1/presentation/etf/${encodeURIComponent(symbol)}`).then(doc=>{if(state.guildPick!==symbol)return;state.guildDetail=doc;const slot=byId("rpg-guild-detail");if(slot)slot.innerHTML=guildDetail(doc,guildHoldings(),state.guild?.package?.groups||{})}).catch(()=>{});
 }
