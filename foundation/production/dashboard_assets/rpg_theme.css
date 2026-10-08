@@ -433,3 +433,10 @@ tbody tr:hover{background:rgba(217,180,90,.05)}
 .rpg-outlook-why{color:#d8cbb0}
 .rpg-growth .rpg-table{min-width:640px}
 .rpg-growth tr.rpg-muted th .rpg-link{color:#b9a98a}
+/* Homestead: housing market cards */
+.rpg-home-markets{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:18px}
+.rpg-home-market{padding:18px 20px;display:flex;flex-direction:column;gap:12px}
+.rpg-home-market .rpg-action{align-self:flex-start}
+.rpg-home-market .rpg-action[disabled]{opacity:.65;cursor:default}
+.rpg-home-stale{border-left:3px solid #b5862f;padding-left:10px}
+.rpg-home-grown{display:block;font-size:.85rem;color:#b9a98a;font-weight:400}

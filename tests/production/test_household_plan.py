@@ -215,3 +215,18 @@ def test_projection_route_uses_the_saved_plan_and_live_holdings(tmp_path):
                      headers={"X-API-Key": "view-key"}).json()
     assert tried["house"]["price_low"] == 300000
     assert api.post("/v1/household-plan/projection", json={}, headers={}).status_code == 401
+
+
+def test_home_prices_grow_to_the_target_month():
+    plan = H.import_books(*books(months=8), "abc")
+    plan["settings"]["target_month"] = "2027-02"
+    flat = project(H.normalize_plan(plan), as_of_month="2026-08")
+    plan["settings"]["home_price_growth"] = 0.03
+    grown = project(H.normalize_plan(plan), as_of_month="2026-08")
+    years = 6 / 12
+    assert grown["house"]["price_low_at_target"] == pytest.approx(350000 * 1.03 ** years, abs=0.01)
+    assert grown["house"]["need_low"] > flat["house"]["need_low"]
+    assert grown["house"]["capacity"][0]["price"] == 350000 and grown["house"]["capacity"][0]["price_at_target"] > 350000
+    with pytest.raises(H.HouseholdPlanError, match="home_price_growth"):
+        plan["settings"]["home_price_growth"] = 0.9
+        H.normalize_plan(plan)

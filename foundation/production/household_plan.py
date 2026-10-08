@@ -40,6 +40,7 @@ DEFAULT_SETTINGS = {
     "house_counts_retirement": False,
     "mortgage_rate": 0.065,         # placeholder from the workbook's House Purchase Planner, not a live rate
     "loan_years": 30,
+    "home_price_growth": 0.0,       # yearly; 0 = today's prices. The Homestead offers the housing forecast.
 }
 MIX_SLEEVES = ("stocks", "crypto", "metals", "mtg", "cash")
 
@@ -85,6 +86,12 @@ def normalize_plan(document) -> dict:
     settings["loan_years"] = int(_number(settings["loan_years"], "loan_years"))
     if not 5 <= settings["loan_years"] <= 40:
         raise HouseholdPlanError("loan_years must be between 5 and 40")
+    try:
+        settings["home_price_growth"] = float(settings["home_price_growth"] or 0)
+    except (TypeError, ValueError):
+        raise HouseholdPlanError("home_price_growth must be a number") from None
+    if not -0.2 <= settings["home_price_growth"] <= 0.3:
+        raise HouseholdPlanError("home_price_growth is out of range")
     for key in ("down_payment_pct", "closing_cost_pct", "plan_investment_return", "plan_retirement_return", "mortgage_rate"):
         try:
             settings[key] = float(settings[key])

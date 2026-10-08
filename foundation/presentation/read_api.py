@@ -194,6 +194,22 @@ class PresentationReadRepository:
             return None
         return {"package": package, "funds": funds}
 
+    def housing(self) -> dict[str, object] | None:
+        """The housing package in the active publication: package summary plus each market. None if absent."""
+        with closing(self.connection_factory()) as db, db.cursor() as cursor:
+            publication_id = self._active_id(cursor)
+            cursor.execute("""
+                SELECT record_type, record_key, payload_json FROM presentation_records
+                WHERE publication_id=%s AND domain_id='housing' AND record_type IN ('housing_market', 'housing_package')
+                ORDER BY record_type, record_key
+            """, (publication_id,))
+            rows = cursor.fetchall()
+        package = next((dict(payload) for kind, _, payload in rows if kind == "housing_package"), None)
+        markets = [dict(payload) for kind, _, payload in rows if kind == "housing_market"]
+        if package is None and not markets:
+            return None
+        return {"package": package, "markets": markets}
+
     def etf_fund(self, symbol: str) -> dict[str, object] | None:
         with closing(self.connection_factory()) as db, db.cursor() as cursor:
             publication_id = self._active_id(cursor)
@@ -669,6 +685,19 @@ def install_presentation_read_routes(
         if guild is None:
             return {"available": False, "package": None, "funds": []}
         return {"available": True, **guild}
+
+    @app.get("/v1/presentation/housing")
+    def presentation_housing(x_api_key: str | None = Header(default=None)):
+        denied = authorize(x_api_key)
+        if denied:
+            return denied
+        try:
+            housing = repository.housing()
+        except LookupError:
+            housing = None
+        if housing is None:
+            return {"available": False, "package": None, "markets": []}
+        return {"available": True, **housing}
 
     @app.get("/v1/presentation/etf/{symbol}")
     def presentation_etf_fund(symbol: str, x_api_key: str | None = Header(default=None)):

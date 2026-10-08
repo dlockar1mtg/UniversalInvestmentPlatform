@@ -106,16 +106,21 @@ def project(plan: dict, *, as_of_month: str, holdings: dict | None = None, assum
 
     target_row = rows[end]
     safety = s["safety_fund"] if s["safety_fund"] is not None else round(abs(target_row["expenses"]) * s["safety_fund_months"], 2)
+    # Prices are entered in today's dollars; grow them to the target month at the plan's home-price growth.
+    years = max(0, (int(months[end][:4]) - int(months[start][:4])) * 12 + int(months[end][5:7]) - int(months[start][5:7])) / 12
+    grow = (1 + s["home_price_growth"]) ** years
+    at = lambda p: round(p * grow, 2)  # noqa: E731
     ladder = sorted(set(a["price_ladder"]) | {s["home_price_low"], s["home_price_high"]})
-    chances = [{"price": p, "cash_needed": house_need(p, s, safety),
-                "chance": round(float(np.mean(usable >= house_need(p, s, safety))), 3),
-                "plan_reaches": series[-1]["plan_house_usable"] >= house_need(p, s, safety)} for p in ladder]
+    chances = [{"price": p, "price_at_target": at(p), "cash_needed": house_need(at(p), s, safety),
+                "chance": round(float(np.mean(usable >= house_need(at(p), s, safety))), 3),
+                "plan_reaches": series[-1]["plan_house_usable"] >= house_need(at(p), s, safety)} for p in ladder]
     dp_cc = s["down_payment_pct"] + s["closing_cost_pct"]
     max_price = {f"p{p}": round(max(0.0, (float(np.percentile(usable, p)) - safety) / dp_cc), -3) for p in (10, 50, 90)} if dp_cc > 0 else {}
     capacity = []
-    for price in (s["home_price_low"], s["home_price_high"]):
+    for today_price in (s["home_price_low"], s["home_price_high"]):
+        price = at(today_price)
         closing = price * s["closing_cost_pct"]
-        row = {"price": price, "closing_costs": round(closing, 2),
+        row = {"price": today_price, "price_at_target": price, "closing_costs": round(closing, 2),
                "twenty_pct_payment": monthly_payment(price * (1 - s["down_payment_pct"]), s["mortgage_rate"], s["loan_years"])}
         for p in (10, 50, 90):
             down = min(price, max(0.0, float(np.percentile(usable, p)) - closing - safety))
@@ -138,8 +143,11 @@ def project(plan: dict, *, as_of_month: str, holdings: dict | None = None, assum
         "chance_below_plan_net_worth": round(float(np.mean(worth < target_row["net_worth"])), 3),
         "chance_investments_below_money_put_in": round(float(np.mean(inv.sum(axis=1) < start_investments + contributed)), 3),
         "house": {"price_low": s["home_price_low"], "price_high": s["home_price_high"],
+                  "home_price_growth": s["home_price_growth"], "years_to_target": round(years, 2),
+                  "price_low_at_target": at(s["home_price_low"]), "price_high_at_target": at(s["home_price_high"]),
+                  "max_price_today_dollars": {k: round(v / grow, -3) for k, v in max_price.items()},
                   "down_payment_pct": s["down_payment_pct"], "closing_cost_pct": s["closing_cost_pct"],
-                  "need_low": house_need(s["home_price_low"], s, safety), "need_high": house_need(s["home_price_high"], s, safety),
+                  "need_low": house_need(at(s["home_price_low"]), s, safety), "need_high": house_need(at(s["home_price_high"]), s, safety),
                   "chances": chances, "max_price_at_down_payment_pct": max_price, "capacity": capacity,
                   "mortgage_rate": s["mortgage_rate"], "loan_years": s["loan_years"]},
         "sleeves": {k: {"label": v["label"], "annual_return": v["annual_return"], "annual_volatility": v["annual_volatility"],
