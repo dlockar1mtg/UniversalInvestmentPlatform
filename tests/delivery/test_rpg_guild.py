@@ -48,3 +48,12 @@ def test_guild_shows_three_year_outlooks_without_ranking_single_funds():
     assert 'sort:"call"' in realm
     css = _read("rpg_theme.css")
     assert ".rpg-outlook-tiles{" in css
+
+
+def test_guild_gives_every_fund_research_without_new_calls():
+    realm = _read("rpg_realm.js")
+    for text in ("outlook_3y", "OWN HISTORY", "its own history", "loose_peer_reading", "As a reading only",
+                 "missed the real 3-year result by a median of", "it fits loosely", "never compared across funds"):
+        assert text in realm, text
+    # own-history outlooks never feed the BUY / AVOID call or a fund-level growth sort
+    assert "outlook_3y.p50)-" not in realm and "loose_peer_reading.cost_percentile)" not in realm.split("function callText")[1].split("}")[0]

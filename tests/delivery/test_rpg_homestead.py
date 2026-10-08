@@ -55,3 +55,11 @@ def test_the_deployed_image_installs_what_the_household_plan_imports():
     names = {line.split(">")[0].split("<")[0].split("[")[0].strip() for line in lines}
     assert {"openpyxl", "numpy", "pandas", "duckdb"} <= names
     assert "requirements/phase_7_3.txt" in (ROOT / "deployment" / "Dockerfile").read_text()
+
+
+def test_housing_cards_read_the_v11_out_of_sample_calibration():
+    page = _read("homestead.js")
+    for text in ("cal.in_sample!==false", "Timing test, out of sample over", "not as a forecast of when prices will rise",
+                 'pkg.model_version||"V10"'):
+        assert text in page, text
+    assert page.isascii()
