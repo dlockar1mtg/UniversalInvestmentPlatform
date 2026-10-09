@@ -24,7 +24,7 @@ jobs:
     timeout-minutes: 15
     services:
       postgres:
-        image: postgres:16
+        image: mirror.gcr.io/library/postgres:16   # Docker Hub answers 429 to shared runners
         env:
           POSTGRES_USER: uip
           POSTGRES_PASSWORD: uip-ci-only
