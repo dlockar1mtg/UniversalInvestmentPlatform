@@ -3,9 +3,7 @@ name: UIP Production Publication Cycle
 on:
   schedule:
     - cron: "0 14 * * *"
-    - cron: "7 17 * * *" # backup: skipped unless a source has newer data than the last publication (see the gate job)
-    - cron: "7 20 * * *"
-    - cron: "7 23 * * *"
+    - cron: "7 20 * * *" # backup: skipped unless a source has newer data than the last publication (see the gate job). One backup only: each publication is about 15 minutes.
   workflow_dispatch:
     inputs:
       confirmation:
@@ -471,19 +469,33 @@ jobs:
           2> >(tee -a "$RUNNER_TEMP/publication_errors.log" >&2)
 
       - name: Publish current governed rich candidate atomically
-        run: >-
-          python scripts/publish_rehearsed_rich_candidate_v2.py
-          --confirm PUBLISH_REHEARSED_RICH_CANDIDATE
-          --crypto-artifact incoming/crypto
-          --metals-artifact incoming/metals
-          --mtg-artifact incoming/mtg
-          --mtg-repo source_repos/mtg
-          --expected-mtg-head "${{ steps.sources.outputs.mtg_head_sha }}"
-          --crypto-source-run-id "${{ steps.sources.outputs.crypto_run_id }}"
-          --metals-source-run-id "${{ steps.sources.outputs.metals_run_id }}"
-          --mtg-source-run-id "${{ steps.sources.outputs.mtg_run_id }}"
-          --evidence-output data/operations/publication/latest_rich_publication.json
-          2> >(tee -a "$RUNNER_TEMP/publication_errors.log" >&2)
+        shell: bash
+        run: |
+          # A sampling profiler watches the run from outside (it cannot change or stop the publication), so the
+          # slow parts of this ~15-minute step can be found from the run's notices. Remove once optimised.
+          pip install -q py-spy >/dev/null 2>&1 || true
+          python scripts/publish_rehearsed_rich_candidate_v2.py \
+            --confirm PUBLISH_REHEARSED_RICH_CANDIDATE \
+            --crypto-artifact incoming/crypto \
+            --metals-artifact incoming/metals \
+            --mtg-artifact incoming/mtg \
+            --mtg-repo source_repos/mtg \
+            --expected-mtg-head "${{ steps.sources.outputs.mtg_head_sha }}" \
+            --crypto-source-run-id "${{ steps.sources.outputs.crypto_run_id }}" \
+            --metals-source-run-id "${{ steps.sources.outputs.metals_run_id }}" \
+            --mtg-source-run-id "${{ steps.sources.outputs.mtg_run_id }}" \
+            --evidence-output data/operations/publication/latest_rich_publication.json \
+            2> >(tee -a "$RUNNER_TEMP/publication_errors.log" >&2) &
+          pid=$!
+          if command -v py-spy >/dev/null; then
+            sudo "$(command -v py-spy)" record --pid "$pid" --rate 20 --nonblocking --idle --subprocesses --full-filenames --format raw \
+              -o "$RUNNER_TEMP/publish_profile.txt" >/dev/null 2>&1 &
+            spy=$!
+          fi
+          status=0; wait "$pid" || status=$?
+          [ -n "${spy:-}" ] && timeout 60 tail --pid="$spy" -f /dev/null || true
+          python scripts/summarize_profile.py "$RUNNER_TEMP/publish_profile.txt" || true
+          exit "$status"
 
       - name: Upload rich publication evidence
         if: always()

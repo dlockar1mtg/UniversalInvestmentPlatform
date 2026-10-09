@@ -31,7 +31,7 @@ def certify_phase_7_6(root: Path | str = Path.cwd()):
     add("NO_SQLITE_FALLBACK", "UIIP_DATABASE_BACKEND\n        value: postgresql" in render, "Hosted profile explicitly selects PostgreSQL.")
     add("FREE_SERVICE_PROFILE", "plan: free" in render and "autoDeployTrigger: checksPass" in render, "Render deploys the free service only after CI passes.")
     add("BOUNDED_ONE_SHOT", "UIIP_ONE_SHOT_MAX_JOBS" in script and "run_scheduled_cycle" in script, "Scheduled processing is bounded and exits.")
-    add("SCHEDULE_IDEMPOTENCY", 'cron: "17 */6 * * *"' in workflow and "cancel-in-progress: false" in workflow, "Off-hour recurring execution prevents overlapping cycles.")
+    add("SCHEDULE_IDEMPOTENCY", 'cron: "17 13 * * *"' in workflow and "cancel-in-progress: false" in workflow, "Off-hour daily execution prevents overlapping cycles.")
     add("SECRET_BOUNDARY", "secrets.UIIP_DATABASE_URL" in workflow and "sync: false" in render, "Credentials remain in platform secret stores.")
     add("PRIVACY_BOUNDARY", "portfolio_holdings.csv" not in workflow and "upload-artifact" not in workflow, "The workflow does not upload holdings or database material.")
     status = "PASSED" if all(c.status == "PASSED" for c in checks) else "FAILED"

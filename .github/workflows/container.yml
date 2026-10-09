@@ -5,6 +5,8 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+    # A pull request only needs the image build when something the image is made from changed.
+    paths: ["deployment/**", "requirements.txt", "requirements/**", "pyproject.toml", ".github/workflows/container.yml"]
 
 permissions:
   contents: read
