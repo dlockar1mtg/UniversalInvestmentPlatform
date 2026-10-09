@@ -63,6 +63,20 @@ def test_a_published_probability_passes_through_with_its_evidence(tmp_path):
     assert rp["status"] == "PUBLISHED" and rp["probability_12m"] == 0.123 and rp["calibration"]["YIELD_CURVE"]["reliability"]
 
 
+def bubble(**research):
+    r = {"abi": 38.75, "contributions": {"a": 30.0, "b": 8.75}, "missing": [], **research}
+    return {"automatic_execution_authorized": False, "research_version": "1.0.0-R", "model_version": "1.0.0",
+            "current": {"research": r, "strict": {"abi": None, "status": "BLOCKED"}, "factors": []},
+            "legacy_observations": [{"label": "July 16, 2026", "abi_reported": 38.75, "legacy_unverified": True}]}
+
+
+def test_the_bubble_index_passes_through_with_the_package(tmp_path):
+    recs = MP.build_macro_records(write(tmp_path / "p", contract(ai_bubble=bubble())))
+    ab = {r.record_type: r for r in recs}["macro_package"].payload["ai_bubble"]
+    assert ab["current"]["research"]["abi"] == 38.75 and ab["current"]["strict"]["status"] == "BLOCKED"
+    assert MP.build_macro_records(write(tmp_path / "q", contract()))[1].payload["ai_bubble"] is None
+
+
 @pytest.mark.parametrize("change,message", [
     (lambda c: c.update(automatic_execution_authorized=True), "authority"),
     (lambda c: c["current"].update(rsi=1.4), "out of range"),
@@ -74,6 +88,12 @@ def test_a_published_probability_passes_through_with_its_evidence(tmp_path):
     (lambda c: c.update(recession_probability={**published(), "probability_12m": None}), "out of range"),
     (lambda c: c.update(recession_probability={**published(), "chosen_model": "MULTI_FACTOR"}), "chosen model"),
     (lambda c: c.update(recession_probability={**published(), "as_of_month": None}), "as-of month"),
+    (lambda c: c.update(ai_bubble={**bubble(), "automatic_execution_authorized": True}), "ai_bubble must not"),
+    (lambda c: c.update(ai_bubble=bubble(abi=140)), "out of range"),
+    (lambda c: c.update(ai_bubble=bubble(abi=50)), "add up"),
+    (lambda c: c.update(ai_bubble=bubble(missing=["eps_revisions"])), "missing factors"),
+    (lambda c: c.update(ai_bubble={**bubble(), "current": {**bubble()["current"], "strict": {"abi": 30}}}), "blocked"),
+    (lambda c: c.update(ai_bubble={**bubble(), "legacy_observations": [{"legacy_unverified": False}]}), "unverified"),
 ])
 def test_contract_breaks_are_refused(tmp_path, change, message):
     c = contract()
@@ -114,6 +134,7 @@ def test_wiring_publication_api_cycle_and_watchtower():
     assert page.isascii() and 'call("/v1/presentation/macro")' in page
     for text in ("The storm signs", "The six watch-fires", "How it read before past recessions", "Earlier readings (unverified)",
                  "NOT PUBLISHED", "never trades", "The seer\\u2019s glass", "Did the odds come true?", "Before each recession",
+                 "The bubble gauge \\u00b7 AI and technology", "${bubble(pkg.ai_bubble)}", "Earlier manual readings (unverified",
                  'rp.status!=="PUBLISHED"'):
         assert text in page, text
     for forbidden in ("method:\"POST\"", "localStorage", "eval("):

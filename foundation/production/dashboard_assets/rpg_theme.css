@@ -510,4 +510,10 @@ th.num .rpg-sort{justify-content:flex-end;width:100%}
 .rpg-watch-seer-grid caption{caption-side:top;text-align:left;padding:0 0 6px;color:#d9b45a}
 .rpg-watch-seer tr.is-here th,.rpg-watch-seer tr.is-here td{background:rgba(217,180,90,.12);color:#f1d78f}
 .rpg-watch-limits{margin:6px 0 0;padding-left:20px;color:#d8cbb0;line-height:1.5}
-@media (max-width:720px){.rpg-watch-big{font-size:2.6rem}}
+.rpg-watch-abi{border-left-color:#b5652f}
+.rpg-abi-of{font-size:1.1rem;color:#b9a98a;margin-left:4px;font-weight:normal}
+.rpg-abi-table th small{display:block;color:#b9a98a;font-family:var(--font-body);font-size:.88rem;font-weight:normal;line-height:1.35;margin-top:2px;max-width:46ch}
+.rpg-abi-pips{display:inline-flex;gap:3px;vertical-align:middle}
+.rpg-abi-pips i{width:12px;height:12px;border:1px solid #6b5432;background:#15110c}
+.rpg-abi-pips i.is-on{background:#c9813a;border-color:#e2a35e}
+@media (max-width:720px){.rpg-watch-big{font-size:2.6rem}.rpg-abi-table{min-width:0}.rpg-abi-wide{display:none}.rpg-abi-table th small{max-width:none}.rpg-abi-table thead{display:none}.rpg-abi-table tr{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:4px 14px;padding:10px 4px;border-bottom:1px solid #3a3127}.rpg-abi-table th[scope=row]{grid-column:1/-1;border:0;padding:0}.rpg-abi-table td{border:0;padding:0}.rpg-abi-table td:empty{display:none}}
