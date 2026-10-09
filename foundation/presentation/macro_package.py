@@ -71,9 +71,34 @@ def verify_macro_package(directory: Path) -> dict[str, Any]:
             raise MacroPackageError("recession probability out of range")
         if not re.fullmatch(r"\d{4}-\d{2}", str(rp.get("as_of_month") or "")):
             raise MacroPackageError("recession probability needs its as-of month")
+    _verify_ai_bubble(c.get("ai_bubble"))
     if item.get("row_count") != len(c.get("history") or []):
         raise MacroPackageError("macro history length differs from the manifest")
     return {"manifest": manifest, "contract": c}
+
+
+def _verify_ai_bubble(ab) -> None:
+    """The AI / technology bubble index section (optional): research score in range and adding up, the strict
+    version blocked, legacy readings marked unverified, never an execution authority."""
+    if ab is None:
+        return
+    if not isinstance(ab, dict) or ab.get("automatic_execution_authorized") is not False:
+        raise MacroPackageError("ai_bubble must not authorize automatic execution")
+    if ab.get("status") == "FAILED":
+        return
+    cur = ab.get("current") or {}
+    r = cur.get("research") or {}
+    if r.get("abi") is not None:
+        if not 0 <= float(r["abi"]) <= 100:
+            raise MacroPackageError("ai_bubble index out of range")
+        if r.get("missing"):
+            raise MacroPackageError("ai_bubble scored with missing factors")
+        if abs(sum(float(v) for v in (r.get("contributions") or {}).values() if v is not None) - float(r["abi"])) > 0.01:
+            raise MacroPackageError("ai_bubble contributions do not add up to the index")
+    if (cur.get("strict") or {}).get("abi") is not None:
+        raise MacroPackageError("ai_bubble strict v1.0 must stay blocked")
+    if any(not o.get("legacy_unverified") for o in ab.get("legacy_observations") or []):
+        raise MacroPackageError("legacy ai_bubble readings must stay marked unverified")
 
 
 def build_macro_records(directory: Path, *, source_run_id: str | None = None):
@@ -90,7 +115,8 @@ def build_macro_records(directory: Path, *, source_run_id: str | None = None):
                "bands_status": c.get("bands_status"), "history": c.get("history") or [], "evaluation": c.get("evaluation"),
                "legacy_snapshots": c.get("legacy_snapshots") or [], "data_freshness": c.get("data_freshness") or {},
                "recession_probability": c.get("recession_probability"), "asset_environment": c.get("asset_environment"),
-               "housing_opportunity": c.get("housing_opportunity"), "automatic_execution_authorized": False}
+               "housing_opportunity": c.get("housing_opportunity"), "ai_bubble": c.get("ai_bubble"),
+               "automatic_execution_authorized": False}
     return [PresentationRecord("macro_reading", DOMAIN_ID, None, "rsi-current", current),
             PresentationRecord("macro_package", DOMAIN_ID, None, "macro-rsi", package)]
 
