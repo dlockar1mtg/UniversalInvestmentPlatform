@@ -26,6 +26,7 @@ const REALM={
   mtg:{name:"The Archive",plain:"MTG",color:"#6a4a8c",ink:"#c9b0e6"},
   etf:{name:"Merchants' Guild",plain:"ETFs",color:"#4d7a3a",ink:"#a9cf92"},
   acorns:{name:"The Coffer",plain:"Acorns",color:"#8c5a2b",ink:"#dba873"},
+  retirement:{name:"The Reliquary",plain:"Retirement",color:"#3f6f6a",ink:"#9fd0c8"},
   purse:{name:"Coin purse",plain:"T-bills",color:"#7d7466",ink:"#cfc4ae"}
 };
 const COIN_NAMES={bitcoin:"Bitcoin",ethereum:"Ethereum",solana:"Solana",xrp:"XRP",chainlink:"Chainlink",avalanche:"Avalanche"};
@@ -81,7 +82,7 @@ function tuck(page,view,title,detail){
   page.classList.add("rpg-realm-on");
 }
 const HALL_SCROLL=["The steward's ledger","Certified totals, attention, domain health and authority"];
-const TREASURY_SCROLL=["The counting house","Certified portfolio tables, Acorns and manual ETF entry"];
+const TREASURY_SCROLL=["The counting house","Certified portfolio tables, Acorns, retirement statements and manual ETF entry"];
 /* Re-apply the realm layout when dashboard.js rewrites Home or Portfolio after the last render. */
 function guardRealmPage(id,viewId,render,scrollText){
   const page=byId(id);
@@ -107,6 +108,7 @@ const ICON={
   charter:c=>`<svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M10 7 H27 a4 4 0 0 1 4 4 V31 a2 2 0 0 1 -2 2 H12 a4 4 0 0 1 -4 -4 V9 a2 2 0 0 1 2 -2 Z" stroke="${c}" stroke-width="2"/><path d="M13 14 H26 M13 19 H26 M13 24 H21" stroke="${c}" stroke-width="1.4"/><circle cx="25" cy="27" r="3" stroke="${c}" stroke-width="1.4"/></svg>`,
   tome:c=>`<svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M6 18 H34 V32 H6 Z" stroke="${c}" stroke-width="2.2"/><path d="M6 18 a14 9 0 0 1 28 0" stroke="${c}" stroke-width="2"/><rect x="17" y="18" width="6" height="7" stroke="${c}" stroke-width="1.4"/></svg>`,
   coffer:c=>`<svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true"><rect x="6" y="13" width="28" height="19" stroke="${c}" stroke-width="2.2"/><path d="M6 19 H34 M12 13 V32 M28 13 V32" stroke="${c}" stroke-width="1.3"/><path d="M17 8 H23 V13 H17 Z" stroke="${c}" stroke-width="1.4"/><circle cx="20" cy="24" r="2.4" stroke="${c}" stroke-width="1.4"/></svg>`,
+  reliquary:c=>`<svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M10 5 H30 M10 35 H30" stroke="${c}" stroke-width="2.2"/><path d="M12 5 C12 14 18 16 18 20 C18 24 12 26 12 35 M28 5 C28 14 22 16 22 20 C22 24 28 26 28 35" stroke="${c}" stroke-width="2.2"/><path d="M15 31 C17 27 23 27 25 31 Z" fill="${c}"/></svg>`,
   purse:c=>`<svg width="40" height="40" viewBox="0 0 40 40" fill="none" aria-hidden="true"><path d="M14 10 H26 L23 15 C31 18 33 25 31 30 C29 34 11 34 9 30 C7 25 9 18 17 15 Z" stroke="${c}" stroke-width="2"/><path d="M15 15 H25" stroke="${c}" stroke-width="1.4"/></svg>`
 };
 const swatch=color=>`<svg class="rpg-swatch" width="14" height="14" viewBox="0 0 14 14" aria-hidden="true"><rect x=".5" y=".5" width="13" height="13" fill="${color}" stroke="#2a1d12"/></svg>`;
@@ -118,8 +120,9 @@ function realmTabs(active){
 }
 
 /* ---------- The Hall ---------- */
+function retirementItems(d){return (d.retirementAccounts?.accounts||[]).filter(a=>a.category==="retirement"&&a.items?.length).map(a=>a.items[0])}
 function realmTotals(d){
-  const totals={mtg:0,crypto:0,metals:0,etf:0,acorns:0,purse:0};
+  const totals={mtg:0,crypto:0,metals:0,etf:0,acorns:0,purse:0,retirement:0};
   for(const p of d.portfolio?.positions||[]){
     const value=num(p.market_value)??0;
     if(p.domain_id==="metals"&&p.asset_subclass==="cash_proxy")totals.purse+=value;
@@ -128,6 +131,7 @@ function realmTotals(d){
   totals.etf=num(d.manualHoldings?.current_value)||0;
   const acorns=d.externalAccount?.items?.[0];
   totals.acorns=acorns?num(acorns.current_value)||0:0;
+  totals.retirement=retirementItems(d).reduce((a,i)=>a+(num(i.current_value)||0),0);
   return totals;
 }
 function chronicle(d){
@@ -157,7 +161,7 @@ function vitals(refresh){
 }
 function treasuryRing(d){
   const totals=realmTotals(d);
-  const order=["mtg","crypto","etf","acorns","metals","purse"];
+  const order=["mtg","crypto","etf","acorns","retirement","metals","purse"];
   const entries=order.map(key=>[key,totals[key]]).filter(([,v])=>v>0).sort((a,b)=>b[1]-a[1]);
   const sum=entries.reduce((a,[,v])=>a+v,0);
   const C=2*Math.PI*70;
@@ -166,7 +170,7 @@ function treasuryRing(d){
   const share=v=>{const p=v/sum*100;return p<1?"<1%":`${Math.round(p)}%`};
   const aria=entries.map(([key,v])=>`${REALM[key].plain} ${share(v)}`).join(", ");
   const legend=entries.map(([key,v])=>`<div class="rpg-legend-row">${swatch(REALM[key].color)}<span class="rpg-legend-name">${esc(REALM[key].name)} \u00b7 ${esc(REALM[key].plain)}</span><span class="rpg-legend-value">${money(v)}</span><span class="rpg-legend-share">${share(v)}</span></div>`).join("");
-  return `<section class="rpg-parch rpg-treasury" aria-labelledby="rpg-treasury-h"><h2 id="rpg-treasury-h" class="rpg-parch-title">The Treasury</h2><div class="rpg-treasury-body"><svg class="rpg-ring" width="220" height="220" viewBox="0 0 220 220" role="img" aria-label="Worth by realm: ${esc(aria)}"><g transform="rotate(-90 110 110)" fill="none" stroke-width="34">${arcs}</g><circle cx="110" cy="110" r="52" fill="none" stroke="#8a6a3a"/><circle cx="110" cy="110" r="88" fill="none" stroke="#8a6a3a"/><text x="110" y="104" text-anchor="middle" font-family="Cinzel, serif" font-size="13" fill="#5a3d1c" letter-spacing="2">WORTH</text><text x="110" y="128" text-anchor="middle" font-family="Cinzel, serif" font-size="22" font-weight="700" fill="#2a1d12">${esc(money(sum,0))}</text></svg><div class="rpg-legend">${legend}</div></div><p class="rpg-parch-note">Market value: certified prices for crypto, metals and MTG; ETFs at the Merchants' Guild close (provisional); your latest Acorns snapshot.</p><button type="button" class="rpg-btn rpg-link" data-rpg-page="portfolio">Open the inventory \u203a</button></section>`;
+  return `<section class="rpg-parch rpg-treasury" aria-labelledby="rpg-treasury-h"><h2 id="rpg-treasury-h" class="rpg-parch-title">The Treasury</h2><div class="rpg-treasury-body"><svg class="rpg-ring" width="220" height="220" viewBox="0 0 220 220" role="img" aria-label="Worth by realm: ${esc(aria)}"><g transform="rotate(-90 110 110)" fill="none" stroke-width="34">${arcs}</g><circle cx="110" cy="110" r="52" fill="none" stroke="#8a6a3a"/><circle cx="110" cy="110" r="88" fill="none" stroke="#8a6a3a"/><text x="110" y="104" text-anchor="middle" font-family="Cinzel, serif" font-size="13" fill="#5a3d1c" letter-spacing="2">WORTH</text><text x="110" y="128" text-anchor="middle" font-family="Cinzel, serif" font-size="22" font-weight="700" fill="#2a1d12">${esc(money(sum,0))}</text></svg><div class="rpg-legend">${legend}</div></div><p class="rpg-parch-note">Market value: certified prices for crypto, metals and MTG; ETFs at the Merchants' Guild close (provisional); your latest Acorns snapshot and retirement statements.</p><button type="button" class="rpg-btn rpg-link" data-rpg-page="portfolio">Open the inventory \u203a</button></section>`;
 }
 function badge(label,tone){return `<span class="rpg-badge rpg-badge-${tone}">${esc(label)}</span>`}
 function callTone(call){return {ACCUMULATE:"azure",STEADY:"bronze",PAUSE:"crimson",BUY:"verdant",HOLD:"bronze"}[call]||"stone"}
@@ -251,6 +255,7 @@ const KIND={
   charter:{label:"Charter \u00b7 Merchants' Guild (ETF)",color:"#8fbf72",tab:"Charters"},
   tome:{label:"Tome \u00b7 The Archive (MTG)",color:"#b493d6",tab:"Tomes"},
   coffer:{label:"Coffer \u00b7 Acorns",color:"#dba873",tab:"Coffers"},
+  reliquary:{label:"Reliquary \u00b7 retirement",color:"#9fd0c8",tab:"Reliquary"},
   purse:{label:"Coin purse \u00b7 T-bills",color:"#b9a98a",tab:"Purse"}
 };
 const CALL_TEXT={STEADY_ACCUMULATION:"Arcane Vault counsel: keep buying steadily.",ACCUMULATE:"Arcane Vault counsel: add more.",PAUSE_NEW_BUYING:"Arcane Vault counsel: pause new buying.",CONTEXT_ONLY_NO_CALL:"Context only: no call for this coin.",HOLD_NO_BUY_SIGNAL:"Hold: no buy signal today.",BUY_CANDIDATE_NOW:"Buy candidate: listed below the model's buy price today.",WAIT_FOR_LISTING_DISCOUNT:"Wait for a listing discount before buying more."};
@@ -265,6 +270,7 @@ function inventoryItems(d){
   for(const h of d.manualHoldings?.items||[])items.push({key:`manual:${h.symbol}`,symbol:h.symbol,name:h.asset_name||h.symbol,kind:"charter",held:`${qty(h.shares)} shares`,paid:num(h.cost_basis),worth:num(h.current_value),avg:num(h.average_cost),account:h.notes||h.account_id||"\u2014",note:guildNote(h),ledger:h.valuation_source==="ETF_PACKAGE_CLOSE"?["ok",`Shares you entered, valued at the Merchants' Guild close of ${dayLabel(h.valuation_as_of)} (free public data, provisional)`]:["manual","Manual snapshot you entered; no usable close for this fund"],guild:true});
   const ac=d.externalAccount?.items?.[0];
   if(ac)items.push({key:"acorns",symbol:"ACORNS",name:"Acorns account",kind:"coffer",held:"1 account",paid:num(ac.contributed_basis),worth:num(ac.current_value),avg:null,account:ac.provider||"Acorns",note:`Snapshot of ${dayLabel(ac.as_of)}. ${ac.notes||""}`.trim(),ledger:["manual","Manual snapshot you entered from the Acorns app"]});
+  for(const r of retirementItems(d))items.push({key:`retirement:${r.account_id}`,symbol:r.account_id==="retirement-401k"?"401K":String(r.account_id).toUpperCase(),name:r.account_label,kind:"reliquary",held:"1 account",paid:r.basis_known?num(r.contributed_basis):null,worth:num(r.current_value),avg:null,account:r.provider||r.account_label,note:`Statement of ${dayLabel(r.as_of)}.${r.basis_known?"":" Contributions not entered, so no gain is shown."} ${r.notes||""}`.trim(),ledger:["manual","Balance you entered from the statement"]});
   const mtg=(d.portfolio?.positions||[]).filter(p=>p.domain_id==="mtg");
   const groups=[["BOXES","Collector booster boxes",p=>/COLLECTOR/.test(String(p.asset_subclass||p.asset_id))],["LAIRS","Secret Lair drops",p=>/SECRET_LAIR/.test(String(p.asset_subclass||p.asset_id))],["OTHER","Other sealed products",()=>true]];
   const used=new Set();
@@ -277,7 +283,7 @@ function inventoryItems(d){
     const buys=members.filter(p=>p.recommendation==="BUY_CANDIDATE_NOW").length;
     items.push({key:`mtg:${symbol}`,symbol,name,kind:"tome",count:String(count),held:`${count} ${symbol==="BOXES"?"boxes":"drops"}`,paid,worth,avg:count?paid/count:null,account:"Collection",note:`${members.length} product${members.length===1?"":"s"}${buys?`, ${buys} buy candidate${buys===1?"":"s"} today`:""}.`,ledger:["ok","In the UIP ledger and priced by the certified MTG authority"],members:members.map(p=>({name:p.asset_name,qty:num(p.quantity),worth:num(p.market_value),paid:num(p.cost_basis),call:p.recommendation})),domain:"mtg"});
   }
-  const rank={relic:0,ingot:1,charter:2,coffer:3,tome:4,purse:5};
+  const rank={relic:0,ingot:1,charter:2,coffer:3,reliquary:4,tome:5,purse:6};
   return items.sort((a,b)=>rank[a.kind]-rank[b.kind]||(b.worth||0)-(a.worth||0));
 }
 function guildNote(h){
@@ -306,15 +312,15 @@ function renderInventory(d){
     view.addEventListener("click",event=>{const tab=event.target.closest("[data-rpg-filter]");const slot=event.target.closest("[data-rpg-item]");if(tab){state.invFilter=tab.dataset.rpgFilter;renderInventory(state.home)}else if(slot){state.invPick=slot.dataset.rpgItem;renderInventory(state.home);view.querySelector(`[data-rpg-item="${CSS.escape(state.invPick)}"]`)?.focus()}});}
   tuck(page,view,TREASURY_SCROLL[0],TREASURY_SCROLL[1]);
   const all=inventoryItems(d);
-  const kinds=["relic","ingot","charter","tome","coffer","purse"].filter(k=>all.some(i=>i.kind===k));
+  const kinds=["relic","ingot","charter","tome","coffer","reliquary","purse"].filter(k=>all.some(i=>i.kind===k));
   if(state.invFilter!=="all"&&!kinds.includes(state.invFilter))state.invFilter="all";
   const shown=all.filter(i=>state.invFilter==="all"||i.kind===state.invFilter);
   if(!all.some(i=>i.key===state.invPick))state.invPick=(all.find(i=>i.kind==="relic")||all[0]||{}).key||null;
   const pick=all.find(i=>i.key===state.invPick);
-  const worth=all.reduce((a,i)=>a+(i.worth||0),0),paid=all.reduce((a,i)=>a+(i.paid||0),0);
+  const worth=all.reduce((a,i)=>a+(i.worth||0),0),paid=all.reduce((a,i)=>a+(i.kind==="reliquary"&&i.paid===null?(i.worth||0):(i.paid||0)),0);
   const tabs=[["all","All"],...kinds.map(k=>[k,KIND[k].tab])].map(([k,label])=>`<button type="button" class="rpg-btn rpg-tab${state.invFilter===k?" is-active":""}" data-rpg-filter="${k}" aria-pressed="${state.invFilter===k}">${esc(label)}</button>`).join("");
   const slots=shown.map(i=>{const selected=i.key===state.invPick;const gain=i.paid!==null&&i.worth!==null?i.worth-i.paid:null;return `<button type="button" class="rpg-btn rpg-slot${selected?" is-selected":""}" data-rpg-item="${esc(i.key)}" data-rpg-kind="${i.kind}" aria-pressed="${selected}" aria-label="${esc(`${i.name}, worth ${money(i.worth)}`)}"><span class="rpg-slot-top">${ICON[i.kind](KIND[i.kind].color)}<span class="rpg-slot-count num">${esc(i.count||"")}</span></span><span class="rpg-slot-symbol">${esc(i.symbol)}</span><span class="rpg-slot-worth num">${money(i.worth)}</span><span class="rpg-slot-gain num ${upDown(gain)}">${gain===null||!i.paid?"\u2014":pct(gain/i.paid)}</span></button>`}).join("");
-  view.innerHTML=`<header class="rpg-stone rpg-crumbs"><nav aria-label="Breadcrumb"><button type="button" class="rpg-btn rpg-crumb" data-rpg-page="home">The Hall</button><span aria-hidden="true">\u203a</span><span class="rpg-crumb-here">Treasury</span></nav><div class="rpg-crumb-stats"><span>Items <strong class="num">${all.length}</strong></span><span>Worth <strong class="num">${money(worth)}</strong></span><span>Gold paid <strong class="num">${money(paid)}</strong></span></div></header>${realmTabs("treasury")}<div class="rpg-inventory-layout"><section class="rpg-stone rpg-inventory" aria-labelledby="rpg-inv-h"><div class="rpg-section-head"><h2 id="rpg-inv-h" class="rpg-stone-title">Inventory</h2><div class="rpg-tabs" role="group" aria-label="Filter by kind">${tabs}</div></div><div class="rpg-slots">${slots}</div></section>${inventoryDetail(pick)}</div>${footer("Quantities and amounts paid from the UIP ledger. ETF rows are the shares you entered, valued at the Merchants' Guild close; Acorns is your own snapshot.")}`;
+  view.innerHTML=`<header class="rpg-stone rpg-crumbs"><nav aria-label="Breadcrumb"><button type="button" class="rpg-btn rpg-crumb" data-rpg-page="home">The Hall</button><span aria-hidden="true">\u203a</span><span class="rpg-crumb-here">Treasury</span></nav><div class="rpg-crumb-stats"><span>Items <strong class="num">${all.length}</strong></span><span>Worth <strong class="num">${money(worth)}</strong></span><span>Gold paid <strong class="num">${money(paid)}</strong></span></div></header>${realmTabs("treasury")}<div class="rpg-inventory-layout"><section class="rpg-stone rpg-inventory" aria-labelledby="rpg-inv-h"><div class="rpg-section-head"><h2 id="rpg-inv-h" class="rpg-stone-title">Inventory</h2><div class="rpg-tabs" role="group" aria-label="Filter by kind">${tabs}</div></div><div class="rpg-slots">${slots}</div></section>${inventoryDetail(pick)}</div>${footer("Quantities and amounts paid from the UIP ledger. ETF rows are the shares you entered, valued at the Merchants' Guild close; Acorns and the Reliquary are your own snapshots and statements.")}`;
 }
 
 /* ---------- The Arcane Vault: a coin's research page ---------- */

@@ -97,6 +97,26 @@ def test_acorns_external_account_renders_with_populated_transaction_portfolio():
     assert 'request("/v1/external-accounts/performance"' in javascript
 
 
+def test_retirement_statements_join_net_worth_the_treasury_and_the_homestead():
+    _, _, javascript = assets()
+    assert "function renderRetirementAccounts(document)" in javascript
+    assert javascript.count("renderRetirementAccounts(retirementAccounts);renderManualHoldings(manualHoldings);") == 3
+    assert 'optional("/v1/external-accounts/summary")' in javascript
+    assert "const retirement=retirementTotals();" in javascript and 'allocation["Retirement"]' in javascript
+    assert "manualHoldings,externalAccount,retirementAccounts,transactions:transactionItems}" in javascript
+    for value in ('"retirement-401k"', '"hsa"', '"pension"'):
+        assert value in javascript
+    realm = (ASSETS / "rpg_realm.js").read_text(encoding="utf-8")
+    assert realm.isascii() and 'retirement:{name:"The Reliquary"' in realm and "function retirementItems(d)" in realm
+    assert '["mtg","crypto","etf","acorns","retirement","metals","purse"]' in realm and 'kind:"reliquary"' in realm
+    home = (ASSETS / "homestead.js").read_text(encoding="utf-8")
+    assert home.isascii() and "data-home-use-statements" in home and "RETIREMENT_STATEMENTS" in home
+    # The projection takes the "retirement" holding as the retirement start, never as an investment sleeve.
+    import json
+    sleeves = json.loads((ROOT / "config/household/projection_assumptions.json").read_text())["holding_sleeves"]
+    assert "retirement" not in sleeves
+
+
 def test_dashboard_preserves_legacy_operations_portfolio_for_reconciliation_only():
     html, _, javascript = assets()
     for identity in (
