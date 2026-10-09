@@ -138,6 +138,18 @@ def test_projection_ranges_house_goal_and_live_holdings():
         project(plan, as_of_month="2026-09", holdings={"stamps": 10})
 
 
+def test_retirement_statements_start_the_retirement_balance_and_never_join_the_investments():
+    plan = H.import_books(*books(months=8), "abc")
+    plan["settings"]["target_month"] = "2027-02"
+    base = project(plan, as_of_month="2026-09", holdings={"etf": 1000})
+    assert base["starting_retirement_source"] == "PLAN_BALANCE"
+    out = project(plan, as_of_month="2026-09", holdings={"etf": 1000, "retirement": 50000})
+    assert out["starting_retirement_source"] == "RETIREMENT_STATEMENTS" and out["starting_retirement"] == 50000
+    assert out["starting_investments"] == 1000 and "retirement" not in out["starting_by_sleeve"]
+    assert out["target_by_sleeve_median"]["retirement"] > 50000 * 0.9
+    assert out["house"]["need_low"] == base["house"]["need_low"]          # house money unchanged: retirement is not counted
+
+
 def test_retirement_is_left_out_of_house_money_by_default():
     plan = H.import_books(*books(months=8), "abc")
     plan["settings"]["target_month"] = "2027-02"

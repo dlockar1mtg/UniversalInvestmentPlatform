@@ -35,7 +35,7 @@ def test_portfolio_exposes_unified_all_account_overview():
     for marker in (
         "function renderOverallPortfolioOverview()",
         "Overall portfolio",
-        "Certified holdings + Acorns + manual stocks & ETFs",
+        "Certified holdings + Acorns + retirement + manual stocks & ETFs",
         "Total current value",
         "Total cost basis",
         "Total gain / loss",

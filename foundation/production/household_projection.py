@@ -57,6 +57,8 @@ def project(plan: dict, *, as_of_month: str, holdings: dict | None = None, assum
     # Starting point: live holdings by sleeve when the dashboard sends them, else the plan's balance.
     begin = {k: 0.0 for k in invest_keys}
     live = {k: float(v) for k, v in (holdings or {}).items() if isinstance(v, (int, float)) and v > 0}
+    # Retirement statements (when entered) start the retirement balance; they are never an investment sleeve.
+    live_retirement = live.pop("retirement", None)
     if live:
         for key, value in live.items():
             sleeve = a["holding_sleeves"].get(key)
@@ -81,7 +83,8 @@ def project(plan: dict, *, as_of_month: str, holdings: dict | None = None, assum
     keep = np.array([1 - sleeves[k]["sell_cost"] for k in invest_keys])
 
     inv = np.tile(np.array([begin[k] for k in invest_keys]), (n_paths, 1))
-    ret = np.full(n_paths, rows[start]["retirement_balance"])
+    start_retirement = live_retirement if live_retirement is not None else rows[start]["retirement_balance"]
+    ret = np.full(n_paths, start_retirement)
     series = []
 
     def snapshot(k, inv, ret):
@@ -137,6 +140,8 @@ def project(plan: dict, *, as_of_month: str, holdings: dict | None = None, assum
         "target_in_plan": target in months, "starting_investments": round(start_investments, 2),
         "starting_investments_source": source, "starting_by_sleeve": {k: round(v, 2) for k, v in begin.items()},
         "investment_contributions_ahead": round(contributed, 2),
+        "starting_retirement": round(float(start_retirement), 2),
+        "starting_retirement_source": "RETIREMENT_STATEMENTS" if live_retirement is not None else "PLAN_BALANCE",
         "safety_fund": safety, "house_counts_retirement": s["house_counts_retirement"],
         "series": series, "target": series[-1],
         "target_by_sleeve_median": by_sleeve,

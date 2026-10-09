@@ -7,6 +7,11 @@ from decimal import Decimal
 import hashlib, json, sqlite3
 from typing import Callable, Mapping, Protocol, Sequence
 
+# Accounts tracked by manual snapshot: id -> (label, category). Retirement accounts are entered from each
+# statement (balance, and contributions to date when the statement shows them).
+ACCOUNTS = {"acorns": ("Acorns", "brokerage"), "retirement-401k": ("401(k) / 403(b)", "retirement"),
+            "hsa": ("HSA", "retirement"), "pension": ("Pension", "retirement")}
+
 @dataclass(frozen=True)
 class ExternalAccountPerformance:
     snapshot_id: str
@@ -21,15 +26,19 @@ class ExternalAccountPerformance:
     notes: str = ""
     authority_state: str = "MANUAL_USER_ENTERED_EXTERNAL_ACCOUNT_PERFORMANCE"
     def __post_init__(self):
-        if self.account_id != "acorns" or self.provider != "Acorns": raise ValueError("only the Acorns account is supported")
+        if self.account_id not in ACCOUNTS: raise ValueError(f"unknown account: {self.account_id}")
+        if self.account_id == "acorns" and self.provider != "Acorns": raise ValueError("the Acorns account's provider is Acorns")
+        if not self.provider.strip() or len(self.provider) > 80 or not self.provider.isprintable(): raise ValueError("provider must be 1-80 printable characters")
         if self.as_of.tzinfo is None or self.recorded_at.tzinfo is None: raise ValueError("timestamps must be timezone-aware")
         if self.current_value < 0 or self.contributed_basis < 0: raise ValueError("values must be non-negative")
     @property
-    def gain_loss(self): return self.current_value - self.contributed_basis
+    def basis_known(self): return self.account_id == "acorns" or self.contributed_basis > 0
     @property
-    def return_pct(self): return None if self.contributed_basis == 0 else self.gain_loss / self.contributed_basis * Decimal(100)
+    def gain_loss(self): return self.current_value - self.contributed_basis if self.basis_known else None
+    @property
+    def return_pct(self): return None if self.contributed_basis == 0 or self.gain_loss is None else self.gain_loss / self.contributed_basis * Decimal(100)
     def document(self):
-        return {"snapshot_id":self.snapshot_id,"fingerprint":self.fingerprint,"account_id":self.account_id,"provider":self.provider,"as_of":self.as_of.isoformat(),"current_value":str(self.current_value),"contributed_basis":str(self.contributed_basis),"gain_loss":str(self.gain_loss),"return_pct":None if self.return_pct is None else str(self.return_pct),"recorded_at":self.recorded_at.isoformat(),"recorded_by":self.recorded_by,"notes":self.notes,"authority_state":self.authority_state}
+        return {"snapshot_id":self.snapshot_id,"fingerprint":self.fingerprint,"account_id":self.account_id,"provider":self.provider,"as_of":self.as_of.isoformat(),"current_value":str(self.current_value),"contributed_basis":str(self.contributed_basis),"account_label":ACCOUNTS[self.account_id][0],"category":ACCOUNTS[self.account_id][1],"basis_known":self.basis_known,"gain_loss":None if self.gain_loss is None else str(self.gain_loss),"return_pct":None if self.return_pct is None else str(self.return_pct),"recorded_at":self.recorded_at.isoformat(),"recorded_by":self.recorded_by,"notes":self.notes,"authority_state":self.authority_state}
 
 class ExternalAccountPerformanceRepository(Protocol):
     def initialize(self)->None: ...
