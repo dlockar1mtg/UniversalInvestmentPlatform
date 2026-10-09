@@ -104,11 +104,15 @@ def test_retirement_statements_join_net_worth_the_treasury_and_the_homestead():
     assert 'optional("/v1/external-accounts/summary")' in javascript
     assert "const retirement=retirementTotals();" in javascript and 'allocation["Retirement"]' in javascript
     assert "manualHoldings,externalAccount,retirementAccounts,transactions:transactionItems}" in javascript
-    for value in ('"retirement-401k"', '"hsa"', '"pension"'):
+    for value in ('"retirement-401k"', '"ira"', '"hsa"', '"pension"', '"/v1/external-accounts/schedule"', "Save paychecks only",
+                  "function retirementSlug(name)", "a.estimate?.value"):
         assert value in javascript
     realm = (ASSETS / "rpg_realm.js").read_text(encoding="utf-8")
     assert realm.isascii() and 'retirement:{name:"The Reliquary"' in realm and "function retirementItems(d)" in realm
     assert '["mtg","crypto","etf","acorns","retirement","metals","purse"]' in realm and 'kind:"reliquary"' in realm
+    assert "r.estimate?.value??r.items[0].current_value" in realm
+    # The Market Board opens on every fund; "grouped only" is an option.
+    assert 'guildFilter:{family:"ALL"' in realm and 'opt("ALL",`All ${funds.length} funds`,st.family)' in realm
     home = (ASSETS / "homestead.js").read_text(encoding="utf-8")
     assert home.isascii() and "data-home-use-statements" in home and "RETIREMENT_STATEMENTS" in home
     # The projection takes the "retirement" holding as the retirement start, never as an investment sleeve.
