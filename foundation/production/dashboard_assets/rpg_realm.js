@@ -3,7 +3,7 @@
    Read-only presentation: nothing here records, changes or executes anything. */
 (()=>{
 "use strict";
-const state={home:null,catalog:null,catalogPromise:null,invFilter:"all",invPick:null,guild:null,guildPromise:null,guildPick:null,guildDetail:null,guildFilter:{family:"",group:"",q:"",mine:false,best:false,buys:false,sort:"default",dir:"desc",cols:{},nums:{},limit:50}};
+const state={home:null,catalog:null,catalogPromise:null,invFilter:"all",invPick:null,guild:null,guildPromise:null,guildPick:null,guildDetail:null,guildFilter:{family:"ALL",group:"",q:"",mine:false,best:false,buys:false,sort:"default",dir:"desc",cols:{},nums:{},limit:50}};
 const byId=id=>document.getElementById(id);
 const esc=value=>{const node=document.createElement("span");node.textContent=String(value??"");return node.innerHTML};
 const num=value=>{if(value===null||value===undefined||value==="")return null;const n=Number(value);return Number.isFinite(n)?n:null};
@@ -120,7 +120,8 @@ function realmTabs(active){
 }
 
 /* ---------- The Hall ---------- */
-function retirementItems(d){return (d.retirementAccounts?.accounts||[]).filter(a=>a.category==="retirement"&&a.items?.length).map(a=>a.items[0])}
+function retirementItems(d){return (d.retirementAccounts?.accounts||[]).filter(a=>a.category==="retirement"&&a.items?.length)}
+const RET_SYMBOL={"retirement-401k":"401K",ira:"IRA",hsa:"HSA",pension:"PENSION"};
 function realmTotals(d){
   const totals={mtg:0,crypto:0,metals:0,etf:0,acorns:0,purse:0,retirement:0};
   for(const p of d.portfolio?.positions||[]){
@@ -131,7 +132,7 @@ function realmTotals(d){
   totals.etf=num(d.manualHoldings?.current_value)||0;
   const acorns=d.externalAccount?.items?.[0];
   totals.acorns=acorns?num(acorns.current_value)||0:0;
-  totals.retirement=retirementItems(d).reduce((a,i)=>a+(num(i.current_value)||0),0);
+  totals.retirement=retirementItems(d).reduce((a,r)=>a+(num(r.estimate?.value??r.items[0].current_value)||0),0);
   return totals;
 }
 function chronicle(d){
@@ -270,7 +271,7 @@ function inventoryItems(d){
   for(const h of d.manualHoldings?.items||[])items.push({key:`manual:${h.symbol}`,symbol:h.symbol,name:h.asset_name||h.symbol,kind:"charter",held:`${qty(h.shares)} shares`,paid:num(h.cost_basis),worth:num(h.current_value),avg:num(h.average_cost),account:h.notes||h.account_id||"\u2014",note:guildNote(h),ledger:h.valuation_source==="ETF_PACKAGE_CLOSE"?["ok",`Shares you entered, valued at the Merchants' Guild close of ${dayLabel(h.valuation_as_of)} (free public data, provisional)`]:["manual","Manual snapshot you entered; no usable close for this fund"],guild:true});
   const ac=d.externalAccount?.items?.[0];
   if(ac)items.push({key:"acorns",symbol:"ACORNS",name:"Acorns account",kind:"coffer",held:"1 account",paid:num(ac.contributed_basis),worth:num(ac.current_value),avg:null,account:ac.provider||"Acorns",note:`Snapshot of ${dayLabel(ac.as_of)}. ${ac.notes||""}`.trim(),ledger:["manual","Manual snapshot you entered from the Acorns app"]});
-  for(const r of retirementItems(d))items.push({key:`retirement:${r.account_id}`,symbol:r.account_id==="retirement-401k"?"401K":String(r.account_id).toUpperCase(),name:r.account_label,kind:"reliquary",held:"1 account",paid:r.basis_known?num(r.contributed_basis):null,worth:num(r.current_value),avg:null,account:r.provider||r.account_label,note:`Statement of ${dayLabel(r.as_of)}.${r.basis_known?"":" Contributions not entered, so no gain is shown."} ${r.notes||""}`.trim(),ledger:["manual","Balance you entered from the statement"]});
+  for(const r of retirementItems(d)){const st=r.items[0],e=r.estimate||{},sc=r.schedule;const paid=st.basis_known?num(e.basis??st.contributed_basis):null;items.push({key:`retirement:${r.account_id}`,symbol:String(r.name||RET_SYMBOL[r.account_kind]||"RETIRE").toUpperCase().slice(0,12),name:r.name||r.account_label,kind:"reliquary",held:r.account_label,paid,worth:num(e.value??st.current_value),avg:null,account:r.account_label,note:`Balance of ${dayLabel(st.as_of)}${e.paychecks_since?`, plus ${e.paychecks_since} paycheck deposit${e.paychecks_since===1?"":"s"} since`:""}.${sc?` Deposits of ${money(num(sc.per_paycheck))} every ${sc.every_days} days.`:""}${st.basis_known?"":" Contributions not entered, so no gain is shown."} ${st.notes||""}`.trim(),ledger:["manual",e.paychecks_since?"Balance you entered, plus scheduled paycheck deposits (no market change assumed)":"Balance you entered from the statement or app"]})}
   const mtg=(d.portfolio?.positions||[]).filter(p=>p.domain_id==="mtg");
   const groups=[["BOXES","Collector booster boxes",p=>/COLLECTOR/.test(String(p.asset_subclass||p.asset_id))],["LAIRS","Secret Lair drops",p=>/SECRET_LAIR/.test(String(p.asset_subclass||p.asset_id))],["OTHER","Other sealed products",()=>true]];
   const used=new Set();
@@ -315,7 +316,7 @@ function renderInventory(d){
   const kinds=["relic","ingot","charter","tome","coffer","reliquary","purse"].filter(k=>all.some(i=>i.kind===k));
   if(state.invFilter!=="all"&&!kinds.includes(state.invFilter))state.invFilter="all";
   const shown=all.filter(i=>state.invFilter==="all"||i.kind===state.invFilter);
-  if(!all.some(i=>i.key===state.invPick))state.invPick=(all.find(i=>i.kind==="relic")||all[0]||{}).key||null;
+  if(!shown.some(i=>i.key===state.invPick))state.invPick=(shown.find(i=>i.kind==="relic")||shown[0]||{}).key||null;
   const pick=all.find(i=>i.key===state.invPick);
   const worth=all.reduce((a,i)=>a+(i.worth||0),0),paid=all.reduce((a,i)=>a+(i.kind==="reliquary"&&i.paid===null?(i.worth||0):(i.paid||0)),0);
   const tabs=[["all","All"],...kinds.map(k=>[k,KIND[k].tab])].map(([k,label])=>`<button type="button" class="rpg-btn rpg-tab${state.invFilter===k?" is-active":""}" data-rpg-filter="${k}" aria-pressed="${state.invFilter===k}">${esc(label)}</button>`).join("");
@@ -595,7 +596,7 @@ function guildBoard(funds,held){
   const fams=["US_EQUITY","INTL_EQUITY","BONDS","OTHER","NONE"].filter(k=>funds.some(f=>guildFamily(f)===k));
   const groups=[...new Set(funds.filter(f=>st.family==="ALL"||(!st.family?guildFamily(f)!=="NONE":guildFamily(f)===st.family)).map(f=>f.peer_group))].sort((a,b)=>groupName(a).localeCompare(groupName(b)));
   const opt=(v,label,cur)=>`<option value="${esc(v)}"${v===cur?" selected":""}>${esc(label)}</option>`;
-  return `<section class="rpg-stone rpg-guild-ledger" aria-labelledby="rpg-board-h"><div class="rpg-section-head"><h2 id="rpg-board-h" class="rpg-stone-title">The Market Board</h2><span class="rpg-crumb-note">Total return, distributions reinvested</span></div><div class="rpg-board-filters" role="search"><label>Family <select data-rpg-filter-key="family">${opt("","All grouped funds",st.family)}${fams.map(k=>opt(k,FAMILY_NAME[k],st.family)).join("")}${opt("ALL","Everything, incl. specialized",st.family)}</select></label>${st.group?`<label class="rpg-check"><input type="checkbox" data-rpg-filter-key="group" value="" checked> Only ${esc(groupName(st.group))}</label>`:""}<label class="rpg-check"><input type="checkbox" data-rpg-filter-key="mine"${st.mine?" checked":""}> Your funds</label><label class="rpg-check"><input type="checkbox" data-rpg-filter-key="best"${st.best?" checked":""}> Best of each exposure</label><span class="rpg-crumb-note rpg-board-hint">Click a column name to sort; click again to flip. Use the row under the names to filter.</span></div><div id="rpg-guild-board">${guildBoardRows(funds,held)}</div></section>`;
+  return `<section class="rpg-stone rpg-guild-ledger" aria-labelledby="rpg-board-h"><div class="rpg-section-head"><h2 id="rpg-board-h" class="rpg-stone-title">The Market Board</h2><span class="rpg-crumb-note">Total return, distributions reinvested</span></div><div class="rpg-board-filters" role="search"><label>Family <select data-rpg-filter-key="family">${opt("ALL",`All ${funds.length} funds`,st.family)}${opt("","Grouped funds only (hides specialized)",st.family)}${fams.map(k=>opt(k,FAMILY_NAME[k],st.family)).join("")}</select></label>${st.group?`<label class="rpg-check"><input type="checkbox" data-rpg-filter-key="group" value="" checked> Only ${esc(groupName(st.group))}</label>`:""}<label class="rpg-check"><input type="checkbox" data-rpg-filter-key="mine"${st.mine?" checked":""}> Your funds</label><label class="rpg-check"><input type="checkbox" data-rpg-filter-key="best"${st.best?" checked":""}> Best of each exposure</label><span class="rpg-crumb-note rpg-board-hint">Click a column name to sort; click again to flip. Use the row under the names to filter.</span></div><div id="rpg-guild-board">${guildBoardRows(funds,held)}</div></section>`;
 }
 function guildChart(f){
   const hist=(f.history_monthly||[]).filter(r=>num(r.close)!==null);

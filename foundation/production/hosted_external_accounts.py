@@ -1,25 +1,29 @@
 """Authenticated manual external account routes: Acorns snapshots and retirement statements.
 
 GET  /v1/external-accounts/performance?account_id=acorns  history for one account (Acorns by default)
-GET  /v1/external-accounts/summary                        latest snapshot and history for every account
+GET  /v1/external-accounts/summary                        every account: latest statements, paycheck schedule,
+                                                          and today's estimate (statement + paychecks since)
 POST /v1/external-accounts/performance                    record a snapshot (operator)
+PUT  /v1/external-accounts/schedule                       set or clear an account's paycheck deposits (operator)
+
+An account id is a kind ("acorns", "retirement-401k", "ira", "hsa", "pension") or "kind:name-slug" when a person
+holds several accounts of one kind.
 """
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from decimal import Decimal, InvalidOperation
 from uuid import uuid4
 from fastapi import Header, Request
 from fastapi.responses import JSONResponse
 from .observability import OperationalEvent
 from .security import APIKeyAuthenticator, Permission
-from .external_account_performance import ACCOUNTS, create_snapshot
+from .external_account_performance import KINDS, create_snapshot, estimate, kind_of, monthly_equivalent, validate_schedule
 
 AUTHORITY = "MANUAL_USER_ENTERED_EXTERNAL_ACCOUNT_PERFORMANCE"
 
 
 def _account(value) -> str:
     account = str(value if value not in (None, "") else "acorns").strip().lower()
-    if account not in ACCOUNTS:
-        raise ValueError(f"account_id must be one of: {', '.join(ACCOUNTS)}")
+    kind_of(account)
     return account
 
 
@@ -32,6 +36,8 @@ def install_external_account_performance_routes(app, settings, repository):
         if p is None:return None,JSONResponse({"error":{"code":"UNAUTHENTICATED","message":"valid credentials are required"}},status_code=401)
         if not p.permits(permission):return p,JSONResponse({"error":{"code":"FORBIDDEN","message":"permission is required"}},status_code=403)
         return p,None
+    def record(name,correlation,payload):
+        if hasattr(app.state,"events"): app.state.events.record(OperationalEvent(name,datetime.now(timezone.utc),correlation,payload))
     @app.get("/v1/external-accounts/performance")
     def read(limit:int=20,account_id:str="acorns",x_api_key:str|None=Header(default=None)):
         _,denied=authorize(x_api_key,Permission.RUN_READ)
@@ -39,19 +45,30 @@ def install_external_account_performance_routes(app, settings, repository):
         try:
             account=_account(account_id); items=repository.history(account,limit)
         except ValueError as exc:return JSONResponse({"error":{"code":"INVALID_REQUEST","message":str(exc)}},status_code=422)
-        label,category=ACCOUNTS[account]
+        label,category=KINDS[kind_of(account)]
         return {"account_id":account,"provider":"Acorns" if account=="acorns" else (items[0].provider if items else label),"account_label":label,
                 "category":category,"items":[i.document() for i in items],"authority_state":AUTHORITY}
     @app.get("/v1/external-accounts/summary")
-    def summary(limit:int=24,x_api_key:str|None=Header(default=None)):
+    def summary(limit:int=24,today:str|None=None,x_api_key:str|None=Header(default=None)):
         _,denied=authorize(x_api_key,Permission.RUN_READ)
         if denied:return denied
-        try: accounts=[{"account_id":a,"account_label":label,"category":category,"items":[i.document() for i in repository.history(a,limit)]}
-                       for a,(label,category) in ACCOUNTS.items()]
-        except ValueError as exc:return JSONResponse({"error":{"code":"INVALID_LIMIT","message":str(exc)}},status_code=422)
-        latest=[a["items"][0] for a in accounts if a["items"]]
-        retirement=[i for i in latest if i["category"]=="retirement"]
-        return {"accounts":accounts,"retirement_value":str(sum((Decimal(i["current_value"]) for i in retirement),Decimal(0))),
+        try:
+            day=date.fromisoformat(today) if today else datetime.now(timezone.utc).date()
+            schedules=repository.schedules()
+            ids=sorted(set(repository.accounts())|{"acorns"},key=lambda a:(list(KINDS).index(kind_of(a)),a))
+            accounts=[]
+            for a in ids:
+                kind=kind_of(a); label,category=KINDS[kind]; items=repository.history(a,limit); sched=schedules.get(a)
+                if not items and a!="acorns": continue
+                accounts.append({"account_id":a,"account_kind":kind,"account_label":label,"category":category,
+                                 "name":items[0].provider if items else label,"items":[i.document() for i in items],
+                                 "schedule":None if not sched else {**sched,"monthly_equivalent":monthly_equivalent(sched["per_paycheck"],sched["every_days"])},
+                                 "estimate":estimate(items[0],sched,day) if items else None})
+        except ValueError as exc:return JSONResponse({"error":{"code":"INVALID_REQUEST","message":str(exc)}},status_code=422)
+        retirement=[a for a in accounts if a["category"]=="retirement" and a["items"]]
+        return {"as_of_date":day.isoformat(),"accounts":accounts,
+                "retirement_value":str(sum((Decimal(a["estimate"]["value"]) for a in retirement),Decimal(0))),
+                "retirement_statement_value":str(sum((Decimal(a["items"][0]["current_value"]) for a in retirement),Decimal(0))),
                 "retirement_accounts_entered":len(retirement),"authority_state":AUTHORITY}
     @app.post("/v1/external-accounts/performance")
     async def write(request:Request,x_api_key:str|None=Header(default=None),x_correlation_id:str|None=Header(default=None)):
@@ -61,7 +78,7 @@ def install_external_account_performance_routes(app, settings, repository):
             body=await request.json()
             if not isinstance(body,dict): raise ValueError("body must be a JSON object")
             account=_account(body.get("account_id"))
-            provider="Acorns" if account=="acorns" else (str(body.get("provider") or "").strip() or ACCOUNTS[account][0])
+            provider="Acorns" if account=="acorns" else (str(body.get("provider") or "").strip() or KINDS[kind_of(account)][0])
             as_of=datetime.fromisoformat(str(body.get("as_of","")).replace("Z","+00:00"))
             if as_of.tzinfo is None: raise ValueError("as_of must include timezone")
             current=Decimal(str(body.get("current_value","")))
@@ -74,5 +91,21 @@ def install_external_account_performance_routes(app, settings, repository):
             persisted=repository.save(item)
         except (ValueError,InvalidOperation,KeyError) as exc:
             return JSONResponse({"error":{"code":"EXTERNAL_ACCOUNT_INVALID","message":str(exc)}},status_code=422,headers={"X-Correlation-ID":correlation})
-        if hasattr(app.state,"events"): app.state.events.record(OperationalEvent("EXTERNAL_ACCOUNT_PERFORMANCE_RECORDED",datetime.now(timezone.utc),correlation,{"account_id":account,"snapshot_id":persisted.snapshot_id,"principal_id":principal.principal_id}))
+        record("EXTERNAL_ACCOUNT_PERFORMANCE_RECORDED",correlation,{"account_id":account,"snapshot_id":persisted.snapshot_id,"principal_id":principal.principal_id})
         return JSONResponse({"created":existed is None or existed.fingerprint!=persisted.fingerprint,"snapshot":persisted.document()},status_code=201,headers={"X-Correlation-ID":correlation})
+    @app.put("/v1/external-accounts/schedule")
+    async def schedule(request:Request,x_api_key:str|None=Header(default=None),x_correlation_id:str|None=Header(default=None)):
+        correlation=x_correlation_id or str(uuid4()); principal,denied=authorize(x_api_key,Permission.RUN_SUBMIT)
+        if denied: denied.headers["X-Correlation-ID"]=correlation; return denied
+        try:
+            body=await request.json()
+            if not isinstance(body,dict): raise ValueError("body must be a JSON object")
+            account=_account(body.get("account_id"))
+            if KINDS[kind_of(account)][1]!="retirement": raise ValueError("paycheck deposits apply to retirement accounts only")
+            if account not in repository.accounts(): raise ValueError("enter a statement for this account first")
+            sched=None if body.get("clear") else validate_schedule(body.get("per_paycheck"),body.get("every_days",14),body.get("next_paycheck"))
+            repository.save_schedule(account,sched,principal.principal_id)
+        except (ValueError,InvalidOperation,TypeError) as exc:
+            return JSONResponse({"error":{"code":"EXTERNAL_ACCOUNT_INVALID","message":str(exc)}},status_code=422,headers={"X-Correlation-ID":correlation})
+        record("EXTERNAL_ACCOUNT_SCHEDULE_SET",correlation,{"account_id":account,"cleared":sched is None,"principal_id":principal.principal_id})
+        return JSONResponse({"account_id":account,"schedule":sched},status_code=200,headers={"X-Correlation-ID":correlation})
