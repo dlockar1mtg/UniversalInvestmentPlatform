@@ -64,6 +64,10 @@ def main(argv=None, fetch=_fetch, now=None) -> int:
         time.sleep(args.sleep_seconds)
     if not fresh:
         raise SystemExit(f"no crypto prices fetched ({'; '.join(failures)})")
+    core_failed = [a for a in ("bitcoin", "ethereum") if a not in fresh]
+    if core_failed:
+        # The calls are made for these two: fail visibly rather than commit a file where they silently lag.
+        raise SystemExit(f"core crypto prices not fetched: {', '.join(core_failed)} ({'; '.join(failures)})")
     stamp = (now or datetime.now(timezone.utc)).strftime("%Y-%m-%dT%H:%M:%SZ")
     rows = merge(existing, fresh, stamp)
     args.output.parent.mkdir(parents=True, exist_ok=True)

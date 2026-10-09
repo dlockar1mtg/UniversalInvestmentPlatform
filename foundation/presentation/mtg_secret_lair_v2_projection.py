@@ -27,6 +27,7 @@ REQUIRED_COLUMNS = (
     "expected_return_6m", "expected_net_return_6m", "call", "note", "rank", "ranked_products", "model_version",
 )
 COPIED = REQUIRED_COLUMNS[2:]
+OPTIONAL_COPIED = ("buy_shipping_usd", "landed_buy_price")      # present once the buyer's shipping is counted
 
 
 def _read_csv(path: Path) -> list[dict[str, str]]:
@@ -113,9 +114,9 @@ def build_secret_lair_v2_records(decisions_path: Path, export_path: Path, *, tod
             "horizon_months": summary.get("horizon_months"),
         }
         if decision:
-            payload.update({field: decision.get(field, "") for field in COPIED})
+            payload.update({field: decision.get(field, "") for field in COPIED + OPTIONAL_COPIED})
         else:
-            payload.update({field: "" for field in COPIED})
+            payload.update({field: "" for field in COPIED + OPTIONAL_COPIED})
             payload.update({"call": "NO_PRICE", "note": "NOT_IN_DAILY_PRICE_FEED", "as_of": as_of})
         records.append(PresentationRecord(record_type=RECORD_TYPE, domain_id=DOMAIN_ID, asset_id=payload["mtg_asset_id"],
                                           record_key=payload["mtg_asset_id"], payload=payload))

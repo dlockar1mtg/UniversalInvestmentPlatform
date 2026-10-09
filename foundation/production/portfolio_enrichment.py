@@ -76,9 +76,13 @@ class EnrichedPortfolioResult:
     positions: tuple[EnrichedPortfolioPosition, ...]
     effective_transaction_count: int
     superseded_transaction_count: int
+    closed_realized_pl: Decimal = Decimal("0")
+    closed_realized_complete: bool = True
+    closed_position_count: int = 0
 
     def document(self) -> dict[str, object]:
         priced = tuple(item for item in self.positions if item.market_value is not None)
+        matched = tuple(item for item in priced if item.cost_basis is not None)   # value and basis both known
         known_basis = tuple(item for item in self.positions if item.cost_basis is not None)
         market_value = sum((item.market_value for item in priced if item.market_value is not None), Decimal("0"))
         cost_basis = sum((item.cost_basis for item in known_basis if item.cost_basis is not None), Decimal("0"))
@@ -102,6 +106,12 @@ class EnrichedPortfolioResult:
             "known_market_value": str(market_value),
             "known_cost_basis": str(cost_basis),
             "known_unrealized_pl": str(unrealized),
+            "matched_position_count": len(matched),
+            "matched_market_value": str(sum((item.market_value for item in matched), Decimal("0"))),
+            "matched_cost_basis": str(sum((item.cost_basis for item in matched), Decimal("0"))),
+            "realized_pl_closed_positions": str(self.closed_realized_pl),
+            "realized_pl_closed_complete": self.closed_realized_complete,
+            "closed_position_count": self.closed_position_count,
             "market_value_complete": len(priced) == len(self.positions),
             "cost_basis_complete": len(known_basis) == len(self.positions),
         }
@@ -309,4 +319,7 @@ def enrich_portfolio(
         positions=positions,
         effective_transaction_count=accounting.effective_transaction_count,
         superseded_transaction_count=accounting.superseded_transaction_count,
+        closed_realized_pl=accounting.closed_realized_pl,
+        closed_realized_complete=accounting.closed_realized_complete,
+        closed_position_count=accounting.closed_position_count,
     )

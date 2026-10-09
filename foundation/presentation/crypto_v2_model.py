@@ -14,6 +14,7 @@ from __future__ import annotations
 import csv
 import json
 import os
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from statistics import median
 
@@ -25,6 +26,7 @@ AVG_MONTHS = 48
 ACCUMULATE_BELOW = 1.0
 PAUSE_FROM = 2.0
 CORE = ("bitcoin", "ethereum")
+MAX_PRICE_AGE_HOURS = 48          # the price fetch runs daily; two missed days and the coin's call is withheld
 HALVINGS = ("2012-11", "2016-07", "2020-05", "2024-04")
 ROBINHOOD_TRADABLE = {"bitcoin", "ethereum", "solana", "chainlink", "xrp", "avalanche"}   # robinhood.com coin-availability, Oct 2026
 STATUS = {"ACCUMULATE": "ACCUMULATE_NEW_CAPITAL", "STEADY": "STEADY_ACCUMULATION", "PAUSE": "PAUSE_NEW_CAPITAL",
@@ -37,6 +39,7 @@ def _months_between(a: str, b: str) -> int:
 
 def load_closes(path: Path = CLOSES) -> dict[str, list[tuple[str, float]]]:
     series: dict[str, dict[str, float]] = {}
+    stamps: dict[str, dict[str, str]] = {}
     updated = ""
     with path.open(newline="", encoding="utf-8") as handle:
         for r in csv.DictReader(handle):
@@ -46,9 +49,12 @@ def load_closes(path: Path = CLOSES) -> dict[str, list[tuple[str, float]]]:
                 continue
             if close > 0:
                 series.setdefault(r["asset"], {})[r["month"]] = close
+                stamps.setdefault(r["asset"], {})[r["month"]] = str(r.get("updated_utc") or "")
                 updated = max(updated, str(r.get("updated_utc") or ""))
     out = {a: sorted(m.items()) for a, m in series.items()}
     out["__updated__"] = updated     # type: ignore[assignment]
+    # when each coin's latest month was last refreshed (one coin's fetch can fail while the others succeed)
+    out["__updated_by_asset__"] = {a: stamps[a][max(m)] for a, m in series.items()}     # type: ignore[assignment]
     return out
 
 
@@ -86,10 +92,22 @@ def zone_history(series):
     return out
 
 
-def score_asset(asset, closes):
+def price_is_stale(stamp: str | None, now: datetime | None = None) -> bool:
+    if not stamp:
+        return True
+    try:
+        when = datetime.fromisoformat(str(stamp).replace("Z", "+00:00"))
+    except ValueError:
+        return True
+    now = now or datetime.now(timezone.utc)
+    return now - when > timedelta(hours=MAX_PRICE_AGE_HOURS) or when.strftime("%Y-%m") < now.strftime("%Y-%m")
+
+
+def score_asset(asset, closes, now: datetime | None = None):
     series = closes.get(asset) or []
     if not series:
         return {"call": "NO_PRICE"}
+    stamp = (closes.get("__updated_by_asset__") or {}).get(asset)
     month, price = series[-1]
     ratios = _ratios(series)
     ratio = ratios.get(month)
@@ -102,6 +120,11 @@ def score_asset(asset, closes):
            "zone": zone(ratio), "peak": peak, "peak_month": peak_month, "drawdown": price / peak - 1,
            "change_12m": price / year_ago - 1 if year_ago else None, "history": hist_avg,
            "core": asset in CORE, "robinhood": asset in ROBINHOOD_TRADABLE}
+    out["price_updated_utc"] = stamp
+    if stamp is not None and price_is_stale(stamp, now):
+        # A coin whose fetch failed keeps last month's (or last week's) price: never present it as today's call.
+        out.update(call="NO_PRICE", stale_price=True)
+        return out
     if asset in CORE:
         out["call"] = "NO_CALL" if ratio is None else "ACCUMULATE" if ratio < ACCUMULATE_BELOW else "STEADY" if ratio < PAUSE_FROM else "PAUSE"
         out["zone_history"] = zone_history(series)
@@ -126,6 +149,7 @@ def apply_crypto_model_decisions(records) -> int:
     path = Path(os.environ.get("UIP_CRYPTO_V2_PATH") or CLOSES)
     closes = load_closes(path)
     updated = closes.pop("__updated__", "")
+    by_asset = closes.get("__updated_by_asset__") or {}
     proj_path = Path(os.environ.get("UIP_CRYPTO_V2_PROJECTIONS_PATH") or PROJECTIONS)
     try:
         projections = json.loads(proj_path.read_text(encoding="utf-8")).get("projections") or {}
@@ -148,7 +172,8 @@ def apply_crypto_model_decisions(records) -> int:
             "model_months_since_halving": s.get("months_since_halving"), "model_last_halving": s.get("last_halving"),
             "model_robinhood_tradable": s.get("robinhood"), "model_price_history": s.get("history") or [],
             "model_thresholds": {"accumulate_below": ACCUMULATE_BELOW, "pause_from": PAUSE_FROM, "average_months": AVG_MONTHS},
-            "model_as_of": updated or None,
+            "model_as_of": by_asset.get(asset.split(":", 1)[1]) or updated or None,
+            "model_price_stale": bool(s.get("stale_price")),
         })
         applied += 1
     return applied

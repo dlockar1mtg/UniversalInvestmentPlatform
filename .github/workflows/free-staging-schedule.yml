@@ -1,7 +1,7 @@
 name: Free Staging Scheduled Cycle
 on:
   schedule:
-    - cron: "17 */6 * * *"
+    - cron: "17 13 * * *" # daily provider check (was every 6 hours)
   workflow_dispatch:
 permissions:
   contents: read

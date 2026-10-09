@@ -5,6 +5,8 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+    # A pull request only needs the image build when something the image is made from changed.
+    paths: ["deployment/**", "requirements.txt", "requirements/**", "pyproject.toml", ".github/workflows/container.yml"]
 
 permissions:
   contents: read
@@ -33,6 +35,7 @@ jobs:
         with:
           context: .
           file: deployment/Dockerfile
+          build-args: BASE_IMAGE=mirror.gcr.io/library/python:3.14-slim   # Docker Hub answers 429 to shared runners
           push: ${{ github.event_name == 'push' }}
           tags: |
             ${{ env.IMAGE_NAME }}:sha-${{ github.sha }}

@@ -53,3 +53,16 @@ def test_production_cycle_uses_v3_calls_and_records_them():
     uranium = twelve["METALS:COMMODITY:URANIUM"]
     assert uranium.recommendation == "HOLD"
     assert any(r.startswith("V3_NOT_MODELED_NON_MONTHLY_HISTORY") for r in report.reason_codes)
+
+
+def test_a_metal_whose_latest_price_is_late_does_not_get_compared_on_a_different_month():
+    series = _metals()
+    late = "METALS:COMMODITY:M3"
+    series[late] = series[late][:-1]                         # its newest month is missing
+    predictions = _v3_predictions(series)
+    assert {p["as_of_month"] for p in predictions.values()} == {"2024-11"}   # everyone scored at the late metal's month
+    assert late in predictions
+    far = _metals()
+    far[late] = far[late][:-5]                               # five months behind: left unranked, the others go on
+    p2 = _v3_predictions(far)
+    assert late not in p2 and {p["as_of_month"] for p in p2.values()} == {"2024-12"} and len(p2) == 7

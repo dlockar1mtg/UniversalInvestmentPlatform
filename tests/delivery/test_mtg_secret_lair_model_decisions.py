@@ -83,3 +83,28 @@ def test_research_page_shows_the_users_position():
     js = (ROOT / "foundation" / "production" / "dashboard_assets" / "recommendation_ui.js").read_text(encoding="utf-8")
     assert "async function slV2FillPosition(assetId)" in js and 'recRequest("/v1/portfolio/enriched")' in js
     assert '<div id="sl-v2-position"></div>${slV2Outcomes(p,buy)}' in js
+
+
+def test_a_stale_decision_file_never_shows_a_buy(tmp_path, monkeypatch):
+    monkeypatch.setenv("UIP_MTG_SECRET_LAIR_V2_PATH", str(_decisions(tmp_path)))
+    monkeypatch.setenv("UIP_MTG_SECRET_LAIR_V2_ENABLED", "1")
+    monkeypatch.setenv("UIP_MTG_DECISIONS_MAX_AGE_DAYS", "4")
+    monkeypatch.setattr(pm, "_decisions_stale", lambda as_of: 9 if str(as_of).startswith("2026-10-05") else None)
+    records = _records()
+    pm.apply_secret_lair_model_decisions(records)
+    a = records[0].payload
+    assert a["model_call"] == "NO_PRICE" and a["model_stale"] and a["model_stale_days"] == 9 and a["model_note"].startswith("DECISIONS_STALE")
+    assert a["native_purchase_status"] == "WAIT_FOR_Q10_ENTRY"               # the certified authority is untouched
+    monkeypatch.setattr(pm, "_decisions_stale", lambda as_of: None)
+    records = _records()
+    pm.apply_secret_lair_model_decisions(records)
+    assert records[0].payload["model_call"] == "BUY" and records[0].payload["model_stale"] is False
+
+
+def test_stale_age_counts_days_past_the_limit(monkeypatch):
+    from datetime import date, timedelta
+    monkeypatch.setenv("UIP_MTG_DECISIONS_MAX_AGE_DAYS", "4")
+    today = date.today()
+    assert pm._decisions_stale((today - timedelta(days=4)).isoformat()) is None
+    assert pm._decisions_stale((today - timedelta(days=6)).isoformat()) == 6
+    assert pm._decisions_stale("not a date") is None

@@ -94,6 +94,7 @@ def test_the_bubble_index_passes_through_with_the_package(tmp_path):
     (lambda c: c.update(ai_bubble=bubble(missing=["eps_revisions"])), "missing factors"),
     (lambda c: c.update(ai_bubble={**bubble(), "current": {**bubble()["current"], "strict": {"abi": 30}}}), "blocked"),
     (lambda c: c.update(ai_bubble={**bubble(), "legacy_observations": [{"legacy_unverified": False}]}), "unverified"),
+    (lambda c: c.update(data_quality={"status": "FINE"}), "data_quality"),
 ])
 def test_contract_breaks_are_refused(tmp_path, change, message):
     c = contract()
@@ -141,3 +142,11 @@ def test_wiring_publication_api_cycle_and_watchtower():
         assert forbidden not in page
     assert '["macro","The Watchtower \\u00b7 Macro",\'data-rpg-page="watchtower"\']' in (assets / "rpg_realm.js").read_text()
     assert ".rpg-watch-gauge{" in (assets / "rpg_theme.css").read_text()
+
+
+def test_a_degraded_package_still_imports_and_says_so(tmp_path):
+    dq = {"status": "DEGRADED", "failed_series": ["PAYEMS"], "why": "these index inputs could not be refreshed this run: PAYEMS"}
+    recs = MP.build_macro_records(write(tmp_path / "p", contract(data_quality=dq)))
+    assert {r.record_type: r for r in recs}["macro_package"].payload["data_quality"]["status"] == "DEGRADED"
+    page = (ROOT / "foundation/production/dashboard_assets/watchtower.js").read_text()
+    assert "STALE INPUTS" in page and "${quality(pkg.data_quality)}" in page

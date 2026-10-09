@@ -76,6 +76,9 @@ class PortfolioAccountingResult:
     positions: tuple[PortfolioPosition, ...]
     effective_transaction_count: int
     superseded_transaction_count: int
+    closed_realized_pl: Decimal = ZERO          # realized P/L of positions sold down to zero (they are not in `positions`)
+    closed_realized_complete: bool = True
+    closed_position_count: int = 0
 
     def document(self) -> dict[str, object]:
         known_basis = sum(
@@ -92,7 +95,11 @@ class PortfolioAccountingResult:
             "effective_transaction_count": self.effective_transaction_count,
             "superseded_transaction_count": self.superseded_transaction_count,
             "known_cost_basis": str(known_basis),
-            "realized_pl_known": str(realized_known),
+            "realized_pl_known": str(realized_known + self.closed_realized_pl),
+            "realized_pl_open_positions": str(realized_known),
+            "realized_pl_closed_positions": str(self.closed_realized_pl),
+            "realized_pl_closed_complete": self.closed_realized_complete,
+            "closed_position_count": self.closed_position_count,
             "pricing_status": "NOT_JOINED_YET",
         }
 
@@ -291,8 +298,14 @@ def derive_portfolio(
         raise ValueError(f"unsupported transaction type: {item.transaction_type}")
 
     positions: list[PortfolioPosition] = []
+    closed_realized, closed_complete, closed_count = ZERO, True, 0
     for state in states.values():
         if state.quantity == ZERO:
+            closed_count += 1
+            if state.realized_pl_complete:
+                closed_realized += state.realized_pl_known
+            else:
+                closed_complete = False
             continue
         status = state.basis_status()
         cost_basis = state.known_cost_basis if status == "KNOWN" else None
@@ -322,4 +335,7 @@ def derive_portfolio(
         positions=tuple(positions),
         effective_transaction_count=len(effective.items),
         superseded_transaction_count=len(effective.superseded_transaction_ids),
+        closed_realized_pl=closed_realized,
+        closed_realized_complete=closed_complete,
+        closed_position_count=closed_count,
     )

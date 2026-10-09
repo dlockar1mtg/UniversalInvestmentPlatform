@@ -42,7 +42,12 @@ def _descriptive_columns(components: dict[str, object]) -> dict[str, object]:
     valuation = descriptive.get("valuation") or {}
     trend = descriptive.get("trend") or {}
     band = descriptive.get("historical_12m_returns") or {}
+    v3 = components.get("v3") if isinstance(components, dict) and isinstance(components.get("v3"), dict) else {}
     return {
+        # The model's own rank (over all metals it ranked), so pages never re-rank from a filtered list.
+        "v3_rank": v3.get("rank", ""),
+        "v3_ranked_metals": v3.get("ranked_metals", ""),
+        "v3_as_of_month": v3.get("as_of_month", ""),
         "valuation_gap_10y": valuation.get("gap", ""),
         "valuation_state": valuation.get("state", ""),
         "trend_gap_12m": trend.get("gap", ""),
