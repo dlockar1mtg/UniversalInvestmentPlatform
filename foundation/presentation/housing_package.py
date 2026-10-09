@@ -60,6 +60,12 @@ def verify_housing_package(directory: Path) -> dict[str, Any]:
     for m in markets:
         if m.get("signal") not in SIGNALS or not 0 <= float(m.get("entry_score", -1)) <= 100 or not m.get("market_state_as_of"):
             raise HousingPackageError(f"housing market {m.get('market')!r} fails the contract")
+    rates = contract.get("rates_outlook")
+    if rates is not None:                                  # contract 1.2: the mortgage-rate outlook
+        for row in rates.get("horizons") or []:
+            band = [row.get(k) for k in ("p10", "p50", "p90")]
+            if not 0 < float(row.get("center", -1)) < 25 or (all(v is not None for v in band) and not band[0] <= band[1] <= band[2]):
+                raise HousingPackageError("housing rates outlook fails the contract")
     return {"manifest": manifest, "contract": contract}
 
 
@@ -81,6 +87,7 @@ def build_housing_records(directory: Path, *, source_run_id: str | None = None):
         **lineage, "contract_version": contract["contract_version"], "data_freshness": contract.get("data_freshness") or {},
         "latest_input_observation": contract.get("latest_input_observation"), "known_issues": contract.get("known_issues") or [],
         "warnings": contract.get("warnings") or [], "market_count": len(contract["markets"]),
+        "rates_outlook": contract.get("rates_outlook"),
         "automatic_execution_authorized": False}))
     return records
 
