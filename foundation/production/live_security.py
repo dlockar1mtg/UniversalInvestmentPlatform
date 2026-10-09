@@ -46,8 +46,14 @@ def install_live_security(app, settings: LiveSecuritySettings) -> None:
         if settings.require_https and request.url.scheme != "https" and forwarded != "https":
             return JSONResponse({"error": {"code": "HTTPS_REQUIRED", "message": "secure transport is required"}}, status_code=400)
         length = request.headers.get("content-length")
-        if length and int(length) > settings.maximum_request_bytes:
-            return JSONResponse({"error": {"code": "REQUEST_TOO_LARGE", "message": "request exceeds the permitted size"}}, status_code=413)
+        if length is not None:
+            if not length.strip().isdigit():
+                return JSONResponse({"error": {"code": "BAD_CONTENT_LENGTH", "message": "content-length must be a number"}}, status_code=400)
+            if int(length) > settings.maximum_request_bytes:
+                return JSONResponse({"error": {"code": "REQUEST_TOO_LARGE", "message": "request exceeds the permitted size"}}, status_code=413)
+        elif request.method in ("POST", "PUT", "PATCH") and "chunked" in request.headers.get("transfer-encoding", "").lower():
+            # A chunked body has no declared size, so the size limit could not be enforced: require a length.
+            return JSONResponse({"error": {"code": "LENGTH_REQUIRED", "message": "a content-length is required"}}, status_code=411)
         response = await call_next(request)
         response.headers["X-Content-Type-Options"] = "nosniff"
         response.headers["X-Frame-Options"] = "DENY"

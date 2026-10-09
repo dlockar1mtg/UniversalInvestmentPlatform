@@ -12,6 +12,17 @@ fetcher = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(fetcher)
 
 
+import pytest  # noqa: E402
+from datetime import datetime, timezone  # noqa: E402
+
+
+@pytest.fixture(autouse=True)
+def _fresh_prices(request, monkeypatch):
+    """The synthetic files carry fixed timestamps; only the staleness tests exercise the age check."""
+    if "stale" not in request.node.name:
+        monkeypatch.setattr(cv, "price_is_stale", lambda stamp, now=None: False)
+
+
 class Rec:
     def __init__(self, asset_id, record_type="recommendation"):
         self.asset_id, self.record_type, self.payload = asset_id, record_type, {"recommendation": "buy"}
@@ -116,3 +127,30 @@ def test_projection_comes_from_the_daily_projection_file(tmp_path, monkeypatch):
     recs = [Rec("crypto:bitcoin")]
     cv.apply_crypto_model_decisions(recs)                                   # a missing file is not an error
     assert recs[0].payload["model_projection"] is None and recs[0].payload["model_call"] == "STEADY"
+
+
+def test_a_stale_coin_price_gets_no_call_and_says_why(tmp_path):
+    months = _months(60)
+    path = tmp_path / "c.csv"
+    with path.open("w", newline="") as h:
+        w = csv.DictWriter(h, fieldnames=["asset", "month", "close", "source", "updated_utc"])
+        w.writeheader()
+        for i, m in enumerate(months):
+            w.writerow({"asset": "bitcoin", "month": m, "close": 100 + i, "source": "t", "updated_utc": "2022-12-28T06:00:00Z"})
+            w.writerow({"asset": "ethereum", "month": m, "close": 50 + i, "source": "t", "updated_utc": "2022-12-30T06:00:00Z"})
+    closes = cv.load_closes(path)
+    now = datetime(2022, 12, 31, 12, tzinfo=timezone.utc)
+    assert cv.score_asset("ethereum", closes, now)["call"] != "NO_PRICE"          # refreshed 30 hours ago
+    stale = cv.score_asset("bitcoin", closes, now)                                  # refreshed 3.25 days ago
+    assert stale["call"] == "NO_PRICE" and stale["stale_price"] and stale["price_updated_utc"] == "2022-12-28T06:00:00Z"
+    assert cv.price_is_stale("2022-11-30T23:00:00Z", datetime(2022, 12, 1, 1, tzinfo=timezone.utc))   # last month's close
+
+
+def test_a_failed_bitcoin_fetch_fails_the_run_instead_of_committing_stale_data(tmp_path):
+    def fetch(url):
+        if "XBTUSD" in url:
+            raise OSError("down")
+        return {"error": [], "result": {"X": [[1704067200, 0, 0, 0, "10"]], "last": 0}}
+    with pytest.raises(SystemExit, match="bitcoin"):
+        fetcher.main(["--output", str(tmp_path / "o.csv"), "--sleep-seconds", "0"], fetch=fetch)
+    assert not (tmp_path / "o.csv").exists()

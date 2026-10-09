@@ -56,7 +56,9 @@ def test_unified_overview_combines_values_without_erasing_source_authority():
     javascript = (ASSETS / "dashboard.js").read_text(encoding="utf-8")
     assert "const totalValue=coreMarket+acornsValue+manualValue" in javascript
     assert "const totalBasis=coreBasis+acornsBasis+manualBasis" in javascript
-    assert "const totalGain=totalValue-totalBasis" in javascript
+    # the gain counts only certified positions whose value and basis are both known (matched totals)
+    assert "const totalGain=totalValue-coreMarket+coreMatched-totalBasis" in javascript
+    assert "core?.matched_market_value" in javascript and "core?.matched_cost_basis" in javascript
     assert "Mixed-authority personal summary" in javascript
     assert "each underlying section keeps its own authority" in javascript
     assert 'allocation["Stocks & ETFs"]' in javascript

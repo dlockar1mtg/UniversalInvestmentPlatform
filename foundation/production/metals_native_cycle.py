@@ -277,6 +277,16 @@ def _month_index(day: date) -> int:
     return day.year * 12 + day.month - 1
 
 
+V3_MAX_LAG_MONTHS = 2
+
+
+def _month_label(index: int | None) -> str | None:
+    if index is None:
+        return None
+    year, month = divmod(int(index), 12)
+    return f"{year:04d}-{month + 1:02d}"
+
+
 def _monthly_closes(points: Sequence[tuple[date, float]]) -> dict[int, float]:
     """Last positive observation in each calendar month (daily data collapses to one value)."""
     closes: dict[int, float] = {}
@@ -390,10 +400,16 @@ def _v3_predictions(points_by_asset: Mapping[str, Sequence[tuple[date, float]]])
     closes_by_asset = {asset: _monthly_closes(points) for asset, points in points_by_asset.items()}
     training: list[tuple[float, float, float]] = []
     latest: dict[str, tuple[float, float]] = {}
+    # Rank every metal at the same month: if one metal's newest monthly price is late, the others are scored at
+    # its month too, so no metal is compared on a different month's prices. A metal more than
+    # V3_MAX_LAG_MONTHS behind the newest is left unranked rather than holding the others back.
+    newest = {asset: max(closes) for asset, closes in closes_by_asset.items()
+              if closes and sum(1 for m in closes if m > max(closes) - 36) >= 24}      # monthly series only (not annual)
+    usable = {a: e for a, e in newest.items() if newest and e >= max(newest.values()) - V3_MAX_LAG_MONTHS}
+    common_end = min(usable.values()) if usable else None
     for asset, closes in closes_by_asset.items():
         if not closes:
             continue
-        end = max(closes)
         for month in sorted(closes):
             if month < V3_FIRST_TRAINING_MONTH:
                 continue
@@ -402,7 +418,7 @@ def _v3_predictions(points_by_asset: Mapping[str, Sequence[tuple[date, float]]])
                 continue
             if month + 12 in closes:
                 training.append((features[0], features[1], closes[month + 12] / closes[month] - 1.0))
-        current = _v3_features(closes, end)
+        current = _v3_features(closes, common_end) if asset in usable else None
         if current is not None:
             latest[asset] = current
     coefficients = _v3_fit(training)
@@ -418,6 +434,7 @@ def _v3_predictions(points_by_asset: Mapping[str, Sequence[tuple[date, float]]])
             "rank": ranked.index(asset) + 1,
             "ranked_metals": len(ranked),
             "recommendation": "BUY" if ranked.index(asset) < V3_BUY_RANKS else "HOLD",
+            "as_of_month": _month_label(common_end),
             "value": latest[asset][0],
             "trend": latest[asset][1],
             "coefficients": {"intercept": coefficients[0], "value": coefficients[1], "trend": coefficients[2]},
@@ -563,6 +580,10 @@ def evaluate_native_cycle(
             "backtest_hit_rate": hit_rate,
             "confidence_adjusted_return": confidence_adjusted_return,
             "recommendation_basis": "V3_1_RANK_TOP3" if v3_asset is not None else "CONFIDENCE_ADJUSTED_12M",
+            # The confidence figure comes from the v2 momentum backtest; v3.1 has no confidence measure of its own,
+            # and its horizons past 12 months only compound the 12-month view.
+            "confidence_basis": "V2_DIRECTIONAL_BACKTEST" if v3_asset is None else "V2_DIRECTIONAL_BACKTEST_NOT_A_V3_MEASURE",
+            "long_horizon_basis": "COMPOUNDED_12M_VIEW_NOT_MODELED" if v3_asset is not None else "EXTRAPOLATED_FROM_12M",
             "risk": _risk_profile(points, lookback, minimum_samples) if sufficient_history else None,
             # Valuation, trend and the historical 12-month range: shown instead of calls (#217, #219).
             "descriptive": _descriptive_indicators(points, minimum_samples),

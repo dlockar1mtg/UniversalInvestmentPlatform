@@ -50,3 +50,13 @@ def test_oversized_requests_are_rejected_before_handler_execution():
     service = application(LiveSecuritySettings("development", ("testserver",), False, 1024))
     response = service.post("/echo", content=b"x" * 1025)
     assert response.status_code == 413 and response.json()["error"]["code"] == "REQUEST_TOO_LARGE"
+
+
+def test_a_bad_or_missing_length_cannot_slip_past_the_size_limit():
+    service = application(LiveSecuritySettings("development", ("testserver",), False, 1024))
+    response = service.post("/echo", content=b"{}", headers={"Content-Length": "abc"})
+    assert response.status_code == 400 and response.json()["error"]["code"] == "BAD_CONTENT_LENGTH"
+    chunks = (part for part in (b"x" * 600, b"x" * 600))
+    response = service.post("/echo", content=chunks)          # a generator body is sent chunked, with no length
+    assert response.status_code == 411 and response.json()["error"]["code"] == "LENGTH_REQUIRED"
+    assert service.post("/echo", content=b"{}").status_code == 200

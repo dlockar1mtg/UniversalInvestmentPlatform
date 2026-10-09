@@ -72,6 +72,9 @@ def verify_macro_package(directory: Path) -> dict[str, Any]:
         if not re.fullmatch(r"\d{4}-\d{2}", str(rp.get("as_of_month") or "")):
             raise MacroPackageError("recession probability needs its as-of month")
     _verify_ai_bubble(c.get("ai_bubble"))
+    dq = c.get("data_quality")
+    if dq is not None and (not isinstance(dq, dict) or dq.get("status") not in ("OK", "DEGRADED")):
+        raise MacroPackageError("macro data_quality status must be OK or DEGRADED")
     if item.get("row_count") != len(c.get("history") or []):
         raise MacroPackageError("macro history length differs from the manifest")
     return {"manifest": manifest, "contract": c}
@@ -116,6 +119,7 @@ def build_macro_records(directory: Path, *, source_run_id: str | None = None):
                "legacy_snapshots": c.get("legacy_snapshots") or [], "data_freshness": c.get("data_freshness") or {},
                "recession_probability": c.get("recession_probability"), "asset_environment": c.get("asset_environment"),
                "housing_opportunity": c.get("housing_opportunity"), "ai_bubble": c.get("ai_bubble"),
+               "data_quality": c.get("data_quality"),
                "automatic_execution_authorized": False}
     return [PresentationRecord("macro_reading", DOMAIN_ID, None, "rsi-current", current),
             PresentationRecord("macro_package", DOMAIN_ID, None, "macro-rsi", package)]

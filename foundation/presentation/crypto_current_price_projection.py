@@ -38,7 +38,6 @@ def build_crypto_current_price_records(artifact_root: Path) -> list[Presentation
         "methodology_version": "1.0.0",
         "scope": "SIX_ASSET_LATEST_DAILY_CANONICAL_MARKET_PRICE",
         "source_table": SOURCE_TABLE,
-        "row_count": 6,
         "price_semantics": PRICE_SEMANTICS,
         "presentation_semantics": PRESENTATION_SEMANTICS,
         "forecast_input_reused_as_price_authority": False,
@@ -50,6 +49,17 @@ def build_crypto_current_price_records(artifact_root: Path) -> list[Presentation
             raise RuntimeError(f"Crypto Current Price V1 manifest mismatch: {key}")
     if set(manifest.get("supported_assets", [])) != ASSETS or len(manifest["supported_assets"]) != 6:
         raise RuntimeError("Crypto Current Price V1 supported asset set mismatch")
+    # The producer leaves out a coin whose price is too old and says so (excluded_assets); Bitcoin and Ether never.
+    excluded = manifest.get("excluded_assets") or []
+    if not isinstance(excluded, list):
+        raise RuntimeError("Crypto Current Price V1 manifest mismatch: excluded_assets")
+    excluded_ids = {str(x.get("universal_asset_id")) for x in excluded if isinstance(x, dict)}
+    if len(excluded_ids) != len(excluded) or not excluded_ids <= ASSETS or excluded_ids & {"crypto:bitcoin", "crypto:ethereum"} \
+            or any(not str(x.get("reason") or "").strip() for x in excluded):
+        raise RuntimeError("Crypto Current Price V1 excluded assets invalid")
+    expected_rows = 6 - len(excluded_ids)
+    if type(manifest.get("row_count")) is not int or manifest["row_count"] != expected_rows:
+        raise RuntimeError("Crypto Current Price V1 manifest mismatch: row_count")
 
     csv_path = manifest_path.with_name("crypto_current_price_v1.csv")
     raw = csv_path.read_bytes()
@@ -63,13 +73,13 @@ def build_crypto_current_price_records(artifact_root: Path) -> list[Presentation
         if tuple(reader.fieldnames or ()) != COLUMNS:
             raise RuntimeError("Crypto Current Price V1 CSV schema mismatch")
         rows = list(reader)
-    if len(rows) != 6:
+    if len(rows) != expected_rows:
         raise RuntimeError("Crypto Current Price V1 row count mismatch")
     records = []
     seen = set()
     for row in rows:
         identity = row["universal_asset_id"]
-        if identity not in ASSETS or identity in seen or row["asset_id"] != identity.removeprefix("crypto:"):
+        if identity not in ASSETS or identity in seen or identity in excluded_ids or row["asset_id"] != identity.removeprefix("crypto:"):
             raise RuntimeError("Crypto Current Price V1 row identity mismatch")
         seen.add(identity)
         fields = {
@@ -100,6 +110,6 @@ def build_crypto_current_price_records(artifact_root: Path) -> list[Presentation
             payload={**row, "_certified_csv_sha256": certified_sha256,
                      "_certified_manifest_status": manifest["status"]},
         ))
-    if seen != ASSETS:
+    if seen | excluded_ids != ASSETS:
         raise RuntimeError("Crypto Current Price V1 missing canonical identities")
     return records

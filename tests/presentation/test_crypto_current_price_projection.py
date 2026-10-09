@@ -142,3 +142,30 @@ def test_current_crypto_authority_accepts_new_certified_digest_and_observation_d
     bitcoin = next(record for record in records if record.asset_id == "crypto:bitcoin")
     assert bitcoin.payload["observation_date"] == "2026-09-23"
     assert bitcoin.payload["_certified_csv_sha256"] == digest
+
+
+def _drop(csv_path, manifest_path, name, excluded):
+    rows = list(csv.DictReader(csv_path.open(encoding="utf-8")))
+    rows = [r for r in rows if r["asset_id"] != name]
+    with csv_path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.DictWriter(handle, fieldnames=projection.COLUMNS)
+        writer.writeheader()
+        writer.writerows(rows)
+    manifest = json.loads(manifest_path.read_text())
+    manifest.update(row_count=len(rows), excluded_assets=excluded, output_sha256=hashlib.sha256(csv_path.read_bytes()).hexdigest())
+    manifest_path.write_text(json.dumps(manifest))
+
+
+def test_a_stale_altcoin_left_out_by_the_producer_is_accepted_but_bitcoin_never(tmp_path, monkeypatch):
+    csv_path, manifest_path = certified_delivery(tmp_path, monkeypatch)
+    _drop(csv_path, manifest_path, "avalanche", [{"universal_asset_id": "crypto:avalanche", "asset_id": "avalanche", "reason": "price is 5 days old"}])
+    records = projection.build_crypto_current_price_records(tmp_path)
+    assert len(records) == 5 and "crypto:avalanche" not in {r.asset_id for r in records}
+    csv_path, manifest_path = certified_delivery(tmp_path / "b", monkeypatch)
+    _drop(csv_path, manifest_path, "bitcoin", [{"universal_asset_id": "crypto:bitcoin", "asset_id": "bitcoin", "reason": "old"}])
+    with pytest.raises(RuntimeError, match="excluded assets invalid"):
+        projection.build_crypto_current_price_records(tmp_path / "b")
+    csv_path, manifest_path = certified_delivery(tmp_path / "c", monkeypatch)
+    _drop(csv_path, manifest_path, "xrp", [])                         # missing with no explanation
+    with pytest.raises(RuntimeError, match="row_count|row count|missing"):
+        projection.build_crypto_current_price_records(tmp_path / "c")

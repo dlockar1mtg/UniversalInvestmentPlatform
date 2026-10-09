@@ -11,6 +11,7 @@ BLOCK = {
 
 def test_the_descriptive_block_becomes_flat_forecast_columns():
     assert _descriptive_columns(BLOCK) == {
+        "v3_rank": "", "v3_ranked_metals": "", "v3_as_of_month": "",
         "valuation_gap_10y": 0.2,
         "valuation_state": "ABOVE_LONG_RUN_AVERAGE",
         "trend_gap_12m": -0.03,
@@ -28,3 +29,8 @@ def test_missing_indicators_keep_the_same_columns_blank():
         columns = _descriptive_columns(components)
         assert set(columns) == set(_descriptive_columns(BLOCK))
         assert all(value == "" for value in columns.values())
+
+
+def test_the_model_rank_travels_with_the_row():
+    cols = _descriptive_columns({**BLOCK, "v3": {"rank": 2, "ranked_metals": 8, "as_of_month": "2026-09"}})
+    assert (cols["v3_rank"], cols["v3_ranked_metals"], cols["v3_as_of_month"]) == (2, 8, "2026-09")

@@ -165,6 +165,33 @@ def _model_number(value: Any) -> float | None:
         return None
 
 
+MTG_DECISIONS_MAX_AGE_DAYS = 4      # the MTG price history runs daily; older decision files are not shown as today's calls
+
+
+def _decisions_stale(as_of: Any) -> int | None:
+    """Days since the decision file's as-of date when that is beyond the limit (None when fresh or unknown)."""
+    from datetime import date, datetime, timezone
+
+    try:
+        when = date.fromisoformat(str(as_of or "")[:10])
+    except ValueError:
+        return None
+    limit = int(os.environ.get("UIP_MTG_DECISIONS_MAX_AGE_DAYS") or MTG_DECISIONS_MAX_AGE_DAYS)
+    age = (datetime.now(timezone.utc).date() - when).days
+    return age if age > limit else None
+
+
+def _withhold_if_stale(payload: dict, as_of: Any) -> None:
+    """A stale decision file never presents a BUY as current: every call becomes NO_PRICE, saying why."""
+    age = _decisions_stale(as_of)
+    if age is None:
+        payload["model_stale"] = False
+        return
+    payload.update(model_stale=True, model_stale_days=age, model_call="NO_PRICE",
+                   model_purchase_status="NO_CURRENT_MARKET_PRICE",
+                   model_note=f"DECISIONS_STALE: the model's prices are from {str(as_of)[:10]}, {age} days ago")
+
+
 def apply_secret_lair_model_decisions(records: list[PresentationRecord]) -> int:
     """Add Secret Lair v2 model decisions to MTG recommendation records, when enabled.
 
@@ -199,6 +226,8 @@ def apply_secret_lair_model_decisions(records: list[PresentationRecord]) -> int:
             "model_as_of": decision.get("as_of") or summary.get("as_of"),
             "model_buy_price_usd": _model_number(decision.get("buy_price")),
             "model_buy_basis": decision.get("buy_price_basis") or None,
+            "model_buy_shipping_usd": _model_number(decision.get("buy_shipping_usd")),
+            "model_landed_buy_price_usd": _model_number(decision.get("landed_buy_price")),
             "model_gap": _model_number(decision.get("gap")),
             "model_expected_return_6m": _model_number(decision.get("expected_return_6m")),
             "model_expected_net_return_6m": _model_number(decision.get("expected_net_return_6m")),
@@ -206,6 +235,7 @@ def apply_secret_lair_model_decisions(records: list[PresentationRecord]) -> int:
             "model_tcgplayer_product_id": str(decision.get("tcgplayer_product_id") or "").strip() or None,
             "model_market_index": list(summary.get("market_index") or [])[-24:],
         })
+        _withhold_if_stale(record.payload, record.payload["model_as_of"])
         applied += 1
     return applied
 
@@ -267,6 +297,7 @@ def apply_precollector_model_decisions(records: list[PresentationRecord]) -> int
             "model_buy_tiers": summary.get("buy_tiers"),
             "model_price_history": list(history.get(product, []))[-36:],
         })
+        _withhold_if_stale(record.payload, record.payload["model_as_of"])
         applied += 1
     return applied
 
@@ -365,6 +396,7 @@ def apply_collector_model_decisions(records: list[PresentationRecord]) -> int:
             "model_tcgplayer_product_id": product or None,
             "model_price_history": list(history.get(product, []))[-36:],
         })
+        _withhold_if_stale(record.payload, record.payload["model_as_of"])
         applied += 1
     return applied
 

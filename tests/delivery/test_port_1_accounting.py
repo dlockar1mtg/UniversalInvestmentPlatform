@@ -181,3 +181,16 @@ def test_derived_portfolio_endpoint_requires_auth_and_returns_effective_holding(
     assert document["positions"][0]["quantity"] == "1"
     assert document["positions"][0]["asset_id"] == "SECRET_LAIR_V1_1SL-BB7E07A2986BB4"
     assert document["pricing_status"] == "NOT_JOINED_YET"
+
+
+def test_realized_profit_of_a_fully_sold_position_is_kept_in_the_totals():
+    later = NOW + timedelta(days=1)
+    items = (txn(transaction_id="b1", asset_id="crypto:bitcoin", domain_id="crypto", price="100"),
+             txn(transaction_id="s1", transaction_type="SELL", asset_id="crypto:bitcoin", domain_id="crypto", price="150", occurred=later),
+             txn(transaction_id="b2", asset_id="crypto:ethereum", domain_id="crypto", quantity="2", price="10"),
+             txn(transaction_id="s2", transaction_type="SELL", asset_id="crypto:ethereum", domain_id="crypto", quantity="1", price="20", occurred=later))
+    p = derive_portfolio(items)
+    doc = p.document()
+    assert [x.asset_id for x in p.positions] == ["crypto:ethereum"]          # bitcoin is closed
+    assert Decimal(doc["realized_pl_known"]) == Decimal("60")              # 50 from the closed bitcoin + 10 from ether
+    assert Decimal(doc["realized_pl_closed_positions"]) == Decimal("50") and doc["closed_position_count"] == 1

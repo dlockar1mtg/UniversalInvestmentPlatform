@@ -298,3 +298,17 @@ def test_registered_metals_vehicle_rejects_wrong_price_semantics():
     })
     with pytest.raises(ValueError, match="unexpected Metals current-price semantics"):
         enrich_portfolio(accounting, reader)
+
+
+def test_matched_totals_only_count_positions_with_both_a_value_and_a_basis():
+    from decimal import Decimal as D
+    from foundation.production.portfolio_enrichment import EnrichedPortfolioPosition, EnrichedPortfolioResult
+
+    def pos(asset, value, basis):
+        return EnrichedPortfolioPosition("mtg", asset, asset, None, None, "c", "USD", D("1"), "KNOWN" if basis is not None else "UNKNOWN",
+                                         basis, basis, None, value, value is not None, "PRICED" if value is not None else "UNPRICED",
+                                         value, None if value is None or basis is None else value - basis, None, None, None)
+    doc = EnrichedPortfolioResult((pos("a", D("1000"), D("800")), pos("b", None, D("500")), pos("c", D("50"), None)), 3, 0).document()
+    assert doc["known_market_value"] == "1050" and doc["known_cost_basis"] == "1300"      # the unmatched sets
+    assert doc["matched_market_value"] == "1000" and doc["matched_cost_basis"] == "800"     # gain 200, as the Unrealized card says
+    assert doc["matched_position_count"] == 1
