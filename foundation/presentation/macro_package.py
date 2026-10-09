@@ -59,8 +59,18 @@ def verify_macro_package(directory: Path) -> dict[str, Any]:
             raise MacroPackageError("macro component contributions do not add up to the rsi")
     if any(not s.get("legacy_unverified") for s in c.get("legacy_snapshots") or []):
         raise MacroPackageError("legacy analyst readings must stay marked unverified")
-    if (c.get("recession_probability") or {}).get("status") == "PUBLISHED" and not c["recession_probability"].get("calibration"):
-        raise MacroPackageError("a recession probability needs its calibration evidence")
+    rp = c.get("recession_probability") or {}
+    if rp.get("status") == "PUBLISHED":
+        if not rp.get("calibration"):
+            raise MacroPackageError("a recession probability needs its calibration evidence")
+        chosen = (rp.get("calibration") or {}).get(rp.get("chosen_model") or "")
+        if not chosen or not chosen.get("reliability"):
+            raise MacroPackageError("a published recession probability needs calibration for its chosen model")
+        p = rp.get("probability_12m")
+        if not isinstance(p, (int, float)) or isinstance(p, bool) or not 0 <= float(p) <= 1:
+            raise MacroPackageError("recession probability out of range")
+        if not re.fullmatch(r"\d{4}-\d{2}", str(rp.get("as_of_month") or "")):
+            raise MacroPackageError("recession probability needs its as-of month")
     if item.get("row_count") != len(c.get("history") or []):
         raise MacroPackageError("macro history length differs from the manifest")
     return {"manifest": manifest, "contract": c}

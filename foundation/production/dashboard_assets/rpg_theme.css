@@ -504,4 +504,10 @@ th.num .rpg-sort{justify-content:flex-end;width:100%}
 .rpg-watch-fresh{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px 18px}
 .rpg-watch-fresh li{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #3a3127;padding:4px 0;color:#d8cbb0}
 .rpg-watch-fresh strong{color:#f1e3c2;font-weight:normal;font-variant-numeric:tabular-nums}
+.rpg-watch-seer{border-left-color:#d9b45a}
+.rpg-watch-seer-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:14px;margin:12px 0}
+.rpg-watch-seer-grid .rpg-table{min-width:0}
+.rpg-watch-seer-grid caption{caption-side:top;text-align:left;padding:0 0 6px;color:#d9b45a}
+.rpg-watch-seer tr.is-here th,.rpg-watch-seer tr.is-here td{background:rgba(217,180,90,.12);color:#f1d78f}
+.rpg-watch-limits{margin:6px 0 0;padding-left:20px;color:#d8cbb0;line-height:1.5}
 @media (max-width:720px){.rpg-watch-big{font-size:2.6rem}}

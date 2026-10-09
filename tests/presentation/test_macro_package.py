@@ -27,6 +27,15 @@ def contract(**changes):
     return c
 
 
+def published():
+    cal = {"brier_skill": 0.201, "auc": 0.899, "first": "1977-01", "last": "2025-10", "false_alarm_months_at_or_above_30": 97,
+           "reliability": [{"band": "5-15%", "months": 83, "mean_predicted": 0.095, "observed": 0.024}],
+           "recessions": [{"recession_start": "2008-01", "max_in_12_before": 0.837, "first_at_or_above_30": "2007-01", "lead_months": 12}]}
+    return {"status": "PUBLISHED", "chosen_model": "YIELD_CURVE", "why": "yield-curve model", "probability_12m": 0.123,
+            "as_of_month": "2026-09", "inputs": {"curve": 1.05}, "calibration": {"YIELD_CURVE": cal},
+            "limitations": ["revised data"], "history": [{"month": "2026-08", "p": 0.143, "y": None}, {"month": "2026-09", "p": 0.128, "y": None}]}
+
+
 def write(directory: Path, c: dict, **manifest_changes) -> Path:
     directory.mkdir(parents=True, exist_ok=True)
     text = json.dumps(c)
@@ -48,6 +57,12 @@ def test_valid_package_becomes_macro_records(tmp_path):
     assert all(r.payload["automatic_execution_authorized"] is False for r in recs)
 
 
+def test_a_published_probability_passes_through_with_its_evidence(tmp_path):
+    recs = MP.build_macro_records(write(tmp_path / "p", contract(recession_probability=published())))
+    rp = {r.record_type: r for r in recs}["macro_package"].payload["recession_probability"]
+    assert rp["status"] == "PUBLISHED" and rp["probability_12m"] == 0.123 and rp["calibration"]["YIELD_CURVE"]["reliability"]
+
+
 @pytest.mark.parametrize("change,message", [
     (lambda c: c.update(automatic_execution_authorized=True), "authority"),
     (lambda c: c["current"].update(rsi=1.4), "out of range"),
@@ -55,6 +70,10 @@ def test_valid_package_becomes_macro_records(tmp_path):
     (lambda c: c["current"]["components"][0].update(contribution=-0.5), "add up"),
     (lambda c: c["legacy_snapshots"][0].update(legacy_unverified=False), "unverified"),
     (lambda c: c.update(recession_probability={"status": "PUBLISHED"}), "calibration"),
+    (lambda c: c.update(recession_probability={**published(), "probability_12m": 1.3}), "out of range"),
+    (lambda c: c.update(recession_probability={**published(), "probability_12m": None}), "out of range"),
+    (lambda c: c.update(recession_probability={**published(), "chosen_model": "MULTI_FACTOR"}), "chosen model"),
+    (lambda c: c.update(recession_probability={**published(), "as_of_month": None}), "as-of month"),
 ])
 def test_contract_breaks_are_refused(tmp_path, change, message):
     c = contract()
@@ -94,7 +113,8 @@ def test_wiring_publication_api_cycle_and_watchtower():
     page = (assets / "watchtower.js").read_text()
     assert page.isascii() and 'call("/v1/presentation/macro")' in page
     for text in ("The storm signs", "The six watch-fires", "How it read before past recessions", "Earlier readings (unverified)",
-                 "NOT PUBLISHED", "never trades"):
+                 "NOT PUBLISHED", "never trades", "The seer\\u2019s glass", "Did the odds come true?", "Before each recession",
+                 'rp.status!=="PUBLISHED"'):
         assert text in page, text
     for forbidden in ("method:\"POST\"", "localStorage", "eval("):
         assert forbidden not in page
