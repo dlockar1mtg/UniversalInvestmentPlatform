@@ -210,6 +210,21 @@ class PresentationReadRepository:
             return None
         return {"package": package, "markets": markets}
 
+    def macro(self) -> dict[str, object] | None:
+        """The macro package in the active publication: the current RSI reading plus history. None if absent."""
+        with closing(self.connection_factory()) as db, db.cursor() as cursor:
+            publication_id = self._active_id(cursor)
+            cursor.execute("""
+                SELECT record_type, payload_json FROM presentation_records
+                WHERE publication_id=%s AND domain_id='macro' AND record_type IN ('macro_reading', 'macro_package')
+            """, (publication_id,))
+            rows = cursor.fetchall()
+        current = next((dict(p) for kind, p in rows if kind == "macro_reading"), None)
+        package = next((dict(p) for kind, p in rows if kind == "macro_package"), None)
+        if current is None and package is None:
+            return None
+        return {"current": current, "package": package}
+
     def etf_fund(self, symbol: str) -> dict[str, object] | None:
         with closing(self.connection_factory()) as db, db.cursor() as cursor:
             publication_id = self._active_id(cursor)
@@ -698,6 +713,19 @@ def install_presentation_read_routes(
         if housing is None:
             return {"available": False, "package": None, "markets": []}
         return {"available": True, **housing}
+
+    @app.get("/v1/presentation/macro")
+    def presentation_macro(x_api_key: str | None = Header(default=None)):
+        denied = authorize(x_api_key)
+        if denied:
+            return denied
+        try:
+            macro = repository.macro()
+        except LookupError:
+            macro = None
+        if macro is None:
+            return {"available": False, "current": None, "package": None}
+        return {"available": True, **macro}
 
     @app.get("/v1/presentation/etf/{symbol}")
     def presentation_etf_fund(symbol: str, x_api_key: str | None = Header(default=None)):
