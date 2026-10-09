@@ -605,6 +605,9 @@ def build_presentation_publication(
     from foundation.presentation.housing_package import housing_records_from_environment
 
     records.extend(housing_records_from_environment())   # provisional housing package (weekly), when supplied
+    from foundation.presentation.macro_package import macro_records_from_environment
+
+    records.extend(macro_records_from_environment())     # provisional macro package (RSI v2.0, daily), when supplied
     records.sort(key=lambda item: (item.record_type, item.domain_id, item.asset_id or "", item.record_key))
     return PresentationPublication(
         publication_id=publication_id or str(uuid4()),

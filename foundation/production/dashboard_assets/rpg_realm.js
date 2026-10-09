@@ -113,7 +113,7 @@ const swatch=color=>`<svg class="rpg-swatch" width="14" height="14" viewBox="0 0
 const footer=text=>`<p class="rpg-footnote">${esc(text)}</p>`;
 
 function realmTabs(active){
-  const tabs=[["hall","The Hall",'data-rpg-page="home"'],["treasury","Treasury",'data-rpg-page="portfolio"'],["metals","The Forge \u00b7 Metals",'data-rpg-domain="metals"'],["crypto","Arcane Vault \u00b7 Crypto",'data-rpg-domain="crypto"'],["mtg","The Archive \u00b7 MTG",'data-rpg-domain="mtg"'],["etf","Merchants' Guild \u00b7 ETFs",'data-rpg-page="guild"'],["homestead","The Homestead \u00b7 Plan",'data-rpg-page="homestead"']];
+  const tabs=[["hall","The Hall",'data-rpg-page="home"'],["treasury","Treasury",'data-rpg-page="portfolio"'],["metals","The Forge \u00b7 Metals",'data-rpg-domain="metals"'],["crypto","Arcane Vault \u00b7 Crypto",'data-rpg-domain="crypto"'],["mtg","The Archive \u00b7 MTG",'data-rpg-domain="mtg"'],["etf","Merchants' Guild \u00b7 ETFs",'data-rpg-page="guild"'],["homestead","The Homestead \u00b7 Plan",'data-rpg-page="homestead"'],["macro","The Watchtower \u00b7 Macro",'data-rpg-page="watchtower"']];
   return `<nav class="rpg-realms" aria-label="Realms">${tabs.map(([key,label,go])=>`<button type="button" class="rpg-btn rpg-realm${key===active?" is-active":""}" ${go}${key===active?' aria-current="page"':""}>${esc(label)}</button>`).join("")}</nav>`;
 }
 

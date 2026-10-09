@@ -482,3 +482,26 @@ th.num .rpg-sort{justify-content:flex-end;width:100%}
 .rpg-home-rates-table{min-width:560px}
 .rpg-home-rates-table th small{font-family:var(--font-body);color:#d8cbb0;font-size:.85rem}
 .rpg-home-rates-why{color:#d8cbb0;margin:10px 0 12px}
+/* The Watchtower (recession stress) */
+.rpg-watch-hero{border-left-color:#a9452f}
+.rpg-watch-top{display:flex;gap:22px;align-items:center;flex-wrap:wrap}
+.rpg-watch-big{font-family:var(--font-display);font-size:3.4rem;font-weight:700;line-height:1;color:#f1d78f}
+.rpg-watch-big.rpg-up{color:#a9cf92}.rpg-watch-big.rpg-down{color:#e48b73}
+.rpg-watch-band{margin:0;font-family:"Alegreya SC",var(--font-body);font-size:1.25rem;color:#f1e3c2}
+.rpg-watch-gauge{margin-top:10px}
+.rpg-watch-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}
+.rpg-watch-table{min-width:720px}
+.rpg-watch-table tfoot th,.rpg-watch-table tfoot td{border-top:1px solid #6b5432;color:#f1d78f}
+.rpg-watch-sub th{padding-left:28px;font-family:var(--font-body);color:#d8cbb0;font-weight:normal}
+.rpg-watch-sub small,.rpg-watch-sys small{color:#b9a98a}
+.rpg-watch-bar{position:relative;display:inline-block;width:120px;height:10px;background:#15110c;border:1px solid #4a3d2c;vertical-align:middle}
+.rpg-watch-bar::after{content:"";position:absolute;left:50%;top:-3px;bottom:-3px;width:1px;background:#b9a98a}
+.rpg-watch-bar i{position:absolute;top:0;bottom:0}
+.rpg-watch-bar i.is-good{background:#4d7a3a}.rpg-watch-bar i.is-bad{background:#a9452f}
+.rpg-watch-cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px;margin-bottom:12px}
+.rpg-watch-card{padding:14px 16px;display:flex;flex-direction:column;gap:8px}
+.rpg-watch-card p{margin:0;color:#3b2f22;line-height:1.45}
+.rpg-watch-fresh{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:6px 18px}
+.rpg-watch-fresh li{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #3a3127;padding:4px 0;color:#d8cbb0}
+.rpg-watch-fresh strong{color:#f1e3c2;font-weight:normal;font-variant-numeric:tabular-nums}
+@media (max-width:720px){.rpg-watch-big{font-size:2.6rem}}
