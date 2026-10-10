@@ -35,7 +35,7 @@ def test_portfolio_exposes_unified_all_account_overview():
     for marker in (
         "function renderOverallPortfolioOverview()",
         "Overall portfolio",
-        "Certified holdings + Acorns + retirement + manual stocks & ETFs",
+        "Certified holdings + Acorns + manual stocks & ETFs · retirement and bank are in the Homestead net worth",
         "Total current value",
         "Total cost basis",
         "Total gain / loss",
@@ -57,7 +57,7 @@ def test_unified_overview_combines_values_without_erasing_source_authority():
     assert "const totalValue=coreMarket+acornsValue+manualValue" in javascript
     assert "const totalBasis=coreBasis+acornsBasis+manualBasis" in javascript
     # the gain counts only certified positions whose value and basis are both known (matched totals)
-    assert "const totalGain=totalValue-coreMarket+coreMatched-retirement.value+retirement.matchedValue-totalBasis" in javascript
+    assert "const totalValue=coreMarket+acornsValue+manualValue;" in javascript and "const totalGain=totalValue-coreMarket+coreMatched-totalBasis" in javascript
     assert "core?.matched_market_value" in javascript and "core?.matched_cost_basis" in javascript
     assert "Mixed-authority personal summary" in javascript
     assert "each underlying section keeps its own authority" in javascript

@@ -102,14 +102,14 @@ def test_retirement_statements_join_net_worth_the_treasury_and_the_homestead():
     assert "function renderRetirementAccounts(document)" in javascript
     assert javascript.count("renderRetirementAccounts(retirementAccounts);renderManualHoldings(manualHoldings);") == 3
     assert 'optional("/v1/external-accounts/summary")' in javascript
-    assert "const retirement=retirementTotals();" in javascript and 'allocation["Retirement"]' in javascript
+    assert "const retirement=retirementTotals();" in javascript and 'allocation["Retirement"]' not in javascript  # investments only since 2026-10-10
     assert "manualHoldings,externalAccount,retirementAccounts,transactions:transactionItems}" in javascript
     for value in ('"retirement-401k"', '"ira"', '"hsa"', '"pension"', '"/v1/external-accounts/schedule"', "Save paychecks only",
                   "function retirementSlug(name)", "a.estimate?.value"):
         assert value in javascript
     realm = (ASSETS / "rpg_realm.js").read_text(encoding="utf-8")
     assert realm.isascii() and 'retirement:{name:"The Reliquary"' in realm and "function retirementItems(d)" in realm
-    assert '["mtg","crypto","etf","acorns","retirement","metals","purse"]' in realm and 'kind:"reliquary"' in realm
+    assert '["mtg","crypto","etf","acorns","metals","purse"]' in realm and "Retirement accounts are not Treasury items" in realm
     assert "r.estimate?.value??r.items[0].current_value" in realm
     # The Market Board opens on every fund; "grouped only" is an option.
     assert 'guildFilter:{family:"ALL"' in realm and 'opt("ALL",`All ${funds.length} funds`,st.family)' in realm
