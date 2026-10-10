@@ -401,6 +401,12 @@ tbody tr:hover{background:rgba(217,180,90,.05)}
 .rpg-home-toggle{display:flex;gap:8px;flex-wrap:wrap}
 .rpg-home-toggle .rpg-realm{padding:6px 12px;font-size:.78rem}
 .rpg-home-tiles{grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.rpg-home-nw{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:flex-end;margin:4px 0 12px}
+.rpg-home-nw .rpg-stat-big{font-size:2rem;color:#f1d78f}
+.rpg-home-nw-parts{margin-top:8px;gap:8px 20px}
+.rpg-home-nw-parts strong.rpg-up{color:#9cc48a}
+.rpg-home-nw-parts strong.rpg-down{color:#e08a7d}
+.rpg-home-horizon{border-color:#6b5432;background:rgba(107,84,50,.16);color:#d8cbb0}
 .rpg-home-ledger td.rpg-home-actual{color:#f1d78f}
 .rpg-home-ledger tr.is-now{box-shadow:inset 3px 0 0 #b5862f}
 .rpg-home-ledger{min-width:880px}

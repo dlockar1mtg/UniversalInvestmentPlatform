@@ -3,7 +3,7 @@
    ranges come from /v1/household-plan/projection with the live holdings from the Treasury. */
 (()=>{
 "use strict";
-const S={doc:null,plan:null,dirty:false,proj:null,projKey:"",pick:null,chart:"house",preview:null,msg:null,tried:null,loading:false};
+const S={doc:null,plan:null,dirty:false,proj:null,projKey:"",pick:null,chart:"house",preview:null,msg:null,tried:null,loading:false,nw:null,nwErr:null};
 const byId=id=>document.getElementById(id);
 const esc=v=>{const n=document.createElement("span");n.textContent=String(v??"");return n.innerHTML};
 const num=v=>{if(v===null||v===undefined||v==="")return null;const n=Number(v);return Number.isFinite(n)?n:null};
@@ -62,8 +62,12 @@ function stillToCome(m,done){
 function load(){
   if(S.loading)return;S.loading=true;
   call("/v1/presentation/housing").then(h=>{S.housing=h;if(S.doc)render()}).catch(()=>{S.housing={available:false}});
+  loadNetWorth();
   call("/v1/household-plan").then(doc=>{S.doc=doc;S.plan=doc.available?clone(doc.plan):null;S.dirty=false;S.loading=false;render();refreshProjection(true)})
     .catch(error=>{S.loading=false;S.msg=["bad",error.message];render()});
+}
+function loadNetWorth(){
+  call("/v1/net-worth").then(doc=>{S.nw=doc;S.nwErr=null;if(S.doc)render()}).catch(error=>{S.nwErr=error.message;if(S.doc)render()});
 }
 function refreshProjection(force){
   if(!S.doc?.available)return;
@@ -73,6 +77,62 @@ function refreshProjection(force){
   if(!force&&k===S.projKey)return;
   S.projKey=k;
   post("/v1/household-plan/projection",body).then(p=>{if(S.projKey!==k)return;S.proj=p;render()}).catch(error=>{S.msg=["bad",`Ranges could not be computed: ${error.message}`];render()});
+}
+
+
+/* ---------------- net worth, month by month ---------------- */
+const PARTS=[["investments","Investments"],["retirement","Retirement"],["bank","Bank"],["house_fund","House fund"],["home_equity","Home equity"]];
+function netWorth(){
+  const head=`<div class="rpg-section-head"><h2 id="rpg-home-nw-h" class="rpg-stone-title">Net worth, month by month</h2><button type="button" class="rpg-btn rpg-link" data-home-export>Download my data</button></div>`;
+  if(S.nwErr)return `<section class="rpg-stone rpg-road" aria-labelledby="rpg-home-nw-h">${head}<p class="rpg-parch-note">${esc(`Net worth could not be read: ${S.nwErr}`)}</p></section>`;
+  if(!S.nw)return `<section class="rpg-stone rpg-road" aria-labelledby="rpg-home-nw-h">${head}<p class="rpg-parch-note">Adding up today\u2019s net worth\u2026</p></section>`;
+  const c=S.nw.current,months=S.nw.months||[];
+  const shown=PARTS.filter(([k])=>num(c.components[k])!==null&&(k!=="home_equity"||num(c.components[k])>0));
+  const chips=shown.map(([k,l])=>`<span>${esc(l)} <strong class="num">${money(c.components[k])}</strong></span>`).join("");
+  const prev=months.filter(m=>m.month<c.month).pop(),first=months[0];
+  const change=(from,label)=>from?`<span>${esc(label)} <strong class="num ${num(c.net_worth)-num(from.net_worth)<0?"rpg-down":"rpg-up"}">${num(c.net_worth)-num(from.net_worth)<0?"\u2212":"+"}${money(Math.abs(num(c.net_worth)-num(from.net_worth)))}</strong></span>`:"";
+  const missing=(c.missing||[]).map(k=>(PARTS.find(p=>p[0]===k)||[k,k])[1]);
+  const notes=[...(c.investments?.notes||[])];
+  const why=`Investments are the Treasury\u2019s total (certified holdings, Acorns and manual stocks and ETFs). Retirement is your latest statements plus the paychecks since. Bank and the house fund are this month in your plan (your check-in when you have one). Debts are not counted yet. A month is kept for good once it ends; months before the first capture come from the balances you entered in the plan.`;
+  return `<section class="rpg-stone rpg-road" aria-labelledby="rpg-home-nw-h">${head}<div class="rpg-home-nw"><div><div class="rpg-stat-label">${esc(monthLabel(c.month))}, today</div><div class="rpg-stat-big num">${money(c.net_worth)}</div><div class="rpg-crumb-stats rpg-home-nw-parts">${chips}${change(prev,`Since ${monthLabel(prev?.month)}`)}${prev&&first&&first.month!==prev.month?change(first,`Since ${monthLabel(first.month)}`):""}</div></div></div>${nwChart(months,c)}${missing.length?`<p class="rpg-vault-why">${esc(`Not in the total yet: ${missing.join(", ")}.`)}</p>`:""}${notes.map(n=>`<p class="rpg-vault-why">${esc(n)}</p>`).join("")}<p class="rpg-crumb-note">${esc(why)}</p></section>`;
+}
+function nwChart(months,c){
+  const rows=months.some(m=>m.month===c.month)?months.map(m=>m.month===c.month?{...m,net_worth:c.net_worth}:m):[...months,{month:c.month,net_worth:c.net_worth,source:"TODAY"}];
+  if(!rows.length)return "";
+  const top0=Math.max(1,...rows.map(r=>num(r.net_worth)||0))*1.1,step=niceStep(top0,5),top=Math.ceil(top0/step)*step;
+  const X0=78,X1=960,Y0=14,Y1=230,slot=(X1-X0)/rows.length,w=Math.min(46,slot*0.7),y=v=>Y1-(Y1-Y0)*Math.max(0,v)/top;
+  const grid=[],labels=[];
+  for(let v=0;v<=top+1;v+=step){grid.push(`M${X0} ${y(v).toFixed(1)} H${X1}`);labels.push(`<text x="${X0-8}" y="${(y(v)+5).toFixed(1)}" text-anchor="end">${esc(compact(v))}</text>`)}
+  const every=Math.max(1,Math.ceil(rows.length/8));
+  const bars=rows.map((r,i)=>{const cx=X0+slot*(i+.5),v=num(r.net_worth)||0,planned=r.source==="PLAN_LEDGER_ACTUALS";
+    return `<rect x="${(cx-w/2).toFixed(1)}" y="${y(v).toFixed(1)}" width="${w.toFixed(1)}" height="${(Y1-y(v)).toFixed(1)}" fill="${planned?"#7d6a45":"#d9b45a"}"><title>${esc(`${monthLabel(r.month)}: ${money(v)}${planned?" (from the plan's entered balances)":r.month===c.month?" (this month, so far)":""}`)}</title></rect>${i%every===0||i===rows.length-1?`<text x="${cx.toFixed(1)}" y="252" text-anchor="middle">${esc(monthLabel(r.month))}</text>`:""}`}).join("");
+  const key=rows.some(r=>r.source==="PLAN_LEDGER_ACTUALS")?`<div class="rpg-chart-key"><span><svg width="18" height="10" aria-hidden="true"><rect width="18" height="10" fill="#d9b45a"/></svg>Kept by the UIP</span><span><svg width="18" height="10" aria-hidden="true"><rect width="18" height="10" fill="#7d6a45"/></svg>From the plan\u2019s entered balances</span></div>`:"";
+  return `${key}<svg viewBox="0 0 1000 264" class="rpg-fluid" role="img" aria-label="${esc(`Net worth by month, ${rows.length} month${rows.length===1?"":"s"}: ${rows.map(r=>`${monthLabel(r.month)} ${money(r.net_worth)}`).join(", ")}.`)}"><g stroke="#3a3127" stroke-width="1" fill="none"><path d="${grid.join(" ")}"/></g>${bars}<g fill="#b9a98a" font-size="14">${labels.join("")}</g></svg>`;
+}
+async function downloadData(){
+  try{
+    const r=await fetch("/v1/my-data/export",{headers:{"X-API-Key":key(),"Accept":"application/json"}});
+    if(!r.ok){const body=await r.json().catch(()=>({}));throw new Error(body.error?.message||`Request failed (${r.status})`)}
+    const blob=await r.blob(),url=URL.createObjectURL(blob),a=document.createElement("a");
+    a.href=url;a.download=`uip-my-data-${today()}.json`;document.body.appendChild(a);a.click();a.remove();
+    setTimeout(()=>URL.revokeObjectURL(url),10000);
+    setMsg("ok","Your data is downloading: every transaction, holding, statement, plan and net-worth month, as one file.");
+  }catch(error){setMsg("bad",`The download did not work: ${error.message}`)}
+  render();
+}
+
+/* ---------------- a plan that keeps going ---------------- */
+const HORIZON=36;
+const addMonths=(m,n)=>{const t=Number(m.slice(0,4))*12+Number(m.slice(5,7))-1+n;return `${Math.floor(t/12)}-${String(t%12+1).padStart(2,"0")}`};
+function extendPlan(plan,through){
+  const last=plan.months[plan.months.length-1];let m=last.month;const added=[];
+  while(m<through){m=addMonths(m,1);added.push({month:m,income:{...last.income},expenses:{...last.expenses},investment_contribution:last.investment_contribution,house_fund_contribution:last.house_fund_contribution,retirement_contribution:last.retirement_contribution,bank_balance:null,retirement_balance:null,investment_balance:null,house_fund_balance:null,home_equity:null,note:`Copied from ${monthLabel(last.month)}; edit to fit.`,bank_check:null})}
+  plan.months.push(...added);return added.length;
+}
+function horizonNote(){
+  const end=S.plan.months[S.plan.months.length-1].month,want=addMonths(nowMonth(),HORIZON);
+  if(end>=want)return "";
+  return `<div class="rpg-home-dirty rpg-home-horizon" role="status"><span>${esc(`Your plan runs to ${monthLabel(end)}. Keep it ${HORIZON} months ahead so the Homestead stays useful after the house: add months through ${monthLabel(want)}, copied from ${monthLabel(end)} for you to edit.`)}</span><button type="button" class="rpg-btn rpg-action" data-home-extend="${esc(want)}">Add the months</button></div>`;
 }
 
 /* ---------------- pieces ---------------- */
@@ -135,7 +195,7 @@ function capacity(p){
 function ledger(){
   const rows=roll(S.plan),now=nowMonth();
   const body=rows.map(r=>`<tr class="${r.month===S.pick?"is-picked":""}${r.month===now?" is-now":""}"><th scope="row"><button type="button" class="rpg-btn rpg-fund-pick" data-home-month="${esc(r.month)}" aria-pressed="${r.month===S.pick}"><strong>${esc(monthLabel(r.month))}</strong><span>${r.checked?`bank checked ${esc(dayText(r.checked))}`:r.anchored.length?"actuals entered":r.month<now?"plan only":r.month===now?"this month":""}</span></button></th><td class="num">${money(r.income)}</td><td class="num">${money(r.expenses)}</td><td class="num">${money(r.net)}</td><td class="num">${money(S.plan.months.find(m=>m.month===r.month).investment_contribution)}</td><td class="num${r.anchored.includes("bank_balance")?" rpg-home-actual":r.checked?" rpg-home-checked":""}"${r.checked?` title="Projected from your ${esc(dayText(r.checked))} bank balance"`:""}>${money(r.bank_balance)}</td><td class="num${r.anchored.includes("retirement_balance")?" rpg-home-actual":""}">${money(r.retirement_balance)}</td><td class="num${r.anchored.includes("investment_balance")?" rpg-home-actual":""}">${money(r.investment_balance)}</td><td class="num"><strong>${money(r.net_worth)}</strong></td></tr>`).join("");
-  return `<section class="rpg-stone rpg-guild-ledger" aria-labelledby="rpg-home-led-h"><div class="rpg-section-head"><h2 id="rpg-home-led-h" class="rpg-stone-title">The ledger of months</h2><span class="rpg-crumb-note">Pick a month to edit it. Gold figures are actuals you entered; the rest roll forward from them.</span></div>${S.dirty?`<div class="rpg-home-dirty" role="status"><span>Unsaved changes to the plan.</span><button type="button" class="rpg-btn rpg-action" data-home-save>Save the plan</button><button type="button" class="rpg-btn rpg-link" data-home-discard>Discard</button></div>`:""}<div class="rpg-table-wrap"><table class="rpg-table rpg-guild-table rpg-home-ledger"><thead><tr><th>Month</th><th class="num">Income</th><th class="num">Bills</th><th class="num">Net</th><th class="num">Invested</th><th class="num">Bank</th><th class="num">Retirement</th><th class="num">Investments</th><th class="num">Net worth</th></tr></thead><tbody>${body}</tbody></table></div><div id="rpg-home-editor">${editor()}</div></section>`;
+  return `<section class="rpg-stone rpg-guild-ledger" aria-labelledby="rpg-home-led-h"><div class="rpg-section-head"><h2 id="rpg-home-led-h" class="rpg-stone-title">The ledger of months</h2><span class="rpg-crumb-note">Pick a month to edit it. Gold figures are actuals you entered; the rest roll forward from them.</span></div>${horizonNote()}${S.dirty?`<div class="rpg-home-dirty" role="status"><span>Unsaved changes to the plan.</span><button type="button" class="rpg-btn rpg-action" data-home-save>Save the plan</button><button type="button" class="rpg-btn rpg-link" data-home-discard>Discard</button></div>`:""}<div class="rpg-table-wrap"><table class="rpg-table rpg-guild-table rpg-home-ledger"><thead><tr><th>Month</th><th class="num">Income</th><th class="num">Bills</th><th class="num">Net</th><th class="num">Invested</th><th class="num">Bank</th><th class="num">Retirement</th><th class="num">Investments</th><th class="num">Net worth</th></tr></thead><tbody>${body}</tbody></table></div><div id="rpg-home-editor">${editor()}</div></section>`;
 }
 
 const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
@@ -267,11 +327,11 @@ function render(){
   if(!S.plan){view.innerHTML=`${crumbs("Household plan \u00b7 not set up yet")}${message()}<section class="rpg-stone rpg-guild-hero"><div><div class="rpg-parch-kicker">The Homestead</div><p class="rpg-guild-counsel">Bring your Income &amp; Net Worth Tracker into the UIP once. After that the plan lives here: edit any month, enter real balances as months pass, and see the range of where the plan lands and what it means for the house.</p></div></section>${importPanel()}`;return}
   const v=S.doc.version,p=S.proj;
   const note=`Plan saved ${v?new Date(v.recorded_at).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}):"\u2014"} \u00b7 ${monthLabel(S.plan.months[0].month)} to ${monthLabel(S.plan.months[S.plan.months.length-1].month)}${S.tried?" \u00b7 showing unsaved settings":""}`;
-  view.innerHTML=`${crumbs(note)}${message()}${p?goal(p)+fan(p)+targetTiles(p)+capacity(p)+ratesSection(p)+housingSection():`<p class="rpg-parch-note">Working out the ranges\u2026</p>`}${purse()}${ledger()}${settingsForm()}${importPanel()}${p?assumptions(p):""}`;
+  view.innerHTML=`${crumbs(note)}${message()}${netWorth()}${p?goal(p)+fan(p)+targetTiles(p)+capacity(p)+ratesSection(p)+housingSection():`<p class="rpg-parch-note">Working out the ranges\u2026</p>`}${purse()}${ledger()}${settingsForm()}${importPanel()}${p?assumptions(p):""}`;
 }
 function setMsg(kind,text){S.msg=text?[kind,text]:null}
 async function savePlan(plan,okText){
-  try{const out=await post("/v1/household-plan",{plan});S.doc={available:true,version:out.version,plan:out.plan,rows:out.rows};S.plan=clone(out.plan);S.dirty=false;S.tried=null;setMsg("ok",okText);render();refreshProjection(true)}
+  try{const out=await post("/v1/household-plan",{plan});S.doc={available:true,version:out.version,plan:out.plan,rows:out.rows};S.plan=clone(out.plan);S.dirty=false;S.tried=null;setMsg("ok",okText);render();refreshProjection(true);loadNetWorth()}
   catch(error){setMsg("bad",`Not saved: ${error.message}`);render()}
 }
 function bind(view){
@@ -279,6 +339,8 @@ function bind(view){
     const t=event.target.closest("button");if(!t||!view.contains(t))return;
     if(t.dataset.homeMonth){S.pick=t.dataset.homeMonth===S.pick?null:t.dataset.homeMonth;const slot=byId("rpg-home-editor");if(slot){slot.innerHTML=editor();view.querySelectorAll("[data-home-month]").forEach(b=>{const on=b.dataset.homeMonth===S.pick;b.setAttribute("aria-pressed",String(on));b.closest("tr")?.classList.toggle("is-picked",on)});slot.querySelector("input")?.focus()}return}
     if(t.dataset.homeChart){S.chart=t.dataset.homeChart;render();return}
+    if(t.hasAttribute("data-home-export")){downloadData();return}
+    if(t.dataset.homeExtend){const n=extendPlan(S.plan,t.dataset.homeExtend);S.dirty=S.dirty||n>0;setMsg("ok",`Added ${n} month${n===1?"":"s"} through ${monthLabel(t.dataset.homeExtend)}, copied from the last month. Edit any of them, then save the plan.`);render();return}
     if(t.hasAttribute("data-home-close")){S.pick=null;render();return}
     if(t.dataset.homeUseStatements!==undefined){const input=t.closest("form")?.querySelector('[data-home-field="retirement_balance"]');if(input){input.value=t.dataset.homeUseStatements;input.focus()}return}
     if(t.dataset.homeApply==="later"){applyEdit(t.closest("form"),true);return}
