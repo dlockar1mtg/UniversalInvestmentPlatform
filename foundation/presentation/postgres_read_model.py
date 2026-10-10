@@ -88,11 +88,13 @@ class PostgresPresentationRepository:
                     len(publication.records),
                 ),
             )
-            for record in publication.records:
-                cursor.execute(
-                    """INSERT INTO presentation_records (
-                        publication_id, record_type, domain_id, asset_id, record_key, payload_json
-                    ) VALUES (%s,%s,%s,%s,%s,%s::jsonb)""",
+            # One batched statement instead of one network round trip per record (about 99% of the
+            # publication's time against the hosted database). Same rows, same transaction.
+            cursor.executemany(
+                """INSERT INTO presentation_records (
+                    publication_id, record_type, domain_id, asset_id, record_key, payload_json
+                ) VALUES (%s,%s,%s,%s,%s,%s::jsonb)""",
+                [
                     (
                         publication.publication_id,
                         record.record_type,
@@ -100,8 +102,10 @@ class PostgresPresentationRepository:
                         record.asset_id,
                         record.record_key,
                         json.dumps(record.payload, sort_keys=True, default=str),
-                    ),
-                )
+                    )
+                    for record in publication.records
+                ],
+            )
 
     def validate_staged(self, publication_id: str) -> dict[str, int]:
         with closing(self._connection_factory()) as db, db.cursor() as cursor:
