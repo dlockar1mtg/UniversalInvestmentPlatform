@@ -41,3 +41,22 @@ def test_package_status_summarises_each_package_and_current_funds():
     assert status["etf"]["funds"] == 3 and status["etf"]["current_funds"] == 2 and status["etf"]["package_id"] == "etf-1"
     assert status["housing"]["latest_input_observation"] == "2026-10-08" and status["housing"]["market_count"] == 2
     assert status["macro"]["data_quality"] == "OK" and status["macro"]["generated_at_utc"].startswith("2026-10-09")
+
+
+def test_asset_details_returns_many_assets_in_one_query():
+    psycopg = pytest.importorskip("psycopg")
+    with closing(psycopg.connect(DSN)) as db, db, db.cursor() as cur:
+        cur.execute("DROP TABLE IF EXISTS presentation_active_publication, presentation_records, presentation_publications")
+    PostgresPresentationRepository.from_dsn(DSN).initialize()
+    with closing(psycopg.connect(DSN)) as db, db, db.cursor() as cur:
+        cur.execute("""INSERT INTO presentation_publications (publication_id, publication_version, source_database_sha256,
+                       source_database_classification, published_at_utc, publication_status, content_fingerprint, record_count)
+                       VALUES ('p1','1','x','x',now(),'ACTIVE','f',4)""")
+        for kind, asset, key in [("asset", "A|1", "A|1"), ("recommendation", "A|1", "A|1"), ("asset", "B|2", "B|2"), ("asset", "C|3", "C|3")]:
+            cur.execute("INSERT INTO presentation_records VALUES ('p1',%s,'mtg',%s,%s,%s::jsonb)", (kind, asset, key, json.dumps({"id": asset, "kind": kind})))
+        cur.execute("INSERT INTO presentation_active_publication (singleton_id, publication_id) VALUES (1,'p1')")
+    repo = PresentationReadRepository.from_dsn(DSN)
+    out = repo.asset_details("mtg", ["A|1", "B|2", "missing"])
+    assert set(out) == {"A|1", "B|2"}
+    assert out["A|1"] == repo.asset_detail("mtg", "A|1")
+    assert sorted(out["A|1"]["records"]) == ["asset", "recommendation"]

@@ -234,6 +234,7 @@ def apply_secret_lair_model_decisions(records: list[PresentationRecord]) -> int:
             "model_prob_profit_6m": _model_number(decision.get("prob_profit_6m")),
             "model_tcgplayer_product_id": str(decision.get("tcgplayer_product_id") or "").strip() or None,
             "model_market_index": list(summary.get("market_index") or [])[-24:],
+            "model_backtest": summary.get("backtest") if isinstance(summary.get("backtest"), dict) else None,
         })
         _withhold_if_stale(record.payload, record.payload["model_as_of"])
         applied += 1
