@@ -150,6 +150,24 @@ def _recommendation(payload: dict[str, object] | None) -> tuple[str | None, str 
     return None, None
 
 
+def _mtg_daily_market_price(domain_id: str, payload: dict[str, object] | None) -> tuple[object, str] | None:
+    """Today's market price from a current MTG model decision (Secret Lair, Pre-Collector, Collector v2).
+
+    None unless the decision is not stale and its price is a positive number; the date returned is
+    the price date (Pre-Collector) or the decision's as-of date.
+    """
+    if domain_id != "mtg" or not payload or not payload.get("model_version") or payload.get("model_stale") is not False:
+        return None
+    try:
+        price = _decimal(payload.get("model_price_usd"))
+    except (ArithmeticError, ValueError):
+        return None
+    if price is None or not price.is_finite() or price <= 0:
+        return None
+    when = payload.get("model_price_date") or payload.get("model_as_of")
+    return price, str(when) if when else None
+
+
 def _freshness(asset: dict[str, object]) -> str | None:
     for field in (
         "last_updated_at_utc",
@@ -266,6 +284,13 @@ def _enrich_position(
             f"holding has no active certified asset record: {position.domain_id}/{position.asset_id}"
         )
 
+    daily_market = _mtg_daily_market_price(position.domain_id, recommendation_payload)
+    if daily_market is not None:
+        # The certified MTG export is a frozen snapshot (Aug 2026); the daily model decisions carry
+        # today's TCGplayer market price for every lane. Value holdings at that price when it is
+        # current, and keep the certified price as the fallback.
+        authority, raw_price, freshness = True, daily_market[0], daily_market[1]
+
     if not authority:
         current_price = None
         pricing_status = "UNPRICED_NO_CERTIFIED_CURRENT_PRICE_AUTHORITY"
@@ -278,7 +303,9 @@ def _enrich_position(
             raise ValueError(
                 f"invalid certified current price for {position.domain_id}/{position.asset_id}"
             )
-        pricing_status = "PRICED_CERTIFIED_CURRENT_AUTHORITY"
+        pricing_status = (
+            "PRICED_DAILY_MARKET_PRICE" if daily_market is not None else "PRICED_CERTIFIED_CURRENT_AUTHORITY"
+        )
 
     market_value = None if current_price is None else position.quantity * current_price
     unrealized = (

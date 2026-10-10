@@ -40,3 +40,14 @@ def test_hosted_csp_allows_same_origin_styles_but_not_inline_style_blocks():
     # The served Metals stylesheet must therefore be loaded from the dashboard origin.
     html = read("foundation/production/dashboard_assets/dashboard.html")
     assert "/dashboard/assets/metals_visual.css" in html
+
+
+def test_dashboard_scripts_never_write_inline_style_attributes_or_style_elements():
+    """The CSP blocks both; per-element styles travel as data-css and are applied through the CSSOM."""
+    assets = ROOT / "foundation/production/dashboard_assets"
+    for script in sorted(assets.glob("*.js")):
+        text = script.read_text(encoding="utf-8")
+        assert ' style="' not in text, script.name
+        assert 'createElement("style")' not in text, script.name
+    realm = (assets / "rpg_realm.js").read_text(encoding="utf-8")
+    assert 'el.style.cssText=el.getAttribute("data-css")' in realm and "new MutationObserver" in realm

@@ -1,3 +1,12 @@
+/* Display names: the certified MTG export prefixes Secret Lairs with "Drop:" (or a bare "x ...") and
+   repeats the finish ("... Foil Edition -- Foil Edition"). Shared by the Hall, Treasury and Book of Deeds. */
+function uipCleanAssetName(name){let n=String(name||"").trim();n=n.replace(/^(Secret Lair )?Drop:\s*/,"");if(/^x\s/.test(n))n="Secret Lair "+n;const m=n.match(/\s+\u2014\s+(?:Foil|Nonfoil|Non-Foil) Edition$/i);if(m&&/Edition/i.test(n.slice(0,m.index)))n=n.slice(0,m.index);return n}
+/* Friendly labels for model statuses shown in tables. */
+const UIP_STATUS_LABELS={STEADY_ACCUMULATION:"Keep buying steadily",ACCUMULATE_NEW_CAPITAL:"Add more",PAUSE_NEW_BUYING:"Pause new buying",CONTEXT_ONLY_NO_CALL:"No call (context only)",HOLD_NO_BUY_SIGNAL:"Hold",BUY_CANDIDATE_NOW:"Buy candidate",WAIT_FOR_LISTING_DISCOUNT:"Wait for a better listing",NO_CURRENT_MARKET_PRICE:"No current price",NOT_PURCHASE_ELIGIBLE:"Not a buy"};
+function uipStatusLabel(code){const c=String(code||"").trim();if(!c||c==="No certified recommendation")return"\u2014";return UIP_STATUS_LABELS[c]||(/^[A-Z0-9_]+$/.test(c)?c.charAt(0)+c.slice(1).toLowerCase().replace(/_/g," "):c)}
+/* The hosted CSP blocks inline style attributes (no 'unsafe-inline'). Markup carries per-element
+   styles as data-css instead, applied here through the CSSOM, which the policy allows. */
+(function(){const apply=root=>{if(root.nodeType!==1)return;if(root.hasAttribute("data-css")){root.style.cssText=root.getAttribute("data-css");}root.querySelectorAll("[data-css]").forEach(el=>{el.style.cssText=el.getAttribute("data-css")})};new MutationObserver(list=>{for(const m of list){if(m.type==="attributes")apply(m.target);else m.addedNodes.forEach(apply)}}).observe(document.documentElement,{childList:true,subtree:true,attributes:true,attributeFilter:["data-css"]});document.addEventListener("DOMContentLoaded",()=>apply(document.documentElement))})();
 /* The Universal Ledger: realm views drawn from the certified dashboard data.
    The Hall (home), the Treasury inventory (portfolio) and the Arcane Vault (crypto research).
    Read-only presentation: nothing here records, changes or executes anything. */
@@ -151,6 +160,7 @@ function vitals(refresh){
       const age=num(it.data_age_days),max=num(it.freshness_max_age_days);
       if(it.freshness_state==="UNKNOWN"){fill=0;text="unknown \u00b7 no data-as-of date"}
       else if(it.freshness_state==="STALE"){fill=12;text=`stale \u00b7 ${age} days old`}
+      else if(max&&max>=60&&it.data_as_of){fill=100;const m=new Date(String(it.data_as_of).slice(0,10)+"T12:00:00Z");text=`current \u00b7 ${isNaN(m)?it.data_as_of:m.toLocaleDateString("en-US",{month:"short",year:"numeric",timeZone:"UTC"})} monthly prices`}
       else{fill=age!==null&&max?Math.round(100-40*Math.max(0,age-1)/max):100;text=age===0?"fresh \u00b7 today":age===1?"fresh \u00b7 1 day old":`current \u00b7 ${age} days old`}
       if(it.health_state&&it.health_state!=="HEALTHY")text+=" \u00b7 needs review";
     }
@@ -158,6 +168,16 @@ function vitals(refresh){
   });
   const funds=state.guild?.available?state.guild.funds||[]:[];
   if(funds.length){const current=funds.filter(f=>f.freshness_state==="CURRENT").length,share=current/funds.length,asOf=state.guild.package?.package_as_of;const fill=Math.round(share*100);rows.push(`<div class="rpg-vital etf"><div class="rpg-vital-head"><span>ETF data</span><span>${esc(share>=0.9?`fresh \u00b7 ${current} of ${funds.length} funds \u00b7 ${dayLabel(asOf)}`:`needs review \u00b7 ${current} of ${funds.length} current`)}</span></div><div class="rpg-bar etf" role="meter" aria-label="ETF data freshness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${fill}"><i data-rpg-w="${fill}"></i></div></div>`)}
+  // Housing (weekly) and macro (weekdays) arrive with the publication; age from when each package was built.
+  const pk=state.packages||{};
+  for(const [id,label,limit] of [["housing","Housing data",9],["macro","Macro data",4]]){
+    const p=pk[id];if(!p||!p.generated_at_utc)continue;
+    const age=Math.max(0,Math.floor((Date.now()-new Date(p.generated_at_utc).getTime())/86400000));
+    const bad=p.data_quality&&p.data_quality!=="OK";
+    const fill=age>limit?12:Math.round(100-40*Math.max(0,age-1)/limit);
+    const text=`${age>limit?"stale":bad?"needs review":age===0?"fresh":"current"} \u00b7 ${age===0?"today":age===1?"1 day old":`${age} days old`}${bad?` \u00b7 inputs ${String(p.data_quality).toLowerCase()}`:""}`;
+    rows.push(`<div class="rpg-vital ${id}"><div class="rpg-vital-head"><span>${esc(label)}</span><span>${esc(text)}</span></div><div class="rpg-bar ${id}" role="meter" aria-label="${esc(label)} freshness" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${fill}"><i data-rpg-w="${fill}"></i></div></div>`);
+  }
   return `<section class="rpg-stone rpg-vitals" aria-label="Data vitals" data-rpg-page="refresh-page" title="Open Vitals">${rows.join("")}</section>`;
 }
 function treasuryRing(d){
@@ -188,7 +208,14 @@ function counselCards(d){
     cards.push(`<button type="button" class="rpg-btn rpg-counsel" data-rpg-domain="crypto" data-rpg-asset="crypto:${key}">${badge(p.model_call==="NO_CALL"?"NO CALL":String(p.model_call||"\u2014"),callTone(p.model_call))}<span><strong>${esc(COIN_NAMES[key])}: ${esc(meaning)}</strong><span>${ratio===null?"No ratio yet.":`Price is ${ratio.toFixed(2)}\u00d7 its 4-year average. Below 1\u00d7 says add more; 2\u00d7 and up says pause.`}</span></span></button>`);
   }
   const metals=(cat.metals||[]).filter(i=>String(i.payload?.recommendation||"").toLowerCase()==="buy").map(i=>i.asset_name);
-  if(metals.length){const list=metals.length>1?`${metals.slice(0,-1).join(", ")} and ${metals[metals.length-1]}`:metals[0];cards.push(`<button type="button" class="rpg-btn rpg-counsel" data-rpg-domain="metals">${badge("BUY","verdant")}<span><strong>The Forge: ${esc(list)}</strong><span>The top three by expected 12-month return. Every other metal holds.</span></span></button>`)}
+  if(metals.length){
+    // Nickel, zinc, aluminum and tin have no US-listed single-metal fund in the UIP (see the Forge's "What you can act on").
+    const NO_FUND=new Set(["nickel","zinc","aluminum","aluminium","tin"]);
+    const join=a=>a.length>1?`${a.slice(0,-1).join(", ")} and ${a[a.length-1]}`:a[0];
+    const fundable=metals.filter(m=>!NO_FUND.has(String(m).toLowerCase()));
+    if(fundable.length)cards.push(`<button type="button" class="rpg-btn rpg-counsel" data-rpg-domain="metals">${badge("BUY","verdant")}<span><strong>The Forge: ${esc(join(fundable))}</strong><span>Among the top three by expected 12-month return, with a fund you can buy. Every other metal holds.</span></span></button>`);
+    else cards.push(`<button type="button" class="rpg-btn rpg-counsel" data-rpg-domain="metals">${badge("HOLD","bronze")}<span><strong>The Forge: hold copper, gold, platinum and silver equally</strong><span>The model's top three (${esc(join(metals))}) have no US-listed fund, so they are research only. Holding the four fundable metals equally matched the model among them in the backtest.</span></span></button>`);
+  }
   const lairs=(d.portfolio?.positions||[]).filter(p=>p.domain_id==="mtg"&&p.recommendation==="BUY_CANDIDATE_NOW").length;
   const mtgHeld=(d.portfolio?.positions||[]).filter(p=>p.domain_id==="mtg").length;
   if(mtgHeld)cards.push(`<button type="button" class="rpg-btn rpg-counsel" data-rpg-domain="mtg">${badge(lairs?"BUY":"HOLD",lairs?"verdant":"bronze")}<span><strong>The Archive: ${lairs?`${lairs} of your Secret Lairs are buy candidates`:"hold the collection"}</strong><span>${lairs?"Listed below the model's buy price today. Check the live listing before buying.":"No buy signal on what you already hold."}</span></span></button>`);
@@ -223,7 +250,7 @@ function liveTransactions(items){
 }
 function assetLabel(d,assetId){
   const p=(d.portfolio?.positions||[]).find(x=>x.asset_id===assetId);
-  if(p&&p.asset_name)return p.asset_name;
+  if(p&&p.asset_name)return uipCleanAssetName(p.asset_name);
   const tail=String(assetId||"").split(":").pop()||"";
   return COIN_NAMES[tail]||tail.toUpperCase()||"Unknown";
 }
@@ -246,6 +273,7 @@ function renderHall(d){
   hall.innerHTML=`${chronicle(d)}${realmTabs("hall")}${vitals(d.refresh)}<div class="rpg-duo">${treasuryRing(d)}${questJournal(d)}</div>${recentDeeds(d)}${footer("Research, not personal financial advice. No counsel here places a trade.")}`;
   applyWidths(hall);
   if(!state.guild)loadGuild().then(()=>{if(state.home===d)renderHall(d);renderInventory(d)}).catch(()=>{});
+  if(!state.packages&&!state.packagesPromise)state.packagesPromise=api("/v1/presentation/package-status").then(doc=>{state.packages=doc.packages||{};if(state.home===d)renderHall(d)}).catch(()=>{state.packagesPromise=null});
   if(!state.catalog)loadCatalog().then(()=>{const q=byId("rpg-quests");if(q&&state.home===d)q.outerHTML=questJournal(d)}).catch(()=>{const q=byId("rpg-quests");const list=q&&q.querySelector(".rpg-counsel-list");if(list)list.innerHTML=`<p class="rpg-parch-note">The oracles are silent: counsel could not be loaded.</p>`});
 }
 

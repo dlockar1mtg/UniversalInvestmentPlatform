@@ -517,3 +517,13 @@ th.num .rpg-sort{justify-content:flex-end;width:100%}
 .rpg-abi-pips i{width:12px;height:12px;border:1px solid #6b5432;background:#15110c}
 .rpg-abi-pips i.is-on{background:#c9813a;border-color:#e2a35e}
 @media (max-width:720px){.rpg-watch-big{font-size:2.6rem}.rpg-abi-table{min-width:0}.rpg-abi-wide{display:none}.rpg-abi-table th small{max-width:none}.rpg-abi-table thead{display:none}.rpg-abi-table tr{display:grid;grid-template-columns:1fr auto auto;align-items:center;gap:4px 14px;padding:10px 4px;border-bottom:1px solid #3a3127}.rpg-abi-table th[scope=row]{grid-column:1/-1;border:0;padding:0}.rpg-abi-table td{border:0;padding:0}.rpg-abi-table td:empty{display:none}}
+
+.rpg-bar.housing>i{background:#8a6a3a}
+.rpg-bar.macro>i{background:#6a5a8a}
+
+/* Phones: the realm tabs repeat the main menu, so keep them to one swipeable row instead of eight stacked buttons. */
+@media (max-width:640px){
+  .rpg-tabs{flex-wrap:nowrap;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding-bottom:4px;margin-left:-2px;margin-right:-2px}
+  .rpg-tabs::-webkit-scrollbar{display:none}
+  .rpg-tabs>*{flex:0 0 auto;white-space:nowrap}
+}
