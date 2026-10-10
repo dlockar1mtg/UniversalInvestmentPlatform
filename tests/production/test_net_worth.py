@@ -154,5 +154,5 @@ def test_homestead_shows_net_worth_history_extends_the_plan_and_downloads_data()
     assert 'call("/v1/net-worth")' in page and 'fetch("/v1/my-data/export"' in page
     assert "Net worth, month by month" in page and "Download my data" in page
     assert "const HORIZON=36;" in page and "data-home-extend" in page
-    assert "${netWorth()}${p?goal(p)" in page          # net worth leads the page; the Treasury stays investments only
+    assert "${netWorth()}${emergency()}${p?goal(p)" in page          # net worth leads the page; the Treasury stays investments only
     assert page.isascii() and "style=" not in page

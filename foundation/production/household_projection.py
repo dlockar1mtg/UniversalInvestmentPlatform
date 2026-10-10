@@ -14,7 +14,7 @@ from pathlib import Path
 
 import numpy as np
 
-from .household_plan import roll_forward
+from .household_plan import essential_spending, roll_forward
 
 ROOT = Path(__file__).resolve().parents[2]
 ASSUMPTIONS = ROOT / "config" / "household" / "projection_assumptions.json"
@@ -108,7 +108,8 @@ def project(plan: dict, *, as_of_month: str, holdings: dict | None = None, assum
         series.append(snap)
 
     target_row = rows[end]
-    safety = s["safety_fund"] if s["safety_fund"] is not None else round(abs(target_row["expenses"]) * s["safety_fund_months"], 2)
+    # The safety fund is months of essential bills (every bill line unless the plan picks the essential ones).
+    safety = s["safety_fund"] if s["safety_fund"] is not None else round(essential_spending(plan, target_row["month"]) * s["safety_fund_months"], 2)
     # Prices are entered in today's dollars; grow them to the target month at the plan's home-price growth.
     years = max(0, (int(months[end][:4]) - int(months[start][:4])) * 12 + int(months[end][5:7]) - int(months[start][5:7])) / 12
     grow = (1 + s["home_price_growth"]) ** years
