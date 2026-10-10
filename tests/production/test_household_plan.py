@@ -274,3 +274,29 @@ def test_bad_bank_check_ins_are_refused(check, message):
     plan["months"][3]["bank_check"] = check
     with pytest.raises(H.HouseholdPlanError, match=message):
         H.normalize_plan(plan)
+
+
+def test_essential_bills_set_the_emergency_and_safety_fund():
+    plan = H.import_books(*books(months=8), "abc")
+    plan["settings"]["target_month"] = "2027-02"
+    normal = H.normalize_plan(plan)
+    assert normal["settings"]["essential_lines"] is None and H.essential_lines(normal) == ["Rent", "Car"]
+    rent = abs(normal["months"][-1]["expenses"]["Rent"])
+    everything = H.essential_spending(normal, "2027-02")
+    plan["settings"]["essential_lines"] = ["Rent"]
+    only_rent = H.normalize_plan(plan)
+    assert only_rent["settings"]["essential_lines"] == ["Rent"] and H.essential_spending(only_rent, "2027-02") == rent < everything
+    assert project(only_rent, as_of_month="2026-09")["safety_fund"] == pytest.approx(6 * rent)
+    assert project(normal, as_of_month="2026-09")["safety_fund"] == pytest.approx(6 * everything)
+    plan["settings"]["essential_lines"] = ["Boat"]
+    with pytest.raises(H.HouseholdPlanError, match="unknown bill line"):
+        H.normalize_plan(plan)
+
+
+def test_homestead_shows_the_emergency_fund_from_essential_bills():
+    from pathlib import Path
+    page = (Path(__file__).resolve().parents[2] / "foundation/production/dashboard_assets/homestead.js").read_text()
+    assert "The emergency fund" in page and "${netWorth()}${emergency()}" in page
+    assert "data-home-essentials" in page and "essential_lines:chosen.length===" in page
+    assert "live.purse" in page                              # T-bills count toward the fund; the house fund does not
+    assert page.isascii() and "style=" not in page

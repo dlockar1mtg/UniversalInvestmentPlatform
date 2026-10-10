@@ -43,6 +43,7 @@ DEFAULT_SETTINGS = {
     "mortgage_rate": 0.065,         # placeholder from the workbook's House Purchase Planner, not a live rate
     "loan_years": 30,
     "home_price_growth": 0.0,       # yearly; 0 = today's prices. The Homestead offers the housing forecast.
+    "essential_lines": None,        # bills that must be paid in a bad month (emergency fund); None = every bill line
 }
 MIX_SLEEVES = ("stocks", "crypto", "metals", "mtg", "cash")
 
@@ -117,6 +118,15 @@ def normalize_plan(document) -> dict:
     expense_lines = [str(x).strip() for x in document.get("expense_lines") or [] if str(x).strip()]
     if len(set(income_lines)) != len(income_lines) or len(set(expense_lines)) != len(expense_lines):
         raise HouseholdPlanError("line names must be unique")
+    essential = settings["essential_lines"]
+    if essential is not None:
+        if not isinstance(essential, (list, tuple)):
+            raise HouseholdPlanError("essential_lines must be a list of bill lines")
+        named = {str(x).strip() for x in essential}
+        unknown = sorted(named - set(expense_lines))
+        if unknown:
+            raise HouseholdPlanError(f"essential_lines names an unknown bill line: {unknown[0]}")
+        settings["essential_lines"] = [line for line in expense_lines if line in named]
     months, seen = [], set()
     for raw in document.get("months") or []:
         if not isinstance(raw, dict):
@@ -167,6 +177,20 @@ def _bank_check(raw, month: str, income_lines: list[str], expense_lines: list[st
     if unknown:
         raise HouseholdPlanError(f"{month} bank check names an unknown line: {unknown[0]}")
     return {"balance": balance, "as_of": as_of, "done": done}
+
+
+def essential_lines(plan: dict) -> list[str]:
+    chosen = plan["settings"].get("essential_lines")
+    return list(plan["expense_lines"]) if chosen is None else list(chosen)
+
+
+def essential_spending(plan: dict, month: str) -> float:
+    """A month's essential bills as a positive amount (the emergency fund and the house's safety fund use it)."""
+    m = next((x for x in plan["months"] if x["month"] == month), None)
+    if m is None:
+        return 0.0
+    keep = set(essential_lines(plan))
+    return round(abs(sum(v for k, v in m["expenses"].items() if k in keep)), 2)
 
 
 def still_to_come(m: dict) -> float:

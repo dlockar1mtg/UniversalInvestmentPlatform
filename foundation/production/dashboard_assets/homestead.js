@@ -121,6 +121,24 @@ async function downloadData(){
   render();
 }
 
+
+/* ---------------- the emergency fund ---------------- */
+function essentialLines(plan){const e=plan.settings?.essential_lines;return Array.isArray(e)?e:plan.expense_lines||[]}
+function emergency(){
+  const month=nowMonth(),m=S.plan.months.find(x=>x.month===month);if(!m)return "";
+  const keep=new Set(essentialLines(S.plan));
+  const bills=Math.abs(Object.entries(m.expenses||{}).filter(([k])=>keep.has(k)).reduce((a,[,v])=>a+(num(v)||0),0));
+  const want=num(S.plan.settings.safety_fund_months)??6,target=bills*want;
+  const row=roll(S.plan).find(r=>r.month===month)||{},bank=num(row.bank_balance)||0;
+  const live=liveHoldings(),tbills=live?num(live.purse)||0:0,have=Math.max(0,bank)+tbills;
+  const covered=bills>0?have/bills:null,short=Math.max(0,target-have),save=num(row.toBank)||0;
+  const pct=target>0?Math.min(1,have/target):1;
+  const W=880,bar=`<svg viewBox="0 0 ${W+20} 34" class="rpg-fluid rpg-home-ef-bar" role="img" aria-label="${esc(`${covered===null?"\u2014":covered.toFixed(1)} of ${want} months covered`)}"><rect x="10" y="8" width="${W}" height="16" fill="#2a241d" stroke="#6b5432"/><rect x="10" y="8" width="${(W*pct).toFixed(1)}" height="16" fill="${pct>=1?"#4d7a3a":"#b5862f"}"/>${Array.from({length:Math.max(0,Math.round(want)-1)},(_,i)=>`<path d="M${(10+W*(i+1)/want).toFixed(1)} 8 V24" stroke="#1c1814" stroke-width="2"/>`).join("")}</svg>`;
+  const verdict=bills<=0?"Mark which bills are essential below to set the target.":pct>=1?`Covered: ${covered.toFixed(1)} months of essential bills, past your ${want}-month target. Money beyond it can go to the house fund or investments.`:`${covered.toFixed(1)} of ${want} months covered. ${money(short)} to go${save>0?`; at this month\u2019s ${money(save)} left for the bank, about ${Math.ceil(short/save)} month${Math.ceil(short/save)===1?"":"s"}.`:"; the plan leaves nothing for the bank this month."}`;
+  const picks=(S.plan.expense_lines||[]).map(l=>`<label class="rpg-check"><input type="checkbox" data-home-essential="${esc(l)}"${keep.has(l)?" checked":""}> ${esc(l)} <span class="rpg-muted num">${money(Math.abs(num(m.expenses[l])||0))}</span></label>`).join("");
+  return `<section class="rpg-stone rpg-road" aria-labelledby="rpg-home-ef-h"><div class="rpg-section-head"><h2 id="rpg-home-ef-h" class="rpg-stone-title">The emergency fund \u00b7 ${esc(want)} months</h2><span class="rpg-crumb-note">${esc(`Essential bills ${money(bills)} a month \u00b7 target ${money(target)}`)}</span></div><p class="rpg-guild-counsel">${esc(verdict)}</p>${bar}<div class="rpg-crumb-stats"><span>Bank this month <strong class="num">${money(bank)}</strong></span><span>T-bills (the Purse) <strong class="num">${money(tbills)}</strong></span><span>Have <strong class="num">${money(have)}</strong></span></div><details class="rpg-home-ef-pick"><summary>Which bills are essential</summary><form class="rpg-home-ef-form" data-home-essentials>${picks}<div class="rpg-home-actions"><button type="submit" class="rpg-btn rpg-action">Save</button></div></form></details><p class="rpg-crumb-note">${esc("Essential means it has to be paid even in a bad month (rent, utilities, food, transport, insurance, minimum debt payments). The house fund and retirement are not counted: they have their own jobs. The house plan keeps the same number of months as its safety fund. Change the months under The house and the plan.")}</p></section>`;
+}
+
 /* ---------------- a plan that keeps going ---------------- */
 const HORIZON=36;
 const addMonths=(m,n)=>{const t=Number(m.slice(0,4))*12+Number(m.slice(5,7))-1+n;return `${Math.floor(t/12)}-${String(t%12+1).padStart(2,"0")}`};
@@ -291,7 +309,7 @@ function housingSection(){
 function settingsForm(){
   const s=S.plan.settings,mix=s.contribution_mix||{};
   const f=(k,label,v,step="any",extra="")=>`<label>${esc(label)}<input type="number" step="${step}" data-home-set="${k}" value="${v===null||v===undefined?"":esc(v)}"${extra}></label>`;
-  return `<section class="rpg-stone rpg-guild-ledger" aria-labelledby="rpg-home-set-h"><div class="rpg-section-head"><h2 id="rpg-home-set-h" class="rpg-stone-title">The house and the plan</h2><span class="rpg-crumb-note">Try changes to see the ranges move, then save them into the plan.</span></div><form class="rpg-board-filters rpg-home-grid" data-home-settings><label>Target month<input type="month" data-home-set="target_month" value="${esc(s.target_month)}"></label>${f("home_price_low","Home price, low",s.home_price_low,"1000")}${f("home_price_high","Home price, high",s.home_price_high,"1000")}${f("home_price_growth","Home-price growth % a year",Math.round((s.home_price_growth||0)*1000)/10,"0.1")}${f("down_payment_pct","Down payment %",Math.round(s.down_payment_pct*1000)/10,"0.5")}${f("closing_cost_pct","Closing costs %",Math.round(s.closing_cost_pct*1000)/10,"0.5")}${f("safety_fund","Safety fund ($, blank = months)",s.safety_fund,"100")}${f("safety_fund_months","Safety fund (months of bills)",s.safety_fund_months,"1")}${f("mortgage_rate","Mortgage rate %",Math.round(s.mortgage_rate*10000)/100,"0.05")}${f("loan_years","Loan years",s.loan_years,"1")}${f("plan_investment_return","Plan's steady return %",Math.round(s.plan_investment_return*1000)/10,"0.5")}<fieldset class="rpg-home-mix"><legend>Where new investment money goes (%)</legend>${SLEEVES.map(([k,l])=>f(`mix:${k}`,l,Math.round((mix[k]||0)*1000)/10,"5")).join("")}</fieldset><label class="rpg-check"><input type="checkbox" data-home-set="house_counts_retirement"${s.house_counts_retirement?" checked":""}> Count retirement toward the house</label><div class="rpg-home-actions"><button type="button" class="rpg-btn rpg-action rpg-action-quiet" data-home-try>Try these</button><button type="button" class="rpg-btn rpg-action" data-home-keep>Save into the plan</button></div></form></section>`;
+  return `<section class="rpg-stone rpg-guild-ledger" aria-labelledby="rpg-home-set-h"><div class="rpg-section-head"><h2 id="rpg-home-set-h" class="rpg-stone-title">The house and the plan</h2><span class="rpg-crumb-note">Try changes to see the ranges move, then save them into the plan.</span></div><form class="rpg-board-filters rpg-home-grid" data-home-settings><label>Target month<input type="month" data-home-set="target_month" value="${esc(s.target_month)}"></label>${f("home_price_low","Home price, low",s.home_price_low,"1000")}${f("home_price_high","Home price, high",s.home_price_high,"1000")}${f("home_price_growth","Home-price growth % a year",Math.round((s.home_price_growth||0)*1000)/10,"0.1")}${f("down_payment_pct","Down payment %",Math.round(s.down_payment_pct*1000)/10,"0.5")}${f("closing_cost_pct","Closing costs %",Math.round(s.closing_cost_pct*1000)/10,"0.5")}${f("safety_fund","Safety fund ($, blank = months)",s.safety_fund,"100")}${f("safety_fund_months","Emergency / safety fund (months of essential bills)",s.safety_fund_months,"1")}${f("mortgage_rate","Mortgage rate %",Math.round(s.mortgage_rate*10000)/100,"0.05")}${f("loan_years","Loan years",s.loan_years,"1")}${f("plan_investment_return","Plan's steady return %",Math.round(s.plan_investment_return*1000)/10,"0.5")}<fieldset class="rpg-home-mix"><legend>Where new investment money goes (%)</legend>${SLEEVES.map(([k,l])=>f(`mix:${k}`,l,Math.round((mix[k]||0)*1000)/10,"5")).join("")}</fieldset><label class="rpg-check"><input type="checkbox" data-home-set="house_counts_retirement"${s.house_counts_retirement?" checked":""}> Count retirement toward the house</label><div class="rpg-home-actions"><button type="button" class="rpg-btn rpg-action rpg-action-quiet" data-home-try>Try these</button><button type="button" class="rpg-btn rpg-action" data-home-keep>Save into the plan</button></div></form></section>`;
 }
 function readSettings(root){
   const out={},mix={};
@@ -327,7 +345,7 @@ function render(){
   if(!S.plan){view.innerHTML=`${crumbs("Household plan \u00b7 not set up yet")}${message()}<section class="rpg-stone rpg-guild-hero"><div><div class="rpg-parch-kicker">The Homestead</div><p class="rpg-guild-counsel">Bring your Income &amp; Net Worth Tracker into the UIP once. After that the plan lives here: edit any month, enter real balances as months pass, and see the range of where the plan lands and what it means for the house.</p></div></section>${importPanel()}`;return}
   const v=S.doc.version,p=S.proj;
   const note=`Plan saved ${v?new Date(v.recorded_at).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}):"\u2014"} \u00b7 ${monthLabel(S.plan.months[0].month)} to ${monthLabel(S.plan.months[S.plan.months.length-1].month)}${S.tried?" \u00b7 showing unsaved settings":""}`;
-  view.innerHTML=`${crumbs(note)}${message()}${netWorth()}${p?goal(p)+fan(p)+targetTiles(p)+capacity(p)+ratesSection(p)+housingSection():`<p class="rpg-parch-note">Working out the ranges\u2026</p>`}${purse()}${ledger()}${settingsForm()}${importPanel()}${p?assumptions(p):""}`;
+  view.innerHTML=`${crumbs(note)}${message()}${netWorth()}${emergency()}${p?goal(p)+fan(p)+targetTiles(p)+capacity(p)+ratesSection(p)+housingSection():`<p class="rpg-parch-note">Working out the ranges\u2026</p>`}${purse()}${ledger()}${settingsForm()}${importPanel()}${p?assumptions(p):""}`;
 }
 function setMsg(kind,text){S.msg=text?[kind,text]:null}
 async function savePlan(plan,okText){
@@ -359,6 +377,11 @@ function bind(view){
   view.addEventListener("submit",async event=>{
     const form=event.target;event.preventDefault();
     if(form.dataset.homeEditor){applyEdit(form,false);return}
+    if(form.hasAttribute("data-home-essentials")){
+      const chosen=[...form.querySelectorAll("[data-home-essential]")].filter(el=>el.checked).map(el=>el.dataset.homeEssential);
+      if(!chosen.length){setMsg("bad","Pick at least one essential bill.");render();return}
+      const plan=clone(S.plan);plan.settings={...plan.settings,essential_lines:chosen.length===(plan.expense_lines||[]).length?null:chosen};
+      savePlan(plan,"Saved. The emergency fund and the house's safety fund now count only the essential bills.");return}
     if(form.dataset.homeCheck){
       const m=readCheck(form);
       if(m.bank_check&&!Number.isFinite(m.bank_check.balance)){setMsg("bad","The bank balance must be a number.");render();return}

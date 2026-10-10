@@ -406,6 +406,12 @@ tbody tr:hover{background:rgba(217,180,90,.05)}
 .rpg-home-nw-parts{margin-top:8px;gap:8px 20px}
 .rpg-home-nw-parts strong.rpg-up{color:#9cc48a}
 .rpg-home-nw-parts strong.rpg-down{color:#e08a7d}
+.rpg-home-ef-bar{margin:6px 0 10px;max-height:40px}
+.rpg-home-ef-pick{margin-top:12px}
+.rpg-home-ef-pick summary{cursor:pointer;color:#e2c27a;font-family:"Alegreya SC",var(--font-body)}
+.rpg-home-ef-form{display:flex;flex-wrap:wrap;gap:8px 22px;padding:12px 0}
+.rpg-home-ef-form .rpg-check{display:inline-flex;align-items:center;gap:6px;color:#d8cbb0}
+.rpg-home-ef-form .rpg-home-actions{flex-basis:100%}
 .rpg-home-horizon{border-color:#6b5432;background:rgba(107,84,50,.16);color:#d8cbb0}
 .rpg-home-ledger td.rpg-home-actual{color:#f1d78f}
 .rpg-home-ledger tr.is-now{box-shadow:inset 3px 0 0 #b5862f}
