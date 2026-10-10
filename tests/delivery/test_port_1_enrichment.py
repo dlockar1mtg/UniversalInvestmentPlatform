@@ -312,3 +312,32 @@ def test_matched_totals_only_count_positions_with_both_a_value_and_a_basis():
     assert doc["known_market_value"] == "1050" and doc["known_cost_basis"] == "1300"      # the unmatched sets
     assert doc["matched_market_value"] == "1000" and doc["matched_cost_basis"] == "800"     # gain 200, as the Unrealized card says
     assert doc["matched_position_count"] == 1
+
+
+def _with_model(d, **model):
+    d["records"]["recommendation"][0]["payload"].update(model_version="secret-lair-v2", model_purchase_status="BUY_CANDIDATE_NOW", **model)
+    return d
+
+
+def test_mtg_holding_is_valued_at_the_current_daily_market_price():
+    accounting = derive_portfolio((transaction(),))
+    reader = FakePresentationReader({("mtg", ASSET_ID): _with_model(
+        detail(authority=True, current_price="137.62"), model_price_usd="155.31", model_stale=False, model_as_of="2026-10-09")})
+    position = enrich_portfolio(accounting, reader).positions[0]
+    assert position.current_price == Decimal("155.31") and position.market_value == Decimal("155.31")
+    assert position.pricing_status == "PRICED_DAILY_MARKET_PRICE"
+    assert position.freshness == "2026-10-09"
+
+
+@pytest.mark.parametrize("model", [
+    {"model_price_usd": "155.31", "model_stale": True, "model_as_of": "2026-09-01"},   # stale decisions
+    {"model_price_usd": "", "model_stale": False},                                    # no market price
+    {"model_price_usd": "n/a", "model_stale": False},                                 # not a number
+    {"model_price_usd": "0", "model_stale": False},
+])
+def test_mtg_holding_falls_back_to_the_certified_price_without_a_current_model_price(model):
+    accounting = derive_portfolio((transaction(),))
+    reader = FakePresentationReader({("mtg", ASSET_ID): _with_model(detail(authority=True, current_price="137.62"), **model)})
+    position = enrich_portfolio(accounting, reader).positions[0]
+    assert position.current_price == Decimal("137.62")
+    assert position.pricing_status == "PRICED_CERTIFIED_CURRENT_AUTHORITY"

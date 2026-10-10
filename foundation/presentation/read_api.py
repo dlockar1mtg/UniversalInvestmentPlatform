@@ -225,6 +225,35 @@ class PresentationReadRepository:
             return None
         return {"current": current, "package": package}
 
+    def package_status(self) -> dict[str, dict[str, object]]:
+        """Small freshness summary of the ETF, housing and macro packages in the active publication."""
+        with closing(self.connection_factory()) as db, db.cursor() as cursor:
+            publication_id = self._active_id(cursor)
+            cursor.execute("""
+                SELECT domain_id,
+                       payload_json->>'generated_at_utc', payload_json->>'package_id', payload_json->>'model_version',
+                       payload_json->>'source_run_id', payload_json->>'latest_input_observation',
+                       payload_json->'data_quality'->>'status', payload_json->>'fund_count', payload_json->>'market_count'
+                FROM presentation_records
+                WHERE publication_id=%s AND record_type IN ('etf_package', 'housing_package', 'macro_package')
+            """, (publication_id,))
+            rows = cursor.fetchall()
+            cursor.execute("""
+                SELECT COUNT(*) FILTER (WHERE payload_json->>'freshness_state' = 'CURRENT'), COUNT(*)
+                FROM presentation_records
+                WHERE publication_id=%s AND domain_id='etf' AND record_type='etf_fund'
+            """, (publication_id,))
+            current_funds, funds = cursor.fetchone() or (0, 0)
+        out: dict[str, dict[str, object]] = {}
+        for domain, generated, package_id, model, run, latest, quality, fund_count, market_count in rows:
+            out[str(domain)] = {"generated_at_utc": generated, "package_id": package_id, "model_version": model,
+                                "source_run_id": run, "latest_input_observation": latest, "data_quality": quality,
+                                "fund_count": int(fund_count) if fund_count else None,
+                                "market_count": int(market_count) if market_count else None}
+        if "etf" in out:
+            out["etf"].update(current_funds=int(current_funds or 0), funds=int(funds or 0))
+        return out
+
     def etf_fund(self, symbol: str) -> dict[str, object] | None:
         with closing(self.connection_factory()) as db, db.cursor() as cursor:
             publication_id = self._active_id(cursor)
@@ -726,6 +755,17 @@ def install_presentation_read_routes(
         if macro is None:
             return {"available": False, "current": None, "package": None}
         return {"available": True, **macro}
+
+    @app.get("/v1/presentation/package-status")
+    def presentation_package_status(x_api_key: str | None = Header(default=None)):
+        denied = authorize(x_api_key)
+        if denied:
+            return denied
+        try:
+            packages = repository.package_status()
+        except LookupError:
+            packages = {}
+        return {"packages": packages}
 
     @app.get("/v1/presentation/etf/{symbol}")
     def presentation_etf_fund(symbol: str, x_api_key: str | None = Header(default=None)):

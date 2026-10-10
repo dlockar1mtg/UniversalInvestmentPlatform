@@ -137,7 +137,7 @@ def test_portfolio_content_is_escaped_and_credential_remains_session_only():
     html, _, javascript = assets()
     assert "snapshot.positions.map" in javascript
     assert "esc(item.name" in javascript and "esc(item.symbol" in javascript
-    assert "esc(item.asset_name||item.asset_id)" in javascript
+    assert "esc(uipCleanAssetName(item.asset_name||item.asset_id))" in javascript
     assert "sessionStorage" in javascript and "localStorage" not in javascript
     assert "dashboard-viewer" not in html and "uiip-dashboard-key" not in html
     assert '"X-API-Key":apiKey' in javascript
