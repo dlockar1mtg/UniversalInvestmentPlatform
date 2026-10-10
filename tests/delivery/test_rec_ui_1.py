@@ -49,7 +49,7 @@ def test_rec_ui_all_view_groups_domains_by_decision_utility():
 
 def test_rec_ui_crypto_reads_asset_detail_and_uses_certified_36_month_authority():
     javascript = read("foundation/production/dashboard_assets/recommendation_ui.js")
-    assert "/v1/presentation/assets/" in javascript
+    assert "/v1/presentation/asset-details?domain=" in javascript
     assert "readAssetDetail" in javascript
     assert "hydrateCryptoResearch" in javascript
     assert 'forecastBy(detail,36,"LONG_RANGE_SCENARIO_MODEL")' in javascript
@@ -360,3 +360,12 @@ def test_rec_ui_metals_summary_no_longer_reads_monthly_returns_from_tactical_sta
     assert "t.return_3m_pct" not in javascript
     assert "t.return_6m_pct" not in javascript
     assert "t.current_drawdown_pct" not in javascript
+
+
+def test_asset_detail_endpoints_batch_and_cap_requests():
+    from pathlib import Path
+    api = Path(__file__).resolve().parents[2].joinpath("foundation/presentation/read_api.py").read_text(encoding="utf-8")
+    assert '@app.get("/v1/presentation/asset-details")' in api and '@app.get("/v1/presentation/mtg-research-batch")' in api
+    assert api.count("if len(wanted) > 100:") == 2
+    # The single-asset endpoint stays for detail pages and older clients.
+    assert '@app.get("/v1/presentation/assets/{domain_id}/{asset_id}")' in api

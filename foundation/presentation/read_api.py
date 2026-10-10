@@ -175,6 +175,25 @@ class PresentationReadRepository:
             })
         return {"domain_id": domain_id, "asset_id": asset_id, "records": grouped}
 
+    def asset_details(self, domain_id: str, asset_ids: list[str]) -> dict[str, dict[str, object]]:
+        """asset_detail for many assets of one domain in a single query: {asset_id: detail}; absent ids are left out."""
+        if not asset_ids:
+            return {}
+        with closing(self.connection_factory()) as db, db.cursor() as cursor:
+            publication_id = self._active_id(cursor)
+            cursor.execute("""
+                SELECT asset_id, record_type, record_key, payload_json
+                FROM presentation_records
+                WHERE publication_id=%s AND domain_id=%s AND asset_id = ANY(%s)
+                ORDER BY asset_id, record_type, record_key
+            """, (publication_id, domain_id, list(asset_ids)))
+            rows = cursor.fetchall()
+        out: dict[str, dict[str, object]] = {}
+        for asset_id, record_type, record_key, payload in rows:
+            detail = out.setdefault(str(asset_id), {"domain_id": domain_id, "asset_id": str(asset_id), "records": {}})
+            detail["records"].setdefault(str(record_type), []).append({"record_key": str(record_key), "payload": dict(payload)})
+        return out
+
     def etf_guild(self) -> dict[str, object] | None:
         """The ETF package in the active publication: package summary plus every fund without its
         price history (fetch one fund with etf_fund for that). None if the publication has none."""
@@ -706,6 +725,43 @@ def install_presentation_read_routes(
         if invalid:
             return invalid
         return {"items": repository.recommendation_catalog(domain_id=normalized, limit=limit, offset=offset), "limit": limit, "offset": offset}
+
+    @app.get("/v1/presentation/asset-details")
+    def presentation_asset_details(
+        domain: str = Query(...),
+        ids: str = Query(..., max_length=20000),
+        x_api_key: str | None = Header(default=None),
+    ):
+        """Up to 100 asset details in one request (Counsel used to send one request per asset)."""
+        denied = authorize(x_api_key)
+        if denied:
+            return denied
+        normalized, invalid = normalize_domain(domain)
+        if invalid:
+            return invalid
+        wanted = list(dict.fromkeys(part.strip() for part in ids.split(",") if part.strip()))
+        if len(wanted) > 100:
+            return JSONResponse({"error": {"code": "TOO_MANY_IDS", "message": "at most 100 ids per request"}}, status_code=400)
+        return {"domain_id": normalized, "items": repository.asset_details(normalized, wanted)}
+
+    @app.get("/v1/presentation/mtg-research-batch")
+    def presentation_mtg_research_batch(
+        ids: str = Query(..., max_length=20000),
+        x_api_key: str | None = Header(default=None),
+    ):
+        """MTG premium research for up to 100 assets in one request; absent ids are left out."""
+        denied = authorize(x_api_key)
+        if denied:
+            return denied
+        wanted = list(dict.fromkeys(part.strip() for part in ids.split(",") if part.strip()))
+        if len(wanted) > 100:
+            return JSONResponse({"error": {"code": "TOO_MANY_IDS", "message": "at most 100 ids per request"}}, status_code=400)
+        items = {}
+        for asset_id in wanted:
+            detail = repository.mtg_premium_research(asset_id)
+            if detail is not None:
+                items[asset_id] = detail
+        return {"items": items}
 
     @app.get("/v1/presentation/assets/{domain_id}/{asset_id}")
     def presentation_asset(domain_id: str, asset_id: str, x_api_key: str | None = Header(default=None)):

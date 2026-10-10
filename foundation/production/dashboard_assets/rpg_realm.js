@@ -205,7 +205,7 @@ function counselCards(d){
     if(!p||p.model_version!=="crypto-v2")continue;
     const ratio=num(p.model_ratio_48m);
     const meaning={ACCUMULATE:"add more",STEADY:"keep buying steadily",PAUSE:"pause new buying"}[p.model_call]||"no call";
-    cards.push(`<button type="button" class="rpg-btn rpg-counsel" data-rpg-domain="crypto" data-rpg-asset="crypto:${key}">${badge(p.model_call==="NO_CALL"?"NO CALL":String(p.model_call||"\u2014"),callTone(p.model_call))}<span><strong>${esc(COIN_NAMES[key])}: ${esc(meaning)}</strong><span>${ratio===null?"No ratio yet.":`Price is ${ratio.toFixed(2)}\u00d7 its 4-year average. Below 1\u00d7 says add more; 2\u00d7 and up says pause.`}</span></span></button>`);
+    cards.push(`<button type="button" class="rpg-btn rpg-counsel" data-rpg-domain="crypto" data-rpg-asset="crypto:${key}">${badge(p.model_call==="NO_CALL"?"NO CALL":String(p.model_call||"\u2014"),callTone(p.model_call))}<span><strong>${esc(COIN_NAMES[key])}: ${esc(meaning)}</strong><span>${ratio===null?"No ratio yet.":`Price today is ${ratio.toFixed(2)}\u00d7 its 4-year average (month to date). Below 1\u00d7 says add more; 2\u00d7 and up says pause.`}</span></span></button>`);
   }
   const metals=(cat.metals||[]).filter(i=>String(i.payload?.recommendation||"").toLowerCase()==="buy").map(i=>i.asset_name);
   if(metals.length){

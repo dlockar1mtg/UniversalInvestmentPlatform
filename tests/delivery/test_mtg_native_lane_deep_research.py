@@ -53,7 +53,7 @@ def test_native_detail_attempts_existing_generic_endpoint_first() -> None:
     source = js()
 
     assert "await readAssetDetail(item)" in source
-    assert "/v1/presentation/assets/" in source
+    assert "/v1/presentation/asset-details?domain=" in source
 
 
 def test_native_detail_uses_certified_price_fields() -> None:

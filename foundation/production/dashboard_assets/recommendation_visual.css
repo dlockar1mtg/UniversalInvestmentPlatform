@@ -2156,3 +2156,5 @@
 .etf .rec-domain-icon{color:#9ccf9f;background:rgba(132,190,140,.08)}
 .etf .rec-domain-viz i{background:linear-gradient(180deg,#9ccf9f,rgba(132,190,140,.1))}
 @media(max-width:900px){.rec-hero .rec-domain-grid{grid-template-columns:1fr}}
+
+.cv-v2-mtd{display:block;font-size:.7em;opacity:.65;font-weight:400}
