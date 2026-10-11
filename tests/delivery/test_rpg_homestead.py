@@ -79,3 +79,10 @@ def test_homestead_shows_the_mortgage_rate_outlook_and_payment_range():
                  "mortgages follow the 10-year Treasury"):
         assert text in page, text
     assert ".rpg-home-rates{" in _read("rpg_theme.css")
+
+
+def test_homestead_lists_goals_side_by_side():
+    page = _read("homestead.js")
+    assert "${emergency()}${goalsSection()}" in page and "Your goals" in page
+    assert "data-goal-add" in page and "data-goal-done" in page and "data-goal-remove" in page
+    assert "chances_without_goals" in page and "chance_without_goals" in page

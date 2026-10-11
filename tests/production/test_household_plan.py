@@ -300,3 +300,30 @@ def test_homestead_shows_the_emergency_fund_from_essential_bills():
     assert "data-home-essentials" in page and "essential_lines:chosen.length===" in page
     assert "live.purse" in page                              # T-bills count toward the fund; the house fund does not
     assert page.isascii() and "style=" not in page
+
+
+def test_goals_are_validated_and_kept_when_done():
+    goals = H.normalize_goals([{"name": "New car", "amount": 15000, "month": "2028-04"},
+                               {"name": "Trip", "amount": 3000, "month": "2027-03", "status": "done", "done_amount": 2800}])
+    assert [g["id"] for g in goals] == ["trip", "new-car"] and goals[0]["done_amount"] == 2800.0
+    for bad in ([{"name": "", "amount": 1, "month": "2028-01"}], [{"name": "x", "amount": 0, "month": "2028-01"}],
+                [{"name": "x", "amount": 5, "month": "soon"}], [{"name": "x", "amount": 5, "month": "2028-01", "status": "maybe"}]):
+        with pytest.raises(H.HouseholdPlanError):
+            H.normalize_goals(bad)
+
+
+def test_a_goal_before_the_house_lowers_its_chances_and_reports_its_own():
+    plan = H.import_books(*books(months=8), "abc")
+    plan["settings"]["target_month"] = "2027-02"
+    base = project(H.normalize_plan(plan), as_of_month="2026-09", holdings={"etf": 1000})
+    assert base["goals_before_target"] == [] and base["house"]["chances_without_goals"] is None
+    plan["settings"]["goals"] = [{"name": "Car", "amount": 8000, "month": "2026-12"},
+                                 {"name": "Later", "amount": 500, "month": "2031-01"},       # after the house: not here
+                                 {"name": "Old", "amount": 900, "month": "2026-11", "status": "done"}]
+    out = project(H.normalize_plan(plan), as_of_month="2026-09", holdings={"etf": 1000})
+    assert [g["id"] for g in out["goals_before_target"]] == ["car"]
+    assert 0 <= out["goals_before_target"][0]["chance"] <= 1
+    with_goal = {c["price"]: c["chance"] for c in out["house"]["chances"]}
+    without = {c["price"]: c["chance"] for c in out["house"]["chances_without_goals"]}
+    assert all(with_goal[p] <= without[p] for p in with_goal)
+    assert without == {c["price"]: c["chance"] for c in base["house"]["chances"]}   # the twin is the no-goal plan

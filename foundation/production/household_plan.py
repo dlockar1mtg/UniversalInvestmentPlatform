@@ -45,6 +45,7 @@ DEFAULT_SETTINGS = {
     "home_price_growth": 0.0,       # yearly; 0 = today's prices. The Homestead offers the housing forecast.
     "essential_lines": None,        # bills that must be paid in a bad month (emergency fund); None = every bill line
     "retirement": None,             # the retirement path's inputs (age, retirement age, spending, jobs); None = not set up
+    "goals": [],                    # goals besides the house: name, amount in today's dollars, month, open or done
 }
 MIX_SLEEVES = ("stocks", "crypto", "metals", "mtg", "cash")
 
@@ -115,6 +116,7 @@ def normalize_plan(document) -> dict:
     settings["contribution_mix"] = weights
     settings["house_counts_retirement"] = bool(settings["house_counts_retirement"])
     settings["retirement"] = normalize_retirement(settings["retirement"])
+    settings["goals"] = normalize_goals(settings["goals"])
 
     income_lines = [str(x).strip() for x in document.get("income_lines") or [] if str(x).strip()]
     expense_lines = [str(x).strip() for x in document.get("expense_lines") or [] if str(x).strip()]
@@ -193,6 +195,51 @@ def essential_spending(plan: dict, month: str) -> float:
         return 0.0
     keep = set(essential_lines(plan))
     return round(abs(sum(v for k, v in m["expenses"].items() if k in keep)), 2)
+
+
+def normalize_goals(raw) -> list[dict]:
+    """Goals besides the house. Amounts are today's dollars; a finished goal keeps its date and what it cost."""
+    if raw in (None, ""):
+        return []
+    if not isinstance(raw, list):
+        raise HouseholdPlanError("goals must be a list")
+    if len(raw) > 30:
+        raise HouseholdPlanError("at most 30 goals")
+    out, seen = [], set()
+    for g in raw:
+        if not isinstance(g, dict):
+            raise HouseholdPlanError("each goal must be an object")
+        name = str(g.get("name") or "").strip()[:80]
+        if not name:
+            raise HouseholdPlanError("each goal needs a name")
+        gid = re.sub(r"[^a-z0-9-]+", "-", str(g.get("id") or name).lower()).strip("-")[:40] or "goal"
+        base, n = gid, 2
+        while gid in seen:
+            gid, n = f"{base}-{n}", n + 1
+        seen.add(gid)
+        amount = _number(g.get("amount"), f"goal {name} amount")
+        if not 0 < amount <= 10_000_000:
+            raise HouseholdPlanError(f"goal {name} amount must be above 0")
+        month = str(g.get("month") or "")
+        if not MONTH.match(month):
+            raise HouseholdPlanError(f"goal {name} month must look like 2028-06")
+        status = str(g.get("status") or "open")
+        if status not in ("open", "done"):
+            raise HouseholdPlanError(f"goal {name} status must be open or done")
+        item = {"id": gid, "name": name, "amount": amount, "month": month, "status": status,
+                "note": str(g.get("note") or "")[:300]}
+        if status == "done":
+            done_month = str(g.get("done_month") or month)
+            if not MONTH.match(done_month):
+                raise HouseholdPlanError(f"goal {name} done_month must look like 2028-06")
+            item["done_month"] = done_month
+            item["done_amount"] = _number(g.get("done_amount", amount), f"goal {name} done_amount")
+        out.append(item)
+    return sorted(out, key=lambda g: (g["month"], g["id"]))
+
+
+def open_goals(plan: dict) -> list[dict]:
+    return [g for g in plan["settings"].get("goals") or [] if g["status"] == "open"]
 
 
 RETIREMENT_DEFAULTS = {

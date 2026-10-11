@@ -14,7 +14,7 @@ from pathlib import Path
 
 import numpy as np
 
-from .household_plan import essential_spending, roll_forward
+from .household_plan import essential_spending, open_goals, roll_forward
 
 ROOT = Path(__file__).resolve().parents[2]
 ASSUMPTIONS = ROOT / "config" / "household" / "projection_assumptions.json"
@@ -87,15 +87,29 @@ def project(plan: dict, *, as_of_month: str, holdings: dict | None = None, assum
     ret = np.full(n_paths, start_retirement)
     series = []
 
+    # Goals before the target month are paid from the bank above the safety fund, then investments; a goal the
+    # money cannot cover that month is left unpaid (postponed) on that path. A twin path without goals shows the cost.
+    infl = (s.get("retirement") or {}).get("inflation", 0.025)
+    goals_by_month: dict[str, list] = {}
+    for g in open_goals(plan):
+        if months[start] < g["month"] <= months[end]:
+            goals_by_month.setdefault(g["month"], []).append(g)
+    cash_used = np.zeros(n_paths)
+    inv_free = None
+    goal_results = []
+
+    def safety_at(month):
+        return s["safety_fund"] if s["safety_fund"] is not None else essential_spending(plan, month) * s["safety_fund_months"]
+
     def snapshot(k, inv, ret):
         r = rows[k]
-        cash_side = r["bank_balance"] + r["house_fund_balance"]
+        cash_side = r["bank_balance"] + r["house_fund_balance"] - cash_used
         invest_total = inv.sum(axis=1)
         usable = cash_side + (inv * keep).sum(axis=1) + (ret if s["house_counts_retirement"] else 0)
         worth = cash_side + r["home_equity"] + invest_total + ret
         return {"month": r["month"], "net_worth": _pcts(worth, levels), "investments": _pcts(invest_total, levels),
                 "house_usable": _pcts(usable, levels), "plan_net_worth": r["net_worth"],
-                "plan_house_usable": round(cash_side + r["investment_balance"] + (r["retirement_balance"] if s["house_counts_retirement"] else 0), 2)}, worth, usable
+                "plan_house_usable": round(r["bank_balance"] + r["house_fund_balance"] + r["investment_balance"] + (r["retirement_balance"] if s["house_counts_retirement"] else 0), 2)}, worth, usable
 
     snap, worth, usable = snapshot(start, inv, ret)
     series.append(snap)
@@ -104,6 +118,22 @@ def project(plan: dict, *, as_of_month: str, holdings: dict | None = None, assum
         growth = np.exp(drift + vol * shocks)
         inv = inv * growth[:, :len(invest_keys)] + rows[k]["investment_contribution"] * mix
         ret = ret * growth[:, len(invest_keys)] + rows[k]["retirement_contribution"]
+        if inv_free is not None:
+            inv_free = inv_free * growth[:, :len(invest_keys)] + rows[k]["investment_contribution"] * mix
+        for g in goals_by_month.get(months[k], []):
+            if inv_free is None:
+                inv_free = inv.copy()
+            amount = g["amount"] * (1 + infl) ** ((k - start) / 12)
+            spare = np.maximum(0.0, rows[k]["bank_balance"] - safety_at(months[k]) - cash_used)
+            liquid = (inv * keep).sum(axis=1)
+            covered = spare + liquid >= amount
+            from_cash = np.where(covered, np.minimum(spare, amount), 0.0)
+            from_inv = np.where(covered, amount - from_cash, 0.0)
+            frac = np.where(liquid > 0, np.minimum(1.0, from_inv / np.where(liquid > 0, liquid, 1.0)), 0.0)
+            inv = inv * (1 - frac)[:, None]
+            cash_used = cash_used + from_cash
+            goal_results.append({"id": g["id"], "name": g["name"], "month": g["month"], "amount": g["amount"],
+                                 "amount_then": round(amount, 2), "chance": round(float(np.mean(covered)), 3)})
         snap, worth, usable = snapshot(k, inv, ret)
         series.append(snap)
 
@@ -118,6 +148,11 @@ def project(plan: dict, *, as_of_month: str, holdings: dict | None = None, assum
     chances = [{"price": p, "price_at_target": at(p), "cash_needed": house_need(at(p), s, safety),
                 "chance": round(float(np.mean(usable >= house_need(at(p), s, safety))), 3),
                 "plan_reaches": series[-1]["plan_house_usable"] >= house_need(at(p), s, safety)} for p in ladder]
+    chances_without_goals = None
+    if inv_free is not None:                       # the house's chances had the goals before it not happened
+        r = rows[end]
+        usable_free = r["bank_balance"] + r["house_fund_balance"] + (inv_free * keep).sum(axis=1) + (ret if s["house_counts_retirement"] else 0)
+        chances_without_goals = [{"price": c["price"], "chance": round(float(np.mean(usable_free >= c["cash_needed"])), 3)} for c in chances]
     dp_cc = s["down_payment_pct"] + s["closing_cost_pct"]
     max_price = {f"p{p}": round(max(0.0, (float(np.percentile(usable, p)) - safety) / dp_cc), -3) for p in (10, 50, 90)} if dp_cc > 0 else {}
     capacity = []
@@ -144,7 +179,7 @@ def project(plan: dict, *, as_of_month: str, holdings: dict | None = None, assum
         "starting_retirement": round(float(start_retirement), 2),
         "starting_retirement_source": "RETIREMENT_STATEMENTS" if live_retirement is not None else "PLAN_BALANCE",
         "safety_fund": safety, "house_counts_retirement": s["house_counts_retirement"],
-        "series": series, "target": series[-1],
+        "series": series, "target": series[-1], "goals_before_target": goal_results,
         "target_by_sleeve_median": by_sleeve,
         "chance_below_plan_net_worth": round(float(np.mean(worth < target_row["net_worth"])), 3),
         "chance_investments_below_money_put_in": round(float(np.mean(inv.sum(axis=1) < start_investments + contributed)), 3),
@@ -154,7 +189,7 @@ def project(plan: dict, *, as_of_month: str, holdings: dict | None = None, assum
                   "max_price_today_dollars": {k: round(v / grow, -3) for k, v in max_price.items()},
                   "down_payment_pct": s["down_payment_pct"], "closing_cost_pct": s["closing_cost_pct"],
                   "need_low": house_need(at(s["home_price_low"]), s, safety), "need_high": house_need(at(s["home_price_high"]), s, safety),
-                  "chances": chances, "max_price_at_down_payment_pct": max_price, "capacity": capacity,
+                  "chances": chances, "chances_without_goals": chances_without_goals, "max_price_at_down_payment_pct": max_price, "capacity": capacity,
                   "mortgage_rate": s["mortgage_rate"], "loan_years": s["loan_years"]},
         "sleeves": {k: {"label": v["label"], "annual_return": v["annual_return"], "annual_volatility": v["annual_volatility"],
                         "sell_cost": v["sell_cost"]} for k, v in sleeves.items()},

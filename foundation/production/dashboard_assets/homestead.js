@@ -229,6 +229,27 @@ function readRetirement(form){
   return out;
 }
 
+
+/* ---------------- goals, side by side ---------------- */
+function goalsSection(){
+  const goals=S.plan.settings.goals||[],p=S.proj,r=S.ret&&S.ret.configured?S.ret:null,ret=S.plan.settings.retirement;
+  const open=goals.filter(g=>g.status==="open"),done=goals.filter(g=>g.status==="done");
+  const chanceOf=g=>{const a=(p?.goals_before_target||[]).find(x=>x.id===g.id);if(a)return a.chance;const b=(r?.goals||[]).find(x=>x.id===g.id);return b?b.chance:null};
+  const cell=c=>c===null||c===undefined?"\u2014":`${Math.round(c*100)}%`;
+  const hi=p?.house?.chances?.find(c=>c.price===p.house.price_high),hiFree=p?.house?.chances_without_goals?.find(c=>c.price===p.house.price_high);
+  const rows=[];
+  rows.push(`<tr><th scope="row">The house</th><td>${esc(monthLabel(S.plan.settings.target_month))}</td><td class="num">${esc(`${compact(S.plan.settings.home_price_low)}\u2013${compact(S.plan.settings.home_price_high)} home`)}</td><td class="num">${hi?esc(`${cell(hi.chance)} at ${compact(p.house.price_high)}`):"\u2014"}</td><td><span class="rpg-muted">set under The house and the plan</span></td></tr>`);
+  for(const g of open)rows.push(`<tr><th scope="row">${esc(g.name)}</th><td>${esc(monthLabel(g.month))}</td><td class="num">${money(g.amount)}</td><td class="num">${cell(chanceOf(g))}</td><td><button type="button" class="rpg-btn rpg-link" data-goal-done="${esc(g.id)}">Done</button> <button type="button" class="rpg-btn rpg-link" data-goal-remove="${esc(g.id)}">Remove</button></td></tr>`);
+  if(ret)rows.push(`<tr><th scope="row">Retire at ${esc(ret.retire_age)}</th><td>${r?esc(monthLabel(r.retire_month)):"\u2014"}</td><td class="num">${r?esc(`${money(r.spending_year)} a year`):"\u2014"}</td><td class="num">${r?esc(`${cell(r.chance)} last to 95`):"\u2026"}</td><td><span class="rpg-muted">set under the road to early retirement</span></td></tr>`);
+  const effects=[];
+  if(hi&&hiFree&&hiFree.chance!==hi.chance)effects.push(`the house at ${compact(p.house.price_high)} from ${cell(hiFree.chance)} to ${cell(hi.chance)}`);
+  if(r&&r.chance_without_goals!==null&&r.chance_without_goals!==undefined&&r.chance_without_goals!==r.chance)effects.push(`retiring at ${r.retire_age} from ${cell(r.chance_without_goals)} to ${cell(r.chance)}`);
+  const effect=!open.length?"Add a goal to see what it costs the house and retirement.":effects.length?`Together, your other goals move ${effects.join(" and ")}.`:"Your other goals don't change the house or retirement chances.";
+  const finished=done.length?`<p class="rpg-vault-why">${esc(`Finished: ${done.map(g=>`${g.name} (${monthLabel(g.done_month)}, ${money(g.done_amount)})`).join(" \u00b7 ")}`)}</p>`:"";
+  const form=`<form class="rpg-board-filters rpg-home-grid rpg-home-goal-form" data-goal-add><label>Goal<input type="text" data-goal="name" maxlength="80" placeholder="e.g. replace the car"></label><label>Amount (today's $)<input type="number" step="100" min="1" data-goal="amount"></label><label>When<input type="month" data-goal="month" value="${esc(addMonths(nowMonth(),12))}"></label><div class="rpg-home-actions"><button type="submit" class="rpg-btn rpg-action">Add the goal</button></div></form>`;
+  return `<section class="rpg-stone rpg-road" aria-labelledby="rpg-home-goals-h"><div class="rpg-section-head"><h2 id="rpg-home-goals-h" class="rpg-stone-title">Your goals</h2><span class="rpg-crumb-note">Simulated together, in date order \u00b7 paid from the bank above the safety fund, then investments; never retirement</span></div><p class="rpg-guild-counsel">${esc(effect)}</p><div class="rpg-table-wrap"><table class="rpg-table"><thead><tr><th>Goal</th><th>When</th><th class="num">Amount</th><th class="num">Chance it is covered</th><th></th></tr></thead><tbody>${rows.join("")}</tbody></table></div>${finished}${form}<p class="rpg-crumb-note">${esc("A goal the money cannot cover in its month is counted as postponed in that market, not paid. Mark a goal done when you pay for it; it stays here with its date and amount.")}</p></section>`;
+}
+
 /* ---------------- a plan that keeps going ---------------- */
 const HORIZON=36;
 const addMonths=(m,n)=>{const t=Number(m.slice(0,4))*12+Number(m.slice(5,7))-1+n;return `${Math.floor(t/12)}-${String(t%12+1).padStart(2,"0")}`};
@@ -435,7 +456,7 @@ function render(){
   if(!S.plan){view.innerHTML=`${crumbs("Household plan \u00b7 not set up yet")}${message()}<section class="rpg-stone rpg-guild-hero"><div><div class="rpg-parch-kicker">The Homestead</div><p class="rpg-guild-counsel">Bring your Income &amp; Net Worth Tracker into the UIP once. After that the plan lives here: edit any month, enter real balances as months pass, and see the range of where the plan lands and what it means for the house.</p></div></section>${importPanel()}`;return}
   const v=S.doc.version,p=S.proj;
   const note=`Plan saved ${v?new Date(v.recorded_at).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}):"\u2014"} \u00b7 ${monthLabel(S.plan.months[0].month)} to ${monthLabel(S.plan.months[S.plan.months.length-1].month)}${S.tried?" \u00b7 showing unsaved settings":""}`;
-  view.innerHTML=`${crumbs(note)}${message()}${netWorth()}${emergency()}${p?goal(p)+fan(p)+targetTiles(p)+capacity(p)+ratesSection(p)+housingSection():`<p class="rpg-parch-note">Working out the ranges\u2026</p>`}${retirementSection()}${purse()}${ledger()}${settingsForm()}${importPanel()}${p?assumptions(p):""}`;
+  view.innerHTML=`${crumbs(note)}${message()}${netWorth()}${emergency()}${goalsSection()}${p?goal(p)+fan(p)+targetTiles(p)+capacity(p)+ratesSection(p)+housingSection():`<p class="rpg-parch-note">Working out the ranges\u2026</p>`}${retirementSection()}${purse()}${ledger()}${settingsForm()}${importPanel()}${p?assumptions(p):""}`;
 }
 function setMsg(kind,text){S.msg=text?[kind,text]:null}
 async function savePlan(plan,okText){
@@ -448,6 +469,10 @@ function bind(view){
     if(t.dataset.homeMonth){S.pick=t.dataset.homeMonth===S.pick?null:t.dataset.homeMonth;const slot=byId("rpg-home-editor");if(slot){slot.innerHTML=editor();view.querySelectorAll("[data-home-month]").forEach(b=>{const on=b.dataset.homeMonth===S.pick;b.setAttribute("aria-pressed",String(on));b.closest("tr")?.classList.toggle("is-picked",on)});slot.querySelector("input")?.focus()}return}
     if(t.dataset.homeChart){S.chart=t.dataset.homeChart;render();return}
     if(t.hasAttribute("data-home-export")){downloadData();return}
+    if(t.dataset.goalDone||t.dataset.goalRemove){const id=t.dataset.goalDone||t.dataset.goalRemove;const plan=clone(S.plan);const list=plan.settings.goals||[];const g=list.find(x=>x.id===id);if(!g)return;
+      if(t.dataset.goalRemove){plan.settings.goals=list.filter(x=>x.id!==id);savePlan(plan,`Removed ${g.name}.`)}
+      else{Object.assign(g,{status:"done",done_month:nowMonth(),done_amount:g.amount});savePlan(plan,`${g.name} marked done. It stays in the list with its date and amount.`)}
+      return}
     if(t.hasAttribute("data-ret-try")){const cfg=readRetirement(t.closest("form"));if(!cfg.age||!cfg.retire_age){setMsg("bad","Enter your age and the age you want to retire.");render();return}S.retTried=cfg;S.ret=null;setMsg(null);render();refreshRetirement(true);return}
     if(t.hasAttribute("data-ret-keep")){const cfg=readRetirement(t.closest("form"));if(!cfg.age||!cfg.retire_age){setMsg("bad","Enter your age and the age you want to retire.");render();return}const plan=clone(S.plan);plan.settings={...plan.settings,retirement:cfg};S.retTried=null;S.ret=null;savePlan(plan,"Retirement inputs saved into the plan.");return}
     if(t.dataset.homeExtend){const n=extendPlan(S.plan,t.dataset.homeExtend);S.dirty=S.dirty||n>0;setMsg("ok",`Added ${n} month${n===1?"":"s"} through ${monthLabel(t.dataset.homeExtend)}, copied from the last month. Edit any of them, then save the plan.`);render();return}
@@ -469,6 +494,13 @@ function bind(view){
   view.addEventListener("submit",async event=>{
     const form=event.target;event.preventDefault();
     if(form.dataset.homeEditor){applyEdit(form,false);return}
+    if(form.hasAttribute("data-goal-add")){
+      const v=k=>form.querySelector(`[data-goal="${k}"]`)?.value||"";
+      const name=v("name").trim(),amount=Number(v("amount")),month=v("month");
+      if(!name||!(amount>0)||!/^\d{4}-\d{2}$/.test(month)){setMsg("bad","A goal needs a name, an amount and a month.");render();return}
+      if(month<=nowMonth()){setMsg("bad","Pick a month after this one.");render();return}
+      const plan=clone(S.plan);plan.settings.goals=[...(plan.settings.goals||[]),{name,amount,month,status:"open"}];
+      savePlan(plan,`Added ${name}. The house and retirement chances now count it.`);return}
     if(form.hasAttribute("data-home-essentials")){
       const chosen=[...form.querySelectorAll("[data-home-essential]")].filter(el=>el.checked).map(el=>el.dataset.homeEssential);
       if(!chosen.length){setMsg("bad","Pick at least one essential bill.");render();return}

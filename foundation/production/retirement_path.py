@@ -23,7 +23,7 @@ from pathlib import Path
 
 import numpy as np
 
-from .household_plan import essential_spending, roll_forward
+from .household_plan import essential_spending, open_goals, roll_forward
 from .household_projection import load_assumptions, monthly_payment
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -92,6 +92,8 @@ class _Inputs:
             self.house = {"month": target, "price": round(price, 2), "from_investments": round(self.house_draw, 2),
                           "loan": round(price * (1 - s["down_payment_pct"]), 2)}
         self.mortgage = (s["mortgage_rate"], s["loan_years"])
+        # goals besides the house, in today's dollars, paid from reachable investments when they can be (else postponed)
+        self.goals = [(_index(g["month"]) - self.start, g) for g in open_goals(plan) if _index(g["month"]) > self.start]
 
         order = a["correlation_order"]
         self.invest_keys = [k for k in order if k != "retirement"]
@@ -138,7 +140,8 @@ def _withdraw(inv, keep, need):
     return need - frac * liquid
 
 
-def _simulate(x: _Inputs, retire_age: float, spending: float, *, extra_monthly=0.0, sell_home=False, paths=PATHS, record=False):
+def _simulate(x: _Inputs, retire_age: float, spending: float, *, extra_monthly=0.0, sell_home=False, paths=PATHS, record=False,
+              goals=True):
     rng = np.random.default_rng(SEED)              # the same markets for every case, so cases compare fairly
     retire_k = max(0, int(round((retire_age - x.age_now) * 12)))
     access_k = int(round((59.5 - x.age_now) * 12))
@@ -150,6 +153,10 @@ def _simulate(x: _Inputs, retire_age: float, spending: float, *, extra_monthly=0
     spend_m = spending / 12
     penalty = 0.10
     ages, acc, rets = [], [], []
+    goal_at = {}
+    for gk, g in (x.goals if goals else []):
+        goal_at.setdefault(gk, []).append(g)
+    goal_chance = {}
 
     def snap(k):
         ages.append(round(x.age_now + k / 12, 1))
@@ -168,6 +175,11 @@ def _simulate(x: _Inputs, retire_age: float, spending: float, *, extra_monthly=0
         if k == x.house_k and x.house_draw > 0:
             short = _withdraw(inv, x.keep, np.full(paths, x.house_draw))
             ret -= short                            # rare: the house is never bought with retirement money in the plan
+        for g in goal_at.get(k, []):
+            liquid = (inv * x.keep).sum(axis=1)
+            covered = liquid >= g["amount"]
+            _withdraw(inv, x.keep, np.where(covered, g["amount"], 0.0))
+            goal_chance[g["id"]] = round(float(np.mean(covered)), 3)
         if sell_home and k == retire_k:
             inv[:, 0] += x.home_proceeds(retire_k)
         if k >= retire_k:
@@ -189,7 +201,8 @@ def _simulate(x: _Inputs, retire_age: float, spending: float, *, extra_monthly=0
         ret = np.maximum(ret, 0.0)
         if record and k % 12 == 0:
             snap(k)
-    out = {"chance": round(float(np.mean(~failed)), 3), "chance_bridge_without_retirement": round(float(np.mean(~early)), 3)}
+    out = {"chance": round(float(np.mean(~failed)), 3), "chance_bridge_without_retirement": round(float(np.mean(~early)), 3),
+           "goal_chance": goal_chance}
     if record:
         out["by_age"] = [{"age": a, "investments": {f"p{p}": round(float(v), 2) for p, v in zip((10, 50, 90), i)},
                           "retirement": {f"p{p}": round(float(v), 2) for p, v in zip((10, 50, 90), r)}} for a, i, r in zip(ages, acc, rets)]
@@ -280,6 +293,9 @@ def retirement_path(plan: dict, *, as_of_month: str, holdings: dict | None = Non
         cases.append({"case": "abroad", "label": "Spending abroad", "spending_year": r["spending_abroad_year"],
                       "chance": abroad["chance"], "earliest_age": _earliest_age(x, r["spending_abroad_year"], sell, lo),
                       "extra_monthly_for_target": _extra_saving(x, target_age, r["spending_abroad_year"], sell)})
+    without_goals = _simulate(x, target_age, x.spending, sell_home=sell, goals=False)["chance"] if x.goals else None   # same markets as the main run
+    goals_out = [{"id": g["id"], "name": g["name"], "month": g["month"], "amount": g["amount"],
+                  "chance": main["goal_chance"].get(g["id"])} for _, g in x.goals]
     other_sell = None
     if x.house is not None:
         alt = _simulate(x, target_age, x.spending, sell_home=not sell, paths=800)
@@ -299,7 +315,7 @@ def retirement_path(plan: dict, *, as_of_month: str, holdings: dict | None = Non
         "bridge_need": round(x.spending * bridge_years, 2),
         "chance": main["chance"], "chance_bridge_without_retirement": main["chance_bridge_without_retirement"],
         "at_retirement": at_ret, "at_access": at_access, "by_age": main["by_age"],
-        "cases": cases, "sell_home": sell, "other_sell_home": other_sell, "house": x.house,
+        "cases": cases, "goals": goals_out, "chance_without_goals": without_goals, "sell_home": sell, "other_sell_home": other_sell, "house": x.house,
         "starting_investments": round(float(x.begin.sum()), 2), "starting_investments_source": x.source,
         "starting_retirement": round(x.retirement_start, 2), "retirement_monthly": round(x.retirement_monthly, 2),
         "after_plan_monthly_investing": x.after_plan, "after_plan_default": x.default_after_plan,
@@ -317,6 +333,7 @@ def retirement_path(plan: dict, *, as_of_month: str, holdings: dict | None = Non
             "Before 59 1/2, retirement money is reached only with tax and the 10% penalty; 72(t) payments or a Roth conversion ladder can avoid the penalty but are not modelled.",
             "Taxes are a flat share of retirement-account withdrawals; capital-gains tax and health insurance before Medicare are not modelled. Add them to spending.",
             "The mix does not get safer with age yet.",
+            "Goals besides the house are paid from reachable investments in their month; one the money cannot cover is left unpaid on that path.",
             "Social Security is left out unless you enter an estimate; retiring at 48 lowers it, since it counts your 35 highest-earning years.",
         ],
     }
