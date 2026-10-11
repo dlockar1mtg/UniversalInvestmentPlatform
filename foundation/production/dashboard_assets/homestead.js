@@ -3,7 +3,7 @@
    ranges come from /v1/household-plan/projection with the live holdings from the Treasury. */
 (()=>{
 "use strict";
-const S={doc:null,plan:null,dirty:false,proj:null,projKey:"",pick:null,chart:"house",preview:null,msg:null,tried:null,loading:false,nw:null,nwErr:null};
+const S={doc:null,plan:null,dirty:false,proj:null,projKey:"",pick:null,chart:"house",preview:null,msg:null,tried:null,loading:false,nw:null,nwErr:null,ret:null,retKey:"",retTried:null,retBusy:false,retErr:null};
 const byId=id=>document.getElementById(id);
 const esc=v=>{const n=document.createElement("span");n.textContent=String(v??"");return n.innerHTML};
 const num=v=>{if(v===null||v===undefined||v==="")return null;const n=Number(v);return Number.isFinite(n)?n:null};
@@ -71,6 +71,7 @@ function loadNetWorth(){
 }
 function refreshProjection(force){
   if(!S.doc?.available)return;
+  refreshRetirement(force);
   const holdings=liveHoldings();
   const body={as_of_month:nowMonth(),holdings:holdings||undefined,settings:S.tried||undefined};
   const k=JSON.stringify([S.doc.version?.version_id,body]);
@@ -137,6 +138,95 @@ function emergency(){
   const verdict=bills<=0?"Mark which bills are essential below to set the target.":pct>=1?`Covered: ${covered.toFixed(1)} months of essential bills, past your ${want}-month target. Money beyond it can go to the house fund or investments.`:`${covered.toFixed(1)} of ${want} months covered. ${money(short)} to go${save>0?`; at this month\u2019s ${money(save)} left for the bank, about ${Math.ceil(short/save)} month${Math.ceil(short/save)===1?"":"s"}.`:"; the plan leaves nothing for the bank this month."}`;
   const picks=(S.plan.expense_lines||[]).map(l=>`<label class="rpg-check"><input type="checkbox" data-home-essential="${esc(l)}"${keep.has(l)?" checked":""}> ${esc(l)} <span class="rpg-muted num">${money(Math.abs(num(m.expenses[l])||0))}</span></label>`).join("");
   return `<section class="rpg-stone rpg-road" aria-labelledby="rpg-home-ef-h"><div class="rpg-section-head"><h2 id="rpg-home-ef-h" class="rpg-stone-title">The emergency fund \u00b7 ${esc(want)} months</h2><span class="rpg-crumb-note">${esc(`Essential bills ${money(bills)} a month \u00b7 target ${money(target)}`)}</span></div><p class="rpg-guild-counsel">${esc(verdict)}</p>${bar}<div class="rpg-crumb-stats"><span>Bank this month <strong class="num">${money(bank)}</strong></span><span>T-bills (the Purse) <strong class="num">${money(tbills)}</strong></span><span>Have <strong class="num">${money(have)}</strong></span></div><details class="rpg-home-ef-pick"><summary>Which bills are essential</summary><form class="rpg-home-ef-form" data-home-essentials>${picks}<div class="rpg-home-actions"><button type="submit" class="rpg-btn rpg-action">Save</button></div></form></details><p class="rpg-crumb-note">${esc("Essential means it has to be paid even in a bad month (rent, utilities, food, transport, insurance, minimum debt payments). The house fund and retirement are not counted: they have their own jobs. The house plan keeps the same number of months as its safety fund. Change the months under The house and the plan.")}</p></section>`;
+}
+
+
+/* ---------------- the road to early retirement ---------------- */
+function retirementAccounts(){return (R().state?.home?.retirementAccounts?.accounts||[]).filter(a=>a.category==="retirement"&&a.items?.length)}
+function refreshRetirement(force){
+  if(!S.doc?.available)return;
+  const cfg=S.retTried||S.plan?.settings?.retirement;
+  if(!cfg){S.ret=null;return}
+  const accts=retirementAccounts(),st=statements(),holdings=liveHoldings();
+  const deposits={};let monthly=0;
+  for(const a of accts)if(a.schedule){deposits[a.account_id]={per_paycheck:num(a.schedule.per_paycheck),every_days:num(a.schedule.every_days)};monthly+=num(a.schedule.monthly_equivalent)||0}
+  const body={as_of_month:nowMonth(),holdings:holdings||undefined,retirement_start:st?st.value:0,retirement_monthly:Math.round(monthly*100)/100,deposits,retirement:S.retTried||undefined};
+  const k=JSON.stringify([S.doc.version?.version_id,body]);
+  if(!force&&k===S.retKey)return;
+  S.retKey=k;S.retBusy=true;S.retErr=null;
+  post("/v1/household-plan/retirement-path",body).then(out=>{if(S.retKey!==k)return;S.ret=out;S.retBusy=false;render()}).catch(error=>{if(S.retKey!==k)return;S.retBusy=false;S.retErr=error.message;render()});
+}
+const pct1=v=>{const n=num(v);return n===null?"\u2014":`${Math.round(n*100)}%`};
+function retirementSection(){
+  const cfg=S.retTried||S.plan.settings.retirement;
+  const head=sub=>`<div class="rpg-section-head"><h2 id="rpg-home-rt-h" class="rpg-stone-title">The road to early retirement${cfg?.retire_age?` \u00b7 age ${esc(cfg.retire_age)}`:""}</h2><span class="rpg-crumb-note">${esc(sub)}</span></div>`;
+  if(!cfg)return `<section class="rpg-stone rpg-road" aria-labelledby="rpg-home-rt-h">${head("Not set up yet")}<p class="rpg-guild-counsel">Enter your age, the age you want to retire and what you expect to spend a year, and the Homestead will run the same simulated markets to 95: the bridge years before 59\u00bd paid from the money you can reach, then retirement accounts.</p>${retirementForm(null)}</section>`;
+  if(S.retErr)return `<section class="rpg-stone rpg-road" aria-labelledby="rpg-home-rt-h">${head("")}<p class="rpg-parch-note">${esc(`The retirement path could not be worked out: ${S.retErr}`)}</p>${retirementForm(cfg)}</section>`;
+  const p=S.ret;
+  if(!p||!p.configured)return `<section class="rpg-stone rpg-road" aria-labelledby="rpg-home-rt-h">${head("")}<p class="rpg-parch-note">Running the markets to age 95\u2026</p>${retirementForm(cfg)}</section>`;
+  const home=p.cases[0],abroad=p.cases.find(c=>c.case==="abroad");
+  const ok=p.chance>=p.on_track_threshold;
+  const caseText=c=>c.chance>=p.on_track_threshold?`on track (${pct1(c.chance)} of markets last to 95)`:`${pct1(c.chance)} of markets last to 95; ${c.earliest_age?`age ${c.earliest_age} reaches ${pct1(p.on_track_threshold)}`:"no age up to 70 reaches it"}${c.extra_monthly_for_target?`, or about ${money(c.extra_monthly_for_target)} more a month invested keeps ${p.retire_age}`:""}`;
+  const counsel=`Retiring at ${p.retire_age} (${monthLabel(p.retire_month)}) on ${money(p.spending_year)} a year in today's dollars: ${caseText(home)}.${abroad?` Spending ${money(abroad.spending_year)} a year abroad: ${caseText(abroad)}.`:""}`;
+  const r=p.at_retirement,acc=p.at_access;
+  const tile=(label,value,sub)=>`<div class="rpg-parch rpg-tile"><div class="rpg-stat-label">${esc(label)}</div><div class="rpg-stat-big num">${value}</div>${sub?`<div class="rpg-stat-sub">${esc(sub)}</div>`:""}</div>`;
+  const tiles=`<div class="rpg-tiles rpg-home-tiles">${tile(`Investments you can reach at ${p.retire_age}`,money(r.investments.p50),`bad case ${money(r.investments.p10)} \u00b7 the ${p.bridge_years}-year bridge to 59\u00bd needs about ${money(p.bridge_need)}`)}${tile(`Retirement accounts at ${p.retire_age}`,money(r.retirement.p50),`bad case ${money(r.retirement.p10)} \u00b7 untouched until 59\u00bd in most markets (${pct1(p.chance_bridge_without_retirement)})`)}${tile("Your number",money(p.fi_number),`${money(p.spending_year)} a year at a ${pctText(p.withdrawal_rate,1)} draw (25\u00d7, the 4% guide: ${money(p.fi_number_4pct)})`)}${tile("Saving rate",pctText(p.savings_rate),`of gross pay over the next 12 months: ${money(p.saving_next_12_months.investments)} invested + ${money(p.saving_next_12_months.retirement_deposits)} retirement deposits`)}</div>`;
+  const sell=p.other_sell_home?`<p class="rpg-vault-why">${esc(p.other_sell_home.sell_home?`If you sell the home when you retire (about ${money(p.other_sell_home.home_proceeds)} after the loan and 6% selling costs), ${pct1(p.other_sell_home.chance)} of markets last to 95. Tick it in the inputs to plan on it.`:`Without selling the home at retirement: ${pct1(p.other_sell_home.chance)} of markets last to 95.`)}</p>`:"";
+  const house=p.house&&p.house.from_investments>0?`<p class="rpg-vault-why">${esc(`The house in ${monthLabel(p.house.month)} takes about ${money(p.house.from_investments)} out of investments (what the house fund and the bank above the safety fund don't cover).`)}</p>`:"";
+  return `<section class="rpg-stone rpg-road" aria-labelledby="rpg-home-rt-h">${head(`Today's dollars \u00b7 ${p.paths.toLocaleString("en-US")} simulated markets to age ${p.end_age}${S.retTried?" \u00b7 showing unsaved inputs":""}`)}<p class="rpg-guild-counsel">${esc(counsel)}</p>${tiles}${retChart(p)}${house}${sell}${matchTable(p)}${earlyAccess(p)}${retirementForm(cfg)}<ul class="rpg-home-limits">${(p.limitations||[]).map(l=>`<li>${esc(l)}</li>`).join("")}</ul><p class="rpg-footnote">${esc(`Planning assumptions, not forecasts. Rules of thumb, not personal tax or investment advice. ${p.rules.year} IRS limits.`)}</p></section>`;
+}
+function retChart(p){
+  const rows=p.by_age;if(rows.length<2)return "";
+  const tot=(r,k)=>r.investments[k]+r.retirement[k];
+  const top0=Math.max(...rows.map(r=>Math.min(tot(r,"p90"),tot(r,"p50")*3)))*1.05||1,step=niceStep(top0,6),top=Math.ceil(top0/step)*step;
+  const a0=rows[0].age,a1=rows[rows.length-1].age;
+  const X0=78,X1=960,Y0=18,Y1=300,x=a=>X0+(X1-X0)*(a-a0)/(a1-a0),y=v=>Y1-(Y1-Y0)*Math.min(1,Math.max(0,v)/top);
+  const line=f=>rows.map((r,i)=>`${i?"L":"M"}${x(r.age).toFixed(1)},${y(f(r)).toFixed(1)}`).join(" ");
+  const band=`${line(r=>tot(r,"p90"))} ${[...rows].reverse().map(r=>`L${x(r.age).toFixed(1)},${y(tot(r,"p10")).toFixed(1)}`).join(" ")} Z`;
+  const grid=[],labels=[];
+  for(let v=0;v<=top+1;v+=step){grid.push(`M${X0} ${y(v).toFixed(1)} H${X1}`);labels.push(`<text x="${X0-8}" y="${(y(v)+5).toFixed(1)}" text-anchor="end">${esc(compact(v))}</text>`)}
+  const ticks=rows.filter(r=>Math.round(r.age)%5===0).map(r=>`<text x="${x(r.age).toFixed(0)}" y="324" text-anchor="middle">${esc(`age ${Math.round(r.age)}`)}</text>`).join("");
+  const mark=(a,l)=>a>a0&&a<a1?`<path d="M${x(a).toFixed(1)} ${Y0} V${Y1}" stroke="#e08a7d" stroke-width="1.5" stroke-dasharray="3 5"/><text x="${(x(a)+6).toFixed(1)}" y="${Y0+14}" fill="#e08a7d">${esc(l)}</text>`:"";
+  return `<div class="rpg-chart-key"><span><svg width="26" height="10" aria-hidden="true"><rect width="26" height="10" fill="#4d7a3a" fill-opacity=".35"/></svg>Everything, 8 in 10 markets</span><span><svg width="26" height="8" aria-hidden="true"><path d="M0 4 H26" stroke="#f1d78f" stroke-width="3"/></svg>Everything, typical</span><span><svg width="26" height="8" aria-hidden="true"><path d="M0 4 H26" stroke="#d9b45a" stroke-width="2" stroke-dasharray="2 4"/></svg>Investments you can reach</span><span><svg width="26" height="8" aria-hidden="true"><path d="M0 4 H26" stroke="#9ec0ea" stroke-width="2" stroke-dasharray="6 4"/></svg>Retirement accounts</span></div><svg viewBox="0 0 1000 336" class="rpg-fluid" role="img" aria-label="${esc(`Balance by age in today's dollars: typical ${money(tot(p.at_retirement,"p50"))} at ${p.retire_age}; bad case ${money(tot(p.at_retirement,"p10"))}.`)}"><g stroke="#3a3127" stroke-width="1" fill="none"><path d="${grid.join(" ")}"/></g><path d="${band}" fill="#4d7a3a" fill-opacity=".35"/><path d="${line(r=>r.investments.p50)}" stroke="#d9b45a" stroke-width="2" stroke-dasharray="2 4" fill="none"/><path d="${line(r=>r.retirement.p50)}" stroke="#9ec0ea" stroke-width="2" stroke-dasharray="6 4" fill="none"/><path d="${line(r=>tot(r,"p50"))}" stroke="#f1d78f" stroke-width="3" fill="none"/>${mark(p.retire_age,`retire ${p.retire_age}`)}${mark(59.5,"59\u00bd")}<g fill="#b9a98a" font-size="14">${labels.join("")}${ticks}</g></svg>`;
+}
+function matchTable(p){
+  const m=p.match;if(!m.jobs.length)return "";
+  const rows=m.jobs.map(j=>`<tr><th scope="row">${esc(j.label)}</th><td class="num">${money(j.salary)}${j.bonus?` + ${money(j.bonus)} bonus`:""}</td><td class="num">${j.match_pct===null?"\u2014":esc(pctText(j.match_pct,1))}</td><td class="num">${j.you_pct===null?"\u2014":esc(pctText(j.you_pct,1))}${j.you_pct_inferred?`<small> from deposits (${esc(pctText(j.deposit_pct_of_pay,1))} of pay in all)</small>`:""}</td><td>${j.full_match===null?"\u2014":j.full_match?badge("Full match","verdant"):badge(`Missing ${money(j.match_missed_year)} a year`,"crimson")}</td></tr>`).join("");
+  const room=`Your own pre-tax deposits come to about ${money(m.employee_total_year)} a year across both jobs; the ${m.rules_year} limit is ${money(m.employee_limit)} per person across every employer, so about ${money(m.room_left_year)} of room is left. For retiring at ${p.retire_age}, extra saving that you can reach before 59\u00bd (a brokerage account, or Roth IRA contributions) does more for the bridge than more 401(k).`;
+  return `<div class="rpg-table-wrap"><table class="rpg-table"><thead><tr><th>Job</th><th class="num">Pay</th><th class="num">Match</th><th class="num">Your share</th><th>Match taken</th></tr></thead><tbody>${rows}</tbody></table></div><p class="rpg-vault-why">${esc(room)}</p>`;
+}
+function earlyAccess(p){
+  const r=p.rules,ph=r.roth_ira_phaseout_single;
+  const items=[
+    "Brokerage and Acorns: reachable any time; only gains are taxed, and long-term gains can be taxed at 0% when other income is low.",
+    `Roth IRA: what you put in (not the growth) comes out any time without tax or penalty. Limit ${money(r.ira_limit)} a year in ${r.year}; for a single filer, direct contributions phase out between ${money(ph[0])} and ${money(ph[1])} of modified income, above which people use the backdoor Roth (ask a tax pro).`,
+    "Roth conversion ladder: move some 401(k) or traditional IRA money to a Roth each year after you stop working; each conversion can come out penalty-free after 5 years (it is taxed in the year you convert).",
+    "72(t) payments: penalty-free withdrawals from an IRA before 59\u00bd, in fixed amounts you must keep taking for 5 years or until 59\u00bd, whichever is longer.",
+    `HSA: ${money(r.hsa_limit_self_only)} a year self-only (${money(r.hsa_limit_family)} family) in ${r.year}. Paying medical bills out of pocket now and keeping the receipts lets you reimburse yourself tax-free years later.`,
+    "The rule of 55 does not help at 48: it only applies when you leave a job in or after the year you turn 55.",
+    "Living abroad: US citizens still owe US tax on 401(k), IRA and investment income (the foreign earned income exclusion covers wages only); Medicare does not cover care abroad, and some brokerages limit accounts for people who live outside the US.",
+  ];
+  return `<details class="rpg-home-ef-pick"><summary>Reaching the money before 59\u00bd (rules of thumb)</summary><ul class="rpg-home-limits">${items.map(i=>`<li>${esc(i)}</li>`).join("")}</ul></details>`;
+}
+function retirementForm(cfg){
+  const c=cfg||{},accts=retirementAccounts();
+  const v=x=>x===null||x===undefined?"":esc(x);
+  const f=(k,label,val,step="any",ph="")=>`<label>${esc(label)}<input type="number" step="${step}" data-ret="${k}" value="${v(val)}"${ph?` placeholder="${esc(ph)}"`:""}></label>`;
+  const p100=x=>x===null||x===undefined?null:Math.round(x*1000)/10;
+  const age=c.age!=null?Math.floor(c.age+((Number(nowMonth().slice(0,4))*12+Number(nowMonth().slice(5,7)))-(Number(String(c.age_as_of).slice(0,4))*12+Number(String(c.age_as_of).slice(5,7))))/12):null;
+  const jobs=(c.jobs&&c.jobs.length?c.jobs:[{},{}]).map((j,i)=>`<fieldset class="rpg-home-mix" data-ret-job="${i}"><legend>${esc(j.label||`Job ${i+1}`)}</legend><label>Name<input type="text" data-job="label" value="${v(j.label)}" maxlength="60"></label><label>401(k) account<select data-job="account_id"><option value="">\u2014</option>${accts.map(a=>`<option value="${esc(a.account_id)}"${a.account_id===j.account_id?" selected":""}>${esc(a.name||a.account_label)}</option>`).join("")}</select></label><label>Yearly pay<input type="number" step="100" data-job="salary" value="${v(j.salary)}"></label><label>Bonus a year<input type="number" step="100" data-job="bonus" value="${v(j.bonus)}"></label><label>Match %<input type="number" step="0.5" data-job="match_pct" value="${v(p100(j.match_pct))}"></label><label>Your % (blank = from deposits)<input type="number" step="0.5" data-job="you_pct" value="${v(p100(j.you_pct))}"></label></fieldset>`).join("");
+  return `<details class="rpg-home-ef-pick"${cfg?"":" open"}><summary>Your retirement inputs</summary><form class="rpg-board-filters rpg-home-grid" data-ret-form>${f("age","Your age today",age,"1")}${f("retire_age","Retire at age",c.retire_age,"1")}${f("spending_year","Spending a year (today's $)",c.spending_year,"500",S.ret?.spending_default_year?`blank = ${Math.round(S.ret.spending_default_year)} (12\u00d7 this month's bills)`:"blank = 12\u00d7 this month's bills")}${f("spending_abroad_year","Spending a year abroad (optional)",c.spending_abroad_year,"500")}${f("withdrawal_rate","Draw rate %",p100(c.withdrawal_rate??0.035),"0.1")}${f("inflation","Inflation %",p100(c.inflation??0.025),"0.1")}${f("withdrawal_tax","Tax on retirement withdrawals %",p100(c.withdrawal_tax??0.10),"1")}${f("after_plan_monthly_investing","Invested a month after the plan ends",c.after_plan_monthly_investing,"50",S.ret?.after_plan_default!=null?`blank = ${Math.round(S.ret.after_plan_default)}`:"")}${f("social_security_monthly","Social Security a month (ssa.gov, optional)",c.social_security_monthly,"50")}${f("social_security_age","Claim it at age",c.social_security_age??67,"1")}<label class="rpg-check"><input type="checkbox" data-ret="sell_home_at_retirement"${c.sell_home_at_retirement?" checked":""}> Sell the home when I retire</label>${jobs}<div class="rpg-home-actions"><button type="button" class="rpg-btn rpg-action rpg-action-quiet" data-ret-try>Try these</button><button type="button" class="rpg-btn rpg-action" data-ret-keep>Save into the plan</button></div></form></details>`;
+}
+function readRetirement(form){
+  const out={age_as_of:nowMonth()},n=el=>el.value===""?null:Number(el.value);
+  form.querySelectorAll("[data-ret]").forEach(el=>{
+    const k=el.dataset.ret;
+    if(k==="sell_home_at_retirement"){out[k]=el.checked;return}
+    const v=n(el);
+    out[k]=["withdrawal_rate","inflation","withdrawal_tax"].includes(k)&&v!==null?v/100:v;
+  });
+  out.jobs=[...form.querySelectorAll("[data-ret-job]")].map(fs=>{const j={};fs.querySelectorAll("[data-job]").forEach(el=>{const k=el.dataset.job;if(k==="label"||k==="account_id"){j[k]=el.value;return}const v=n(el);j[k]=["match_pct","you_pct"].includes(k)&&v!==null?v/100:v});return j}).filter(j=>j.salary);
+  return out;
 }
 
 /* ---------------- a plan that keeps going ---------------- */
@@ -345,7 +435,7 @@ function render(){
   if(!S.plan){view.innerHTML=`${crumbs("Household plan \u00b7 not set up yet")}${message()}<section class="rpg-stone rpg-guild-hero"><div><div class="rpg-parch-kicker">The Homestead</div><p class="rpg-guild-counsel">Bring your Income &amp; Net Worth Tracker into the UIP once. After that the plan lives here: edit any month, enter real balances as months pass, and see the range of where the plan lands and what it means for the house.</p></div></section>${importPanel()}`;return}
   const v=S.doc.version,p=S.proj;
   const note=`Plan saved ${v?new Date(v.recorded_at).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}):"\u2014"} \u00b7 ${monthLabel(S.plan.months[0].month)} to ${monthLabel(S.plan.months[S.plan.months.length-1].month)}${S.tried?" \u00b7 showing unsaved settings":""}`;
-  view.innerHTML=`${crumbs(note)}${message()}${netWorth()}${emergency()}${p?goal(p)+fan(p)+targetTiles(p)+capacity(p)+ratesSection(p)+housingSection():`<p class="rpg-parch-note">Working out the ranges\u2026</p>`}${purse()}${ledger()}${settingsForm()}${importPanel()}${p?assumptions(p):""}`;
+  view.innerHTML=`${crumbs(note)}${message()}${netWorth()}${emergency()}${p?goal(p)+fan(p)+targetTiles(p)+capacity(p)+ratesSection(p)+housingSection():`<p class="rpg-parch-note">Working out the ranges\u2026</p>`}${retirementSection()}${purse()}${ledger()}${settingsForm()}${importPanel()}${p?assumptions(p):""}`;
 }
 function setMsg(kind,text){S.msg=text?[kind,text]:null}
 async function savePlan(plan,okText){
@@ -358,6 +448,8 @@ function bind(view){
     if(t.dataset.homeMonth){S.pick=t.dataset.homeMonth===S.pick?null:t.dataset.homeMonth;const slot=byId("rpg-home-editor");if(slot){slot.innerHTML=editor();view.querySelectorAll("[data-home-month]").forEach(b=>{const on=b.dataset.homeMonth===S.pick;b.setAttribute("aria-pressed",String(on));b.closest("tr")?.classList.toggle("is-picked",on)});slot.querySelector("input")?.focus()}return}
     if(t.dataset.homeChart){S.chart=t.dataset.homeChart;render();return}
     if(t.hasAttribute("data-home-export")){downloadData();return}
+    if(t.hasAttribute("data-ret-try")){const cfg=readRetirement(t.closest("form"));if(!cfg.age||!cfg.retire_age){setMsg("bad","Enter your age and the age you want to retire.");render();return}S.retTried=cfg;S.ret=null;setMsg(null);render();refreshRetirement(true);return}
+    if(t.hasAttribute("data-ret-keep")){const cfg=readRetirement(t.closest("form"));if(!cfg.age||!cfg.retire_age){setMsg("bad","Enter your age and the age you want to retire.");render();return}const plan=clone(S.plan);plan.settings={...plan.settings,retirement:cfg};S.retTried=null;S.ret=null;savePlan(plan,"Retirement inputs saved into the plan.");return}
     if(t.dataset.homeExtend){const n=extendPlan(S.plan,t.dataset.homeExtend);S.dirty=S.dirty||n>0;setMsg("ok",`Added ${n} month${n===1?"":"s"} through ${monthLabel(t.dataset.homeExtend)}, copied from the last month. Edit any of them, then save the plan.`);render();return}
     if(t.hasAttribute("data-home-close")){S.pick=null;render();return}
     if(t.dataset.homeUseStatements!==undefined){const input=t.closest("form")?.querySelector('[data-home-field="retirement_balance"]');if(input){input.value=t.dataset.homeUseStatements;input.focus()}return}

@@ -44,6 +44,7 @@ DEFAULT_SETTINGS = {
     "loan_years": 30,
     "home_price_growth": 0.0,       # yearly; 0 = today's prices. The Homestead offers the housing forecast.
     "essential_lines": None,        # bills that must be paid in a bad month (emergency fund); None = every bill line
+    "retirement": None,             # the retirement path's inputs (age, retirement age, spending, jobs); None = not set up
 }
 MIX_SLEEVES = ("stocks", "crypto", "metals", "mtg", "cash")
 
@@ -113,6 +114,7 @@ def normalize_plan(document) -> dict:
         raise HouseholdPlanError("contribution_mix shares must add up to 100%")
     settings["contribution_mix"] = weights
     settings["house_counts_retirement"] = bool(settings["house_counts_retirement"])
+    settings["retirement"] = normalize_retirement(settings["retirement"])
 
     income_lines = [str(x).strip() for x in document.get("income_lines") or [] if str(x).strip()]
     expense_lines = [str(x).strip() for x in document.get("expense_lines") or [] if str(x).strip()]
@@ -191,6 +193,73 @@ def essential_spending(plan: dict, month: str) -> float:
         return 0.0
     keep = set(essential_lines(plan))
     return round(abs(sum(v for k, v in m["expenses"].items() if k in keep)), 2)
+
+
+RETIREMENT_DEFAULTS = {
+    "age": None, "age_as_of": None, "retire_age": None,
+    "spending_year": None,             # today's dollars; None = 12 x this month's bills
+    "spending_abroad_year": None,      # optional second case (a lower-cost country)
+    "withdrawal_rate": 0.035,          # 3.5%: the 4% guide trimmed for a 45-year retirement
+    "inflation": 0.025,
+    "withdrawal_tax": 0.10,            # share of retirement-account withdrawals lost to tax
+    "after_plan_monthly_investing": None,  # after the plan's last month; None = its last 12 months' saving
+    "social_security_monthly": None, "social_security_age": 67,
+    "sell_home_at_retirement": False,
+    "jobs": [],
+}
+
+
+def normalize_retirement(raw) -> dict | None:
+    """Validate the retirement path's inputs (stored in the plan, never in the repository)."""
+    if raw in (None, {}):
+        return None
+    if not isinstance(raw, dict):
+        raise HouseholdPlanError("retirement must be an object")
+    out = dict(RETIREMENT_DEFAULTS)
+    out.update({k: raw[k] for k in RETIREMENT_DEFAULTS if k in raw})
+
+    def rng(key, lo, hi, *, allow_none=False, integer=False):
+        v = _number(out[key], key, allow_none=allow_none)
+        if v is None:
+            return None
+        if not lo <= v <= hi:
+            raise HouseholdPlanError(f"retirement {key} must be between {lo} and {hi}")
+        return int(v) if integer else v
+
+    out["age"] = rng("age", 16, 90, integer=True)
+    if not MONTH.match(str(out["age_as_of"] or "")):
+        raise HouseholdPlanError("retirement age_as_of must look like 2026-10")
+    out["retire_age"] = rng("retire_age", 30, 80, integer=True)
+    for key in ("spending_year", "spending_abroad_year", "after_plan_monthly_investing", "social_security_monthly"):
+        out[key] = rng(key, 0, 10_000_000, allow_none=True)
+    out["social_security_age"] = rng("social_security_age", 62, 70, integer=True)
+    for key, hi in (("withdrawal_rate", 0.1), ("inflation", 0.15), ("withdrawal_tax", 0.6)):
+        try:
+            out[key] = float(out[key])
+        except (TypeError, ValueError):
+            raise HouseholdPlanError(f"retirement {key} must be a number") from None
+        if not (0 < out[key] if key == "withdrawal_rate" else 0 <= out[key]) or out[key] > hi:
+            raise HouseholdPlanError(f"retirement {key} is out of range")
+    out["sell_home_at_retirement"] = bool(out["sell_home_at_retirement"])
+    jobs = []
+    for job in out["jobs"] or []:
+        if not isinstance(job, dict):
+            raise HouseholdPlanError("each retirement job must be an object")
+        item = {"label": str(job.get("label") or "Job").strip()[:60], "account_id": str(job.get("account_id") or "").strip()[:80] or None}
+        for key in ("salary", "bonus"):
+            item[key] = _number(job.get(key), f"job {key}")
+            if not 0 <= item[key] <= 10_000_000:
+                raise HouseholdPlanError(f"job {key} is out of range")
+        for key in ("match_pct", "you_pct"):
+            v = job.get(key)
+            item[key] = None if v in (None, "") else float(v)
+            if item[key] is not None and not 0 <= item[key] <= 1:
+                raise HouseholdPlanError(f"job {key} must be a share between 0 and 1")
+        jobs.append(item)
+    if len(jobs) > 6:
+        raise HouseholdPlanError("at most 6 jobs")
+    out["jobs"] = jobs
+    return out
 
 
 def still_to_come(m: dict) -> float:

@@ -1,4 +1,11 @@
-"""Authenticated routes for the household plan (the Homestead page)."""
+"""Authenticated routes for the household plan (the Homestead page).
+
+GET  /v1/household-plan                    the current plan and its rolled-forward months
+POST /v1/household-plan                    save a new version (operator)
+POST /v1/household-plan/import             preview a workbook import (operator; saves nothing)
+POST /v1/household-plan/projection         the house ranges, with live holdings
+POST /v1/household-plan/retirement-path    the early-retirement path, with live holdings and retirement statements
+"""
 from __future__ import annotations
 
 from datetime import datetime, timezone
@@ -6,9 +13,11 @@ from uuid import uuid4
 
 from fastapi import Header, Request
 from fastapi.responses import JSONResponse
+from starlette.concurrency import run_in_threadpool
 
 from .household_plan import HouseholdPlanError, create_version, import_workbook, normalize_plan, roll_forward
 from .household_projection import project
+from .retirement_path import retirement_path
 from .observability import OperationalEvent
 from .security import APIKeyAuthenticator, Permission
 
@@ -108,5 +117,37 @@ def install_household_plan_routes(app, settings, repository):
         try:
             result = project(plan, as_of_month=month, holdings=holdings)
         except ValueError as exc:
+            return invalid(exc)
+        return {"available": True, "version": current.summary(), **result}
+
+    @app.post("/v1/household-plan/retirement-path")
+    async def retirement(request: Request, x_api_key: str | None = Header(default=None)):
+        _, denied = authorize(x_api_key, Permission.RUN_READ)
+        if denied:
+            return denied
+        current = repository.current()
+        if current is None:
+            return {"available": False}
+        try:
+            body = await request.json()
+        except Exception:  # noqa: BLE001 - an empty body means no live figures
+            body = {}
+        body = body if isinstance(body, dict) else {}
+        plan = current.plan
+        if isinstance(body.get("retirement"), dict):          # try retirement inputs without saving them
+            try:
+                plan = normalize_plan({**plan, "settings": {**plan["settings"], "retirement": body["retirement"]}})
+            except HouseholdPlanError as exc:
+                return invalid(exc)
+        month = str(body.get("as_of_month") or datetime.now(timezone.utc).strftime("%Y-%m"))
+        holdings = body.get("holdings") if isinstance(body.get("holdings"), dict) else None
+        deposits = body.get("deposits") if isinstance(body.get("deposits"), dict) else None
+        try:
+            start = float(body.get("retirement_start") or 0)
+            monthly = float(body.get("retirement_monthly") or 0)
+            result = await run_in_threadpool(          # a few seconds of simulation; keep the server answering
+                lambda: retirement_path(plan, as_of_month=month, holdings=holdings, retirement_start=start,
+                                        retirement_monthly=monthly, deposits=deposits))
+        except (TypeError, ValueError) as exc:
             return invalid(exc)
         return {"available": True, "version": current.summary(), **result}
