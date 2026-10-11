@@ -97,6 +97,30 @@ def _plan_month(plans, month: str) -> dict | None:
             "plan_version": version.version_id}
 
 
+def market_hpi(presentation, market: str):
+    """The Housing platform's latest house price index for a market (None when it is not published)."""
+    try:
+        housing = presentation.housing() if presentation is not None else None
+    except Exception:                        # the housing package is optional
+        return None
+    for m in (housing or {}).get("markets", []):
+        if m.get("market") == market and m.get("hpi"):
+            return float(m["hpi"])
+    return None
+
+
+def _owned_home(plans, presentation, month: str) -> dict | None:
+    from .home_owner import balance_at, value_at
+
+    version = plans.current() if plans is not None else None
+    home = version.plan["settings"].get("home") if version is not None else None
+    if not home or month < home["closing_month"]:
+        return None
+    value, source = value_at(home, market_hpi(presentation, home["market"]))
+    balance = balance_at(home, month)
+    return {"value": _money(value), "value_source": source, "loan_balance": _money(balance), "equity": _money(value - balance)}
+
+
 def compute_net_worth(*, today: date | None = None, transactions=None, presentation=None, manual=None,
                       external=None, plans=None) -> dict:
     today = today or datetime.now(timezone.utc).date()
@@ -104,12 +128,13 @@ def compute_net_worth(*, today: date | None = None, transactions=None, presentat
     investments = _investments(transactions, presentation, manual, external)
     retirement = _retirement(external, today)
     plan = _plan_month(plans, month)
+    home = _owned_home(plans, presentation, month)
     parts = {"investments": investments["total"], "retirement": retirement["total"],
              "bank": plan["bank"] if plan else None, "house_fund": plan["house_fund"] if plan else None,
-             "home_equity": plan["home_equity"] if plan else None}
+             "home_equity": home["equity"] if home else (plan["home_equity"] if plan else None)}
     worth = sum((Decimal(v) for v in parts.values() if v is not None), Decimal(0))
     return {"month": month, "as_of_date": today.isoformat(), "net_worth": _money(worth), "components": parts,
-            "investments": investments, "retirement": retirement, "plan": plan,
+            "investments": investments, "retirement": retirement, "plan": plan, "home": home,
             "missing": [k for k, v in parts.items() if v is None], "debts": None}
 
 

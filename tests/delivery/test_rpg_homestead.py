@@ -86,3 +86,11 @@ def test_homestead_lists_goals_side_by_side():
     assert "${emergency()}${goalsSection()}" in page and "Your goals" in page
     assert "data-goal-add" in page and "data-goal-done" in page and "data-goal-remove" in page
     assert "chances_without_goals" in page and "chance_without_goals" in page
+
+
+def test_homestead_switches_to_owner_mode():
+    page = _read("homestead.js")
+    assert 'post("/v1/household-plan/home"' in page
+    assert "owned()?ownerSection()+housingSection():" in page and "purchaseForm()" in page
+    for hook in ("data-home-buy-try", "data-home-buy-save", "data-home-own-add", "data-home-own-costs", "data-home-own-undo"):
+        assert hook in page, hook

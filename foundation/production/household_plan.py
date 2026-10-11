@@ -25,6 +25,8 @@ import re
 import sqlite3
 from typing import Callable
 
+from .home_owner import HomeError, normalize_home
+
 SCHEMA = "household-plan-1"
 MONTH = re.compile(r"^\d{4}-(0[1-9]|1[0-2])$")
 BALANCES = ("bank_balance", "retirement_balance", "investment_balance", "house_fund_balance", "home_equity")
@@ -46,6 +48,7 @@ DEFAULT_SETTINGS = {
     "essential_lines": None,        # bills that must be paid in a bad month (emergency fund); None = every bill line
     "retirement": None,             # the retirement path's inputs (age, retirement age, spending, jobs); None = not set up
     "goals": [],                    # goals besides the house: name, amount in today's dollars, month, open or done
+    "home": None,                   # the home once bought (owner mode): price, loan, PMI, escrow, statements; None = not yet
 }
 MIX_SLEEVES = ("stocks", "crypto", "metals", "mtg", "cash")
 
@@ -117,6 +120,10 @@ def normalize_plan(document) -> dict:
     settings["house_counts_retirement"] = bool(settings["house_counts_retirement"])
     settings["retirement"] = normalize_retirement(settings["retirement"])
     settings["goals"] = normalize_goals(settings["goals"])
+    try:
+        settings["home"] = normalize_home(settings["home"])
+    except HomeError as exc:
+        raise HouseholdPlanError(str(exc)) from None
 
     income_lines = [str(x).strip() for x in document.get("income_lines") or [] if str(x).strip()]
     expense_lines = [str(x).strip() for x in document.get("expense_lines") or [] if str(x).strip()]
