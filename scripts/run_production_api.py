@@ -16,6 +16,9 @@ from foundation.production.hosted_external_accounts import install_external_acco
 from foundation.production.external_account_performance import PostgresExternalAccountPerformanceRepository
 from foundation.production.hosted_manual_holdings import install_manual_holding_routes
 from foundation.production.hosted_household_plan import install_household_plan_routes
+from foundation.production.hosted_net_worth import install_net_worth_routes
+from foundation.production.net_worth import NetWorthHistory
+from foundation.production.data_export import install_data_export_routes
 from foundation.production.household_plan import PostgresHouseholdPlanRepository
 from foundation.production.hosted_refresh_status import install_refresh_status_routes
 from foundation.production.manual_holdings import PostgresManualHoldingRepository
@@ -32,6 +35,7 @@ manual_holding_repository = None
 household_plan_repository = None
 presentation_repository = None
 asset_catalog_repository = None
+net_worth_history = None
 if os.getenv("RENDER_EXTERNAL_HOSTNAME"):
     free_settings = FreeStagingSettings.from_environment()
     os.environ.update(free_settings.application_environment())
@@ -48,6 +52,8 @@ if os.getenv("RENDER_EXTERNAL_HOSTNAME"):
     household_plan_repository.initialize()
     presentation_repository = PresentationReadRepository.from_dsn(free_settings.database_url)
     asset_catalog_repository = GovernedAssetCatalogRepository.from_dsn(free_settings.database_url)
+    net_worth_history = NetWorthHistory.from_dsn(free_settings.database_url)
+    net_worth_history.initialize()
 settings = HTTPServiceSettings.from_environment()
 app = create_http_app(settings, repository=repository)
 if portfolio_repository is not None:
@@ -85,6 +91,16 @@ if transaction_repository is not None:
             transaction_repository,
             presentation_repository,
         )
+if net_worth_history is not None:
+    install_net_worth_routes(
+        app, settings, net_worth_history,
+        transactions=transaction_repository, presentation=presentation_repository, manual=manual_holding_repository,
+        external=external_account_repository, plans=household_plan_repository,
+    )
+    install_data_export_routes(
+        app, settings, transactions=transaction_repository, manual=manual_holding_repository,
+        external=external_account_repository, plans=household_plan_repository, history=net_worth_history,
+    )
 if os.getenv("EBAY_DELETION_VERIFICATION_TOKEN") and os.getenv("EBAY_DELETION_ENDPOINT_URL"):
     install_ebay_compliance_routes(app, EbayComplianceSettings.from_environment())
 install_live_security(app, LiveSecuritySettings.from_environment())

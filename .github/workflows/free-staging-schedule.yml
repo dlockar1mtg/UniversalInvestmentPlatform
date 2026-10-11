@@ -20,7 +20,7 @@ jobs:
       UIIP_DATABASE_URL: ${{ secrets.UIIP_DATABASE_URL }}
       UIIP_ALPHA_VANTAGE_API_KEY: ${{ secrets.UIIP_ALPHA_VANTAGE_API_KEY }}
       UIIP_FRED_API_KEY: ${{ secrets.UIIP_FRED_API_KEY }}
-      UIIP_SCHEDULES_JSON: '[{"schedule_id":"providers-6h","job_type":"provider_check","interval_seconds":21600,"payload":{}}]'
+      UIIP_SCHEDULES_JSON: '[{"schedule_id":"providers-6h","job_type":"provider_check","interval_seconds":21600,"payload":{}},{"schedule_id":"net-worth-daily","job_type":"net_worth_snapshot","interval_seconds":72000,"payload":{}}]'
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
