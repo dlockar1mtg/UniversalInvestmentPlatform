@@ -3,7 +3,7 @@
    ranges come from /v1/household-plan/projection with the live holdings from the Treasury. */
 (()=>{
 "use strict";
-const S={doc:null,plan:null,dirty:false,proj:null,projKey:"",pick:null,chart:"house",preview:null,msg:null,tried:null,loading:false,nw:null,nwErr:null,ret:null,retKey:"",retTried:null,retBusy:false,retErr:null};
+const S={doc:null,plan:null,dirty:false,proj:null,projKey:"",pick:null,chart:"house",preview:null,msg:null,tried:null,loading:false,nw:null,nwErr:null,ret:null,retKey:"",retTried:null,retBusy:false,retErr:null,homeDoc:null,homeKey:"",homeTried:null,homeErr:null};
 const byId=id=>document.getElementById(id);
 const esc=v=>{const n=document.createElement("span");n.textContent=String(v??"");return n.innerHTML};
 const num=v=>{if(v===null||v===undefined||v==="")return null;const n=Number(v);return Number.isFinite(n)?n:null};
@@ -61,7 +61,7 @@ function stillToCome(m,done){
 /* ---------------- loading ---------------- */
 function load(){
   if(S.loading)return;S.loading=true;
-  call("/v1/presentation/housing").then(h=>{S.housing=h;if(S.doc)render()}).catch(()=>{S.housing={available:false}});
+  call("/v1/presentation/housing").then(h=>{S.housing=h;refreshHome(true);if(S.doc)render()}).catch(()=>{S.housing={available:false}});
   loadNetWorth();
   call("/v1/household-plan").then(doc=>{S.doc=doc;S.plan=doc.available?clone(doc.plan):null;S.dirty=false;S.loading=false;render();refreshProjection(true)})
     .catch(error=>{S.loading=false;S.msg=["bad",error.message];render()});
@@ -71,6 +71,7 @@ function loadNetWorth(){
 }
 function refreshProjection(force){
   if(!S.doc?.available)return;
+  refreshHome(force);
   refreshRetirement(force);
   const holdings=liveHoldings();
   const body={as_of_month:nowMonth(),holdings:holdings||undefined,settings:S.tried||undefined};
@@ -150,7 +151,7 @@ function refreshRetirement(force){
   const accts=retirementAccounts(),st=statements(),holdings=liveHoldings();
   const deposits={};let monthly=0;
   for(const a of accts)if(a.schedule){deposits[a.account_id]={per_paycheck:num(a.schedule.per_paycheck),every_days:num(a.schedule.every_days)};monthly+=num(a.schedule.monthly_equivalent)||0}
-  const body={as_of_month:nowMonth(),holdings:holdings||undefined,retirement_start:st?st.value:0,retirement_monthly:Math.round(monthly*100)/100,deposits,retirement:S.retTried||undefined};
+  const body={as_of_month:nowMonth(),holdings:holdings||undefined,retirement_start:st?st.value:0,retirement_monthly:Math.round(monthly*100)/100,deposits,retirement:S.retTried||undefined,home_value:S.homeDoc&&!S.homeDoc.preview?S.homeDoc.value:undefined};
   const k=JSON.stringify([S.doc.version?.version_id,body]);
   if(!force&&k===S.retKey)return;
   S.retKey=k;S.retBusy=true;S.retErr=null;
@@ -238,6 +239,7 @@ function goalsSection(){
   const cell=c=>c===null||c===undefined?"\u2014":`${Math.round(c*100)}%`;
   const hi=p?.house?.chances?.find(c=>c.price===p.house.price_high),hiFree=p?.house?.chances_without_goals?.find(c=>c.price===p.house.price_high);
   const rows=[];
+  if(S.plan.settings.home)rows.push(`<tr><th scope="row">The house</th><td>${esc(monthLabel(S.plan.settings.home.closing_month))}</td><td class="num">${money(S.plan.settings.home.price)}</td><td class="num">Bought</td><td></td></tr>`);else
   rows.push(`<tr><th scope="row">The house</th><td>${esc(monthLabel(S.plan.settings.target_month))}</td><td class="num">${esc(`${compact(S.plan.settings.home_price_low)}\u2013${compact(S.plan.settings.home_price_high)} home`)}</td><td class="num">${hi?esc(`${cell(hi.chance)} at ${compact(p.house.price_high)}`):"\u2014"}</td><td><span class="rpg-muted">set under The house and the plan</span></td></tr>`);
   for(const g of open)rows.push(`<tr><th scope="row">${esc(g.name)}</th><td>${esc(monthLabel(g.month))}</td><td class="num">${money(g.amount)}</td><td class="num">${cell(chanceOf(g))}</td><td><button type="button" class="rpg-btn rpg-link" data-goal-done="${esc(g.id)}">Done</button> <button type="button" class="rpg-btn rpg-link" data-goal-remove="${esc(g.id)}">Remove</button></td></tr>`);
   if(ret)rows.push(`<tr><th scope="row">Retire at ${esc(ret.retire_age)}</th><td>${r?esc(monthLabel(r.retire_month)):"\u2014"}</td><td class="num">${r?esc(`${money(r.spending_year)} a year`):"\u2014"}</td><td class="num">${r?esc(`${cell(r.chance)} last to 95`):"\u2026"}</td><td><span class="rpg-muted">set under the road to early retirement</span></td></tr>`);
@@ -248,6 +250,55 @@ function goalsSection(){
   const finished=done.length?`<p class="rpg-vault-why">${esc(`Finished: ${done.map(g=>`${g.name} (${monthLabel(g.done_month)}, ${money(g.done_amount)})`).join(" \u00b7 ")}`)}</p>`:"";
   const form=`<form class="rpg-board-filters rpg-home-grid rpg-home-goal-form" data-goal-add><label>Goal<input type="text" data-goal="name" maxlength="80" placeholder="e.g. replace the car"></label><label>Amount (today's $)<input type="number" step="100" min="1" data-goal="amount"></label><label>When<input type="month" data-goal="month" value="${esc(addMonths(nowMonth(),12))}"></label><div class="rpg-home-actions"><button type="submit" class="rpg-btn rpg-action">Add the goal</button></div></form>`;
   return `<section class="rpg-stone rpg-road" aria-labelledby="rpg-home-goals-h"><div class="rpg-section-head"><h2 id="rpg-home-goals-h" class="rpg-stone-title">Your goals</h2><span class="rpg-crumb-note">Simulated together, in date order \u00b7 paid from the bank above the safety fund, then investments; never retirement</span></div><p class="rpg-guild-counsel">${esc(effect)}</p><div class="rpg-table-wrap"><table class="rpg-table"><thead><tr><th>Goal</th><th>When</th><th class="num">Amount</th><th class="num">Chance it is covered</th><th></th></tr></thead><tbody>${rows.join("")}</tbody></table></div>${finished}${form}<p class="rpg-crumb-note">${esc("A goal the money cannot cover in its month is counted as postponed in that market, not paid. Mark a goal done when you pay for it; it stays here with its date and amount.")}</p></section>`;
+}
+
+
+/* ---------------- owner mode: the home once it is bought ---------------- */
+const HOME_MARKETS=[["Wichita","Wichita"],["DFW Composite","Dallas\u2013Fort Worth"]];
+function marketNow(name){const m=(S.housing?.markets||[]).find(x=>x.market===name);const r=S.housing?.package?.rates_outlook;const w=r?.mortgage_30yr_latest_weekly?.rate??r?.mortgage_30yr_month_avg??m?.mortgage_30yr;return {hpi:num(m?.hpi),rate:num(w)===null?null:num(w)/100,as_of:m?.market_state_as_of}}
+function owned(){return S.homeTried||S.plan?.settings?.home||null}
+function refreshHome(force){
+  if(!S.doc?.available)return;
+  const h=owned();if(!h){S.homeDoc=null;return}
+  const now=marketNow(h.market);
+  const body={as_of_month:nowMonth(),hpi_now:now.hpi||undefined,rate_now:now.rate||undefined,home:S.homeTried||undefined};
+  const k=JSON.stringify([S.doc.version?.version_id,body]);
+  if(!force&&k===S.homeKey)return;
+  S.homeKey=k;S.homeErr=null;
+  post("/v1/household-plan/home",body).then(d=>{if(S.homeKey!==k)return;S.homeDoc=d.owned?d:null;render();if(!d.preview)refreshRetirement(true)}).catch(e=>{if(S.homeKey!==k)return;S.homeErr=e.message;render()});
+}
+function ownerSection(){
+  const d=S.homeDoc,h=owned();
+  if(S.homeErr)return `<section class="rpg-stone rpg-road"><p class="rpg-parch-note">${esc(`The home could not be worked out: ${S.homeErr}`)}</p>${homeForms(h)}</section>`;
+  if(!d)return `<section class="rpg-stone rpg-road"><p class="rpg-parch-note">Working out the home\u2026</p></section>`;
+  const tile=(label,value,sub)=>`<div class="rpg-parch rpg-tile"><div class="rpg-stat-label">${esc(label)}</div><div class="rpg-stat-big num">${value}</div>${sub?`<div class="rpg-stat-sub">${esc(sub)}</div>`:""}</div>`;
+  const pay=d.payment,src={PRICE_X_HPI:"price moved with the market index",APPRAISAL_X_HPI:"appraisal moved with the market index",APPRAISAL:"your appraisal",PRICE:"the price (no index yet)"}[d.value_source]||"";
+  const tiles=`<div class="rpg-tiles rpg-home-tiles">${tile("Home value",money(d.value),`${src} \u00b7 ${d.gain_since_closing<0?"\u2212":"+"}${money(Math.abs(d.gain_since_closing))} since closing`)}${tile("Loan balance",money(d.loan_balance),`paid off ${monthLabel(d.payoff_month)} on schedule \u00b7 ${money(d.interest_left)} interest still to pay`)}${tile("Equity",money(d.equity),`${pctText(d.equity_share)} of the home \u00b7 in net worth, never spending money`)}${tile("Monthly payment",money(pay.total,2),`${money(pay.principal_and_interest,2)} loan${pay.pmi?` + ${money(pay.pmi,2)} PMI`:""}${pay.escrow?` + ${money(pay.escrow,2)} escrow`:""}${pay.hoa?` + ${money(pay.hoa,2)} HOA`:""}`)}</div>`;
+  const checks=[];
+  if(d.pmi)checks.push(`PMI (${money(d.pmi.monthly,2)} a month): you can ask for it to come off ${d.pmi.request_month?`in ${monthLabel(d.pmi.request_month)}`:"once the loan reaches 80% of the price"}, when the loan reaches 80% of the original price, and it ends on its own ${d.pmi.automatic_month?`by ${monthLabel(d.pmi.automatic_month)}`:"at 78%"}. Today the loan is ${pctText(d.pmi.ltv_today_value)} of the home's current value; lenders sometimes drop PMI early on a new appraisal, under their own rules.`);
+  if(d.refinance){const r=d.refinance;checks.push(r.monthly_saving>0?`Refinancing at today's ${pctText(r.rate_now,2)} (yours is ${pctText(h.rate,2)}) would cost about ${money(r.costs)} and save about ${money(r.monthly_saving)} a month, paying back in ${r.break_even_months} months. ${r.worth_a_look?`That is before ${r.keep_until?`you plan to sell (${monthLabel(r.keep_until)})`:"5 years"}, so it is worth asking a lender for a quote.`:`That is not before ${r.keep_until?`you plan to sell (${monthLabel(r.keep_until)})`:"5 years"}, so not yet.`}`:`Today's rate (${pctText(r.rate_now,2)}) is not below yours (${pctText(h.rate,2)}), so refinancing would not save anything.`)}
+  const x=d.extra_principal;
+  checks.push(`${money(x.monthly)} more principal a month saves about ${money(x.interest_saved)} of interest and ends the loan ${x.months_sooner} months sooner: a guaranteed ${pctText(x.guaranteed_return,2)} return. Investing it instead has a typical 8% a year for stocks with big swings, and money you can reach before 59\u00bd helps the early-retirement bridge more.`);
+  checks.push(`Set aside ${money(d.maintenance_month[0])}\u2013${money(d.maintenance_month[1])} a month for upkeep (1\u20132% of the home's value a year).`);
+  checks.push(`Your plan's bills should now carry the ${money(pay.total,2)} payment in place of rent (edit any month in the ledger and apply it to every later month).`);
+  const head=`<div class="rpg-section-head"><h2 id="rpg-home-own-h" class="rpg-stone-title">The home \u00b7 bought ${esc(monthLabel(h.closing_month))}</h2><span class="rpg-crumb-note">${esc(d.preview?"Preview \u00b7 not saved":`${HOME_MARKETS.find(m=>m[0]===h.market)?.[1]||h.market} price index`)}</span></div>`;
+  const previewBar=d.preview?`<div class="rpg-home-dirty" role="status"><span>This is a preview of owner mode with the figures you entered.</span><button type="button" class="rpg-btn rpg-action" data-home-own-save>Save the purchase</button><button type="button" class="rpg-btn rpg-link" data-home-own-cancel>Leave the preview</button></div>`:"";
+  return `<section class="rpg-stone rpg-guild-hero rpg-home-hero rpg-home-owner" aria-labelledby="rpg-home-own-h">${head}${previewBar}${tiles}<ul class="rpg-home-limits rpg-home-checks">${checks.map(c=>`<li>${esc(c)}</li>`).join("")}</ul>${d.preview?"":homeForms(h)}<ul class="rpg-home-limits">${(d.limitations||[]).map(l=>`<li>${esc(l)}</li>`).join("")}</ul></section>`;
+}
+function homeForms(h){
+  const v=x=>x===null||x===undefined?"":esc(x);
+  return `<details class="rpg-home-ef-pick"><summary>Record a statement, extra principal or an appraisal</summary><form class="rpg-board-filters rpg-home-grid" data-home-own-add><label>What<select data-own="kind"><option value="statements">Loan balance from a statement</option><option value="extra_payments">Extra principal paid</option><option value="appraisals">Appraisal</option></select></label><label>Month<input type="month" data-own="month" value="${esc(nowMonth())}"></label><label>Amount<input type="number" step="0.01" min="0" data-own="amount"></label><div class="rpg-home-actions"><button type="submit" class="rpg-btn rpg-action">Save</button></div></form><form class="rpg-board-filters rpg-home-grid" data-home-own-costs><label>PMI a month<input type="number" step="0.01" min="0" data-own="pmi_monthly" value="${v(h.pmi_monthly)}"></label><label>Escrow a month (tax and insurance)<input type="number" step="0.01" min="0" data-own="escrow_monthly" value="${v(h.escrow_monthly)}"></label><label>HOA a month<input type="number" step="0.01" min="0" data-own="hoa_monthly" value="${v(h.hoa_monthly)}"></label><div class="rpg-home-actions"><button type="submit" class="rpg-btn rpg-action rpg-action-quiet">Update the monthly costs</button></div></form><p class="rpg-crumb-note">${esc(`${h.statements.length} statement${h.statements.length===1?"":"s"}, ${h.extra_payments.length} extra payment${h.extra_payments.length===1?"":"s"} and ${h.appraisals.length} appraisal${h.appraisals.length===1?"":"s"} recorded.`)}</p><button type="button" class="rpg-btn rpg-link" data-home-own-undo>Undo the purchase record</button></details>`;
+}
+function purchaseForm(){
+  const s=S.plan.settings,mid=Math.round((s.home_price_low+s.home_price_high)/2);
+  const f=(k,label,val,step="any")=>`<label>${esc(label)}<input type="number" step="${step}" min="0" data-buy="${k}" value="${val===null||val===undefined?"":esc(val)}"></label>`;
+  return `<details class="rpg-home-ef-pick rpg-home-buy"><summary>Bought the house? Record it at closing (or preview owner mode with sample figures)</summary><form class="rpg-board-filters rpg-home-grid" data-home-buy><label>Market<select data-buy="market">${HOME_MARKETS.map(([k,l])=>`<option value="${esc(k)}">${esc(l)}</option>`).join("")}</select></label>${f("price","Price",mid,"1000")}<label>Closing month<input type="month" data-buy="closing_month" value="${esc(s.target_month)}"></label>${f("down_payment","Down payment",Math.round(mid*s.down_payment_pct),"100")}${f("closing_costs","Closing costs",Math.round(mid*s.closing_cost_pct),"100")}${f("loan_amount","Loan amount",Math.round(mid*(1-s.down_payment_pct)),"100")}${f("rate","Rate %",Math.round(s.mortgage_rate*10000)/100,"0.01")}${f("term_years","Years",s.loan_years,"1")}${f("pmi_monthly","PMI a month",0,"1")}${f("escrow_monthly","Escrow a month",0,"1")}${f("hoa_monthly","HOA a month",0,"1")}<div class="rpg-home-actions"><button type="button" class="rpg-btn rpg-action rpg-action-quiet" data-home-buy-try>Preview owner mode</button><button type="button" class="rpg-btn rpg-action" data-home-buy-save>Save the purchase</button></div></form></details>`;
+}
+function readPurchase(form){
+  const out={};form.querySelectorAll("[data-buy]").forEach(el=>{const k=el.dataset.buy;out[k]=k==="market"||k==="closing_month"?el.value:el.value===""?null:Number(el.value)});
+  if(out.rate!==null)out.rate=out.rate/100;
+  out.hpi_at_closing=marketNow(out.market).hpi;out.statements=[];out.extra_payments=[];out.appraisals=[];
+  return out;
 }
 
 /* ---------------- a plan that keeps going ---------------- */
@@ -456,7 +507,7 @@ function render(){
   if(!S.plan){view.innerHTML=`${crumbs("Household plan \u00b7 not set up yet")}${message()}<section class="rpg-stone rpg-guild-hero"><div><div class="rpg-parch-kicker">The Homestead</div><p class="rpg-guild-counsel">Bring your Income &amp; Net Worth Tracker into the UIP once. After that the plan lives here: edit any month, enter real balances as months pass, and see the range of where the plan lands and what it means for the house.</p></div></section>${importPanel()}`;return}
   const v=S.doc.version,p=S.proj;
   const note=`Plan saved ${v?new Date(v.recorded_at).toLocaleDateString("en-US",{month:"short",day:"numeric",year:"numeric"}):"\u2014"} \u00b7 ${monthLabel(S.plan.months[0].month)} to ${monthLabel(S.plan.months[S.plan.months.length-1].month)}${S.tried?" \u00b7 showing unsaved settings":""}`;
-  view.innerHTML=`${crumbs(note)}${message()}${netWorth()}${emergency()}${goalsSection()}${p?goal(p)+fan(p)+targetTiles(p)+capacity(p)+ratesSection(p)+housingSection():`<p class="rpg-parch-note">Working out the ranges\u2026</p>`}${retirementSection()}${purse()}${ledger()}${settingsForm()}${importPanel()}${p?assumptions(p):""}`;
+  view.innerHTML=`${crumbs(note)}${message()}${netWorth()}${emergency()}${goalsSection()}${owned()?ownerSection()+housingSection():p?goal(p)+fan(p)+targetTiles(p)+capacity(p)+ratesSection(p)+housingSection()+purchaseForm():`<p class="rpg-parch-note">Working out the ranges\u2026</p>`}${retirementSection()}${purse()}${ledger()}${settingsForm()}${importPanel()}${p?assumptions(p):""}`;
 }
 function setMsg(kind,text){S.msg=text?[kind,text]:null}
 async function savePlan(plan,okText){
@@ -469,6 +520,12 @@ function bind(view){
     if(t.dataset.homeMonth){S.pick=t.dataset.homeMonth===S.pick?null:t.dataset.homeMonth;const slot=byId("rpg-home-editor");if(slot){slot.innerHTML=editor();view.querySelectorAll("[data-home-month]").forEach(b=>{const on=b.dataset.homeMonth===S.pick;b.setAttribute("aria-pressed",String(on));b.closest("tr")?.classList.toggle("is-picked",on)});slot.querySelector("input")?.focus()}return}
     if(t.dataset.homeChart){S.chart=t.dataset.homeChart;render();return}
     if(t.hasAttribute("data-home-export")){downloadData();return}
+    if(t.hasAttribute("data-home-buy-try")||t.hasAttribute("data-home-buy-save")){const h=readPurchase(t.closest("form"));if(!(h.price>0)||!h.closing_month||h.loan_amount===null||h.rate===null){setMsg("bad","Enter at least the price, closing month, loan amount and rate.");render();return}
+      if(t.hasAttribute("data-home-buy-try")){S.homeTried=h;S.homeDoc=null;setMsg(null);render();refreshHome(true);return}
+      const plan=clone(S.plan);plan.settings={...plan.settings,home:h};S.homeTried=null;S.homeDoc=null;savePlan(plan,"The purchase is recorded. The Homestead is in owner mode.");return}
+    if(t.hasAttribute("data-home-own-save")){const plan=clone(S.plan);plan.settings={...plan.settings,home:S.homeTried};S.homeTried=null;S.homeDoc=null;savePlan(plan,"The purchase is recorded. The Homestead is in owner mode.");return}
+    if(t.hasAttribute("data-home-own-cancel")){S.homeTried=null;S.homeDoc=null;setMsg(null);render();refreshHome(true);return}
+    if(t.hasAttribute("data-home-own-undo")){const plan=clone(S.plan);plan.settings={...plan.settings,home:null};S.homeDoc=null;savePlan(plan,"The purchase record is removed. The Homestead is back on the road to the house.");return}
     if(t.dataset.goalDone||t.dataset.goalRemove){const id=t.dataset.goalDone||t.dataset.goalRemove;const plan=clone(S.plan);const list=plan.settings.goals||[];const g=list.find(x=>x.id===id);if(!g)return;
       if(t.dataset.goalRemove){plan.settings.goals=list.filter(x=>x.id!==id);savePlan(plan,`Removed ${g.name}.`)}
       else{Object.assign(g,{status:"done",done_month:nowMonth(),done_amount:g.amount});savePlan(plan,`${g.name} marked done. It stays in the list with its date and amount.`)}
@@ -494,6 +551,17 @@ function bind(view){
   view.addEventListener("submit",async event=>{
     const form=event.target;event.preventDefault();
     if(form.dataset.homeEditor){applyEdit(form,false);return}
+    if(form.hasAttribute("data-home-own-add")){
+      const kind=form.querySelector('[data-own="kind"]').value,month=form.querySelector('[data-own="month"]').value,amount=Number(form.querySelector('[data-own="amount"]').value);
+      if(!/^\d{4}-\d{2}$/.test(month)||!(amount>0)){setMsg("bad","Enter a month and an amount.");render();return}
+      const plan=clone(S.plan),h=plan.settings.home;
+      const item=kind==="statements"?{month,balance:amount}:kind==="extra_payments"?{month,amount}:{month,value:amount,hpi:marketNow(h.market).hpi};
+      h[kind]=[...(h[kind]||[]).filter(x=>kind==="extra_payments"||x.month!==month),item];
+      savePlan(plan,{statements:"Statement balance saved; the loan follows it from that month.",extra_payments:"Extra principal saved.",appraisals:"Appraisal saved; the home's value starts from it."}[kind]);return}
+    if(form.hasAttribute("data-home-own-costs")){
+      const plan=clone(S.plan),h=plan.settings.home;
+      for(const k of ["pmi_monthly","escrow_monthly","hoa_monthly"]){const v=form.querySelector(`[data-own="${k}"]`).value;h[k]=v===""?0:Number(v)}
+      savePlan(plan,"Monthly costs updated.");return}
     if(form.hasAttribute("data-goal-add")){
       const v=k=>form.querySelector(`[data-goal="${k}"]`)?.value||"";
       const name=v("name").trim(),amount=Number(v("amount")),month=v("month");

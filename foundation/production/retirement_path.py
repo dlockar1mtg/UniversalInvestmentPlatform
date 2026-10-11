@@ -60,7 +60,7 @@ def _loan_balance(loan: float, rate: float, years: int, months_paid: int) -> flo
 class _Inputs:
     """Everything one simulation needs, worked out once from the plan and the live figures."""
 
-    def __init__(self, plan, as_of_month, holdings, retirement_start, retirement_monthly, a):
+    def __init__(self, plan, as_of_month, holdings, retirement_start, retirement_monthly, a, home_value=None):
         s, r = plan["settings"], plan["settings"]["retirement"]
         self.r = r
         rows = roll_forward(plan)
@@ -81,7 +81,11 @@ class _Inputs:
         # the house: what the bank and house fund cannot cover comes out of investments in the target month
         self.house_k, self.house_draw, self.house = None, 0.0, None
         target = s["target_month"]
-        if target in by_month and _index(target) > self.start:
+        self.owned = s.get("home")                  # owner mode: the house is bought, nothing more comes out for it
+        self.owned_value = None
+        if self.owned:
+            self.owned_value = float(home_value) if home_value else self.owned["price"]
+        elif target in by_month and _index(target) > self.start:
             t = by_month[target]
             years = (_index(target) - self.start) / 12
             price = (s["home_price_low"] + s["home_price_high"]) / 2 * (1 + s["home_price_growth"]) ** years
@@ -125,6 +129,10 @@ class _Inputs:
         self.ss = (r["social_security_monthly"] or 0.0, r["social_security_age"])
 
     def home_proceeds(self, retire_k: int) -> float:
+        if self.owned:
+            from .home_owner import balance_at
+            owed = balance_at(self.owned, _month(self.start + retire_k))
+            return max(0.0, self.owned_value * (1 - SELL_HOME_COST) - owed)
         if self.house_k is None or retire_k <= self.house_k:
             return 0.0
         rate, years = self.mortgage
@@ -271,13 +279,13 @@ def match_check(jobs: list[dict], deposits: dict | None, rules: dict) -> dict:
 
 def retirement_path(plan: dict, *, as_of_month: str, holdings: dict | None = None, retirement_start: float = 0.0,
                     retirement_monthly: float = 0.0, deposits: dict | None = None, assumptions: dict | None = None,
-                    rules: dict | None = None) -> dict:
+                    rules: dict | None = None, home_value: float | None = None) -> dict:
     r = plan["settings"].get("retirement")
     if not r:
         return {"configured": False}
     a = assumptions or load_assumptions()
     rules = rules or load_rules()
-    x = _Inputs(plan, as_of_month, holdings, retirement_start, retirement_monthly, a)
+    x = _Inputs(plan, as_of_month, holdings, retirement_start, retirement_monthly, a, home_value)
     target_age = r["retire_age"]
     sell = r["sell_home_at_retirement"]
     main = _simulate(x, target_age, x.spending, sell_home=sell, record=True)
@@ -297,8 +305,8 @@ def retirement_path(plan: dict, *, as_of_month: str, holdings: dict | None = Non
     goals_out = [{"id": g["id"], "name": g["name"], "month": g["month"], "amount": g["amount"],
                   "chance": main["goal_chance"].get(g["id"])} for _, g in x.goals]
     other_sell = None
-    if x.house is not None:
-        alt = _simulate(x, target_age, x.spending, sell_home=not sell, paths=800)
+    if x.house is not None or x.owned:
+        alt = _simulate(x, target_age, x.spending, sell_home=not sell)   # same markets as the main run
         other_sell = {"sell_home": not sell, "chance": alt["chance"], "home_proceeds": round(x.home_proceeds(int(round((target_age - x.age_now) * 12))), 2)}
     retire_month = _month(x.start + int(round((target_age - x.age_now) * 12)))
     access_month = _month(x.start + int(round((59.5 - x.age_now) * 12)))

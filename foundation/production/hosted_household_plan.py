@@ -5,6 +5,7 @@ POST /v1/household-plan                    save a new version (operator)
 POST /v1/household-plan/import             preview a workbook import (operator; saves nothing)
 POST /v1/household-plan/projection         the house ranges, with live holdings
 POST /v1/household-plan/retirement-path    the early-retirement path, with live holdings and retirement statements
+POST /v1/household-plan/home               owner mode: value, loan, equity, PMI, refinance and payment checks
 """
 from __future__ import annotations
 
@@ -18,6 +19,7 @@ from starlette.concurrency import run_in_threadpool
 from .household_plan import HouseholdPlanError, create_version, import_workbook, normalize_plan, roll_forward
 from .household_projection import project
 from .retirement_path import retirement_path
+from .home_owner import home_status
 from .observability import OperationalEvent
 from .security import APIKeyAuthenticator, Permission
 
@@ -145,9 +147,46 @@ def install_household_plan_routes(app, settings, repository):
         try:
             start = float(body.get("retirement_start") or 0)
             monthly = float(body.get("retirement_monthly") or 0)
+            home_value = float(body["home_value"]) if body.get("home_value") else None
             result = await run_in_threadpool(          # a few seconds of simulation; keep the server answering
                 lambda: retirement_path(plan, as_of_month=month, holdings=holdings, retirement_start=start,
-                                        retirement_monthly=monthly, deposits=deposits))
+                                        retirement_monthly=monthly, deposits=deposits, home_value=home_value))
         except (TypeError, ValueError) as exc:
             return invalid(exc)
         return {"available": True, "version": current.summary(), **result}
+
+    @app.post("/v1/household-plan/home")
+    async def owned_home(request: Request, x_api_key: str | None = Header(default=None)):
+        _, denied = authorize(x_api_key, Permission.RUN_READ)
+        if denied:
+            return denied
+        current = repository.current()
+        if current is None:
+            return {"available": False}
+        try:
+            body = await request.json()
+        except Exception:  # noqa: BLE001
+            body = {}
+        body = body if isinstance(body, dict) else {}
+        plan = current.plan
+        if isinstance(body.get("home"), dict):                # preview a purchase without saving it
+            try:
+                plan = normalize_plan({**plan, "settings": {**plan["settings"], "home": body["home"]}})
+            except HouseholdPlanError as exc:
+                return invalid(exc)
+        home = plan["settings"].get("home")
+        if not home:
+            return {"available": True, "owned": False}
+        month = str(body.get("as_of_month") or datetime.now(timezone.utc).strftime("%Y-%m"))
+        r = plan["settings"].get("retirement")
+        keep_until = None
+        if r and r.get("sell_home_at_retirement"):
+            k = int(r["age_as_of"][:4]) * 12 + int(r["age_as_of"][5:7]) - 1 + (r["retire_age"] - r["age"]) * 12
+            keep_until = f"{k // 12}-{k % 12 + 1:02d}"
+        try:
+            hpi = float(body["hpi_now"]) if body.get("hpi_now") else None
+            rate = float(body["rate_now"]) if body.get("rate_now") else None
+            status = home_status(home, as_of_month=max(month, home["closing_month"]), hpi_now=hpi, rate_now=rate, keep_until=keep_until)
+        except (TypeError, ValueError) as exc:
+            return invalid(exc)
+        return {"available": True, "owned": True, "preview": isinstance(body.get("home"), dict), "home": home, **status}
