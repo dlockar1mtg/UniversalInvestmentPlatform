@@ -1,0 +1,18 @@
+{
+  "rules_id": "us-retirement-limits-2026",
+  "year": 2026,
+  "status": "IRS_PUBLISHED_LIMITS",
+  "employee_deferral_limit": 24500,
+  "employee_deferral_note": "One limit per person across every employer's 401(k) or 403(b); employer match does not count toward it.",
+  "catch_up_50_plus": 8000,
+  "ira_limit": 7500,
+  "roth_ira_phaseout_single": [153000, 168000],
+  "hsa_limit_self_only": 4400,
+  "hsa_limit_family": 8750,
+  "penalty_free_access_age": 59.5,
+  "early_withdrawal_penalty": 0.10,
+  "sources": [
+    "https://www.accountingtoday.com/news/irs-ups-limits-for-401k-and-ira-contributions-in-2026",
+    "https://www.cpapracticeadvisor.com/2025/05/01/irs-raises-hsa-contribution-limits-for-2026/160064/"
+  ]
+}
