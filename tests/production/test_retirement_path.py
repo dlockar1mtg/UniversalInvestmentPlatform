@@ -114,3 +114,14 @@ def test_homestead_shows_the_retirement_path():
     assert "${retirementSection()}${purse()}" in page and "data-ret-keep" in page
     assert "Reaching the money before 59" in page
     assert page.isascii() and "style=" not in page
+
+
+def test_goals_cost_retirement_something_and_report_their_chance():
+    goals = [{"name": "Car", "amount": 30000, "month": "2034-05"}]
+    base = retirement_path(plan(RET), as_of_month="2026-10", holdings={"etf": 9000})
+    p = plan(RET)
+    p["settings"]["goals"] = normalize_plan({**p, "settings": {**p["settings"], "goals": goals}})["settings"]["goals"]
+    out = retirement_path(p, as_of_month="2026-10", holdings={"etf": 9000})
+    assert base["goals"] == [] and base["chance_without_goals"] is None
+    assert out["goals"][0]["id"] == "car" and 0 <= out["goals"][0]["chance"] <= 1
+    assert out["chance"] <= out["chance_without_goals"]             # the same markets with and without the goal
