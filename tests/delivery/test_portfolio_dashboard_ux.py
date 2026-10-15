@@ -177,3 +177,14 @@ def test_dashboard_layout_is_responsive_scroll_safe_and_print_safe():
     assert ".portfolio-layout{grid-template-columns:1fr}" in css
     assert ".transaction-form{grid-template-columns:1fr}" in css
     assert "@media print" in css and "table{min-width:0}" in css
+
+
+def test_retirement_balances_can_be_updated_in_one_place():
+    _, css, javascript = assets()
+    assert 'id="retirement-quick-form"' in javascript and "Update balances" in javascript
+    assert "data-quick-account=" in javascript and 'id="retirement-quick-as-of"' in javascript
+    # each new balance is a statement for today; the paychecks since the last one join the contributed total
+    assert 'notes:"Balance update"' in javascript
+    assert "const basis=i.basis_known?(Number(i.contributed_basis)+deposited).toFixed(2):null" in javascript
+    assert ".retirement-quick{" in css
+    assert "style=" not in javascript.split('id="retirement-quick-form"', 1)[1].split("</form>", 1)[0]
