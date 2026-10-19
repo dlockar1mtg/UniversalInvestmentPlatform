@@ -28,6 +28,13 @@ def portfolio_validate(job):
     report = preview_portfolio_csv(Path(str(job.payload.get("path", os.getenv("UIIP_PORTFOLIO_CSV", "portfolio_holdings.csv")))))
     if not report.valid: raise ValueError(f"portfolio validation failed with {len(report.errors)} error(s)")
 
+def mtg_singles_prices(job):
+    """Price every MTG single held at today's Scryfall (TCGplayer market) price. Logs counts only."""
+    from foundation.production.mtg_singles import SinglesRepository, refresh_prices
+    repo = SinglesRepository.from_dsn(os.environ["UIIP_DATABASE_URL"]); repo.initialize()
+    print(json.dumps({"mtg_singles_prices": refresh_prices(repo)}))   # no card names in the public log
+
+
 def net_worth_snapshot(job):
     """Keep this month's net-worth row current, so the history has every month even when the dashboard is closed."""
     dsn = os.environ["UIIP_DATABASE_URL"]
@@ -38,15 +45,18 @@ def net_worth_snapshot(job):
     from foundation.production.net_worth import NetWorthHistory, capture
     from foundation.production.transaction_persistence import PostgresTransactionRepository
     history = NetWorthHistory.from_dsn(dsn); history.initialize()
+    from foundation.production.mtg_singles import SinglesRepository
+    singles = SinglesRepository.from_dsn(dsn); singles.initialize()
     out = capture(history, transactions=PostgresTransactionRepository.from_dsn(dsn), presentation=PresentationReadRepository.from_dsn(dsn),
                   manual=PostgresManualHoldingRepository.from_dsn(dsn), external=PostgresExternalAccountPerformanceRepository.from_dsn(dsn),
-                  plans=PostgresHouseholdPlanRepository.from_dsn(dsn))
+                  plans=PostgresHouseholdPlanRepository.from_dsn(dsn), singles=singles)
     print(json.dumps({"net_worth_month": out["snapshot"]["month"], "status": out["status"], "seeded_months": out["seeded_months"],
                       "missing": out["snapshot"]["missing"]}))   # amounts stay out of the public log
 
 handlers.register("provider_check", provider_check)
 handlers.register("portfolio_validate", portfolio_validate)
 handlers.register("net_worth_snapshot", net_worth_snapshot)
+handlers.register("mtg_singles_prices", mtg_singles_prices)
 worker = HostedWorker(repository, handlers, WorkerSettings.from_environment())
 result = run_scheduled_cycle(repository, schedules, worker, maximum_jobs=int(os.getenv("UIIP_ONE_SHOT_MAX_JOBS", "20")))
 print(json.dumps(result.document(), sort_keys=True))

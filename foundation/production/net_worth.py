@@ -5,7 +5,7 @@ count here, in net worth, which the Homestead shows. Debts and home equity join 
 
 compute_net_worth() reads the same sources the dashboard reads:
   investments  certified holdings (transaction ledger x active presentation prices), manual ETF holdings at the
-               Merchants' Guild close, and the latest Acorns snapshot
+               Merchants' Guild close, the latest Acorns snapshot, and MTG singles at today's Scryfall price
   retirement   each retirement account's latest statement plus paycheck deposits since (no market move assumed)
   bank         the household plan's bank balance for this month (a check-in when there is one, else rolled forward)
   house fund   the plan's house-fund balance for this month
@@ -29,13 +29,13 @@ def _money(value) -> str:
     return str(Decimal(str(value)).quantize(Decimal("0.01")))
 
 
-def _investments(transactions, presentation, manual, external) -> dict:
+def _investments(transactions, presentation, manual, external, singles=None) -> dict:
     from .hosted_manual_holdings import mark_to_market
     from .portfolio_accounting import derive_portfolio
     from .portfolio_enrichment import enrich_portfolio
 
     out: dict = {"certified": None, "certified_basis": None, "manual_etfs": None, "manual_basis": None,
-                 "acorns": None, "acorns_basis": None, "notes": []}
+                 "acorns": None, "acorns_basis": None, "mtg_singles": None, "mtg_singles_basis": None, "notes": []}
     if transactions is not None and presentation is not None:
         try:
             enriched = enrich_portfolio(derive_portfolio(transactions.list(limit=500, offset=0)), presentation).document()
@@ -57,7 +57,12 @@ def _investments(transactions, presentation, manual, external) -> dict:
         if acorns:
             out["acorns"] = _money(acorns[0].current_value)
             out["acorns_basis"] = _money(acorns[0].contributed_basis) if acorns[0].basis_known else None
-    parts = [out[k] for k in ("certified", "manual_etfs", "acorns") if out[k] is not None]
+    if singles is not None:
+        from .mtg_singles import summary as singles_summary
+        doc = singles_summary(singles.lots(), singles.prices())
+        if doc["card_count"]:
+            out["mtg_singles"], out["mtg_singles_basis"] = doc["value"], doc["basis_for_totals"]
+    parts = [out[k] for k in ("certified", "manual_etfs", "acorns", "mtg_singles") if out[k] is not None]
     out["total"] = _money(sum((Decimal(p) for p in parts), Decimal(0)))
     return out
 
@@ -122,10 +127,10 @@ def _owned_home(plans, presentation, month: str) -> dict | None:
 
 
 def compute_net_worth(*, today: date | None = None, transactions=None, presentation=None, manual=None,
-                      external=None, plans=None) -> dict:
+                      external=None, plans=None, singles=None) -> dict:
     today = today or datetime.now(timezone.utc).date()
     month = today.strftime("%Y-%m")
-    investments = _investments(transactions, presentation, manual, external)
+    investments = _investments(transactions, presentation, manual, external, singles)
     retirement = _retirement(external, today)
     plan = _plan_month(plans, month)
     home = _owned_home(plans, presentation, month)

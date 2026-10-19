@@ -113,6 +113,10 @@ def create_http_app(settings: HTTPServiceSettings, repository=None, dashboard_se
     def homestead_js():
         return FileResponse(assets / "homestead.js", media_type="text/javascript")
 
+    @app.get("/dashboard/assets/mtg_singles.js", include_in_schema=False)
+    def mtg_singles_js():
+        return FileResponse(assets / "mtg_singles.js", media_type="text/javascript")
+
     @app.get("/dashboard/assets/watchtower.js", include_in_schema=False)
     def watchtower_js():
         return FileResponse(assets / "watchtower.js", media_type="text/javascript")
