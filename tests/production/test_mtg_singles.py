@@ -108,7 +108,7 @@ def test_collection_summary_decks_and_honest_gain(tmp_path):
     r = repo(tmp_path)
     cards, _ = parse_text(TEXT)
     r.save(new_lots(cards, "Atraxa", now=NOW))
-    assert refresh_prices(r, fetch=fake_fetch, now=NOW) == {"printings": 6, "priced": 5, "not_found": 0}
+    assert refresh_prices(r, fetch=fake_fetch, now=NOW) == {"printings": 6, "priced": 5, "other_finish": 0, "not_found": 0}
     doc = summary(r.lots(), r.prices())
     # 55 + 30 + 2 x 1.50 + 0.80 + 0.90 = 89.70; the serialized card has no price
     assert doc["value"] == "89.70" and doc["card_count"] == 7 and doc["unpriced_cards"] == 1
@@ -347,3 +347,21 @@ def test_import_route_match_mode(tmp_path):
     assert c.post("/v1/mtg-singles/import", headers=h, json={"deck": "Atraxa", "text": full, "mode": "merge"}).status_code == 422
     page = (ROOT / "foundation/production/dashboard_assets/mtg_singles.js").read_text()
     assert 'value="match" data-si="mode"' in page and "cut_to:" in page
+
+
+def test_a_finish_with_no_price_uses_the_other_finish_labelled():
+    # Scryfall lists SLD 2028 Consecrated Sphinx as nonfoil/foil but only prices the nonfoil.
+    def fetch(ids):
+        return {"data": [{"id": "cs", "name": "Consecrated Sphinx", "set": "sld", "collector_number": "2028",
+                          "prices": {"usd": "33.02", "usd_foil": None}}], "not_found": []}
+    card = {"name": "Consecrated Sphinx", "set_code": "sld", "collector_number": "2028", "finish": "foil", "quantity": 1}
+    prices = lookup_prices([card], fetch=fetch, now=NOW)
+    p = prices[price_key(card)]
+    assert p["usd"] is None and p["usd_other_finish"] == 33.02 and p["other_finish"] == "nonfoil"
+    lot = new_lots([card], "Esika", now=NOW)[0]
+    doc = summary([lot], prices)
+    row = doc["lots"][0]
+    assert row["value"] == "33.02" and row["value_source"] == "SCRYFALL_OTHER_FINISH" and row["price_finish"] == "nonfoil"
+    assert doc["unpriced_cards"] == 0
+    lot.manual_value = Decimal("45")
+    assert summary([lot], prices)["lots"][0]["value_source"] == "MANUAL"     # your own value still wins

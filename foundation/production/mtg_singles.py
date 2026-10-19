@@ -199,8 +199,15 @@ def lookup_prices(cards: list[dict], *, fetch=scryfall_fetch, now: datetime | No
             image = (card.get("image_uris") or {}).get("small") or (((card.get("card_faces") or [{}])[0].get("image_uris") or {}).get("small"))
             for key in keys:
                 finish = wanted[key]["finish"]
-                usd = prices.get({"nonfoil": "usd", "foil": "usd_foil", "etched": "usd_etched"}[finish])
+                field = {"nonfoil": "usd", "foil": "usd_foil", "etched": "usd_etched"}
+                usd = prices.get(field[finish])
+                # Scryfall sometimes lists only one finish's price for a printing that comes in both (some
+                # Secret Lair drops): keep that price as a stand-in, labelled, rather than no value at all.
+                other = next(((f, prices[field[f]]) for f in ("nonfoil", "foil", "etched")
+                              if f != finish and prices.get(field[f]) not in (None, "")), (None, None))
                 out[key] = {"key": key, "scryfall_id": card.get("id"), "name": card.get("name"),
+                            "usd_other_finish": float(other[1]) if usd in (None, "") and other[1] else None,
+                            "other_finish": other[0] if usd in (None, "") and other[1] else None,
                             "set_code": card.get("set"), "set_name": card.get("set_name"),
                             "collector_number": card.get("collector_number"), "finish": finish,
                             "usd": float(usd) if usd not in (None, "") else None, "image": image,
@@ -352,8 +359,10 @@ def new_lots(cards: list[dict], deck: str, now: datetime | None = None) -> list[
 
 def lot_document(lot: Lot, prices: dict[str, dict]) -> dict:
     price = prices.get(lot.key)
+    market = price.get("usd") if price else None
+    stand_in = price.get("usd_other_finish") if price and market is None else None
     unit = lot.manual_value if lot.manual_value is not None else (
-        Decimal(str(price["usd"])) if price and price.get("usd") is not None else None)
+        Decimal(str(market)) if market is not None else Decimal(str(stand_in)) if stand_in is not None else None)
     worth = None if unit is None else unit * lot.quantity
     paid = None if lot.price_paid is None else lot.price_paid * lot.quantity
     return {"lot_id": lot.lot_id, "deck": lot.deck, "name": (price or {}).get("name") or lot.name,
@@ -361,7 +370,10 @@ def lot_document(lot: Lot, prices: dict[str, dict]) -> dict:
             "collector_number": lot.collector_number or (price or {}).get("collector_number"), "finish": lot.finish,
             "quantity": lot.quantity, "exact_printing": bool(lot.set_code and lot.collector_number),
             "unit_value": _money(unit),
-            "value_source": "MANUAL" if lot.manual_value is not None else ("SCRYFALL_TCGPLAYER_MARKET" if unit is not None else "UNPRICED"),
+            "value_source": "MANUAL" if lot.manual_value is not None else (
+                "SCRYFALL_TCGPLAYER_MARKET" if market is not None else
+                "SCRYFALL_OTHER_FINISH" if stand_in is not None else "UNPRICED"),
+            "price_finish": (price or {}).get("other_finish") if stand_in is not None and lot.manual_value is None else lot.finish,
             "value": _money(worth), "price_paid": _money(lot.price_paid), "paid": _money(paid),
             "paid_estimated": lot.paid_estimated,
             "gain": None if worth is None or paid is None else _money(worth - paid),
@@ -416,7 +428,9 @@ def refresh_prices(repo: SinglesRepository, *, fetch=scryfall_fetch, now=None) -
     found = lookup_prices(cards, fetch=fetch, now=now) if cards else {}
     repo.save_prices(found)
     keys = {price_key(c) for c in cards}
-    return {"printings": len(keys), "priced": sum(1 for k in keys if (found.get(k) or {}).get("usd") is not None),
+    return {"printings": len(keys),
+            "priced": sum(1 for k in keys if (found.get(k) or {}).get("usd") is not None),
+            "other_finish": sum(1 for k in keys if (found.get(k) or {}).get("usd") is None and (found.get(k) or {}).get("usd_other_finish") is not None),
             "not_found": len(keys - set(found))}
 
 
