@@ -311,6 +311,17 @@ function extendPlan(plan,through){
   while(m<through){m=addMonths(m,1);added.push({month:m,income:{...last.income},expenses:{...last.expenses},investment_contribution:last.investment_contribution,house_fund_contribution:last.house_fund_contribution,retirement_contribution:last.retirement_contribution,bank_balance:null,retirement_balance:null,investment_balance:null,house_fund_balance:null,home_equity:null,note:`Copied from ${monthLabel(last.month)}; edit to fit.`,bank_check:null})}
   plan.months.push(...added);return added.length;
 }
+/* The ledger is the plan; this month can take today's real investment and retirement figures as its actuals. */
+function liveNote(){
+  const c=S.nw?.current,month=nowMonth(),m=S.plan?.months.find(x=>x.month===month);
+  if(!c||!m)return "";
+  const inv=num(c.components?.investments),ret=num(c.components?.retirement);
+  const row=roll(S.plan).find(r=>r.month===month)||{};
+  const off=(a,b)=>a!==null&&Math.abs(a-(num(b)||0))>=1;
+  if(!off(inv,row.investment_balance)&&!off(ret,row.retirement_balance))return "";
+  const parts=[inv!==null?`investments ${money(inv)} (the plan has ${money(row.investment_balance)})`:"",ret!==null?`retirement ${money(ret)} (the plan has ${money(row.retirement_balance)})`:""].filter(Boolean).join(" and ");
+  return `<div class="rpg-home-dirty rpg-home-horizon" role="status"><span>${esc(`Today you have ${parts}. The ledger is your plan, so it moves only when you enter actuals: use today's figures for ${monthLabel(month)} and every later month rolls forward from them.`)}</span><button type="button" class="rpg-btn rpg-action" data-home-use-live="${esc(month)}">Use today's figures</button></div>`;
+}
 function horizonNote(){
   const end=S.plan.months[S.plan.months.length-1].month,want=addMonths(nowMonth(),HORIZON);
   if(end>=want)return "";
@@ -377,7 +388,7 @@ function capacity(p){
 function ledger(){
   const rows=roll(S.plan),now=nowMonth();
   const body=rows.map(r=>`<tr class="${r.month===S.pick?"is-picked":""}${r.month===now?" is-now":""}"><th scope="row"><button type="button" class="rpg-btn rpg-fund-pick" data-home-month="${esc(r.month)}" aria-pressed="${r.month===S.pick}"><strong>${esc(monthLabel(r.month))}</strong><span>${r.checked?`bank checked ${esc(dayText(r.checked))}`:r.anchored.length?"actuals entered":r.month<now?"plan only":r.month===now?"this month":""}</span></button></th><td class="num">${money(r.income)}</td><td class="num">${money(r.expenses)}</td><td class="num">${money(r.net)}</td><td class="num">${money(S.plan.months.find(m=>m.month===r.month).investment_contribution)}</td><td class="num${r.anchored.includes("bank_balance")?" rpg-home-actual":r.checked?" rpg-home-checked":""}"${r.checked?` title="Projected from your ${esc(dayText(r.checked))} bank balance"`:""}>${money(r.bank_balance)}</td><td class="num${r.anchored.includes("retirement_balance")?" rpg-home-actual":""}">${money(r.retirement_balance)}</td><td class="num${r.anchored.includes("investment_balance")?" rpg-home-actual":""}">${money(r.investment_balance)}</td><td class="num"><strong>${money(r.net_worth)}</strong></td></tr>`).join("");
-  return `<section class="rpg-stone rpg-guild-ledger" aria-labelledby="rpg-home-led-h"><div class="rpg-section-head"><h2 id="rpg-home-led-h" class="rpg-stone-title">The ledger of months</h2><span class="rpg-crumb-note">Pick a month to edit it. Gold figures are actuals you entered; the rest roll forward from them.</span></div>${horizonNote()}${S.dirty?`<div class="rpg-home-dirty" role="status"><span>Unsaved changes to the plan.</span><button type="button" class="rpg-btn rpg-action" data-home-save>Save the plan</button><button type="button" class="rpg-btn rpg-link" data-home-discard>Discard</button></div>`:""}<div class="rpg-table-wrap"><table class="rpg-table rpg-guild-table rpg-home-ledger"><thead><tr><th>Month</th><th class="num">Income</th><th class="num">Bills</th><th class="num">Net</th><th class="num">Invested</th><th class="num">Bank</th><th class="num">Retirement</th><th class="num">Investments</th><th class="num">Net worth</th></tr></thead><tbody>${body}</tbody></table></div><div id="rpg-home-editor">${editor()}</div></section>`;
+  return `<section class="rpg-stone rpg-guild-ledger" aria-labelledby="rpg-home-led-h"><div class="rpg-section-head"><h2 id="rpg-home-led-h" class="rpg-stone-title">The ledger of months</h2><span class="rpg-crumb-note">Pick a month to edit it. Gold figures are actuals you entered; the rest roll forward from them.</span></div>${liveNote()}${horizonNote()}${S.dirty?`<div class="rpg-home-dirty" role="status"><span>Unsaved changes to the plan.</span><button type="button" class="rpg-btn rpg-action" data-home-save>Save the plan</button><button type="button" class="rpg-btn rpg-link" data-home-discard>Discard</button></div>`:""}<div class="rpg-table-wrap"><table class="rpg-table rpg-guild-table rpg-home-ledger"><thead><tr><th>Month</th><th class="num">Income</th><th class="num">Bills</th><th class="num">Net</th><th class="num">Invested</th><th class="num">Bank</th><th class="num">Retirement</th><th class="num">Investments</th><th class="num">Net worth</th></tr></thead><tbody>${body}</tbody></table></div><div id="rpg-home-editor">${editor()}</div></section>`;
 }
 
 const today=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,"0")}-${String(d.getDate()).padStart(2,"0")}`};
@@ -522,6 +533,10 @@ function bind(view){
     if(t.dataset.homeMonth){S.pick=t.dataset.homeMonth===S.pick?null:t.dataset.homeMonth;const slot=byId("rpg-home-editor");if(slot){slot.innerHTML=editor();view.querySelectorAll("[data-home-month]").forEach(b=>{const on=b.dataset.homeMonth===S.pick;b.setAttribute("aria-pressed",String(on));b.closest("tr")?.classList.toggle("is-picked",on)});slot.querySelector("input")?.focus()}return}
     if(t.dataset.homeChart){S.chart=t.dataset.homeChart;render();return}
     if(t.hasAttribute("data-home-export")){downloadData();return}
+    if(t.dataset.homeUseLive){const c=S.nw?.current;const m=S.plan.months.find(x=>x.month===t.dataset.homeUseLive);if(!c||!m)return;
+      const inv=num(c.components?.investments),ret=num(c.components?.retirement);
+      if(inv!==null)m.investment_balance=Math.round(inv*100)/100;if(ret!==null)m.retirement_balance=Math.round(ret*100)/100;
+      S.dirty=true;setMsg("ok",`${monthLabel(m.month)} now starts from today's investments and retirement (including MTG singles). Save the plan to keep it.`);render();return}
     if(t.hasAttribute("data-home-buy-try")||t.hasAttribute("data-home-buy-save")){const h=readPurchase(t.closest("form"));if(!(h.price>0)||!h.closing_month||h.loan_amount===null||h.rate===null){setMsg("bad","Enter at least the price, closing month, loan amount and rate.");render();return}
       if(t.hasAttribute("data-home-buy-try")){S.homeTried=h;S.homeDoc=null;setMsg(null);render();refreshHome(true);return}
       const plan=clone(S.plan);plan.settings={...plan.settings,home:h};S.homeTried=null;S.homeDoc=null;savePlan(plan,"The purchase is recorded. The Homestead is in owner mode.");return}

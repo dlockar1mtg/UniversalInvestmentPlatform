@@ -94,3 +94,9 @@ def test_homestead_switches_to_owner_mode():
     assert "owned()?ownerSection()+housingSection():" in page and "purchaseForm()" in page
     for hook in ("data-home-buy-try", "data-home-buy-save", "data-home-own-add", "data-home-own-costs", "data-home-own-undo"):
         assert hook in page, hook
+
+
+def test_the_ledger_can_take_todays_real_figures_for_this_month():
+    page = _read("homestead.js")
+    assert "${liveNote()}${horizonNote()}" in page and "data-home-use-live" in page
+    assert "m.investment_balance=Math.round(inv*100)/100" in page and "m.retirement_balance=Math.round(ret*100)/100" in page
