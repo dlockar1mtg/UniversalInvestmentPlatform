@@ -59,6 +59,8 @@ def parse_text(text: str, *, estimated: bool = False) -> tuple[list[dict], list[
     cards, unread, skipping = [], [], False
     for raw in str(text or "").splitlines():
         line = raw.strip()
+        if len(line) >= 2 and line[0] == '"' and line[-1] == '"':
+            line = line[1:-1].replace('""', '"').strip()   # Moxfield's .csv deck export quotes names with commas
         if not line or line.startswith("//") or line.startswith("#"):
             continue
         if not line[0].isdigit():                      # a section header: Commander, Deck, Sideboard, Maybeboard
@@ -416,6 +418,80 @@ def refresh_prices(repo: SinglesRepository, *, fetch=scryfall_fetch, now=None) -
     keys = {price_key(c) for c in cards}
     return {"printings": len(keys), "priced": sum(1 for k in keys if (found.get(k) or {}).get("usd") is not None),
             "not_found": len(keys - set(found))}
+
+
+def sync_deck(repo: SinglesRepository, deck: str, cards: list[dict], *, cut_to: str | None = BINDER,
+              save: bool = True, now: datetime | None = None) -> dict:
+    """Make a deck match a full list (a fresh Moxfield export): add what is new, cut what is gone, keep the rest.
+
+    Matching is by exact printing and finish. Cut cards move to the binder (cut_to=None removes them). A price
+    paid on a list line fills in or replaces the price paid of the cards it matches. Nothing is written unless
+    save is true, so the same call previews the change.
+    """
+    now = now or datetime.now(timezone.utc)
+    deck = (deck or "").strip()[:80] or BINDER
+    want: dict[str, dict] = {}
+    for c in cards:
+        k = price_key(c)
+        if k in want:
+            want[k]["quantity"] += int(c["quantity"])
+            if c.get("price_paid") is not None:
+                want[k].update(price_paid=c["price_paid"], paid_estimated=c.get("paid_estimated"))
+        else:
+            want[k] = {**c, "quantity": int(c["quantity"]), "deck": deck}
+    have: dict[str, list[Lot]] = {}
+    for lot in repo.lots():
+        if lot.deck == deck:
+            have.setdefault(lot.key, []).append(lot)
+    added, cut, kept, repriced, writes = [], [], 0, 0, []
+    for k, c in want.items():
+        lots = have.get(k, [])
+        held = sum(l.quantity for l in lots)
+        if c["quantity"] > held:
+            new = new_lots([{**c, "quantity": c["quantity"] - held}], deck, now=now)
+            added.append({"name": c["name"], "quantity": c["quantity"] - held})
+            writes += new
+        kept += min(held, c["quantity"])
+        if c.get("price_paid") is not None:
+            price = Decimal(str(c["price_paid"])).quantize(Decimal("0.01"))
+            for lot in lots:
+                if lot.price_paid != price or lot.paid_estimated != bool(c.get("paid_estimated")):
+                    lot.price_paid, lot.paid_estimated = price, bool(c.get("paid_estimated"))
+                    writes.append(lot)
+                    repriced += lot.quantity
+        extra = held - c["quantity"]
+        for lot in sorted(lots, key=lambda l: l.added_at, reverse=True):
+            if extra <= 0:
+                break
+            take = min(extra, lot.quantity)
+            cut.append({"name": lot.name, "quantity": take})
+            extra -= take
+            writes += _cut(lot, take, cut_to, now)
+    for k, lots in have.items():
+        if k in want:
+            continue
+        for lot in lots:
+            cut.append({"name": lot.name, "quantity": lot.quantity})
+            writes += _cut(lot, lot.quantity, cut_to, now)
+    if save:
+        repo.save(writes)
+    return {"deck": deck, "added": added, "cut": cut, "kept": kept, "repriced": repriced,
+            "cut_to": cut_to or "removed", "saved": save}
+
+
+def _cut(lot: Lot, quantity: int, cut_to: str | None, now: datetime) -> list[Lot]:
+    """Take some copies of a lot out of its deck: into cut_to (a deck name), or removed when cut_to is None."""
+    out = []
+    if quantity < lot.quantity:
+        rest = Lot(**{**lot.__dict__, "quantity": lot.quantity - quantity})
+        out.append(rest)
+        lot = Lot(**{**lot.__dict__, "lot_id": uuid.uuid4().hex, "quantity": quantity})
+    if cut_to:
+        lot.deck = cut_to[:80]
+    else:
+        lot.status, lot.closed_at = "removed", now.isoformat()
+    out.append(lot)
+    return out
 
 
 def set_prices_paid(repo: SinglesRepository, updates: list[dict]) -> int:

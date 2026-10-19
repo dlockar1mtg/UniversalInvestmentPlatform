@@ -1,8 +1,10 @@
 """Authenticated routes for MTG singles (Commander decks and the binder).
 
 GET  /v1/mtg-singles                   every card held, by deck, valued at today's price; totals
-POST /v1/mtg-singles/import            {deck, text, estimated, save}: read a Moxfield export; save=false previews
-                                       (with prices), save=true adds the cards (operator)
+POST /v1/mtg-singles/import            {deck, text, estimated, save, mode}: read a Moxfield export; save=false previews
+                                       (with prices), save=true writes (operator). mode "add" (an upgrade) adds the
+                                       cards; mode "match" (the whole deck) adds what is new and cuts what is gone,
+                                       to the binder or (cut_to "remove") out of the collection
 POST /v1/mtg-singles/lots/{lot_id}     {action: move|sell|remove|value|paid, ...} (operator)
 POST /v1/mtg-singles/paid              {updates: [{lot_id, price_paid, estimated}]}: many prices paid at once (operator)
 POST /v1/mtg-singles/refresh-prices    price every printing again now (operator); a daily job also does it
@@ -15,7 +17,7 @@ from fastapi.responses import JSONResponse
 from starlette.concurrency import run_in_threadpool
 
 from .mtg_singles import (SinglesError, apply_action, lookup_prices, lot_document, new_lots, parse_any, price_key,
-                          refresh_prices, scryfall_fetch, set_prices_paid, summary)
+                          refresh_prices, scryfall_fetch, set_prices_paid, summary, sync_deck)
 from .security import APIKeyAuthenticator, Permission
 
 MAX_IMPORT_CHARS = 400_000
@@ -88,11 +90,22 @@ def install_mtg_singles_routes(app, settings, repository, fetch=scryfall_fetch) 
                 price_error = f"prices could not be fetched right now ({type(exc).__name__}: {str(exc)[:120]}); the daily refresh will add them"
         prices = {**known, **priced_now}
         preview = [lot_document(lot, prices) for lot in lots]
+        mode = str(body.get("mode") or "add")
+        sync = None
+        if mode == "match":
+            cut_to = None if body.get("cut_to") == "remove" else "Binder"
+            try:
+                sync = sync_deck(repository, str(body.get("deck") or ""), cards, cut_to=cut_to, save=save)
+            except SinglesError as exc:
+                return invalid(exc)
+        elif mode != "add":
+            return invalid("mode must be add or match")
         if save:
             if priced_now:
                 repository.save_prices(priced_now)
-            repository.save(lots)
-        return {"saved": save, "deck": lots[0].deck if lots else None, "cards": preview,
+            if sync is None:
+                repository.save(lots)
+        return {"saved": save, "mode": mode, "sync": sync, "deck": lots[0].deck if lots else None, "cards": preview,
                 "card_count": sum(c["quantity"] for c in preview),
                 "not_found": [c["name"] for c in preview if c["value_source"] == "UNPRICED"],
                 "unread_lines": unread, "price_error": price_error,

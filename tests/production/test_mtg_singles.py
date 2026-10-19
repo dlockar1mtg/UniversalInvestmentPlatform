@@ -288,3 +288,62 @@ def test_many_prices_paid_at_once(tmp_path):
     assert c.post("/v1/mtg-singles/paid", headers={"X-API-Key": "op-key"}, json={"updates": [{"lot_id": "nope"}]}).status_code == 422
     page = (ROOT / "foundation/production/dashboard_assets/mtg_singles.js").read_text()
     assert 'post("/v1/mtg-singles/paid",{updates})' in page and "data-singles-paid-save" in page
+
+
+def test_moxfield_quotes_names_with_commas_and_they_are_read():
+    text = '1 Tuvasa the Sunlit (C18) 47 *F*\n"1 Boseiju, Who Endures (PNEO) 266p"\n"1 Atraxa, Grand Unifier (ONE) 196"\n1 Forbidden Orchard (PLST) CHK-276\n'
+    cards, unread = parse_text(text)
+    assert unread == [] and [c["name"] for c in cards] == ["Tuvasa the Sunlit", "Boseiju, Who Endures", "Atraxa, Grand Unifier", "Forbidden Orchard"]
+    assert (cards[1]["set_code"], cards[1]["collector_number"]) == ("pneo", "266p")
+    assert cards[3]["collector_number"] == "CHK-276"
+    # a file whose first line is quoted is still the text format
+    assert parse_any('"1 Esika, God of the Tree / The Prismatic Bridge (KHM) 168"\n1 Sol Ring (CMM) 410\n')[0][0]["set_code"] == "khm"
+
+
+def test_matching_a_deck_to_a_fresh_export_adds_cuts_and_keeps(tmp_path):
+    from foundation.production.mtg_singles import sync_deck
+    r = repo(tmp_path)
+    r.save(new_lots(parse_text("1 Smothering Tithe (RNA) 22 *F*\n2 Island (UNF) 236 *E*\n1 Wear // Tear (STX) 245")[0], "Atraxa", now=NOW))
+    r.save(new_lots(parse_text("1 Arcane Signet")[0], "Other deck", now=NOW))
+    fresh = parse_text("1 Smothering Tithe (RNA) 22 *F* ~$18.50\n1 Island (UNF) 236 *E*\n1 Sol Ring (C21) 263")[0]
+    preview = sync_deck(r, "Atraxa", fresh, save=False, now=NOW)
+    assert preview["added"] == [{"name": "Sol Ring", "quantity": 1}] and preview["kept"] == 2 and preview["repriced"] == 1
+    assert sorted((c["name"], c["quantity"]) for c in preview["cut"]) == [("Island", 1), ("Wear // Tear", 1)]
+    assert sum(l.quantity for l in r.lots() if l.deck == "Atraxa") == 4          # the preview wrote nothing
+    sync_deck(r, "Atraxa", fresh, now=NOW)
+    atraxa = {(l.name, l.quantity) for l in r.lots() if l.deck == "Atraxa"}
+    assert atraxa == {("Smothering Tithe", 1), ("Island", 1), ("Sol Ring", 1)}
+    assert {(l.name, l.quantity) for l in r.lots() if l.deck == BINDER} == {("Island", 1), ("Wear // Tear", 1)}
+    assert next(l for l in r.lots() if l.name == "Smothering Tithe").paid_estimated
+    assert [l.name for l in r.lots() if l.deck == "Other deck"] == ["Arcane Signet"]   # other decks untouched
+    again = sync_deck(r, "Atraxa", fresh, save=False, now=NOW)
+    assert again["added"] == [] and again["cut"] == [] and again["repriced"] == 0     # running it twice changes nothing
+    sync_deck(r, "Atraxa", parse_text("1 Sol Ring (C21) 263")[0], cut_to=None, now=NOW)
+    assert {l.name for l in r.lots() if l.deck == "Atraxa"} == {"Sol Ring"}
+    assert {l.name for l in r.lots(status=None) if l.status == "removed"} == {"Smothering Tithe", "Island"}
+
+
+def test_import_route_match_mode(tmp_path):
+    pytest.importorskip("fastapi")
+    import sqlite3
+
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+    from foundation.production.hosted_mtg_singles import install_mtg_singles_routes
+
+    r = SinglesRepository(lambda: sqlite3.connect(str(tmp_path / "m.sqlite3"), check_same_thread=False))
+    r.initialize()
+    app = FastAPI()
+    install_mtg_singles_routes(app, SimpleNamespace(credentials={"operator": ("op", ("operator",))}), r, fetch=fake_fetch)
+    c = TestClient(app)
+    h = {"X-API-Key": "op"}
+    first = "1 Smothering Tithe (RNA) 22 *F*\n1 Wear // Tear (STX) 245"
+    c.post("/v1/mtg-singles/import", headers=h, json={"deck": "Atraxa", "text": first, "save": True})
+    full = 'Commander\n"1 Atraxa, Praetors\' Voice (2X2) 190 *F*"\n1 Smothering Tithe (RNA) 22 *F*\n1 Wear // Tear (STX) 245'
+    preview = c.post("/v1/mtg-singles/import", headers=h, json={"deck": "Atraxa", "text": full, "mode": "match"}).json()
+    assert preview["sync"]["added"] == [{"name": "Atraxa, Praetors' Voice", "quantity": 1}] and preview["sync"]["cut"] == []
+    out = c.post("/v1/mtg-singles/import", headers=h, json={"deck": "Atraxa", "text": full, "mode": "match", "save": True}).json()
+    assert out["collection"]["card_count"] == 3                                   # nothing doubled
+    assert c.post("/v1/mtg-singles/import", headers=h, json={"deck": "Atraxa", "text": full, "mode": "merge"}).status_code == 422
+    page = (ROOT / "foundation/production/dashboard_assets/mtg_singles.js").read_text()
+    assert 'value="match" data-si="mode"' in page and "cut_to:" in page

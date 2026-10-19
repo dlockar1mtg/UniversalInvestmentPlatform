@@ -41,13 +41,15 @@ function actionForm(c){
 }
 function importForm(){
   const decks=S.doc?.decks||[];
-  return `<form class="transaction-form singles-import" data-singles-import><label>Deck<select data-si="deck">${deckOptions(S.open||decks[0]?.deck||"__new")}</select></label><label class="singles-newdeck"${decks.length?" hidden":""}>New deck name<input data-si="new_deck" maxlength="80" placeholder="e.g. Atraxa superfriends"></label><label class="wide">Cards (Moxfield export: Export \u203a Text, or a CSV)<textarea data-si="text" rows="8" placeholder="1 Smothering Tithe (RNA) 22 *F* $18.50&#10;1 Sol Ring (C21) 263 ~$2.00&#10;1 Mana Crypt (2XM) 270"></textarea></label><label>Or a file<input type="file" accept=".txt,.csv,text/plain,text/csv" data-si="file"></label><label class="singles-check"><input type="checkbox" data-si="estimated"> Prices paid in this list are estimates</label><p class="wide muted singles-hint">Add a price paid at the end of a line: <code>$18.50</code>, or <code>~$18.50</code> for an estimate. *F* means foil and *E* etched. Lines without a set and number are priced at Scryfall's default printing.</p><div class="wide transaction-actions"><button type="button" class="secondary" data-singles-preview>Preview</button><button type="submit">Add to the deck</button><span class="form-message${S.msg?` ${S.msg[0]==="bad"?"bad":"good"}`:""}" role="status">${S.msg?esc(S.msg[1]):""}</span></div></form>`;
+  return `<form class="transaction-form singles-import" data-singles-import><label>Deck<select data-si="deck">${deckOptions(S.open||decks[0]?.deck||"__new")}</select></label><label class="singles-newdeck"${decks.length?" hidden":""}>New deck name<input data-si="new_deck" maxlength="80" placeholder="e.g. Atraxa superfriends"></label><label class="wide">Cards (Moxfield export: Export \u203a Text, or a CSV)<textarea data-si="text" rows="8" placeholder="1 Smothering Tithe (RNA) 22 *F* $18.50&#10;1 Sol Ring (C21) 263 ~$2.00&#10;1 Mana Crypt (2XM) 270"></textarea></label><label>Or a file<input type="file" accept=".txt,.csv,text/plain,text/csv" data-si="file"></label><fieldset class="wide singles-mode"><legend>This list is</legend><label class="singles-check"><input type="radio" name="singles-mode" value="add" data-si="mode" checked> New cards for the deck (an upgrade): add them</label><label class="singles-check"><input type="radio" name="singles-mode" value="match" data-si="mode"> The whole deck (a fresh Moxfield export): add what is new, take out what is gone</label><label class="singles-check"><input type="checkbox" data-si="cut_remove"> Cards taken out leave the collection (otherwise they go to the binder)</label></fieldset><label class="singles-check"><input type="checkbox" data-si="estimated"> Prices paid in this list are estimates</label><p class="wide muted singles-hint">Add a price paid at the end of a line: <code>$18.50</code>, or <code>~$18.50</code> for an estimate. *F* means foil and *E* etched. Lines without a set and number are priced at Scryfall's default printing.</p><div class="wide transaction-actions"><button type="button" class="secondary" data-singles-preview>Preview</button><button type="submit">Add to the deck</button><span class="form-message${S.msg?` ${S.msg[0]==="bad"?"bad":"good"}`:""}" role="status">${S.msg?esc(S.msg[1]):""}</span></div></form>`;
 }
 function previewBlock(){
   const p=S.preview;if(!p)return "";
   const total=p.cards.reduce((a,c)=>a+(num(c.value)||0),0);
   const warn=[p.not_found?.length?`No market price for: ${p.not_found.slice(0,12).join(", ")}${p.not_found.length>12?"\u2026":""}. You can set your own value after adding them.`:"",p.unread_lines?.length?`Could not read ${p.unread_lines.length} line${p.unread_lines.length===1?"":"s"}: ${p.unread_lines.slice(0,5).join(" | ")}`:"",p.price_error||""].filter(Boolean);
-  return `<div class="singles-preview"><h4>Preview \u00b7 ${esc(p.card_count)} cards for ${esc(p.deck)} \u00b7 worth ${money(total)}</h4>${warn.map(w=>`<p class="governance-note">${esc(w)}</p>`).join("")}${cardsTable(p.cards,{actions:false})}</div>`;
+  const y=p.sync,names=list=>list.slice(0,10).map(x=>`${x.quantity>1?`${x.quantity} `:""}${x.name}`).join(", ")+(list.length>10?"\u2026":"");
+  const sync=y?`<p class="governance-note singles-sync">${esc(`Matching ${y.deck} to this list: ${count(y.added)} to add${y.added.length?` (${names(y.added)})`:""}; ${count(y.cut)} to take out${y.cut.length?` (${names(y.cut)}), ${y.cut_to==="removed"?"leaving the collection":"into the binder"}`:""}; ${y.kept} already there${y.repriced?`; ${y.repriced} get the price paid from the list`:""}.`)}</p>`:"";
+  return `<div class="singles-preview"><h4>Preview \u00b7 ${esc(p.card_count)} cards for ${esc(p.deck)} \u00b7 worth ${money(total)}</h4>${sync}${warn.map(w=>`<p class="governance-note">${esc(w)}</p>`).join("")}${cardsTable(p.cards,{actions:false})}</div>`;
 }
 function render(){
   const page=byId("portfolio");if(!page)return;
@@ -68,10 +70,12 @@ function render(){
 }
 
 /* ---------------- actions ---------------- */
+const count=list=>(list||[]).reduce((a,x)=>a+(x.quantity||0),0);
 function readImport(form){
   const sel=form.querySelector('[data-si="deck"]').value;
   const deck=sel==="__new"?form.querySelector('[data-si="new_deck"]').value.trim():sel;
-  return {deck,text:form.querySelector('[data-si="text"]').value,estimated:form.querySelector('[data-si="estimated"]').checked};
+  const mode=form.querySelector('[data-si="mode"]:checked')?.value||"add";
+  return {deck,text:form.querySelector('[data-si="text"]').value,estimated:form.querySelector('[data-si="estimated"]').checked,mode,cut_to:form.querySelector('[data-si="cut_remove"]').checked?"remove":"binder"};
 }
 async function runImport(form,save){
   const body=readImport(form);
@@ -80,7 +84,7 @@ async function runImport(form,save){
   S.msg=["ok",save?"Adding the cards\u2026":"Pricing the list\u2026"];render();
   try{
     const out=await post("/v1/mtg-singles/import",{...body,save});
-    if(save){S.preview=null;S.open=out.deck;S.msg=["ok",`Added ${out.card_count} cards to ${out.deck}.${out.not_found.length?` ${out.not_found.length} have no market price yet.`:""}`];changed(out.collection)}
+    if(save){S.preview=null;S.open=out.deck;const y=out.sync;S.msg=["ok",y?`${out.deck} now matches the list: ${count(y.added)} added, ${count(y.cut)} taken out${y.cut.length?` (${y.cut_to==="removed"?"left the collection":"moved to the binder"})`:""}, ${y.kept} unchanged.`:`Added ${out.card_count} cards to ${out.deck}.${out.not_found.length?` ${out.not_found.length} have no market price yet.`:""}`];changed(out.collection)}
     else{S.preview=out;S.msg=null;render();const f=byId("portfolio")?.querySelector("[data-singles-import] [data-si=text]");if(f)f.value=body.text}
   }catch(error){S.msg=["bad",error.message];render()}
 }
