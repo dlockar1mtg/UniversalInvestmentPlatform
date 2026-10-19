@@ -156,3 +156,25 @@ def test_homestead_shows_net_worth_history_extends_the_plan_and_downloads_data()
     assert "const HORIZON=36;" in page and "data-home-extend" in page
     assert "${message()}${netWorth()}${emergency()}${goalsSection()}" in page          # net worth leads the page; the Treasury stays investments only
     assert page.isascii() and "style=" not in page
+
+
+def test_this_months_row_follows_a_change_within_six_hours(tmp_path):
+    pytest.importorskip("fastapi")
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+    from foundation.production.hosted_net_worth import install_net_worth_routes
+
+    history = NetWorthHistory.sqlite(tmp_path / "nw.sqlite3")
+    history.initialize()
+    manual = Manual()
+    app = FastAPI()
+    install_net_worth_routes(app, SimpleNamespace(credentials={"viewer": ("v", ("viewer",))}), history, manual=manual)
+    c = TestClient(app)
+    first = c.get("/v1/net-worth", headers={"X-API-Key": "v"}).json()
+    this_month = [m for m in first["months"] if m["month"] == first["current"]["month"]][0]
+    assert this_month["net_worth"] == "95.00"
+    manual.current = lambda: (SimpleNamespace(cost_basis=Decimal("90"), document=lambda: {"symbol": "VOO", "asset_type": "ETF", "shares": "0.2",
+                                                                                        "cost_basis": "90", "current_value": "150", "current_price": "750", "as_of": "2026-10-01"}),)
+    second = c.get("/v1/net-worth", headers={"X-API-Key": "v"}).json()
+    row = [m for m in second["months"] if m["month"] == second["current"]["month"]][0]
+    assert second["current"]["net_worth"] == "150.00" and row["net_worth"] == "150.00"   # not left at 95 for 6 hours
