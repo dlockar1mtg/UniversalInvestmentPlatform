@@ -67,6 +67,7 @@ function load(){
     .catch(error=>{S.loading=false;S.msg=["bad",error.message];render()});
 }
 function loadNetWorth(){
+  S.nwAt=Date.now();
   call("/v1/net-worth").then(doc=>{S.nw=doc;S.nwErr=null;if(S.doc)render()}).catch(error=>{S.nwErr=error.message;if(S.doc)render()});
 }
 function refreshProjection(force){
@@ -91,12 +92,13 @@ function netWorth(){
   const c=S.nw.current,months=S.nw.months||[];
   const shown=PARTS.filter(([k])=>num(c.components[k])!==null&&(k!=="home_equity"||num(c.components[k])>0));
   const chips=shown.map(([k,l])=>`<span>${esc(l)} <strong class="num">${money(c.components[k])}</strong></span>`).join("");
+  const inv=c.investments||{};const invParts=[["certified","certified holdings"],["manual_etfs","stocks & ETFs"],["acorns","Acorns"],["mtg_singles","MTG singles"]].filter(([k])=>num(inv[k])).map(([k,l])=>`${l} ${money(inv[k])}`).join(" \u00b7 ");
   const prev=months.filter(m=>m.month<c.month).pop(),first=months[0];
   const change=(from,label)=>from?`<span>${esc(label)} <strong class="num ${num(c.net_worth)-num(from.net_worth)<0?"rpg-down":"rpg-up"}">${num(c.net_worth)-num(from.net_worth)<0?"\u2212":"+"}${money(Math.abs(num(c.net_worth)-num(from.net_worth)))}</strong></span>`:"";
   const missing=(c.missing||[]).map(k=>(PARTS.find(p=>p[0]===k)||[k,k])[1]);
   const notes=[...(c.investments?.notes||[])];
-  const why=`Investments are the Treasury\u2019s total (certified holdings, Acorns and manual stocks and ETFs). Retirement is your latest statements plus the paychecks since. Bank and the house fund are this month in your plan (your check-in when you have one). Debts are not counted yet. A month is kept for good once it ends; months before the first capture come from the balances you entered in the plan.`;
-  return `<section class="rpg-stone rpg-road" aria-labelledby="rpg-home-nw-h">${head}<div class="rpg-home-nw"><div><div class="rpg-stat-label">${esc(monthLabel(c.month))}, today</div><div class="rpg-stat-big num">${money(c.net_worth)}</div><div class="rpg-crumb-stats rpg-home-nw-parts">${chips}${change(prev,`Since ${monthLabel(prev?.month)}`)}${prev&&first&&first.month!==prev.month?change(first,`Since ${monthLabel(first.month)}`):""}</div></div></div>${nwChart(months,c)}${missing.length?`<p class="rpg-vault-why">${esc(`Not in the total yet: ${missing.join(", ")}.`)}</p>`:""}${notes.map(n=>`<p class="rpg-vault-why">${esc(n)}</p>`).join("")}<p class="rpg-crumb-note">${esc(why)}</p></section>`;
+  const why=`Investments are the Treasury\u2019s total (certified holdings, Acorns, manual stocks and ETFs, and MTG singles). Retirement is your latest statements plus the paychecks since. Bank and the house fund are this month in your plan (your check-in when you have one). Debts are not counted yet. A month is kept for good once it ends; months before the first capture come from the balances you entered in the plan.`;
+  return `<section class="rpg-stone rpg-road" aria-labelledby="rpg-home-nw-h">${head}<div class="rpg-home-nw"><div><div class="rpg-stat-label">${esc(monthLabel(c.month))}, today</div><div class="rpg-stat-big num">${money(c.net_worth)}</div><div class="rpg-crumb-stats rpg-home-nw-parts">${chips}${change(prev,`Since ${monthLabel(prev?.month)}`)}${prev&&first&&first.month!==prev.month?change(first,`Since ${monthLabel(first.month)}`):""}</div>${invParts?`<p class="rpg-vault-why">${esc(`Investments: ${invParts}.`)}</p>`:""}</div></div>${nwChart(months,c)}${missing.length?`<p class="rpg-vault-why">${esc(`Not in the total yet: ${missing.join(", ")}.`)}</p>`:""}${notes.map(n=>`<p class="rpg-vault-why">${esc(n)}</p>`).join("")}<p class="rpg-crumb-note">${esc(why)}</p></section>`;
 }
 function nwChart(months,c){
   const rows=months.some(m=>m.month===c.month)?months.map(m=>m.month===c.month?{...m,net_worth:c.net_worth}:m):[...months,{month:c.month,net_worth:c.net_worth,source:"TODAY"}];
@@ -613,6 +615,9 @@ function watch(){
   document.addEventListener("click",event=>{if(event.target.closest('.nav-item[data-page="homestead"]'))setTimeout(()=>{try{render()}catch(error){console.error("[homestead]",error)}},0)});
   if(location.hash==="#homestead")setTimeout(render,0);
   document.addEventListener("uip:home-rendered",()=>{if(S.doc?.available)refreshProjection(false);if(byId("rpg-homestead")&&byId("homestead")?.classList.contains("active-page"))render()});
+  // New retirement balances or MTG cards change net worth: read it again (and on opening the page, at most once a minute).
+  document.addEventListener("uip:mtg-singles-changed",()=>{S.nwAt=0;if(S.doc)loadNetWorth()});
+  document.addEventListener("click",event=>{if(event.target.closest('.nav-item[data-page="homestead"],[data-rpg-page="homestead"]')&&S.doc&&Date.now()-(S.nwAt||0)>60000)loadNetWorth()});
 }
 if(document.readyState==="loading")document.addEventListener("DOMContentLoaded",watch);else watch();
 window.UIPHomestead={render,state:S,roll};

@@ -1,7 +1,8 @@
 """Authenticated net-worth routes.
 
 GET  /v1/net-worth          today's net worth (investments, retirement, bank, house fund, home equity) and every
-                            month kept so far; refreshes this month's row when it is over 6 hours old
+                            month kept so far; refreshes this month's row when it is over 6 hours old or no
+                            longer matches today's figure
 POST /v1/net-worth/capture  store this month's row now (operator)
 
 The daily free-staging cycle also captures (job type net_worth_snapshot), so a month is kept even when nobody opens
@@ -45,9 +46,10 @@ def install_net_worth_routes(app, settings, history, **sources) -> None:
         this_month = now.strftime("%Y-%m")
         row = next((m for m in months if m["month"] == this_month), None)
         fresh = row is not None and now - datetime.fromisoformat(row["captured_at"]) < STALE_AFTER
-        if fresh:
-            current = compute_net_worth(**sources)
-        else:                                   # keep the history moving whenever the dashboard is opened
+        current = compute_net_worth(**sources) if fresh else None
+        if current is not None and abs(float(current["net_worth"]) - float(row["net_worth"])) >= 1:
+            fresh = False                       # something changed (a statement, new cards): keep this month's row current
+        if not fresh:                           # keep the history moving whenever the dashboard is opened
             current = capture(history, **sources)["snapshot"]
             months = history.months()
         return {"current": current, "months": months, "authority_state": "DERIVED_FROM_UIP_HOLDINGS_STATEMENTS_AND_PLAN"}
