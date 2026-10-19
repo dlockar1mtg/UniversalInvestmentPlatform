@@ -103,7 +103,7 @@ def test_retirement_statements_join_net_worth_the_treasury_and_the_homestead():
     assert javascript.count("renderRetirementAccounts(retirementAccounts);renderManualHoldings(manualHoldings);") == 3
     assert 'optional("/v1/external-accounts/summary")' in javascript
     assert "const retirement=retirementTotals();" in javascript and 'allocation["Retirement"]' not in javascript  # investments only since 2026-10-10
-    assert "manualHoldings,externalAccount,retirementAccounts,transactions:transactionItems}" in javascript
+    assert "manualHoldings,externalAccount,retirementAccounts,mtgSingles,transactions:transactionItems}" in javascript
     for value in ('"retirement-401k"', '"ira"', '"hsa"', '"pension"', '"/v1/external-accounts/schedule"', "Save paychecks only",
                   "function retirementSlug(name)", "a.estimate?.value"):
         assert value in javascript

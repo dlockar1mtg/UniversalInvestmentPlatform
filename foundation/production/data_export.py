@@ -6,6 +6,7 @@ GET /v1/my-data/export (read permission) returns, as an attachment:
   external_accounts   Acorns and retirement statements, and the paycheck schedules
   household_plan      the current plan, and the list of saved versions
   net_worth_months    the month-by-month net-worth history
+  mtg_singles         every Commander single, held, sold or removed
 
 Market data is not included: the packages republish it every day. The file is the owner's own record, so the
 UIP never writes it anywhere else.
@@ -34,7 +35,7 @@ def _transactions(repo) -> list:
         offset += PAGE
 
 
-def build_export(*, transactions=None, manual=None, external=None, plans=None, history=None, now=None) -> dict:
+def build_export(*, transactions=None, manual=None, external=None, plans=None, history=None, singles=None, now=None) -> dict:
     now = now or datetime.now(timezone.utc)
     doc: dict = {"format": FORMAT, "exported_at": now.isoformat(), "notes": []}
     doc["transactions"] = _transactions(transactions) if transactions is not None else None
@@ -63,7 +64,13 @@ def build_export(*, transactions=None, manual=None, external=None, plans=None, h
     else:
         doc["household_plan"] = None
     doc["net_worth_months"] = history.months() if history is not None else None
-    doc["notes"] = [k for k in ("transactions", "manual_holdings", "external_accounts", "household_plan", "net_worth_months")
+    if singles is not None:
+        from .mtg_singles import lot_document
+        prices = singles.prices()
+        doc["mtg_singles"] = {"lots": [lot_document(lot, prices) for lot in singles.lots(status=None)]}
+    else:
+        doc["mtg_singles"] = None
+    doc["notes"] = [k for k in ("transactions", "manual_holdings", "external_accounts", "household_plan", "net_worth_months", "mtg_singles")
                     if doc[k] is None]
     return doc
 

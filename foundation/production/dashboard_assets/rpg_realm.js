@@ -141,6 +141,7 @@ function realmTotals(d){
   totals.etf=num(d.manualHoldings?.current_value)||0;
   const acorns=d.externalAccount?.items?.[0];
   totals.acorns=acorns?num(acorns.current_value)||0:0;
+  totals.mtg+=num(d.mtgSingles?.value)||0;                   // Commander singles join sealed product in the MTG sleeve
   totals.retirement=retirementItems(d).reduce((a,r)=>a+(num(r.estimate?.value??r.items[0].current_value)||0),0);
   return totals;
 }
@@ -313,6 +314,11 @@ function inventoryItems(d){
     const buys=members.filter(p=>p.recommendation==="BUY_CANDIDATE_NOW").length;
     items.push({key:`mtg:${symbol}`,symbol,name,kind:"tome",count:String(count),held:`${count} ${symbol==="BOXES"?"boxes":"drops"}`,paid,worth,avg:count?paid/count:null,account:"Collection",note:`${members.length} product${members.length===1?"":"s"}${buys?`, ${buys} buy candidate${buys===1?"":"s"} today`:""}.`,ledger:["ok","In the UIP ledger and priced by the certified MTG authority"],members:members.map(p=>({name:p.asset_name,qty:num(p.quantity),worth:num(p.market_value),paid:num(p.cost_basis),call:p.recommendation})),domain:"mtg"});
   }
+  const singles=d.mtgSingles;
+  if(singles&&singles.card_count){
+    const decks=singles.decks||[];
+    items.push({key:"mtg:SINGLES",symbol:"SINGLES",name:"Commander singles",kind:"tome",count:String(singles.card_count),held:`${singles.card_count} cards in ${decks.length} deck${decks.length===1?"":"s"}`,paid:num(singles.basis_for_totals),worth:num(singles.value),avg:null,account:"Decks and binder",note:`Priced at each exact printing's TCGplayer market price (Scryfall)${singles.prices_as_of?`, ${dayLabel(singles.prices_as_of)}`:""}.${singles.unpriced_cards?` ${singles.unpriced_cards} card${singles.unpriced_cards===1?" has":"s have"} no price yet.`:""} Cards with no price paid count their value as paid.`,ledger:["manual","Cards you entered from Moxfield, priced daily"],members:decks.map(g=>({name:g.deck,qty:g.cards,worth:num(g.value),paid:g.cards_with_paid===g.cards&&!g.unpriced?num(g.paid_known):null})),singles:true});
+  }
   const rank={relic:0,ingot:1,charter:2,coffer:3,reliquary:4,tome:5,purse:6};
   return items.sort((a,b)=>rank[a.kind]-rank[b.kind]||(b.worth||0)-(a.worth||0));
 }
@@ -331,7 +337,7 @@ function inventoryDetail(it){
   const ret=gain!==null&&it.paid?gain/it.paid:null;
   const stat=(label,value,extra="")=>`<div><div class="rpg-stat-label">${esc(label)}</div><div class="rpg-stat-value">${value}</div>${extra}</div>`;
   const members=it.members?`<div class="rpg-members">${it.members.slice().sort((a,b)=>(b.worth||0)-(a.worth||0)).map(m=>`<div class="rpg-member"><span>${esc(m.name)}${m.qty>1?` \u00d7${m.qty}`:""}</span><span class="num">${money(m.worth)}</span><span class="num ${upDown(m.worth!==null&&m.paid!==null?m.worth-m.paid:null)}">${m.worth!==null&&m.paid?pct((m.worth-m.paid)/m.paid,0):"\u2014"}</span></div>`).join("")}</div>`:"";
-  const research=it.guild?`<button type="button" class="rpg-btn rpg-link rpg-link-ink" data-rpg-page="guild">Open the Merchants' Guild \u203a</button>`:it.domain?`<button type="button" class="rpg-btn rpg-link rpg-link-ink" data-rpg-domain="${esc(it.domain)}"${it.domain==="crypto"&&it.asset?` data-rpg-asset="${esc(it.asset)}"`:""}>Open the research \u203a</button>`:"";
+  const research=it.singles?`<button type="button" class="rpg-btn rpg-link rpg-link-ink singles-jump">Manage the decks and add cards \u203a</button>`:it.guild?`<button type="button" class="rpg-btn rpg-link rpg-link-ink" data-rpg-page="guild">Open the Merchants' Guild \u203a</button>`:it.domain?`<button type="button" class="rpg-btn rpg-link rpg-link-ink" data-rpg-domain="${esc(it.domain)}"${it.domain==="crypto"&&it.asset?` data-rpg-asset="${esc(it.asset)}"`:""}>Open the research \u203a</button>`:"";
   return `<aside class="rpg-parch rpg-item-detail" aria-labelledby="rpg-item-h" aria-live="polite"><div class="rpg-parch-kicker">${esc(KIND[it.kind].label)}</div><h2 id="rpg-item-h" class="rpg-item-name">${esc(it.name)}</h2><div class="rpg-rule"></div><div class="rpg-item-stats">${stat("Held",esc(it.held))}${stat("Gold paid",money(it.paid))}${stat("Worth now",money(it.worth),`<div class="rpg-stat-sub ${upDown(gain)}">${signed(gain)}${ret===null?"":` \u00b7 ${pct(ret)}`}</div>`)}${stat("Average cost",it.avg===null?"\u2014":money(it.avg))}${stat("Account",esc(it.account))}</div>${it.note?`<p class="rpg-item-note">${esc(it.note)}</p>`:""}${members}<div class="rpg-ledger-line"><svg width="10" height="10" aria-hidden="true"><rect width="10" height="10" fill="${LEDGER_DOT[it.ledger[0]]}"/></svg><span>${esc(it.ledger[1])}</span></div>${research}</aside>`;
 }
 function renderInventory(d){

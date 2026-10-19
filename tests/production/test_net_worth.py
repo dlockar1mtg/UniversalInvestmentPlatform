@@ -140,7 +140,7 @@ def test_download_my_data_has_every_entered_record(tmp_path):
     r = client.get("/v1/my-data/export", headers={"X-API-Key": "view-key"})
     assert r.status_code == 200 and r.headers["content-disposition"].startswith('attachment; filename="uip-my-data-')
     doc = json.loads(r.text)
-    assert doc["format"] == FORMAT and doc["notes"] == [] and doc["transactions"] == []
+    assert doc["format"] == FORMAT and doc["notes"] == ["mtg_singles"] and doc["transactions"] == []   # no singles store given here
     assert doc["manual_holdings"][0]["current"]["symbol"] == "VOO" and len(doc["manual_holdings"][0]["history"]) == 1
     assert set(doc["external_accounts"]["accounts"]) == {"acorns", "hsa", "retirement-401k:plan-a"}
     assert doc["external_accounts"]["schedules"]["retirement-401k:plan-a"]["every_days"] == 14
