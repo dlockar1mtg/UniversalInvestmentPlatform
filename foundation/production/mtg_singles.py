@@ -151,15 +151,18 @@ def _identifier(card: dict) -> dict:
     return {"name": card["name"]}
 
 
-def scryfall_fetch(identifiers: list[dict], *, session=None) -> dict:
-    """POST /cards/collection. Returns {"data": [...], "not_found": [...]} (network; Scryfall asks for a UA)."""
-    import requests
+def scryfall_fetch(identifiers: list[dict], *, opener=None) -> dict:
+    """POST /cards/collection. Returns {"data": [...], "not_found": [...]}.
 
-    s = session or requests.Session()
-    r = s.post(SCRYFALL_COLLECTION, json={"identifiers": identifiers}, timeout=30,
-               headers={"User-Agent": "UIP-MTG-singles/1.0", "Accept": "application/json"})
-    r.raise_for_status()
-    return r.json()
+    Uses the standard library (the deployed image has no `requests`); Scryfall asks for a User-Agent and Accept.
+    """
+    import urllib.request
+
+    req = urllib.request.Request(
+        SCRYFALL_COLLECTION, data=json.dumps({"identifiers": identifiers}).encode(), method="POST",
+        headers={"User-Agent": "UIP-MTG-singles/1.0", "Accept": "application/json", "Content-Type": "application/json"})
+    with (opener or urllib.request.urlopen)(req, timeout=30) as response:
+        return json.loads(response.read().decode("utf-8"))
 
 
 def lookup_prices(cards: list[dict], *, fetch=scryfall_fetch, now: datetime | None = None) -> dict[str, dict]:
@@ -174,9 +177,15 @@ def lookup_prices(cards: list[dict], *, fetch=scryfall_fetch, now: datetime | No
         ids.setdefault(ident, []).append(key)
     out: dict[str, dict] = {}
     idents = list(ids)
+    failures, batches = [], 0
     for start in range(0, len(idents), SCRYFALL_BATCH):
         batch = [json.loads(i) for i in idents[start:start + SCRYFALL_BATCH]]
-        doc = fetch(batch)
+        batches += 1
+        try:
+            doc = fetch(batch)
+        except Exception as exc:  # noqa: BLE001 - one bad batch must not lose the others
+            failures.append(exc)
+            continue
         for card in doc.get("data", []):
             prices = card.get("prices") or {}
             by_set = json.dumps({"set": card.get("set"), "collector_number": card.get("collector_number")}, sort_keys=True)
@@ -197,6 +206,8 @@ def lookup_prices(cards: list[dict], *, fetch=scryfall_fetch, now: datetime | No
                             "fetched_at": now.isoformat()}
         if start + SCRYFALL_BATCH < len(idents):
             time.sleep(0.12)                           # Scryfall asks for 50-100 ms between requests
+    if failures and len(failures) == batches:
+        raise failures[-1]                             # nothing could be priced: say why
     return out
 
 
@@ -405,6 +416,28 @@ def refresh_prices(repo: SinglesRepository, *, fetch=scryfall_fetch, now=None) -
     keys = {price_key(c) for c in cards}
     return {"printings": len(keys), "priced": sum(1 for k in keys if (found.get(k) or {}).get("usd") is not None),
             "not_found": len(keys - set(found))}
+
+
+def set_prices_paid(repo: SinglesRepository, updates: list[dict]) -> int:
+    """Many prices paid at once (a deck's table). Each update: lot_id, price_paid (blank clears), estimated."""
+    if len(updates) > 2000:
+        raise SinglesError("too many cards in one save")
+    changed = []
+    for u in updates:
+        lot = repo.lot(str(u.get("lot_id") or ""))
+        if lot is None or lot.status != "held":
+            raise SinglesError("a card in the list is no longer in the collection")
+        v = u.get("price_paid")
+        price = None if v in (None, "") else Decimal(str(v)).quantize(Decimal("0.01"))
+        if price is not None and not 0 <= price <= 1_000_000:
+            raise SinglesError(f"bad price paid for {lot.name}")
+        estimated = bool(u.get("estimated")) and price is not None
+        if price == lot.price_paid and estimated == lot.paid_estimated:
+            continue
+        lot.price_paid, lot.paid_estimated = price, estimated
+        changed.append(lot)
+    repo.save(changed)
+    return len(changed)
 
 
 def apply_action(repo: SinglesRepository, lot_id: str, body: dict, now: datetime | None = None) -> list[Lot]:

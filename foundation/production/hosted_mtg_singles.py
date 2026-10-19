@@ -4,6 +4,7 @@ GET  /v1/mtg-singles                   every card held, by deck, valued at today
 POST /v1/mtg-singles/import            {deck, text, estimated, save}: read a Moxfield export; save=false previews
                                        (with prices), save=true adds the cards (operator)
 POST /v1/mtg-singles/lots/{lot_id}     {action: move|sell|remove|value|paid, ...} (operator)
+POST /v1/mtg-singles/paid              {updates: [{lot_id, price_paid, estimated}]}: many prices paid at once (operator)
 POST /v1/mtg-singles/refresh-prices    price every printing again now (operator); a daily job also does it
 GET  /v1/mtg-singles/history           cards sold or removed
 """
@@ -14,7 +15,7 @@ from fastapi.responses import JSONResponse
 from starlette.concurrency import run_in_threadpool
 
 from .mtg_singles import (SinglesError, apply_action, lookup_prices, lot_document, new_lots, parse_any, price_key,
-                          refresh_prices, scryfall_fetch, summary)
+                          refresh_prices, scryfall_fetch, set_prices_paid, summary)
 from .security import APIKeyAuthenticator, Permission
 
 MAX_IMPORT_CHARS = 400_000
@@ -84,7 +85,7 @@ def install_mtg_singles_routes(app, settings, repository, fetch=scryfall_fetch) 
             try:
                 priced_now = await run_in_threadpool(lambda: lookup_prices(missing, fetch=fetch))
             except Exception as exc:  # noqa: BLE001 - the price source is best-effort; cards still import
-                price_error = f"prices could not be fetched right now ({type(exc).__name__}); the daily refresh will add them"
+                price_error = f"prices could not be fetched right now ({type(exc).__name__}: {str(exc)[:120]}); the daily refresh will add them"
         prices = {**known, **priced_now}
         preview = [lot_document(lot, prices) for lot in lots]
         if save:
@@ -111,6 +112,21 @@ def install_mtg_singles_routes(app, settings, repository, fetch=scryfall_fetch) 
             return invalid(exc)
         return current()
 
+    @app.post("/v1/mtg-singles/paid")
+    async def paid(request: Request, x_api_key: str | None = Header(default=None)):
+        denied = authorize(x_api_key, Permission.RUN_SUBMIT)
+        if denied:
+            return denied
+        try:
+            body = await request.json()
+            updates = body.get("updates") if isinstance(body, dict) else None
+            if not isinstance(updates, list):
+                raise SinglesError("updates must be a list")
+            count = set_prices_paid(repository, updates)
+        except (SinglesError, ValueError, ArithmeticError) as exc:
+            return invalid(exc)
+        return {"updated": count, **current()}
+
     @app.post("/v1/mtg-singles/refresh-prices")
     async def refresh(x_api_key: str | None = Header(default=None)):
         denied = authorize(x_api_key, Permission.RUN_SUBMIT)
@@ -119,5 +135,5 @@ def install_mtg_singles_routes(app, settings, repository, fetch=scryfall_fetch) 
         try:
             result = await run_in_threadpool(lambda: refresh_prices(repository, fetch=fetch))
         except Exception as exc:  # noqa: BLE001
-            return invalid(f"prices could not be fetched right now ({type(exc).__name__})", status=502)
+            return invalid(f"prices could not be fetched right now ({type(exc).__name__}: {str(exc)[:120]})", status=502)
         return {"refresh": result, **current()}

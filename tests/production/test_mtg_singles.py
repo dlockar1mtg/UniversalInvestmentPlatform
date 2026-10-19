@@ -210,3 +210,81 @@ def test_dashboard_shows_and_counts_singles():
     assert 'optional("/v1/mtg-singles")' in dash and "mtgSingles,transactions:transactionItems}" in dash
     realm = (assets / "rpg_realm.js").read_text(encoding="utf-8")
     assert "totals.mtg+=num(d.mtgSingles?.value)||0;" in realm and 'key:"mtg:SINGLES"' in realm
+
+
+def test_scryfall_fetch_uses_the_standard_library_with_a_user_agent():
+    import json as _json
+
+    import foundation.production.mtg_singles as M
+    seen = {}
+
+    class Response:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+        def read(self):
+            return _json.dumps({"data": [], "not_found": []}).encode()
+
+    def opener(req, timeout):
+        seen.update(url=req.full_url, method=req.get_method(), ua=req.get_header("User-agent"),
+                    body=_json.loads(req.data), timeout=timeout)
+        return Response()
+
+    assert M.scryfall_fetch([{"set": "rna", "collector_number": "22"}], opener=opener) == {"data": [], "not_found": []}
+    assert seen["url"] == M.SCRYFALL_COLLECTION and seen["method"] == "POST" and seen["ua"].startswith("UIP-")
+    assert seen["body"] == {"identifiers": [{"set": "rna", "collector_number": "22"}]}
+    source = (ROOT / "foundation/production/mtg_singles.py").read_text()
+    assert "import requests" not in source                      # the deployed image has no requests package
+
+
+def test_one_failed_batch_keeps_the_others_and_all_failing_says_why():
+    cards = [{"name": f"Card {i}", "set_code": "rna", "collector_number": "22" if i == 0 else f"x{i}", "finish": "nonfoil"}
+             for i in range(80)]
+    state = {"n": 0}
+
+    def flaky(ids):
+        state["n"] += 1
+        if state["n"] == 2:
+            raise OSError("boom")
+        return fake_fetch(ids)
+    prices = lookup_prices(cards, fetch=flaky, now=NOW)
+    assert prices[price_key(cards[0])]["usd"] == 15.0            # the first batch survived the second's failure
+
+    def down(ids):
+        raise OSError("no route")
+    with pytest.raises(OSError):
+        lookup_prices(cards, fetch=down, now=NOW)
+
+
+def test_many_prices_paid_at_once(tmp_path):
+    pytest.importorskip("fastapi")
+    import sqlite3
+
+    from fastapi import FastAPI
+    from fastapi.testclient import TestClient
+    from foundation.production.hosted_mtg_singles import install_mtg_singles_routes
+
+    r = SinglesRepository(lambda: sqlite3.connect(str(tmp_path / "p.sqlite3"), check_same_thread=False))
+    r.initialize()
+    r.save(new_lots(parse_text(TEXT)[0], "Atraxa", now=NOW))
+    refresh_prices(r, fetch=fake_fetch, now=NOW)
+    app = FastAPI()
+    install_mtg_singles_routes(app, SimpleNamespace(credentials={"operator": ("op-key", ("operator",)), "viewer": ("v", ("viewer",))}), r, fetch=fake_fetch)
+    c = TestClient(app)
+    lots = {l.name: l for l in r.lots()}
+    body = {"updates": [{"lot_id": lots["Island"].lot_id, "price_paid": "1.00", "estimated": True},
+                        {"lot_id": lots["Wear // Tear"].lot_id, "price_paid": "0.50", "estimated": False},
+                        {"lot_id": lots["Atraxa, Praetors' Voice"].lot_id, "price_paid": "", "estimated": True}]}
+    assert c.post("/v1/mtg-singles/paid", headers={"X-API-Key": "v"}, json=body).status_code == 403
+    out = c.post("/v1/mtg-singles/paid", headers={"X-API-Key": "op-key"}, json=body).json()
+    assert out["updated"] == 3
+    after = {l.name: l for l in r.lots()}
+    assert after["Island"].price_paid == Decimal("1.00") and after["Island"].paid_estimated
+    assert after["Wear // Tear"].paid_estimated is False
+    assert after["Atraxa, Praetors' Voice"].price_paid is None and after["Atraxa, Praetors' Voice"].paid_estimated is False
+    assert c.post("/v1/mtg-singles/paid", headers={"X-API-Key": "op-key"}, json={"updates": [{"lot_id": "nope"}]}).status_code == 422
+    page = (ROOT / "foundation/production/dashboard_assets/mtg_singles.js").read_text()
+    assert 'post("/v1/mtg-singles/paid",{updates})' in page and "data-singles-paid-save" in page
