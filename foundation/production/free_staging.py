@@ -3,7 +3,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime, timezone
+import json
 import os
+import re
+import sys
 from time import sleep
 from typing import Callable, Mapping, Sequence
 
@@ -86,6 +89,33 @@ class ScheduledCycleResult:
     def document(self):
         return {"enqueued_job_ids": list(self.enqueued_job_ids), "exhausted": self.exhausted,
                 "failed": self.failed, "processed": self.processed, "started_at": self.started_at.isoformat()}
+
+
+_SECRET_QUERY = re.compile(r"(?i)\b(api_?key|apikey|token|access_token|key|password)=[^&\s'\"]+")
+
+
+def describe_failure(job_type: str, exc: BaseException, secrets: Sequence[str] = ()) -> dict:
+    """A one-line, log-safe account of why a scheduled job failed.
+
+    The free-staging log is public, so key values (from the environment, or in a URL's query string) are blanked.
+    """
+    text = f"{type(exc).__name__}: {exc}"
+    for value in sorted({s for s in secrets if s and len(s) >= 6}, key=len, reverse=True):
+        text = text.replace(value, "***")
+    text = _SECRET_QUERY.sub(lambda m: f"{m.group(1)}=***", text)
+    return {"job_failed": job_type, "error": " ".join(text.split())[:300]}
+
+
+def logged_handler(job_type: str, handler: Callable, secrets: Sequence[str] = (), emit: Callable[[str], None] | None = None):
+    """Wrap a job handler so a failure prints its reason (redacted) before the worker records it."""
+    def run(job):
+        try:
+            return handler(job)
+        except Exception as exc:
+            line = json.dumps(describe_failure(job_type, exc, secrets))
+            (emit or (lambda s: print(s, file=sys.stderr, flush=True)))(line)
+            raise
+    return run
 
 
 def run_scheduled_cycle(repository, schedules: Sequence[RecurringSchedule], worker: HostedWorker,

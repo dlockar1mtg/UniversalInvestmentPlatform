@@ -6,7 +6,7 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path: sys.path.insert(0, str(ROOT))
 
-from foundation.production.free_staging import FreeStagingSettings, build_neon_repositories, run_scheduled_cycle
+from foundation.production.free_staging import FreeStagingSettings, build_neon_repositories, logged_handler, run_scheduled_cycle
 from foundation.production.portfolio import preview_portfolio_csv
 from foundation.production.providers import AlphaVantageProvider, FREDProvider
 from foundation.production.worker import HandlerRegistry, HostedWorker, RecurringSchedule, WorkerSettings, build_job_repository
@@ -53,10 +53,11 @@ def net_worth_snapshot(job):
     print(json.dumps({"net_worth_month": out["snapshot"]["month"], "status": out["status"], "seeded_months": out["seeded_months"],
                       "missing": out["snapshot"]["missing"]}))   # amounts stay out of the public log
 
-handlers.register("provider_check", provider_check)
-handlers.register("portfolio_validate", portfolio_validate)
-handlers.register("net_worth_snapshot", net_worth_snapshot)
-handlers.register("mtg_singles_prices", mtg_singles_prices)
+# A failed job prints why (key values blanked; the log is public) before the worker records it.
+_secrets = [v for k, v in os.environ.items() if any(t in k.upper() for t in ("KEY", "TOKEN", "SECRET", "PASSWORD", "DATABASE_URL"))]
+for _name, _handler in (("provider_check", provider_check), ("portfolio_validate", portfolio_validate),
+                        ("net_worth_snapshot", net_worth_snapshot), ("mtg_singles_prices", mtg_singles_prices)):
+    handlers.register(_name, logged_handler(_name, _handler, _secrets))
 worker = HostedWorker(repository, handlers, WorkerSettings.from_environment())
 result = run_scheduled_cycle(repository, schedules, worker, maximum_jobs=int(os.getenv("UIIP_ONE_SHOT_MAX_JOBS", "20")))
 print(json.dumps(result.document(), sort_keys=True))

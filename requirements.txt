@@ -1,6 +1,6 @@
 pandas
 numpy
-duckdb
+duckdb<2  # 2.0 (Oct 21, 2026) refuses new work on a connection with an unfinished result; migrate before lifting
 pyyaml
 pytest
 openpyxl
