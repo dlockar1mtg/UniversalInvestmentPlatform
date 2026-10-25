@@ -12,7 +12,10 @@ import os
 import re
 from typing import Callable, Mapping, Sequence
 from urllib.parse import urlencode, urljoin
-from urllib.request import urlopen
+from pathlib import Path
+import sys
+from urllib.error import HTTPError
+from urllib.request import Request, urlopen
 
 Transport = Callable[[str, float], bytes]
 
@@ -21,14 +24,26 @@ class ProviderError(RuntimeError):
     pass
 
 
+# Some official sites (World Bank's document host since Oct 23, 2026) answer Python's default
+# "Python-urllib" identity with 403 Forbidden, so requests carry ordinary browser headers.
+REQUEST_HEADERS = {
+    "User-Agent": "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/130.0 Safari/537.36",
+    "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,*/*;q=0.8",
+    "Accept-Language": "en-US,en;q=0.9",
+}
+
+
 def _default_transport(url: str, timeout: float) -> bytes:
-    with urlopen(url, timeout=timeout) as response:  # noqa: S310 - fixed provider URLs
+    request = Request(url, headers=REQUEST_HEADERS)
+    with urlopen(request, timeout=timeout) as response:  # noqa: S310 - fixed provider URLs
         return response.read()
 
 
 def _request_bytes(url: str, transport: Transport, timeout: float) -> bytes:
     try:
         payload = transport(url, timeout)
+    except HTTPError as exc:
+        raise ProviderError(f"provider request failed: HTTP {exc.code}") from exc
     except Exception as exc:
         raise ProviderError(f"provider request failed: {type(exc).__name__}") from exc
     if not isinstance(payload, bytes) or not payload:
@@ -253,10 +268,13 @@ class WorldBankCommodityProvider:
         transport: Transport = _default_transport,
         timeout: float = 30.0,
         workbook_url: str | None = None,
+        cache_path: str | os.PathLike | None = None,
     ):
         self._transport = transport
         self._timeout = timeout
         self._workbook_url = workbook_url
+        self._cache_path = cache_path if cache_path is not None else (os.getenv("UIIP_WORLD_BANK_WORKBOOK_CACHE") or None)
+        self.used_cached_workbook = False
 
     def _resolve_workbook_url(self) -> str:
         if self._workbook_url:
@@ -276,6 +294,26 @@ class WorldBankCommodityProvider:
             if "cmo-historical-data-monthly" in link.lower() and ".xlsx" in link.lower()
         ]
         return candidates[0] if candidates else self.FALLBACK_URL
+
+    def workbook_bytes(self) -> bytes:
+        """Download the monthly workbook. With a cache path, keep the last good copy and fall back to it
+        when the download fails; the caller's freshness limit still decides whether its data is recent enough."""
+        cache = Path(self._cache_path) if self._cache_path else None
+        try:
+            payload = _request_bytes(self._resolve_workbook_url(), self._transport, self._timeout)
+            if not payload.startswith(b"PK"):
+                raise ProviderError("World Bank response was not a valid XLSX workbook")
+        except ProviderError as exc:
+            if cache is not None and cache.is_file() and cache.stat().st_size > 0:
+                self.used_cached_workbook = True
+                print(f"World Bank download failed ({exc}); using the last good workbook copy", file=sys.stderr)
+                return cache.read_bytes()
+            raise
+        self.used_cached_workbook = False
+        if cache is not None:
+            cache.parent.mkdir(parents=True, exist_ok=True)
+            cache.write_bytes(payload)
+        return payload
 
     @staticmethod
     def _month(value: object) -> date | None:
@@ -302,8 +340,7 @@ class WorldBankCommodityProvider:
         unknown = sorted(set(requested) - set(self.TARGETS))
         if unknown:
             raise ValueError(f"unsupported World Bank commodities: {', '.join(unknown)}")
-        workbook_url = self._resolve_workbook_url()
-        payload = _request_bytes(workbook_url, self._transport, self._timeout)
+        payload = self.workbook_bytes()
         try:
             from openpyxl import load_workbook
             workbook = load_workbook(BytesIO(payload), read_only=True, data_only=True)
