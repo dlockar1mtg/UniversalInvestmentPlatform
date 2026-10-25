@@ -158,3 +158,66 @@ def test_world_bank_missing_discovery_link_uses_guarded_fallback() -> None:
         WorldBankCommodityProvider.INDEX_URL,
         WorldBankCommodityProvider.FALLBACK_URL,
     ]
+
+
+def _forbidden(url, timeout):
+    from urllib.error import HTTPError
+    raise HTTPError(url, 403, "Forbidden", {}, None)
+
+
+def test_default_transport_sends_browser_headers(monkeypatch) -> None:
+    import foundation.production.providers as providers
+    seen = {}
+
+    class _Response:
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *exc):
+            return False
+
+        def read(self):
+            return b"ok"
+
+    def fake_urlopen(request, timeout):
+        seen["ua"] = request.get_header("User-agent")
+        return _Response()
+
+    monkeypatch.setattr(providers, "urlopen", fake_urlopen)
+    assert providers._default_transport("https://example.test/x", 5) == b"ok"
+    assert seen["ua"].startswith("Mozilla/5.0") and "Python-urllib" not in seen["ua"]
+
+
+def test_http_status_is_named_in_the_error() -> None:
+    from foundation.production.providers import ProviderError, _request_bytes
+    with pytest.raises(ProviderError, match="HTTP 403"):
+        _request_bytes("https://example.test/x", _forbidden, 5)
+
+
+def test_world_bank_saves_good_workbook_then_falls_back_to_it(tmp_path) -> None:
+    cache = tmp_path / "cache" / "wb.xlsx"
+    workbook = _world_bank_fixture()
+    good = WorldBankCommodityProvider(transport=lambda url, timeout: workbook, workbook_url="https://example.test/wb.xlsx", cache_path=cache)
+    first = good.latest(["gold"])
+    assert cache.read_bytes() == workbook and good.used_cached_workbook is False
+
+    blocked = WorldBankCommodityProvider(transport=_forbidden, workbook_url="https://example.test/wb.xlsx", cache_path=cache)
+    again = blocked.latest(["gold"])
+    assert blocked.used_cached_workbook is True
+    assert again[0].value == first[0].value and again[0].observation_date == first[0].observation_date
+
+
+def test_world_bank_without_a_cached_copy_still_fails(tmp_path) -> None:
+    from foundation.production.providers import ProviderError
+    blocked = WorldBankCommodityProvider(transport=_forbidden, workbook_url="https://example.test/wb.xlsx", cache_path=tmp_path / "none.xlsx")
+    with pytest.raises(ProviderError, match="HTTP 403"):
+        blocked.latest(["gold"])
+
+
+def test_world_bank_html_block_page_is_not_cached(tmp_path) -> None:
+    from foundation.production.providers import ProviderError
+    cache = tmp_path / "wb.xlsx"
+    page = WorldBankCommodityProvider(transport=lambda u, t: b"<html>Access denied</html>", workbook_url="https://example.test/wb.xlsx", cache_path=cache)
+    with pytest.raises(ProviderError):
+        page.latest(["gold"])
+    assert not cache.exists()

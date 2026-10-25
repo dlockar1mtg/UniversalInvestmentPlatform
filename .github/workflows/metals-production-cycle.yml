@@ -58,6 +58,7 @@ jobs:
       UIIP_DATABASE_URL: ${{ secrets.UIIP_DATABASE_URL }}
       UIIP_FRED_API_KEY: ${{ secrets.UIIP_FRED_API_KEY }}
       UIIP_ALPHA_VANTAGE_API_KEY: ${{ secrets.UIIP_ALPHA_VANTAGE_API_KEY }}
+      UIIP_WORLD_BANK_WORKBOOK_CACHE: data/cache/metals/world_bank_cmo_monthly.xlsx
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -105,12 +106,25 @@ jobs:
 
           echo "Vehicle metadata collection failed for an unapproved reason."
           exit "$collection_status"
+      - name: Restore last good World Bank workbook
+        uses: actions/cache/restore@v4
+        with:
+          path: data/cache/metals/world_bank_cmo_monthly.xlsx
+          key: metals-world-bank-${{ github.run_id }}
+          restore-keys: |
+            metals-world-bank-
       - name: Collect official benchmark input
         run: python scripts/collect_metals_benchmark_input.py
       - name: Collect full World Bank monthly commodity history
         run: >-
           python scripts/collect_metals_benchmark_history.py
           --output data/operations/metals/commodity_benchmark_history.csv
+      - name: Save World Bank workbook for later runs
+        if: success() && hashFiles('data/cache/metals/world_bank_cmo_monthly.xlsx') != ''
+        uses: actions/cache/save@v4
+        with:
+          path: data/cache/metals/world_bank_cmo_monthly.xlsx
+          key: metals-world-bank-${{ github.run_id }}
       - name: Collect daily market input
         run: python scripts/collect_metals_daily_market_input.py
       - name: Ingest UIP-native observations

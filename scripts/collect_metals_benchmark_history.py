@@ -39,8 +39,7 @@ _request_bytes = _PROVIDER_MODULE._request_bytes
 
 def collect_rows() -> list[dict[str, object]]:
     provider = WorldBankCommodityProvider()
-    workbook_url = provider._resolve_workbook_url()
-    payload = _request_bytes(workbook_url, provider._transport, provider._timeout)
+    payload = provider.workbook_bytes()
     try:
         from openpyxl import load_workbook
         workbook = load_workbook(BytesIO(payload), read_only=True, data_only=True)
