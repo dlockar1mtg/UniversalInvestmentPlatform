@@ -370,7 +370,8 @@ jobs:
               run_id=""
             done < <(printf '%s' "$runs" | jq -r '[.workflow_runs[] | select(.head_branch == "main" and .status == "completed" and .conclusion == "success") | select(.event == "schedule" or .event == "workflow_dispatch")] | sort_by(.run_started_at) | reverse | .[0:10][] | "\(.id) \(.run_started_at)"')
             [ -n "${run_id:-}" ] || { echo "No successful ETF market data run"; return 1; }
-            python -c 'import sys; from datetime import datetime, timezone; s=datetime.fromisoformat(sys.argv[1].replace("Z","+00:00")); sys.exit(0 if (datetime.now(timezone.utc)-s).total_seconds() <= 30*3600 else 1)' "$started" || { echo "Newest ETF run ${run_id} is over 30 hours old"; return 1; }
+            # 30 hours, or 78 when the gap includes a Sunday (no ETF run on Sundays; markets closed).
+            python -m foundation.presentation.etf_freshness "$started" || { echo "Newest ETF run ${run_id} is too old to publish"; return 1; }
             artifact="$(api_get "https://api.github.com/repos/${repo}/actions/runs/${run_id}/artifacts?per_page=100" | jq -c '[.artifacts[] | select(.expired == false and (.name | startswith("etf-production-")))][0] // empty')" || return 1
             [ -n "$artifact" ] || { echo "ETF run ${run_id} has no etf-production artifact"; return 1; }
             artifact_id="$(printf '%s' "$artifact" | jq -r '.id')"; digest="$(printf '%s' "$artifact" | jq -r '.digest // ""')"
