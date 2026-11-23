@@ -73,6 +73,31 @@ jobs:
           -r requirements/metals_production.txt
       - name: Validate required secrets
         run: python -c "import os; assert os.environ.get('UIIP_DATABASE_URL')"
+      - name: Restore last good vehicle metadata
+        uses: actions/cache/restore@v4
+        with:
+          path: data/cache/metals/vehicle_market_metadata.csv
+          key: metals-vehicle-metadata-${{ github.run_id }}
+          restore-keys: |
+            metals-vehicle-metadata-
+      - name: Use the newer of the saved and committed vehicle metadata
+        run: |
+          # The committed snapshot only changes when someone commits it; the cached copy is the
+          # last good run's. Without this, the rate-limit fallback judged a months-old file.
+          python - <<'PY'
+          import csv
+          from pathlib import Path
+          cached = Path("data/cache/metals/vehicle_market_metadata.csv")
+          committed = Path("config/metals/vehicle_market_metadata.csv")
+          def newest(path):
+              with path.open(newline="", encoding="utf-8") as handle:
+                  return min((row.get("metadata_as_of_date") or "0000") for row in csv.DictReader(handle))
+          if cached.is_file() and newest(cached) > newest(committed):
+              committed.write_bytes(cached.read_bytes())
+              print(f"Using the last good run's vehicle metadata (oldest row {newest(cached)}).")
+          else:
+              print("Using the committed vehicle metadata snapshot.")
+          PY
       - name: Collect vehicle metadata
         shell: bash
         run: |
@@ -106,6 +131,13 @@ jobs:
 
           echo "Vehicle metadata collection failed for an unapproved reason."
           exit "$collection_status"
+      - name: Save vehicle metadata for later runs
+        run: mkdir -p data/cache/metals && cp config/metals/vehicle_market_metadata.csv data/cache/metals/vehicle_market_metadata.csv
+      - name: Save vehicle metadata cache
+        uses: actions/cache/save@v4
+        with:
+          path: data/cache/metals/vehicle_market_metadata.csv
+          key: metals-vehicle-metadata-${{ github.run_id }}
       - name: Restore last good World Bank workbook
         uses: actions/cache/restore@v4
         with:

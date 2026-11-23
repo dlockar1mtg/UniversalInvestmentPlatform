@@ -96,3 +96,90 @@ def test_write_collected_metadata_round_trips(tmp_path: Path) -> None:
         document = list(csv.DictReader(handle))
     assert document[0]["ticker"] == "GLD"
     assert document[0]["median_bid_ask_spread_pct"] == "0.03"
+
+
+def _last_good(path: Path, rows: list[tuple[str, str]]) -> Path:
+    with path.open("w", newline="", encoding="utf-8") as handle:
+        writer = csv.writer(handle)
+        writer.writerow(["ticker", "expense_ratio_pct", "assets_under_management_usd", "average_daily_volume_shares",
+                         "median_bid_ask_spread_pct", "metadata_as_of_date", "source_name", "source_url"])
+        for ticker, as_of in rows:
+            writer.writerow([ticker, "0.4", "5000000", "100000", "0.02", as_of, "earlier run", f"https://issuer.example/{ticker.lower()}"])
+    return path
+
+
+def test_incomplete_fund_keeps_its_last_good_row(tmp_path: Path) -> None:
+    from foundation.production.metals_vehicle_metadata_collection import carry_forward_incomplete
+
+    fresh = collect_vehicle_metadata(
+        template_path=_template(tmp_path / "template.csv"),
+        quote_loader=lambda ticker: {},  # Yahoo sent nothing usable for this fund
+        as_of=date(2026, 11, 19),
+    )
+    merged, carried = carry_forward_incomplete(
+        fresh, last_good_path=_last_good(tmp_path / "good.csv", [("GLD", "2026-11-18")]), as_of=date(2026, 11, 19)
+    )
+    assert carried == ["GLD"]
+    assert merged[0].assets_under_management_usd == 5_000_000
+    assert merged[0].metadata_as_of_date == "2026-11-18"  # keeps its own date, so freshness still applies
+
+
+def test_last_good_row_past_the_stale_line_is_not_carried(tmp_path: Path) -> None:
+    from foundation.production.metals_vehicle_metadata_collection import carry_forward_incomplete
+
+    fresh = collect_vehicle_metadata(
+        template_path=_template(tmp_path / "template.csv"), quote_loader=lambda ticker: {}, as_of=date(2026, 11, 19)
+    )
+    merged, carried = carry_forward_incomplete(
+        fresh, last_good_path=_last_good(tmp_path / "good.csv", [("GLD", "2026-07-25")]), as_of=date(2026, 11, 19)
+    )
+    assert carried == [] and merged[0].assets_under_management_usd is None
+
+
+def test_complete_fresh_rows_are_never_replaced(tmp_path: Path) -> None:
+    from foundation.production.metals_vehicle_metadata_collection import carry_forward_incomplete
+
+    fresh = collect_vehicle_metadata(
+        template_path=_template(tmp_path / "template.csv"),
+        quote_loader=lambda ticker: {"totalAssets": 9_000_000, "averageVolume": 1, "bid": 99.9, "ask": 100.1},
+        as_of=date(2026, 11, 19),
+    )
+    merged, carried = carry_forward_incomplete(
+        fresh, last_good_path=_last_good(tmp_path / "good.csv", [("GLD", "2026-11-18")]), as_of=date(2026, 11, 19)
+    )
+    assert carried == [] and merged[0].assets_under_management_usd == 9_000_000
+
+
+def test_missing_last_good_file_changes_nothing(tmp_path: Path) -> None:
+    from foundation.production.metals_vehicle_metadata_collection import carry_forward_incomplete
+
+    fresh = collect_vehicle_metadata(
+        template_path=_template(tmp_path / "template.csv"), quote_loader=lambda ticker: {}, as_of=date(2026, 11, 19)
+    )
+    assert carry_forward_incomplete(fresh, last_good_path=tmp_path / "none.csv", as_of=date(2026, 11, 19))[1] == []
+
+
+def test_retry_fills_a_fund_yahoo_skipped_the_first_time(tmp_path: Path) -> None:
+    from foundation.production.metals_vehicle_metadata_collection import retry_incomplete
+
+    template = _template(tmp_path / "template.csv")
+    calls = {"n": 0}
+
+    def flaky(ticker):
+        calls["n"] += 1
+        return {} if calls["n"] == 1 else {"totalAssets": 7_000_000, "averageVolume": 10, "bid": 99.9, "ask": 100.1}
+
+    first = collect_vehicle_metadata(template_path=template, quote_loader=flaky, as_of=date(2026, 11, 19))
+    pauses = []
+    fixed = retry_incomplete(first, template_path=template, quote_loader=flaky, as_of=date(2026, 11, 19), sleep=pauses.append)
+    assert fixed[0].assets_under_management_usd == 7_000_000 and pauses == [10.0]
+
+
+def test_retry_gives_up_after_the_set_attempts(tmp_path: Path) -> None:
+    from foundation.production.metals_vehicle_metadata_collection import retry_incomplete
+
+    template = _template(tmp_path / "template.csv")
+    first = collect_vehicle_metadata(template_path=template, quote_loader=lambda t: {}, as_of=date(2026, 11, 19))
+    pauses = []
+    out = retry_incomplete(first, template_path=template, quote_loader=lambda t: {}, as_of=date(2026, 11, 19), sleep=pauses.append)
+    assert out[0].assets_under_management_usd is None and len(pauses) == 2

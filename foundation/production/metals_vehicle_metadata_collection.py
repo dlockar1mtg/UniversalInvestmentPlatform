@@ -131,3 +131,107 @@ def write_collected_metadata(rows: list[CollectedVehicleMetadata], output_path: 
         writer.writeheader()
         for row in rows:
             writer.writerow(asdict(row))
+
+
+def _is_complete(row: CollectedVehicleMetadata) -> bool:
+    return (
+        row.expense_ratio_pct is not None
+        and row.assets_under_management_usd is not None
+        and row.average_daily_volume_shares is not None
+        and row.median_bid_ask_spread_pct is not None
+    )
+
+
+def _float_or_none(value: object) -> float | None:
+    try:
+        return float(value) if value not in (None, "") else None
+    except (TypeError, ValueError):
+        return None
+
+
+def carry_forward_incomplete(
+    rows: list[CollectedVehicleMetadata],
+    *,
+    last_good_path: Path,
+    as_of: date,
+    max_age_days: int = 90,
+) -> tuple[list[CollectedVehicleMetadata], list[str]]:
+    """Keep a fund's last good row when today's market-data reply for it is incomplete.
+
+    Yahoo often answers for 11 of 12 funds. Rather than failing every fund, the incomplete one keeps
+    its previous complete row with its own (older) as-of date, so the freshness rules still judge it.
+    A previous row older than ``max_age_days`` (the STALE line) is not carried. Returns the rows and
+    the carried tickers.
+    """
+    previous: dict[str, CollectedVehicleMetadata] = {}
+    if last_good_path.is_file():
+        with last_good_path.open(newline="", encoding="utf-8") as handle:
+            for raw in csv.DictReader(handle):
+                as_of_text = (raw.get("metadata_as_of_date") or "").strip()
+                if not as_of_text:
+                    continue
+                try:
+                    observed = date.fromisoformat(as_of_text)
+                except ValueError:
+                    continue
+                if not 0 <= (as_of - observed).days <= max_age_days:
+                    continue
+                candidate = CollectedVehicleMetadata(
+                    ticker=raw["ticker"].strip().upper(),
+                    expense_ratio_pct=_float_or_none(raw.get("expense_ratio_pct")),
+                    assets_under_management_usd=_float_or_none(raw.get("assets_under_management_usd")),
+                    average_daily_volume_shares=_float_or_none(raw.get("average_daily_volume_shares")),
+                    median_bid_ask_spread_pct=_float_or_none(raw.get("median_bid_ask_spread_pct")),
+                    metadata_as_of_date=as_of_text,
+                    source_name=(raw.get("source_name") or "").strip(),
+                    source_url=(raw.get("source_url") or "").strip(),
+                )
+                if _is_complete(candidate):
+                    previous[candidate.ticker] = candidate
+    merged: list[CollectedVehicleMetadata] = []
+    carried: list[str] = []
+    for row in rows:
+        if not _is_complete(row) and row.ticker in previous:
+            merged.append(previous[row.ticker])
+            carried.append(row.ticker)
+        else:
+            merged.append(row)
+    return merged, carried
+
+
+def retry_incomplete(
+    rows: list[CollectedVehicleMetadata],
+    *,
+    template_path: Path,
+    quote_loader: Callable[[str], Mapping[str, object]],
+    as_of: date,
+    attempts: int = 2,
+    pause_seconds: float = 10.0,
+    sleep: Callable[[float], None] | None = None,
+) -> list[CollectedVehicleMetadata]:
+    """Ask the market-data source again for funds whose reply was incomplete, keeping the order."""
+    import tempfile
+    import time
+
+    sleep = sleep or time.sleep
+    with template_path.open(newline="", encoding="utf-8") as handle:
+        reader = csv.DictReader(handle)
+        fieldnames = reader.fieldnames or []
+        template_rows = {row["ticker"].strip().upper(): row for row in reader}
+    current = {row.ticker: row for row in rows}
+    for _ in range(attempts):
+        missing = [ticker for ticker, row in current.items() if not _is_complete(row)]
+        if not missing:
+            break
+        sleep(pause_seconds)
+        with tempfile.TemporaryDirectory() as folder:
+            subset = Path(folder) / "retry.csv"
+            with subset.open("w", newline="", encoding="utf-8") as handle:
+                writer = csv.DictWriter(handle, fieldnames=fieldnames)
+                writer.writeheader()
+                for ticker in missing:
+                    writer.writerow(template_rows[ticker])
+            for row in collect_vehicle_metadata(template_path=subset, quote_loader=quote_loader, as_of=as_of):
+                if _is_complete(row):
+                    current[row.ticker] = row
+    return [current[row.ticker] for row in rows]
