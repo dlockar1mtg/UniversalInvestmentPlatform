@@ -153,7 +153,7 @@ jobs:
             local artifact_prefix="$4"
             local token="$5"
 
-            local runs_json run_json status conclusion event head_sha run_id started_at
+            local runs_json run_json status conclusion event head_sha run_id started_at failed_runs=""
             runs_json="$(api_get "$token" "https://api.github.com/repos/${repo}/actions/workflows/${workflow}/runs?per_page=50")"
             printf '%s' "$runs_json" |
               jq -r --arg key "$key" --arg path ".github/workflows/${workflow}" '[.workflow_runs[] | select(.head_branch == "main") | select(.event != "push") | select(.path == $path)] | sort_by(.run_started_at // .created_at) | reverse | .[0:3][] | "RUN_CANDIDATE domain=\($key) run=\(.id) event=\(.event) status=\(.status) conclusion=\(.conclusion // "") started_at=\(.run_started_at // .created_at)"' || true
@@ -165,9 +165,17 @@ jobs:
               candidate_id="$(printf '%s' "$candidate" | jq -r '.id')"
               # A source run still queued or in progress has published nothing yet (GitHub often
               # starts schedules hours late), so use the newest finished run; the 30-hour limit
-              # below still refuses anything stale, and a failed finished run still stops the cycle.
+              # below still refuses anything stale.
               if [ "$(printf '%s' "$candidate" | jq -r '.status')" != "completed" ]; then
                 echo "SKIPPED_RUNNING_RUN domain=${key} run=${candidate_id} status=$(printf '%s' "$candidate" | jq -r '.status')"
+                continue
+              fi
+              # A failed run is passed over for the newest successful one before it. The 30-hour limit
+              # below still applies, so a source is carried for at most about a day, with a warning;
+              # one flaky source no longer stops every other domain from publishing.
+              if [ "$(printf '%s' "$candidate" | jq -r '.conclusion // ""')" != "success" ]; then
+                echo "SKIPPED_FAILED_RUN domain=${key} run=${candidate_id} conclusion=$(printf '%s' "$candidate" | jq -r '.conclusion // ""')"
+                failed_runs="${failed_runs:+${failed_runs},}${candidate_id}"
                 continue
               fi
               if [ "$(printf '%s' "$candidate" | jq -r '.status + "/" + (.conclusion // "")')" = "completed/success" ]; then
@@ -206,6 +214,10 @@ jobs:
             started_at="$(printf '%s' "$run_json" | jq -r '.run_started_at // .created_at')"
 
             echo "SOURCE_CANDIDATE domain=${key} repo=${repo} workflow=${workflow} run=${run_id} event=${event} status=${status} conclusion=${conclusion} started_at=${started_at}"
+            if [ -n "$failed_runs" ]; then
+              echo "::warning title=${key} carried from its last good run::Newer ${repo}/${workflow} run(s) ${failed_runs} failed; publishing ${key} from run ${run_id} (started ${started_at}). Fix the source; after 30 hours it stops the publication."
+              echo "CARRIED_SOURCE domain=${key} run=${run_id} failed_runs=${failed_runs}"
+            fi
 
             test "$status" = "completed" || {
               echo "Latest governed source run is not complete: ${repo}/${run_id} status=${status}" >&2
