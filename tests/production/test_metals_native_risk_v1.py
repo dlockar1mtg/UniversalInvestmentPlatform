@@ -254,5 +254,5 @@ def test_rehearsal_workflow_is_manual_and_artifact_only():
     assert "build_metals_native_risk_sidecar.py" in text
     assert "native_rich_history/metals_price_history.csv" in text
     assert "native_risk_v1" in text
-    assert "actions/upload-artifact@v4" in text
+    assert "actions/upload-artifact@" in text   # any version: Dependabot moves it
     assert "UIIP_DATABASE_URL" not in text
