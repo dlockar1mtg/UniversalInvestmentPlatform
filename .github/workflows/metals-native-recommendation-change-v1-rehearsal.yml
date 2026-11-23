@@ -16,10 +16,10 @@ jobs:
       UIIP_DATABASE_URL: ${{ secrets.UIIP_DATABASE_URL }}
     steps:
       - name: Checkout UIP
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
 
@@ -131,7 +131,7 @@ jobs:
 
       - name: Upload Recommendation Change V1 evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: metals-native-recommendation-change-v1-${{ github.run_id }}
           path: data/operations/metals/native_recommendation_change_v1/

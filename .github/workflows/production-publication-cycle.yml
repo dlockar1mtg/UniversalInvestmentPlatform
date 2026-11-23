@@ -100,10 +100,10 @@ jobs:
       UIP_MTG_COLLECTOR_V2_ENABLED: "1" # Collector v2: tested quarter returns (mtg #97), decisions and pages (#263)
     steps:
       - name: Checkout UIP
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.14"
           cache: pip
@@ -281,7 +281,7 @@ jobs:
             "$SOURCE_TOKEN"
 
       - name: Checkout current governed MTG authority
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: dlockar1mtg/mtg-investment-terminal
           ref: ${{ steps.sources.outputs.mtg_head_sha }}
@@ -503,7 +503,7 @@ jobs:
 
       - name: Upload rich publication evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: uip-rich-production-publication-${{ github.run_id }}
           path: |

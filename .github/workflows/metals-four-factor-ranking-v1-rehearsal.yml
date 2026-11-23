@@ -24,15 +24,15 @@ jobs:
           test "${{ inputs.confirmation }}" = "REHEARSE_METALS_FOUR_FACTOR_RANKING_V1"
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Setup Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.14'
 
       - name: Download pinned certified Metals production artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: metals-production-34849676771
           path: _metals_artifact
@@ -100,7 +100,7 @@ jobs:
           PY
 
       - name: Upload ranking rehearsal evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: metals-four-factor-ranking-v1-${{ github.run_id }}
           path: data/operations/metals/vehicle_ranking_v1/

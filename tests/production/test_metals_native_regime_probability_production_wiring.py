@@ -25,5 +25,5 @@ def test_regime_probability_v1_build_occurs_after_native_cycle_and_before_artifa
     text = WORKFLOW.read_text(encoding='utf-8')
     native_cycle = text.index('Run UIP-native forecasts')
     regime = text.index('Build UIP-native regime probability V1 sidecar')
-    upload = text.index('actions/upload-artifact@v4')
+    upload = text.index('actions/upload-artifact@')   # any version: Dependabot moves it
     assert native_cycle < regime < upload
