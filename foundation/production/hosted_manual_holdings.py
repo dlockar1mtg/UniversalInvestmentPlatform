@@ -1,17 +1,18 @@
-"""Authenticated routes for manual stock and ETF holding snapshots."""
+"""Authenticated routes for manual stock, ETF and sealed-MTG holding snapshots."""
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation
 from uuid import uuid4
 
 from fastapi import Header, Request
 from fastapi.responses import JSONResponse
+from starlette.concurrency import run_in_threadpool
 
 from .manual_holdings import create_manual_holding_snapshot
 from .observability import OperationalEvent
 from .security import APIKeyAuthenticator, Permission
 
 
-def mark_to_market(documents, prices):
+def mark_to_market(documents, prices, sealed=None):
     """Value ETF snapshots at the latest package close (shares x close), keeping the entered snapshot.
 
     Holdings without a usable close keep their manually entered value. The entered value stays
@@ -23,6 +24,9 @@ def mark_to_market(documents, prices):
         price = prices.get(str(doc.get("symbol", "")).upper()) if doc.get("asset_type") == "ETF" else None
         doc["snapshot_current_value"] = doc["current_value"]
         doc["snapshot_current_price"] = doc.get("current_price")
+        if doc.get("asset_type") == "MTG_SEALED":
+            marked.append(_mark_sealed(doc, (sealed or {}).get(str(doc.get("symbol", "")))))
+            continue
         if price is None:
             doc.update({"valuation_source": "MANUAL_SNAPSHOT", "valuation_as_of": doc.get("as_of")})
             marked.append(doc)
@@ -42,7 +46,26 @@ def mark_to_market(documents, prices):
     return marked
 
 
-def install_manual_holding_routes(app, settings, repository, market_prices=None):
+def _mark_sealed(doc, price):
+    """Sealed MTG at the stored TCGplayer market price x boxes; the entered value until a price exists."""
+    usd = (price or {}).get("usd")
+    if not usd:
+        doc.update({"valuation_source": "MANUAL_SNAPSHOT", "valuation_as_of": doc.get("as_of")})
+        return doc
+    shares, basis, each = Decimal(doc["shares"]), Decimal(doc["cost_basis"]), Decimal(str(usd))
+    value = (shares * each).quantize(Decimal("0.01"))
+    gain = value - basis
+    doc.update({
+        "current_value": str(value), "current_price": str(each), "gain_loss": str(gain),
+        "return_pct": None if basis == 0 else str(gain / basis * Decimal(100)),
+        "valuation_source": "TCGPLAYER_MARKET", "valuation_as_of": price.get("as_of"),
+        "tcgplayer_name": price.get("name") or None,
+    })
+    return doc
+
+
+def install_manual_holding_routes(app, settings, repository, market_prices=None, sealed_prices=None,
+                                  refresh_sealed=None):
     principals, hashes = {}, {}
     for pid, (credential, roles) in sorted(settings.credentials.items()):
         principals[pid] = roles
@@ -74,10 +97,15 @@ def install_manual_holding_routes(app, settings, repository, market_prices=None)
             prices = market_prices() if market_prices is not None else {}
         except Exception:
             prices = {}                                    # pricing is best-effort; snapshots still serve
-        documents = mark_to_market([item.document() for item in items], prices or {})
+        try:
+            sealed = sealed_prices() if sealed_prices is not None else {}
+        except Exception:
+            sealed = {}
+        documents = mark_to_market([item.document() for item in items], prices or {}, sealed)
         total_value = sum((Decimal(doc["current_value"]) for doc in documents), Decimal("0"))
         total_basis = sum((item.cost_basis for item in items), Decimal("0"))
-        marked = [doc for doc in documents if doc["valuation_source"] == "ETF_PACKAGE_CLOSE"]
+        marked = [doc for doc in documents if doc["valuation_source"] in ("ETF_PACKAGE_CLOSE", "TCGPLAYER_MARKET")]
+        sealed_docs = [doc for doc in documents if doc.get("asset_type") == "MTG_SEALED"]
         return {
             "items": documents,
             "position_count": len(items),
@@ -87,6 +115,8 @@ def install_manual_holding_routes(app, settings, repository, market_prices=None)
             "gain_loss": str(total_value - total_basis),
             "marked_position_count": len(marked),
             "valuation_as_of": max((doc["valuation_as_of"] for doc in marked if doc.get("valuation_as_of")), default=None),
+            "mtg_sealed_value": str(sum((Decimal(doc["current_value"]) for doc in sealed_docs), Decimal("0"))),
+            "mtg_sealed_cost_basis": str(sum((Decimal(doc["cost_basis"]) for doc in sealed_docs), Decimal("0"))),
             "authority_state": "MANUAL_USER_ENTERED_EXTERNAL_HOLDINGS",
         }
 
@@ -140,6 +170,11 @@ def install_manual_holding_routes(app, settings, repository, market_prices=None)
                 notes=str(body.get("notes", "")),
             )
             persisted = repository.save(item)
+            if persisted.asset_type == "MTG_SEALED" and refresh_sealed is not None:
+                try:   # price it now instead of waiting for the daily job; best-effort
+                    await run_in_threadpool(lambda: refresh_sealed([persisted.symbol]))
+                except Exception:  # noqa: BLE001
+                    pass
         except (ValueError, InvalidOperation, KeyError) as exc:
             return JSONResponse(
                 {"error": {"code": "MANUAL_HOLDING_INVALID", "message": str(exc)}},

@@ -92,7 +92,7 @@ function netWorth(){
   const c=S.nw.current,months=S.nw.months||[];
   const shown=PARTS.filter(([k])=>num(c.components[k])!==null&&(k!=="home_equity"||num(c.components[k])>0));
   const chips=shown.map(([k,l])=>`<span>${esc(l)} <strong class="num">${money(c.components[k])}</strong></span>`).join("");
-  const inv=c.investments||{};const invParts=[["certified","certified holdings"],["manual_etfs","stocks & ETFs"],["acorns","Acorns"],["mtg_singles","MTG singles"]].filter(([k])=>num(inv[k])).map(([k,l])=>`${l} ${money(inv[k])}`).join(" \u00b7 ");
+  const inv=c.investments||{};const invParts=[["certified","certified holdings"],["manual_etfs","stocks & ETFs"],["acorns","Acorns"],["mtg_singles","MTG singles"],["mtg_sealed","sealed MTG"]].filter(([k])=>num(inv[k])).map(([k,l])=>`${l} ${money(inv[k])}`).join(" \u00b7 ");
   const prev=months.filter(m=>m.month<c.month).pop(),first=months[0];
   const change=(from,label)=>from?`<span>${esc(label)} <strong class="num ${num(c.net_worth)-num(from.net_worth)<0?"rpg-down":"rpg-up"}">${num(c.net_worth)-num(from.net_worth)<0?"\u2212":"+"}${money(Math.abs(num(c.net_worth)-num(from.net_worth)))}</strong></span>`:"";
   const missing=(c.missing||[]).map(k=>(PARTS.find(p=>p[0]===k)||[k,k])[1]);

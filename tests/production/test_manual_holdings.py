@@ -38,7 +38,7 @@ def test_manual_holding_derives_position_metrics():
 
 
 def test_manual_holding_requires_stock_or_etf_and_non_negative_values():
-    with pytest.raises(ValueError, match="ETF or STOCK"):
+    with pytest.raises(ValueError, match="ETF, STOCK or MTG_SEALED"):
         snapshot(asset_type="CRYPTO")
     with pytest.raises(ValueError, match="non-negative"):
         snapshot(current_value=Decimal("-1"))

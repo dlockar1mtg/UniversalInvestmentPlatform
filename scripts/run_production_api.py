@@ -15,6 +15,7 @@ from foundation.production.hosted_transactions import install_hosted_transaction
 from foundation.production.hosted_external_accounts import install_external_account_performance_routes
 from foundation.production.external_account_performance import PostgresExternalAccountPerformanceRepository
 from foundation.production.hosted_manual_holdings import install_manual_holding_routes
+from foundation.production.mtg_sealed import refresh_sealed_prices, sealed_prices
 from foundation.production.hosted_household_plan import install_household_plan_routes
 from foundation.production.hosted_net_worth import install_net_worth_routes
 from foundation.production.net_worth import NetWorthHistory
@@ -74,6 +75,8 @@ if manual_holding_repository is not None:
     install_manual_holding_routes(
         app, settings, manual_holding_repository,
         market_prices=None if presentation_repository is None else presentation_repository.etf_latest_prices,
+        sealed_prices=None if singles_repository is None else (lambda: sealed_prices(singles_repository)),
+        refresh_sealed=None if singles_repository is None else (lambda ids: refresh_sealed_prices(singles_repository, ids)),
     )
 if household_plan_repository is not None:
     install_household_plan_routes(app, settings, household_plan_repository)
