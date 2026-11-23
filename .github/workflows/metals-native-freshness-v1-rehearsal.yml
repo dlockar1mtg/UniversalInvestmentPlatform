@@ -12,8 +12,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 15
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.14"
       - name: Resolve latest successful Metals production run
@@ -44,7 +44,7 @@ jobs:
           --daily-market _metals_artifact/operations/metals/daily_market_input.csv
           --contract config/presentation/metals_data_freshness_v1.json
           --output-root data/operations/metals/native_freshness_v1_rehearsal
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: metals-native-freshness-v1-${{ github.run_id }}
           path: data/operations/metals/native_freshness_v1_rehearsal/

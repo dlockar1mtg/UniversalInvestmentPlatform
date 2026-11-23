@@ -26,8 +26,8 @@ jobs:
       ALPACA_API_SECRET_KEY: ${{ secrets.ALPACA_API_SECRET_KEY }}
       WORK: data/operations/metals/vehicle_evidence_refresh
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.14"
           cache: pip
@@ -46,7 +46,7 @@ jobs:
           echo "run_id=$run_id" >> "$GITHUB_OUTPUT"
           echo "Using Metals production run $run_id"
           mkdir -p "$WORK"
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           name: metals-production-${{ steps.production.outputs.run_id }}
           path: _metals_artifact
@@ -83,7 +83,7 @@ jobs:
           python scripts/build_metals_vehicle_ranking_evidence.py --rehearsal "$WORK/rehearsal.json" --commodity-state "$WORK/commodity_state.json" --source "$WORK/source.json"
       - name: Show the change
         run: git --no-pager diff --stat -- config/presentation
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: metals-vehicle-evidence-refresh-${{ github.run_id }}
           path: |

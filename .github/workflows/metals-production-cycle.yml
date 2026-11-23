@@ -64,8 +64,8 @@ jobs:
       UIIP_ALPHA_VANTAGE_API_KEY: ${{ secrets.UIIP_ALPHA_VANTAGE_API_KEY }}
       UIIP_WORLD_BANK_WORKBOOK_CACHE: data/cache/metals/world_bank_cmo_monthly.xlsx
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.14"
           cache: pip
@@ -78,7 +78,7 @@ jobs:
       - name: Validate required secrets
         run: python -c "import os; assert os.environ.get('UIIP_DATABASE_URL')"
       - name: Restore last good vehicle metadata
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: data/cache/metals/vehicle_market_metadata.csv
           key: metals-vehicle-metadata-${{ github.run_id }}
@@ -138,12 +138,12 @@ jobs:
       - name: Save vehicle metadata for later runs
         run: mkdir -p data/cache/metals && cp config/metals/vehicle_market_metadata.csv data/cache/metals/vehicle_market_metadata.csv
       - name: Save vehicle metadata cache
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: data/cache/metals/vehicle_market_metadata.csv
           key: metals-vehicle-metadata-${{ github.run_id }}
       - name: Restore last good World Bank workbook
-        uses: actions/cache/restore@v4
+        uses: actions/cache/restore@v6
         with:
           path: data/cache/metals/world_bank_cmo_monthly.xlsx
           key: metals-world-bank-${{ github.run_id }}
@@ -157,7 +157,7 @@ jobs:
           --output data/operations/metals/commodity_benchmark_history.csv
       - name: Save World Bank workbook for later runs
         if: success() && hashFiles('data/cache/metals/world_bank_cmo_monthly.xlsx') != ''
-        uses: actions/cache/save@v4
+        uses: actions/cache/save@v6
         with:
           path: data/cache/metals/world_bank_cmo_monthly.xlsx
           key: metals-world-bank-${{ github.run_id }}
@@ -261,7 +261,7 @@ jobs:
         run: python scripts/check_metals_native_readiness.py --package-root "${{ steps.package.outputs.path }}" --strict
       - name: Validate migration contract
         run: python scripts/check_metals_runtime_migration.py --strict
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: always()
         with:
           name: metals-production-${{ github.run_id }}

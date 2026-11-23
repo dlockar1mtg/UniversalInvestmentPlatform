@@ -12,8 +12,8 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.14"
       - name: Resolve latest successful Metals production run
@@ -63,7 +63,7 @@ jobs:
           assert m["publication_activated"] is False
           assert m["source_collection_performed"] is False
           PY
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: metals-native-model-component-v1-${{ github.run_id }}
           path: data/operations/metals/native_model_component_v1_rehearsal/

@@ -13,10 +13,10 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: Checkout UIP
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: '3.12'
 
@@ -113,7 +113,7 @@ jobs:
           PY
 
       - name: Upload risk V1 rehearsal evidence
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: metals-native-risk-v1-${{ github.run_id }}
           path: data/operations/metals/native_risk_v1/

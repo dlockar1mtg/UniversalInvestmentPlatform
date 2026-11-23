@@ -44,9 +44,9 @@ jobs:
         python-version: ["3.14"]
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
@@ -57,7 +57,7 @@ jobs:
       - name: Install platform and production dependencies
         run: pip install -r requirements.txt -r requirements/phase_7_3.txt
       - name: Set up Node.js for production JavaScript validation
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v7
         with:
           node-version: "24"
       - name: Validate production JavaScript syntax

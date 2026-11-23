@@ -12,10 +12,10 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Checkout UIP
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
 
       - name: Checkout MTG source repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v7
         with:
           repository: dlockar1mtg/mtg-investment-terminal
           ref: main
@@ -24,7 +24,7 @@ jobs:
           persist-credentials: false
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v7
         with:
           python-version: "3.14"
 
@@ -36,7 +36,7 @@ jobs:
 
       - name: Upload portability evidence
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: mtg-premium-line-ending-portability-${{ github.run_id }}
           path: data/operations/publication/mtg_premium_line_ending_audit.json

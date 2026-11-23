@@ -10,14 +10,14 @@ jobs:
   audit:
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0
 
       - name: Audit historical Metals freshness methodology
         run: python scripts/audit_metals_freshness_methodology_history.py
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: metals-freshness-methodology-history-${{ github.run_id }}
           path: data/operations/publication/metals_freshness_methodology_history_audit.json
