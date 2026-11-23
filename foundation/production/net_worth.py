@@ -35,7 +35,8 @@ def _investments(transactions, presentation, manual, external, singles=None) -> 
     from .portfolio_enrichment import enrich_portfolio
 
     out: dict = {"certified": None, "certified_basis": None, "manual_etfs": None, "manual_basis": None,
-                 "acorns": None, "acorns_basis": None, "mtg_singles": None, "mtg_singles_basis": None, "notes": []}
+                 "acorns": None, "acorns_basis": None, "mtg_singles": None, "mtg_singles_basis": None,
+                 "mtg_sealed": None, "mtg_sealed_basis": None, "notes": []}
     if transactions is not None and presentation is not None:
         try:
             enriched = enrich_portfolio(derive_portfolio(transactions.list(limit=500, offset=0)), presentation).document()
@@ -49,9 +50,18 @@ def _investments(transactions, presentation, manual, external, singles=None) -> 
             prices = presentation.etf_latest_prices() if presentation is not None else {}
         except Exception:                    # pricing is best-effort, as on the dashboard
             prices = {}
-        docs = mark_to_market([item.document() for item in items], prices or {})
-        out["manual_etfs"] = _money(sum((Decimal(d["current_value"]) for d in docs), Decimal(0)))
-        out["manual_basis"] = _money(sum((item.cost_basis for item in items), Decimal(0)))
+        sealed = {}
+        if singles is not None:
+            from .mtg_sealed import sealed_prices
+            sealed = sealed_prices(singles)
+        docs = mark_to_market([item.document() for item in items], prices or {}, sealed)
+        stocks = [d for d in docs if d.get("asset_type") != "MTG_SEALED"]
+        boxes = [d for d in docs if d.get("asset_type") == "MTG_SEALED"]
+        out["manual_etfs"] = _money(sum((Decimal(d["current_value"]) for d in stocks), Decimal(0)))
+        out["manual_basis"] = _money(sum((Decimal(d["cost_basis"]) for d in stocks), Decimal(0)))
+        if boxes:   # sealed MTG held outside the certified lanes (Play Booster boxes and the like)
+            out["mtg_sealed"] = _money(sum((Decimal(d["current_value"]) for d in boxes), Decimal(0)))
+            out["mtg_sealed_basis"] = _money(sum((Decimal(d["cost_basis"]) for d in boxes), Decimal(0)))
     if external is not None:
         acorns = external.history("acorns", 1)
         if acorns:
@@ -62,7 +72,7 @@ def _investments(transactions, presentation, manual, external, singles=None) -> 
         doc = singles_summary(singles.lots(), singles.prices())
         if doc["card_count"]:
             out["mtg_singles"], out["mtg_singles_basis"] = doc["value"], doc["basis_for_totals"]
-    parts = [out[k] for k in ("certified", "manual_etfs", "acorns", "mtg_singles") if out[k] is not None]
+    parts = [out[k] for k in ("certified", "manual_etfs", "acorns", "mtg_singles", "mtg_sealed") if out[k] is not None]
     out["total"] = _money(sum((Decimal(p) for p in parts), Decimal(0)))
     return out
 

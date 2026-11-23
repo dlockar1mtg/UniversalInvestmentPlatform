@@ -138,7 +138,9 @@ function realmTotals(d){
     if(p.domain_id==="metals"&&p.asset_subclass==="cash_proxy")totals.purse+=value;
     else if(totals[p.domain_id]!==undefined)totals[p.domain_id]+=value;
   }
-  totals.etf=num(d.manualHoldings?.current_value)||0;
+  const sealed=num(d.manualHoldings?.mtg_sealed_value)||0;          // sealed MTG kept as manual holdings sits with MTG
+  totals.etf=(num(d.manualHoldings?.current_value)||0)-sealed;
+  totals.mtg+=sealed;
   const acorns=d.externalAccount?.items?.[0];
   totals.acorns=acorns?num(acorns.current_value)||0:0;
   totals.mtg+=num(d.mtgSingles?.value)||0;                   // Commander singles join sealed product in the MTG sleeve

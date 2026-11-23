@@ -1,4 +1,8 @@
-"""Immutable manual snapshots for externally held stocks and ETFs."""
+"""Immutable manual snapshots for externally held stocks, ETFs and sealed MTG product.
+
+MTG_SEALED holdings use the TCGplayer product id as their symbol and are priced daily from TCGCSV
+(foundation.production.mtg_sealed); shares are the number of boxes.
+"""
 from __future__ import annotations
 
 from contextlib import closing
@@ -9,6 +13,9 @@ import hashlib
 import json
 import sqlite3
 from typing import Callable, Protocol, Sequence
+
+
+ASSET_TYPES = frozenset({"ETF", "STOCK", "MTG_SEALED"})
 
 
 @dataclass(frozen=True)
@@ -31,8 +38,8 @@ class ManualHoldingSnapshot:
     def __post_init__(self):
         if not self.symbol.strip():
             raise ValueError("symbol is required")
-        if self.asset_type not in {"ETF", "STOCK"}:
-            raise ValueError("asset_type must be ETF or STOCK")
+        if self.asset_type not in ASSET_TYPES:
+            raise ValueError("asset_type must be ETF, STOCK or MTG_SEALED")
         if not self.account_id.strip():
             raise ValueError("account_id is required")
         if self.as_of.tzinfo is None or self.recorded_at.tzinfo is None:
@@ -102,8 +109,12 @@ def create_manual_holding_snapshot(
 ) -> ManualHoldingSnapshot:
     if as_of.tzinfo is None:
         raise ValueError("as_of must include timezone")
-    normalized_symbol = symbol.strip().upper()
     normalized_type = asset_type.strip().upper()
+    if normalized_type == "MTG_SEALED":
+        from .mtg_sealed import tcgplayer_product_id
+        normalized_symbol = tcgplayer_product_id(symbol)  # a TCGplayer product id or link
+    else:
+        normalized_symbol = symbol.strip().upper()
     normalized_account = account_id.strip()
     payload = {
         "symbol": normalized_symbol,
@@ -255,7 +266,7 @@ class PostgresManualHoldingRepository:
                 fingerprint TEXT NOT NULL UNIQUE,
                 symbol TEXT NOT NULL,
                 asset_name TEXT NOT NULL,
-                asset_type TEXT NOT NULL CHECK(asset_type IN ('ETF','STOCK')),
+                asset_type TEXT NOT NULL,
                 account_id TEXT NOT NULL,
                 as_of TIMESTAMPTZ NOT NULL,
                 shares NUMERIC NOT NULL CHECK(shares>=0),
@@ -265,6 +276,15 @@ class PostgresManualHoldingRepository:
                 recorded_by TEXT NOT NULL,
                 notes TEXT NOT NULL,
                 authority_state TEXT NOT NULL)"""
+            )
+            # The allowed types are one named constraint, replaced on every start, so adding a type
+            # (MTG_SEALED, Nov 2026) needs no manual migration. Earlier tables had an unnamed inline
+            # CHECK(asset_type IN ('ETF','STOCK')), which Postgres named manual_holding_snapshots_asset_type_check.
+            cursor.execute("ALTER TABLE manual_holding_snapshots DROP CONSTRAINT IF EXISTS manual_holding_snapshots_asset_type_check")
+            cursor.execute("ALTER TABLE manual_holding_snapshots DROP CONSTRAINT IF EXISTS manual_holding_asset_type_allowed")
+            cursor.execute(
+                "ALTER TABLE manual_holding_snapshots ADD CONSTRAINT manual_holding_asset_type_allowed "
+                "CHECK (asset_type IN (" + ",".join(f"'{t}'" for t in sorted(ASSET_TYPES)) + "))"
             )
             cursor.execute(
                 "CREATE INDEX IF NOT EXISTS manual_holding_current_idx "

@@ -33,6 +33,13 @@ def mtg_singles_prices(job):
     from foundation.production.mtg_singles import SinglesRepository, refresh_prices
     repo = SinglesRepository.from_dsn(os.environ["UIIP_DATABASE_URL"]); repo.initialize()
     print(json.dumps({"mtg_singles_prices": refresh_prices(repo)}))   # no card names in the public log
+    # Sealed MTG held as manual holdings (Play Booster boxes and the like): TCGplayer market via TCGCSV.
+    from foundation.production.manual_holdings import PostgresManualHoldingRepository
+    from foundation.production.mtg_sealed import refresh_sealed_prices
+    held = [h.symbol for h in PostgresManualHoldingRepository.from_dsn(os.environ["UIIP_DATABASE_URL"]).current()
+            if h.asset_type == "MTG_SEALED" and h.shares > 0]
+    if held:
+        print(json.dumps({"mtg_sealed_prices": refresh_sealed_prices(repo, held)}))   # counts only
 
 
 def net_worth_snapshot(job):
