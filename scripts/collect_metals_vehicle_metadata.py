@@ -13,6 +13,8 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from foundation.production.metals_vehicle_metadata_collection import (  # noqa: E402
+    carry_forward_incomplete,
+    retry_incomplete,
     collect_vehicle_metadata,
     write_collected_metadata,
 )
@@ -57,6 +59,11 @@ def main() -> int:
         quote_loader=_yahoo_quote_loader,
         as_of=args.as_of,
     )
+    # Yahoo's gaps are usually momentary: ask again for just the incomplete funds before carrying.
+    rows = retry_incomplete(rows, template_path=args.template, quote_loader=_yahoo_quote_loader, as_of=args.as_of)
+    # A fund Yahoo answered incompletely keeps its last good row (from the template, which the
+    # workflow refreshes from the last good run) while that row is within the 90-day freshness limit.
+    rows, carried = carry_forward_incomplete(rows, last_good_path=args.template, as_of=args.as_of)
     write_collected_metadata(rows, args.output)
 
     complete = sum(
@@ -71,6 +78,7 @@ def main() -> int:
         "as_of": args.as_of.isoformat(),
         "vehicle_count": len(rows),
         "complete_collection_count": complete,
+        "carried_from_last_good": carried,
         "output": str(args.output.resolve()),
     }
     print(json.dumps(payload, indent=2, sort_keys=True))
