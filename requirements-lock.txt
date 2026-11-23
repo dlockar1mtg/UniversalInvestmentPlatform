@@ -7,12 +7,12 @@ annotated-types==0.8.0
 anyio==4.16.0
 attrs==26.1.0
 beautifulsoup4==4.15.0
-certifi==2026.11.20
+certifi==2026.10.23
 cffi==2.1.1
 charset-normalizer==3.5.2
 click==8.5.1
 curl-cffi==0.17.0
-duckdb==1.5.6
+duckdb==2.0.1
 et-xmlfile==2.0.0
 fastapi==0.165.0
 frozendict==2.5.1
@@ -28,9 +28,9 @@ numpy==2.5.5
 openpyxl==3.1.5
 opentelemetry-api==1.45.2
 packaging==26.3
-pandas==2.3.3
+pandas==3.1.1
 peewee==4.5.3
-pip==26.2.2
+pip==26.3
 platformdirs==4.14.8
 pluggy==1.7.0
 protobuf==7.36.2
@@ -56,4 +56,4 @@ tzdata==2026.6
 urllib3==2.8.0
 uvicorn==0.54.0
 websockets==17.4
-yfinance==0.2.66
+yfinance==1.8.0
