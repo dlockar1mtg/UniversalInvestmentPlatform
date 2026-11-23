@@ -186,7 +186,7 @@ function freshness(pkg){
   return items?`<section class="rpg-stone rpg-road"><div class="rpg-section-head"><h2 class="rpg-stone-title">Latest data</h2><span class="rpg-crumb-note">${esc(`Package ${pkg.package_id||""} \u00b7 generated ${String(pkg.generated_at_utc||"").slice(0,16).replace("T"," ")} UTC`)}</span></div><ul class="rpg-watch-fresh">${items}</ul></section>`:"";
 }
 function load(){
-  if(S.loading)return;S.loading=true;
+  if(S.loading)return;S.loading=true;S.keyAtLoad=key();
   call("/v1/presentation/macro").then(d=>{S.doc=d;S.loading=false;render()}).catch(e=>{S.doc={available:false,error:e.message};S.loading=false;render()});
 }
 function render(){
@@ -194,13 +194,17 @@ function render(){
   let view=byId("rpg-watchtower");
   if(!view){view=document.createElement("div");view.id="rpg-watchtower";view.className="rpg-realm-view";page.appendChild(view);R().bindNavigation?.(view);
     view.addEventListener("click",event=>{const t=event.target.closest("[data-watch-open]");if(!t)return;S.open=S.open===t.dataset.watchOpen?null:t.dataset.watchOpen;render()})}
+  // A failed read is not kept once the key changes (e.g. the page opened on #watchtower before the key was entered).
+  if(S.doc&&S.doc.error&&key()!==S.keyAtLoad)S.doc=null;
+  if(!S.doc&&!key()){view.innerHTML=`${crumbs("Recession stress")}<p class="rpg-parch-note">Enter your dashboard key to read the Watchtower.</p>`;return}
   if(!S.doc){view.innerHTML=`${crumbs("Recession stress")}<p class="rpg-parch-note">Climbing the tower\u2026</p>`;load();return}
   if(!S.doc.available){view.innerHTML=`${crumbs("Recession stress")}<section class="rpg-stone"><p class="rpg-parch-note">${esc(S.doc.error?`The Watchtower could not be read: ${S.doc.error}`:"The Watchtower has no reading in this publication yet. It fills after the Macro Intelligence Platform's daily package publishes.")}</p></section>`;return}
   const cur=S.doc.current||{},pkg=S.doc.package||{};
   view.innerHTML=`${crumbs(`RSI v${cur.model_version||"2.0.0"} \u00b7 as of ${monthLabel(cur.as_of_month)} \u00b7 provisional`)}${quality(pkg.data_quality)}${hero(cur,pkg)}${systems(cur)}${chart(pkg)}${trials(pkg)}${seer(pkg.recession_probability||{})}${bubble(pkg.ai_bubble)}${others(cur,pkg)}${legacy(pkg)}${freshness(pkg)}`;
 }
 function watch(){
-  document.addEventListener("click",event=>{if(event.target.closest('.nav-item[data-page="watchtower"]'))setTimeout(()=>{try{render()}catch(error){console.error("[watchtower]",error)}},0)});
+  // Opening the page again retries a read that failed.
+  document.addEventListener("click",event=>{if(event.target.closest('.nav-item[data-page="watchtower"],[data-rpg-page="watchtower"]')){if(S.doc&&S.doc.error)S.doc=null;setTimeout(()=>{try{render()}catch(error){console.error("[watchtower]",error)}},0)}});
   if(location.hash==="#watchtower")setTimeout(render,0);
 }
 window.UIPWatchtower={render,state:S};
