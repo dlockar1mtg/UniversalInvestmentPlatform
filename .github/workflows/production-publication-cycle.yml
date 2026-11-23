@@ -19,6 +19,10 @@ concurrency:
   group: uip-production-publication-cycle
   cancel-in-progress: false
 
+env:
+  # Install the exact versions in requirements-lock.txt (see that file); Dependabot proposes updates monthly.
+  PIP_CONSTRAINT: requirements-lock.txt
+
 jobs:
   gate:
     # GitHub often starts scheduled runs hours late or skips them, so the publication also has
