@@ -300,12 +300,14 @@ function inventoryItems(d){
     const unit=kind==="relic"?(p.asset_symbol||""):"shares";
     items.push({key:p.asset_id,symbol:p.asset_symbol||assetLabel(d,p.asset_id),name:p.asset_name||p.asset_symbol,kind,held:`${qty(p.quantity)} ${unit}`.trim(),paid:num(p.cost_basis),worth:num(p.market_value),avg:num(p.average_cost),account:p.account_id||"\u2014",note:CALL_TEXT[p.recommendation]||(p.recommendation?String(p.recommendation).replace(/_/g," ").toLowerCase():""),ledger:["ok","In the UIP ledger and priced by the certified authority"],domain:p.domain_id,asset:p.asset_id});
   }
-  for(const h of d.manualHoldings?.items||[])items.push({key:`manual:${h.symbol}`,symbol:h.symbol,name:h.asset_name||h.symbol,kind:"charter",held:`${qty(h.shares)} shares`,paid:num(h.cost_basis),worth:num(h.current_value),avg:num(h.average_cost),account:h.notes||h.account_id||"\u2014",note:guildNote(h),ledger:h.valuation_source==="ETF_PACKAGE_CLOSE"?["ok",`Shares you entered, valued at the Merchants' Guild close of ${dayLabel(h.valuation_as_of)} (free public data, provisional)`]:["manual","Manual snapshot you entered; no usable close for this fund"],guild:true});
+  for(const h of d.manualHoldings?.items||[])if(h.asset_type!=="MTG_SEALED")items.push({key:`manual:${h.symbol}`,symbol:h.symbol,name:h.asset_name||h.symbol,kind:"charter",held:`${qty(h.shares)} shares`,paid:num(h.cost_basis),worth:num(h.current_value),avg:num(h.average_cost),account:h.notes||h.account_id||"\u2014",note:guildNote(h),ledger:h.valuation_source==="ETF_PACKAGE_CLOSE"?["ok",`Shares you entered, valued at the Merchants' Guild close of ${dayLabel(h.valuation_as_of)} (free public data, provisional)`]:["manual","Manual snapshot you entered; no usable close for this fund"],guild:true});
   const ac=d.externalAccount?.items?.[0];
   if(ac)items.push({key:"acorns",symbol:"ACORNS",name:"Acorns account",kind:"coffer",held:"1 account",paid:num(ac.contributed_basis),worth:num(ac.current_value),avg:null,account:ac.provider||"Acorns",note:`Snapshot of ${dayLabel(ac.as_of)}. ${ac.notes||""}`.trim(),ledger:["manual","Manual snapshot you entered from the Acorns app"]});
   // Retirement accounts are not Treasury items (owner, 2026-10-10): they count in the Homestead net worth.
-  const mtg=(d.portfolio?.positions||[]).filter(p=>p.domain_id==="mtg");
-  const groups=[["BOXES","Collector booster boxes",p=>/COLLECTOR/.test(String(p.asset_subclass||p.asset_id))],["LAIRS","Secret Lair drops",p=>/SECRET_LAIR/.test(String(p.asset_subclass||p.asset_id))],["OTHER","Other sealed products",()=>true]];
+  // Sealed MTG kept as manual holdings (Play Booster boxes etc.) joins the certified sealed chests, not the stock tiles.
+  const sealedManual=(d.manualHoldings?.items||[]).filter(h=>h.asset_type==="MTG_SEALED").map(h=>({asset_id:`sealed:${h.symbol}`,asset_name:h.tcgplayer_name||h.asset_name||`TCGplayer ${h.symbol}`,quantity:h.shares,cost_basis:h.cost_basis,market_value:h.current_value,recommendation:null,manualSealed:true,asOf:h.valuation_as_of}));
+  const mtg=(d.portfolio?.positions||[]).filter(p=>p.domain_id==="mtg").concat(sealedManual);
+  const groups=[["BOXES","Booster boxes",p=>p.manualSealed?/display|box/i.test(String(p.asset_name)):/COLLECTOR/.test(String(p.asset_subclass||p.asset_id))],["LAIRS","Secret Lair drops",p=>/SECRET_LAIR/.test(String(p.asset_subclass||p.asset_id))],["OTHER","Other sealed products",()=>true]];
   const used=new Set();
   for(const [symbol,name,test] of groups){
     const members=mtg.filter(p=>!used.has(p.asset_id)&&test(p));
@@ -314,7 +316,7 @@ function inventoryItems(d){
     const count=members.reduce((a,p)=>a+(num(p.quantity)||0),0);
     const paid=members.reduce((a,p)=>a+(num(p.cost_basis)||0),0),worth=members.reduce((a,p)=>a+(num(p.market_value)||0),0);
     const buys=members.filter(p=>p.recommendation==="BUY_CANDIDATE_NOW").length;
-    items.push({key:`mtg:${symbol}`,symbol,name,kind:"tome",count:String(count),held:`${count} ${symbol==="BOXES"?"boxes":"drops"}`,paid,worth,avg:count?paid/count:null,account:"Collection",note:`${members.length} product${members.length===1?"":"s"}${buys?`, ${buys} buy candidate${buys===1?"":"s"} today`:""}.`,ledger:["ok","In the UIP ledger and priced by the certified MTG authority"],members:members.map(p=>({name:p.asset_name,qty:num(p.quantity),worth:num(p.market_value),paid:num(p.cost_basis),call:p.recommendation})),domain:"mtg"});
+    items.push({key:`mtg:${symbol}`,symbol,name,kind:"tome",count:String(count),held:`${count} ${symbol==="BOXES"?"boxes":"drops"}`,paid,worth,avg:count?paid/count:null,account:"Collection",note:`${members.length} product${members.length===1?"":"s"}${buys?`, ${buys} buy candidate${buys===1?"":"s"} today`:""}.`,ledger:["ok",members.some(p=>p.manualSealed)?(members.every(p=>p.manualSealed)?"Sealed product you entered, priced daily at the TCGplayer market price (not rated by the models)":"Certified products priced by the MTG authority; sealed product you entered is priced daily at the TCGplayer market price (not rated by the models)"):"In the UIP ledger and priced by the certified MTG authority"],members:members.map(p=>({name:p.asset_name,qty:num(p.quantity),worth:num(p.market_value),paid:num(p.cost_basis),call:p.recommendation})),domain:"mtg"});
   }
   const singles=d.mtgSingles;
   if(singles&&singles.card_count){
