@@ -149,19 +149,28 @@ def _float_or_none(value: object) -> float | None:
         return None
 
 
+# Fund metadata (expense ratio, assets, average volume, typical spread) moves slowly; a reading this
+# old is still a fair guide for choosing between funds. Matches the AGING line in metals_vehicle_metadata.
+MAX_CARRY_DAYS = 180
+FAST_FIELDS = ("assets_under_management_usd", "average_daily_volume_shares")
+CARRY_FIELDS = ("expense_ratio_pct", "assets_under_management_usd", "average_daily_volume_shares",
+                "median_bid_ask_spread_pct")
+
+
 def carry_forward_incomplete(
     rows: list[CollectedVehicleMetadata],
     *,
     last_good_path: Path,
     as_of: date,
-    max_age_days: int = 90,
+    max_age_days: int = MAX_CARRY_DAYS,
 ) -> tuple[list[CollectedVehicleMetadata], list[str]]:
-    """Keep a fund's last good row when today's market-data reply for it is incomplete.
+    """Fill what today's market-data reply left out, field by field, from the fund's last good row.
 
-    Yahoo often answers for 11 of 12 funds. Rather than failing every fund, the incomplete one keeps
-    its previous complete row with its own (older) as-of date, so the freshness rules still judge it.
-    A previous row older than ``max_age_days`` (the STALE line) is not carried. Returns the rows and
-    the carried tickers.
+    Yahoo often answers part of a fund's data (or nothing, for some funds, for days). A missing field is
+    taken from the last complete row if that row is within ``max_age_days``. Honest dating: if assets or
+    average volume had to be carried, the row keeps the older row's as-of date, so the freshness rules
+    judge it; a carried spread or expense ratio (structural, slow-moving) keeps today's date.
+    Returns the rows and the tickers that needed anything carried.
     """
     previous: dict[str, CollectedVehicleMetadata] = {}
     if last_good_path.is_file():
@@ -191,11 +200,19 @@ def carry_forward_incomplete(
     merged: list[CollectedVehicleMetadata] = []
     carried: list[str] = []
     for row in rows:
-        if not _is_complete(row) and row.ticker in previous:
-            merged.append(previous[row.ticker])
-            carried.append(row.ticker)
-        else:
+        old = previous.get(row.ticker)
+        if _is_complete(row) or old is None:
             merged.append(row)
+            continue
+        missing = [name for name in CARRY_FIELDS if getattr(row, name) is None]
+        values = {name: getattr(old, name) if name in missing else getattr(row, name) for name in CARRY_FIELDS}
+        dated = old.metadata_as_of_date if any(name in FAST_FIELDS for name in missing) else row.metadata_as_of_date
+        note = f"carried from {old.metadata_as_of_date}: {', '.join(missing)}"
+        merged.append(CollectedVehicleMetadata(
+            ticker=row.ticker, **values, metadata_as_of_date=dated,
+            source_name=f"{row.source_name}; {note}" if row.source_name else note,
+            source_url=row.source_url or old.source_url))
+        carried.append(row.ticker)
     return merged, carried
 
 

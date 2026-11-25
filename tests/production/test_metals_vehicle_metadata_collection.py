@@ -131,9 +131,47 @@ def test_last_good_row_past_the_stale_line_is_not_carried(tmp_path: Path) -> Non
         template_path=_template(tmp_path / "template.csv"), quote_loader=lambda ticker: {}, as_of=date(2026, 11, 19)
     )
     merged, carried = carry_forward_incomplete(
-        fresh, last_good_path=_last_good(tmp_path / "good.csv", [("GLD", "2026-07-25")]), as_of=date(2026, 11, 19)
+        fresh, last_good_path=_last_good(tmp_path / "good.csv", [("GLD", "2026-05-01")]), as_of=date(2026, 11, 19)
     )
     assert carried == [] and merged[0].assets_under_management_usd is None
+
+
+def test_a_four_month_old_row_is_still_carried_and_keeps_its_date(tmp_path: Path) -> None:
+    """Nov 24-25, 2026: Yahoo answered fully for 2 of 12 funds; the last good rows were from Jul 25 (123
+    days). Fund metadata moves slowly, so up to 180 days is AGING, not a reason to stop the Metals run."""
+    from foundation.production.metals_vehicle_metadata_collection import carry_forward_incomplete
+    from foundation.production.metals_vehicle_metadata import freshness_status
+
+    fresh = collect_vehicle_metadata(
+        template_path=_template(tmp_path / "template.csv"), quote_loader=lambda ticker: {}, as_of=date(2026, 11, 25)
+    )
+    merged, carried = carry_forward_incomplete(
+        fresh, last_good_path=_last_good(tmp_path / "good.csv", [("GLD", "2026-07-25")]), as_of=date(2026, 11, 25)
+    )
+    assert carried == ["GLD"] and merged[0].metadata_as_of_date == "2026-07-25"
+    assert freshness_status("2026-07-25", as_of=date(2026, 11, 25)) == ("AGING", 123)
+    assert freshness_status("2026-05-01", as_of=date(2026, 11, 25))[0] == "STALE"
+
+
+def test_only_the_missing_fields_are_carried(tmp_path: Path) -> None:
+    from foundation.production.metals_vehicle_metadata_collection import carry_forward_incomplete
+
+    good = _last_good(tmp_path / "good.csv", [("GLD", "2026-11-01")])
+    # spread missing (no bid/ask before the open): fresh assets and volume, carried spread, today's date
+    fresh = collect_vehicle_metadata(template_path=_template(tmp_path / "template.csv"),
+                                     quote_loader=lambda t: {"totalAssets": 9_000_000, "averageVolume": 7},
+                                     as_of=date(2026, 11, 25))
+    if fresh[0].median_bid_ask_spread_pct is None:
+        merged, carried = carry_forward_incomplete(fresh, last_good_path=good, as_of=date(2026, 11, 25))
+        assert merged[0].assets_under_management_usd == 9_000_000 and merged[0].median_bid_ask_spread_pct == 0.02
+        assert merged[0].metadata_as_of_date == "2026-11-25" and "carried from 2026-11-01" in merged[0].source_name
+    # volume missing: carried, and the row takes the older date
+    fresh = collect_vehicle_metadata(template_path=_template(tmp_path / "template.csv"),
+                                     quote_loader=lambda t: {"totalAssets": 9_000_000, "bid": 99.9, "ask": 100.1},
+                                     as_of=date(2026, 11, 25))
+    merged, carried = carry_forward_incomplete(fresh, last_good_path=good, as_of=date(2026, 11, 25))
+    assert merged[0].assets_under_management_usd == 9_000_000 and merged[0].average_daily_volume_shares == 100_000
+    assert merged[0].metadata_as_of_date == "2026-11-01" and carried == ["GLD"]
 
 
 def test_complete_fresh_rows_are_never_replaced(tmp_path: Path) -> None:
