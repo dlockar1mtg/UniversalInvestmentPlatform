@@ -156,8 +156,10 @@ def freshness_status(
     *,
     as_of: date,
     current_days: int = 45,
-    aging_days: int = 90,
+    aging_days: int = 180,
 ) -> tuple[str, int | None]:
+    # Fund metadata (expense ratio, assets, volume, spread) moves slowly. Up to 45 days is CURRENT; up to
+    # 180 days AGING (still usable, shown as aging); older is STALE and the fund is not eligible.
     if not metadata_as_of_date:
         return "MISSING", None
     observed = date.fromisoformat(metadata_as_of_date)

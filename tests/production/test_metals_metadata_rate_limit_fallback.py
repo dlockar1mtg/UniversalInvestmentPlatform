@@ -43,12 +43,14 @@ def test_existing_metadata_is_valid_while_aging() -> None:
 
 
 def test_existing_metadata_fails_closed_once_stale() -> None:
+    # The committed snapshot's rows are from 2026-07-25; past 180 days (the AGING line since Nov 2026)
+    # they are STALE and the fallback fails closed.
     result = subprocess.run(
         [
             sys.executable,
             str(ROOT / "scripts" / "validate_metals_vehicle_metadata_fallback.py"),
             "--as-of",
-            "2026-10-24",
+            "2027-01-22",
             "--fallback-reason",
             "YAHOO_RATE_LIMIT",
         ],
